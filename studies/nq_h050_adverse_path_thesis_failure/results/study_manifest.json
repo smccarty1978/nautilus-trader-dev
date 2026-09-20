@@ -1,0 +1,32 @@
+{
+  "study_id": "nq_h050_adverse_path_thesis_failure",
+  "title": "NQ H050 Adverse-Path Thesis Failure & Risk Architecture Study",
+  "status": "COMPLETE",
+  "frozen_runtime_source": "studies/nq_h050_m4_runtime_recovery",
+  "dataset_scope": "2025 Q1 OOS (2,422 streaming NT trades, 3,070,314 1s bars)",
+  "primary_cohort": "Top 10% M4 confidence (>= 0.003001, N=411)",
+  "landmarks_evaluated": [
+    -0.5,
+    -0.75,
+    -1.0,
+    -1.25,
+    -1.5
+  ],
+  "verdicts": {
+    "A_CAUSAL_LANDMARK_INTEGRITY": "LANDMARK_CAUSALITY_PASS",
+    "B_STATE_INFORMATION_VALUE": "CAUSAL_STATE_ADDS_INFORMATION",
+    "C_OOS_REPLICATION": "STATE_SIGNAL_OOS_REPLICATES",
+    "D_NEXT_STEP_ELIGIBILITY": "DYNAMIC_RISK_POLICY_STUDY_WARRANTED"
+  },
+  "artifacts": {
+    "research_contract.json": "f39a791b95c6fc15ece625595da964b9301d5241a68a9611f0312a0d5f4d4957",
+    "landmark_event_ledger.parquet": "eb63aee877baf719599616b23be4c160a63c3971223ef07261fcf319e5fd3aec",
+    "leakage_audit.json": "077ae28864b4e6b1c142bed7c2e184fe237461bec68be681194d3cf62e53c32c",
+    "descriptive_landmark_tables.json": "fd283bc9a5324f11cb41384c9ab54a32e03364a6eb4a44fcb82e212dd6f1610f",
+    "conditioning_analysis_at_landmarks.json": "3475e4d45f12a762033fc53b13d93b17baf3124f9da12e11cc3f5db573f04eac",
+    "baseline_comparison.json": "3d6b4cf6a50f4b21f31a41cacf55d2b93fabf06116db59333be4fe2c7bec19a3",
+    "causal_feature_manifest.json": "5fbcd8f55a312a3196502c238210d8e37d1b2a8df24d52dddcaea2cd05e36954",
+    "ADVERSE_PATH_THESIS_FAILURE_REPORT.md": "149d3cdb27d449fd94882ecc0f879e6a4923ab899432255caf8be3403f1ce986",
+    "c1_streaming_nt_engine_oos_trades.parquet": "77acd5702b7d561ac93acaf2a1cfccbd1d35c4a7030c883dad36c2023ec4811f"
+  }
+}

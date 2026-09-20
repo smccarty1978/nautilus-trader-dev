@@ -57,6 +57,7 @@ some are cited from git history and audit trails. **They are never a source of i
 | `docs/templates/RESEARCH_STUDY_REQUEST_TEMPLATE.md` | Fill-in research request form + agent intake result block, used at STEP 0-2 of `docs/RESEARCH_STUDY_BLUEPRINT.md` §6 |
 | `docs/BACKTEST_DATA_LOGGING.md` | Logging conventions that make outputs visualizable |
 | `docs/VISUALIZER_EXTENSIONS.md` | How to add an overlay to the TradingView visualizer |
+| `docs/design/GROUND_UP_RESEARCH_PLATFORM.md` | PROPOSAL revision 8 (2026-09-16; Phase 0 complete in ../ntr, Phase 1 synthetic approved): ground-up single-engine research/training/backtest architecture for a new repo; revised after red-team reviews 1-8; §8.1 incremental research workflow; transitive dependency gids (change log at top maps every finding to its section) |
 
 ## DESIGN CONTRACT (cited by live code — keep)
 

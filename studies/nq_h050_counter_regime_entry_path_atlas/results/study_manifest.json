@@ -1,0 +1,82 @@
+{
+  "study": "nq_h050_counter_regime_entry_path_atlas",
+  "status": "COMPLETE",
+  "verdict": "OUTCOME_B_REGIME_EXHAUSTION_INFORMATION_EXISTS_BUT_COUNTER_ENTRY_PATH_IS_NOISY",
+  "census": {
+    "total": 23915,
+    "train": 21493,
+    "oos": 2422
+  },
+  "files": {
+    "H050_COUNTER_REGIME_ENTRY_PATH_REPORT.md": {
+      "path": "results\\H050_COUNTER_REGIME_ENTRY_PATH_REPORT.md",
+      "size_bytes": 23224,
+      "sha256": "2c57752d25f3345ac02410db9c8d198a735e7d37fe7f63458b6dd51148703268"
+    },
+    "checkpoint_vs_next_bar_comparison.json": {
+      "path": "results\\checkpoint_vs_next_bar_comparison.json",
+      "size_bytes": 1626,
+      "sha256": "c3601a405d36018de56d4d67e157d214d92adfdbd04046d2551a68bfec358c04"
+    },
+    "competing_barrier_atlas.json": {
+      "path": "results\\competing_barrier_atlas.json",
+      "size_bytes": 9394,
+      "sha256": "f28e81545fbbabde66480edde087017becc54abc02749837e67fc4cf533fc7eb"
+    },
+    "counter_entry_path_ledger.parquet": {
+      "path": "results\\counter_entry_path_ledger.parquet",
+      "size_bytes": 7892169,
+      "sha256": "58ba0d607c92572deb562624c36fea914ed2d3214b19e71bd813084d0b6143fc"
+    },
+    "counter_path_distribution.json": {
+      "path": "results\\counter_path_distribution.json",
+      "size_bytes": 6473,
+      "sha256": "41149e5ba7a9938bb1c9eb88fc72162efb6340d37942b5cc8f5ce2a1c213bf40"
+    },
+    "directional_analysis.json": {
+      "path": "results\\directional_analysis.json",
+      "size_bytes": 4242,
+      "sha256": "eb723b56366a87961d6e94801cbaa43d3674f989cae7dad4f9f00f4718839b8a"
+    },
+    "incumbent_severity_vs_counter_path.json": {
+      "path": "results\\incumbent_severity_vs_counter_path.json",
+      "size_bytes": 5862,
+      "sha256": "20f668a12564ca9f24a2f5a6fa8b3f69f972951175563e0b1fa7e419500dba45"
+    },
+    "leakage_audit.json": {
+      "path": "results\\leakage_audit.json",
+      "size_bytes": 644,
+      "sha256": "68184f7cdd5a2eaab3162c4acdbbc3a753fc2c66b0d85f9fce7f3f657e42f976"
+    },
+    "mae_conditional_recovery.json": {
+      "path": "results\\mae_conditional_recovery.json",
+      "size_bytes": 14659,
+      "sha256": "1b8c122cccee9f7353bc14d3d80f82e3655b3df2d980776854dfe33c988ff6b8"
+    },
+    "model_confidence_path_frontier.json": {
+      "path": "results\\model_confidence_path_frontier.json",
+      "size_bytes": 35975,
+      "sha256": "3b92779532808b5bbec62929e3f3b00711b93599d6600de73eb5d9c2e3ccad84"
+    },
+    "parent_artifact_hashes.json": {
+      "path": "results\\parent_artifact_hashes.json",
+      "size_bytes": 444,
+      "sha256": "707fe0de5b3d269fd8ab0ab45a46fc3a44598140951dc1fac253feebbec3ec1d"
+    },
+    "population_reconciliation.json": {
+      "path": "results\\population_reconciliation.json",
+      "size_bytes": 278,
+      "sha256": "3b1718886e445dd63e73d2ad13406f1714064527235f19f51ce649d4affca452"
+    },
+    "runtime_contract.json": {
+      "path": "results\\runtime_contract.json",
+      "size_bytes": 524,
+      "sha256": "07f82fb9f456ca0d02263026ec4600b8f4b6849c299a5c50514315df5dbb36bb"
+    },
+    "yearly_oos_replication.json": {
+      "path": "results\\yearly_oos_replication.json",
+      "size_bytes": 2056,
+      "sha256": "1d369295a5da3968a0e337bcf10867f06c6f54d990c8bf99c32447d37fa488cf"
+    }
+  }
+}

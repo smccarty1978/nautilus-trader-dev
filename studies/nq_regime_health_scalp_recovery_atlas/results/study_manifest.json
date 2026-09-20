@@ -1,0 +1,25 @@
+{
+  "study_id": "nq_regime_health_scalp_recovery_atlas",
+  "status": "COMPLETE",
+  "parent_studies": [
+    "studies/nq_unconditioned_regime_path_atlas",
+    "studies/nq_universal_regime_health_model",
+    "studies/nq_universal_regime_health_trajectory",
+    "studies/nq_regime_health_policy_translation"
+  ],
+  "model_hashes": {
+    "HEAD_1_M1_U": "a6047c14815ced1786b8a00f1d18d3495a8e285bb91e3de0f3f9bf98600390c2",
+    "HEAD_2_M1_U": "693ab868289d30b7eacbc4bad144a97755596850b133a40b098c96516cf626ff"
+  },
+  "event_counts": {
+    "EVENT_A_persistent_q4": 5733,
+    "EVENT_B_recovery": 587
+  },
+  "decision_classification": {
+    "counter_regime_classification": "SCALP_D_MIXED_SCALP_AND_REVERSAL_STRUCTURE",
+    "recovery_classification": "RECOVERY_A_SURVIVAL_ONLY_NO_MEANINGFUL_REEXTENSION"
+  },
+  "decision_rationale": "EVENT_A generates consistent, reproducible counter-regime excursion (mean 0.81 ATR MFE vs 0.22 ATR MAE to flip, 74.8% positive net return) with robust continuation after the flip (+0.65 ATR MFE at 180s), exhibiting a mixed scalp and early-reversal structure. EVENT_B generates statistical survival (38.2% reach NEW_MAX) but weak forward expansion (mean remaining MFE only 0.44 ATR, 61.8% survive without meaningful re-extension), failing to justify an add-on policy.",
+  "artifacts_generated": 14,
+  "timestamp": "2026-09-16T12:14:46Z"
+}

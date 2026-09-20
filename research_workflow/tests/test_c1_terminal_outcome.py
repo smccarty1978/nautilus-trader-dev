@@ -1,0 +1,220 @@
+"""C1: the canonical lifecycle terminal survives the composite kernel.
+
+Regression for the defect the nq_va_multitf_trade_state_geometry fixture found: `_emit` derived
+`flip_ts` from the COMPOSITE row disposition, so a qualifying opposite flip the kernel had already
+recorded in `p.flip_ts` was discarded whenever any milestone arm was censored -- which, with
+one-sided arms, is virtually every row.
+
+These tests exercise the PRODUCTION path: the real compiler builds the outcome contract, the real
+``LabelOutcomeContract.from_plan`` reads it, and the real ``LabelOutcomeKernel`` emits the row.
+Nothing here reimplements kernel logic.
+"""
+from __future__ import annotations
+
+import pytest
+
+from research_workflow.host.interfaces import BarView
+from research_workflow.host.outcomes import LabelOutcomeContract, LabelOutcomeKernel
+
+NS = 1_000_000_000
+T0 = 1_700_000_000 * NS
+ATR = 20.0
+ENTRY = 15_000.0
+HORIZON_NS = 24 * 3600 * NS
+
+
+class _NoSessions:
+    def session_close(self, _ts):
+        raise AssertionError("session_close must not be consulted when censoring is off")
+
+
+def _plan(*, arms, cost=None, terminal=True):
+    spec = {
+        "contract": "label", "kernel": "composite", "direction": "regime_1m.dir",
+        "atr": "excursion_1m.frozen_atr", "entry_reference": "next_bar_open",
+        "session_end_censoring": False, "session_end_rule": "ignore",
+        "horizon_end_rule": "strict", "max_gap_ns": 300 * NS,
+        "same_bar_rule": "ambiguous_censor", "arms": arms,
+        "flip": {"horizon_ns": HORIZON_NS, "source": "regime_1m", "role": "opposite",
+                 "inclusive_start": True},
+        "primary_arm": arms[0]["id"] if arms else None,
+        "composition": {"logic": "OR"}, "direction_sign": 1,
+        "observed_seconds": True, "terminal_outcome": terminal,
+    }
+    if cost is not None:
+        spec["cost_points_per_side"] = cost
+    return LabelOutcomeContract.from_plan(spec)
+
+
+def _arm(aid, fav, adv, prefix):
+    return {"id": aid, "favorable_atr": fav, "adverse_atr": adv, "horizon_ns": HORIZON_NS,
+            "expiry": "censor", "prefix": prefix}
+
+
+def _bars(offsets):
+    """One 1s bar per offset (signed ATR). Bar 0 is flat: its OPEN is the executable entry."""
+    out = []
+    for i, off in enumerate(offsets):
+        px = ENTRY + off * ATR
+        hi, lo = (ENTRY, ENTRY) if i == 0 else (max(ENTRY, px), min(ENTRY, px))
+        ts_event = T0 + (i + 1) * NS
+        out.append(BarView("1s", ts_event, ts_event + NS, ENTRY if i == 0 else px, hi, lo, px, 1.0))
+    return out
+
+
+def _run(offsets, *, arms, flip_at=None, cost=None, terminal=True):
+    k = LabelOutcomeKernel(_plan(arms=arms, cost=cost, terminal=terminal), _NoSessions())
+    bars = _bars(offsets)
+    k.open({"observation_ts": T0, "regime_start_ns": T0, "checkpoint_index": 0}, T0, 1, ATR)
+    for i, b in enumerate(bars):
+        k.on_bar(b)
+        if flip_at is not None and i == flip_at:
+            k.on_flip(b.ts_init, -1, 1)
+    k.finalize(bars[-1].ts_init)
+    rows = k.drain_rows()
+    assert len(rows) == 1
+    return rows[0], bars
+
+
+# --------------------------------------------------------------------------------------------
+# THE REGRESSION: an arm stays censored/untouched while the canonical opposite flip DOES occur.
+# --------------------------------------------------------------------------------------------
+def test_terminal_flip_survives_a_censored_arm():
+    arms = [_arm("fav_5p00", 5.0, 99.0, "fp_fav_5p00"),      # never touched -> CENSORED
+            _arm("fav_0p25", 0.25, 99.0, "fp_fav_0p25")]     # touched
+    row, bars = _run([0.0, 0.30, 0.40, 0.20], arms=arms, flip_at=2)
+
+    # the composite row is censored, exactly as before -- that is not the terminal's business
+    assert row["censored"] == 1
+    assert row["fp_fav_5p00_disposition"] == "CENSORED"
+    assert row["fp_fav_0p25_disposition"] == "POSITIVE"
+
+    # ...and the canonical terminal is nonetheless fully present
+    assert row["terminal_flip_ts"] == bars[2].ts_init
+    assert row["terminal_flip_disposition"] == "LABELED_POSITIVE"
+    assert row["terminal_time_to_flip_seconds"] == (bars[2].ts_init - T0) / NS
+    assert row["terminal_exit_ts"] == bars[3].ts_event
+    assert row["terminal_exit_price"] == bars[3].open
+
+
+def test_pre_c1_behaviour_is_the_documented_defect():
+    """With terminal_outcome off (a pre-C1 sealed plan) the row replays exactly as before."""
+    arms = [_arm("fav_5p00", 5.0, 99.0, "fp_fav_5p00")]
+    row, _ = _run([0.0, 0.30, 0.40, 0.20], arms=arms, flip_at=2, terminal=False)
+    assert row["flip_ts"] is None            # the old, defective derivation
+    assert "terminal_flip_ts" not in row     # and no new columns leak into a sealed replay
+
+
+# --------------------------------------------------------------------------------------------
+# Executable terminal fill and realized gross economics.
+# --------------------------------------------------------------------------------------------
+def test_terminal_exit_is_next_bar_open_not_the_decision_close():
+    arms = [_arm("fav_0p25", 0.25, 99.0, "fp_fav_0p25")]
+    row, bars = _run([0.0, 0.30, 0.50, 0.10], arms=arms, flip_at=2)
+    flip_bar, exit_bar = bars[2], bars[3]
+    assert row["terminal_flip_ts"] == flip_bar.ts_init
+    assert row["terminal_exit_price"] == exit_bar.open
+    assert row["terminal_exit_price"] != flip_bar.close      # never the decision-bar close
+    assert row["terminal_exit_ts"] > row["terminal_flip_ts"] - NS
+
+
+def test_realized_gross_arithmetic_is_exact():
+    arms = [_arm("fav_0p25", 0.25, 99.0, "fp_fav_0p25")]
+    row, bars = _run([0.0, 0.30, 0.50, 0.40], arms=arms, flip_at=2)
+    entry_px, exit_px = bars[0].open, bars[3].open
+    expected_pts = 1 * (exit_px - entry_px)
+    assert row["terminal_entry_price"] == entry_px
+    assert row["terminal_gross_pnl_points"] == pytest.approx(expected_pts, abs=1e-12)
+    assert row["terminal_gross_pnl_atr"] == pytest.approx(expected_pts / ATR, abs=1e-12)
+    assert row["terminal_duration_seconds"] == pytest.approx(
+        (row["terminal_exit_ts"] - row["terminal_entry_ts"]) / NS, abs=1e-12)
+
+
+def test_short_direction_signs_gross_correctly():
+    arms = [_arm("fav_0p25", 0.25, 99.0, "fp_fav_0p25")]
+    k = LabelOutcomeKernel(_plan(arms=arms), _NoSessions())
+    bars = _bars([0.0, -0.30, -0.50, -0.40])          # price falls; a SHORT profits
+    k.open({"observation_ts": T0, "regime_start_ns": T0, "checkpoint_index": 0}, T0, -1, ATR)
+    for i, b in enumerate(bars):
+        k.on_bar(b)
+        if i == 2:
+            k.on_flip(b.ts_init, 1, -1)
+    k.finalize(bars[-1].ts_init)
+    row = k.drain_rows()[0]
+    assert row["terminal_gross_pnl_points"] == pytest.approx(-1 * (bars[3].open - bars[0].open))
+    assert row["terminal_gross_pnl_points"] > 0
+
+
+def test_net_is_unavailable_without_a_declared_cost():
+    arms = [_arm("fav_0p25", 0.25, 99.0, "fp_fav_0p25")]
+    row, _ = _run([0.0, 0.30, 0.50, 0.40], arms=arms, flip_at=2)
+    assert row["terminal_gross_pnl_points"] is not None
+    assert row["terminal_cost_points"] is None
+    assert row["terminal_net_pnl_points"] is None      # explicitly unavailable, never guessed
+    assert row["terminal_net_pnl_atr"] is None
+
+
+def test_net_is_computed_when_a_cost_is_declared():
+    arms = [_arm("fav_0p25", 0.25, 99.0, "fp_fav_0p25")]
+    row, _ = _run([0.0, 0.30, 0.50, 0.40], arms=arms, flip_at=2, cost=0.375)
+    assert row["terminal_cost_points"] == pytest.approx(0.75)
+    assert row["terminal_net_pnl_points"] == pytest.approx(row["terminal_gross_pnl_points"] - 0.75)
+    assert row["terminal_net_pnl_atr"] == pytest.approx(row["terminal_net_pnl_points"] / ATR)
+
+
+# --------------------------------------------------------------------------------------------
+# The lifecycle clock is not tied to the fixed-time observation horizon.
+# --------------------------------------------------------------------------------------------
+def test_terminal_flip_far_past_the_fixed_observation_window():
+    arms = [_arm("fav_0p25", 0.25, 99.0, "fp_fav_0p25")]
+    offsets = [0.0, 0.30] + [0.10] * 1400 + [0.20]        # flip at ~t=1402s, well past T300
+    row, bars = _run(offsets, arms=arms, flip_at=len(offsets) - 2)
+    assert row["terminal_time_to_flip_seconds"] > 1_000
+    assert row["terminal_flip_disposition"] == "LABELED_POSITIVE"
+    assert row["terminal_exit_price"] == bars[-1].open
+
+
+def test_no_flip_leaves_the_terminal_explicitly_unresolved():
+    arms = [_arm("fav_0p25", 0.25, 99.0, "fp_fav_0p25")]
+    row, _ = _run([0.0, 0.30, 0.50, 0.40], arms=arms, flip_at=None)
+    assert row["terminal_flip_ts"] is None
+    assert row["terminal_flip_disposition"] == "CENSORED"
+    assert row["terminal_gross_pnl_points"] is None
+    assert row["terminal_exit_unavailable_reason"] is None
+
+
+def test_flip_on_the_final_bar_records_why_the_exit_is_missing():
+    arms = [_arm("fav_0p25", 0.25, 99.0, "fp_fav_0p25")]
+    row, bars = _run([0.0, 0.30, 0.50], arms=arms, flip_at=2)   # no bar after the flip
+    assert row["terminal_flip_ts"] == bars[2].ts_init
+    assert row["terminal_flip_disposition"] == "LABELED_POSITIVE"       # the flip is still canonical
+    assert row["terminal_exit_ts"] is None
+    assert row["terminal_exit_unavailable_reason"] == "DATA_END"
+    assert row["terminal_gross_pnl_points"] is None
+
+
+# --------------------------------------------------------------------------------------------
+# Three independent clocks: arms must not be cut short by the terminal.
+# --------------------------------------------------------------------------------------------
+def test_milestone_arms_keep_running_after_the_flip():
+    """The flip must not terminate barrier observation -- the arms own their own clock."""
+    arms = [_arm("fav_2p00", 2.0, 99.0, "fp_fav_2p00"),
+            _arm("fav_0p25", 0.25, 99.0, "fp_fav_0p25")]
+    row, bars = _run([0.0, 0.30, 0.50, 1.00, 2.10], arms=arms, flip_at=2)
+    assert row["terminal_flip_ts"] == bars[2].ts_init
+    # +2.00A is first reached on bar 4, AFTER the flip on bar 2, and is still recorded
+    assert row["fp_fav_2p00_disposition"] == "POSITIVE"
+    assert row["fp_fav_2p00_resolution_seconds"] == pytest.approx(
+        (bars[4].ts_init - bars[0].ts_event) / NS)
+
+
+# --------------------------------------------------------------------------------------------
+# The compiler declares the columns, and only for new compiles that carry a flip.
+# --------------------------------------------------------------------------------------------
+def test_compiler_declares_terminal_columns_for_a_flip_outcome():
+    from research_workflow.grammar import compiler as C
+    src = (C.__file__ and open(C.__file__, encoding="utf-8").read()) or ""
+    assert 'contract["terminal_outcome"] = True' in src
+    for col in ("terminal_flip_ts", "terminal_exit_price", "terminal_gross_pnl_atr",
+                "terminal_net_pnl_points"):
+        assert col in src, col

@@ -1,0 +1,20 @@
+{
+  "prior_observational_study": {
+    "reported_net_loss_avoided_atr": 0.6072,
+    "definition": "immediate_exit_mean_pnl_atr - held_to_c1_mean_pnl_atr on top 10% risk bucket",
+    "immediate_exit_mean_pnl_atr": -0.8134,
+    "held_to_c1_mean_pnl_atr": -1.4206,
+    "population": "Pooled across all 6 horizons in 2024 Validation"
+  },
+  "policy_study_as_reported": {
+    "reported_loss_avoided_atr": 5.9478,
+    "definition": "immediate_exit_mean_pnl_atr - held_to_c1_mean_pnl_atr on flagged trades in 2024",
+    "immediate_exit_mean_pnl_atr": -0.2659,
+    "held_to_c1_mean_pnl_atr": -6.2137,
+    "population": "P0-P5 candidate trades in 2024 Validation"
+  },
+  "reconciliation_verdict": {
+    "root_cause_of_loss_avoided_jump": "CRITICAL_MODEL_LEAKAGE",
+    "explanation": "In both studies, the formula was identical: (Immediate Mark PnL) - (Held to C1 PnL). However, under the leaked policy model, the model selected trades whose regime peak ran away to -10A to -82A (because ext_mag used future cur_peak). Thus, the held-to-C1 mean was an artificial -6.21 ATR. When recomputed using strictly causal features on the exact same P0 rows, held-to-C1 mean on flagged trades is -1.1666 ATR and immediate exit is -0.7528 ATR, yielding a genuine loss avoided of +0.4137 ATR, completely in line with the observational study's +0.6072 ATR."
+  }
+}

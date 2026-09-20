@@ -1,0 +1,16 @@
+{
+  "population_name": "POPULATION_C_STATE_TRANSITIONS",
+  "filter_logic": "is_first_crossing_pb05 | is_first_crossing_pb10 | is_first_crossing_pb15 | is_first_crossing_pb20 | is_first_rollover_bar",
+  "n_samples": 144174,
+  "n_episodes": 33773,
+  "observations_per_episode": 4.269,
+  "train_samples": 128572,
+  "oos_samples": 15602,
+  "sub_triggers": {
+    "first_crossing_pb05": 33773,
+    "first_crossing_pb10": 19885,
+    "first_crossing_pb15": 9948,
+    "first_crossing_pb20": 3914,
+    "first_recovery_rollover": 97292
+  }
+}

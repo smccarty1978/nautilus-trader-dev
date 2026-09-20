@@ -1,0 +1,535 @@
+<USER_REQUEST>
+You are running a bounded end-to-end H050 runtime parity validation on the already-tested 2025 Q1 OOS quarter.
+
+Do not begin stop-loss research, threshold tuning, or additional strategy optimization.
+
+The purpose is to answer one unresolved question from the previous NautilusTrader BacktestEngine validation:
+
+Did the NT strategy genuinely regenerate H050_0 and H050_1 from causal streaming feature state and frozen model scoring, or did it merely consume precomputed/frozen H050 timestamps from the observational ledger as an execution schedule?
+
+If the previous run used frozen timestamps, then the execution-engine test is valid as an execution validation, but the live signal-generation layer remains unproven.
+
+This study must close that gap.
+
+⸻
+
+1. First: audit the previous BacktestEngine implementation
+
+Inspect:
+
+* scratch/run_nt_event_driven_oos_validation.py
+* any strategy class it used
+* any loaded ledgers / schedules / checkpoint tables
+* any model-loading code
+* any feature runtime code
+* any H050 scoring code
+* any R1/R2 regime generation code
+
+Answer explicitly:
+
+A. H050_0 generation
+
+Was H050_0:
+
+1. generated live from streamed causal features + frozen model score/threshold, or
+2. loaded from an existing frozen timestamp/identity ledger?
+
+B. H050_1 generation
+
+Was H050_1:
+
+1. generated live from streamed causal features + frozen model score/threshold after R1 confirmation, or
+2. loaded from an existing frozen timestamp/identity ledger?
+
+C. R1/R2 generation
+
+Were R1 and R2:
+
+1. produced live from the regime engine during replay, or
+2. looked up from the observational ledger?
+
+D. Population
+
+Was the 2,422-trade OOS population:
+
+1. discovered by runtime logic, or
+2. injected as a frozen trade schedule?
+
+Produce an explicit verdict:
+
+* FULL_END_TO_END_RUNTIME_ALREADY_PROVEN
+* EXECUTION_ENGINE_ONLY_FROZEN_SIGNAL_SCHEDULE
+* MIXED_RUNTIME_AND_FROZEN_SCHEDULE
+
+Do not infer. Inspect the actual code path.
+
+⸻
+
+2. If frozen timestamps drove any H050 event, run the missing full parity test
+
+Use the same historical period:
+
+2025 Q1 OOS
+
+* 2025-01-01 through 2025-03-31
+* expected OOS population: 2,422
+* expected M4 Top 10% population: 411
+
+Use historical NQ data replayed through the genuine NautilusTrader event loop.
+
+No live market feed is required.
+
+The required architecture is:
+
+historical 1s bars
+→ NT BacktestEngine event delivery
+→ causal runtime feature state
+→ frozen H050 model scoring
+→ threshold/qualification logic
+→ H050_0 generation
+→ order submission
+→ NT fill event
+→ live R1 regime confirmation
+→ continue causal feature updates
+→ live opposing H050_1 generation
+→ C1 exit if present
+→ R2 fallback if no H050_1
+→ NT fill/accounting
+
+The frozen observational ledger must be used only after runtime generation as the reconciliation oracle.
+
+It must not tell the strategy:
+
+* when to enter
+* when H050_1 occurs
+* when R1 occurs
+* when R2 occurs
+* what direction to trade
+
+⸻
+
+3. Frozen scientific definitions
+
+Do not retrain or modify anything.
+
+Use the exact frozen:
+
+* H050 model artifact
+* feature order
+* preprocessing
+* score semantics
+* threshold
+* qualification rules
+* M4 confidence definition
+* regime engine
+* R1/R2 confirmation rules
+* timestamp semantics
+* direction semantics
+
+If any artifact needed to recreate H050 live is missing or cannot be bound exactly, stop with:
+
+RUNTIME_MODEL_BINDING_GAP
+
+and identify precisely what is missing.
+
+Do not substitute a model or reconstruct an approximation.
+
+⸻
+
+4. No optimization and no stops
+
+Do not add:
+
+* stop loss
+* break-even
+* trailing stop
+* profit target
+* time stop
+* H050 delay
+* score filter
+* 600-second rule
+* directional exclusion
+* threshold modification
+
+This is a parity test only.
+
+⸻
+
+5. Required H050_0 runtime pipeline
+
+For every 1-second replay event:
+
+1. update only state causally available at that timestamp
+2. update completed higher-timeframe structures only when their bars are complete
+3. calculate the exact frozen feature vector
+4. preserve exact feature order
+5. score with the frozen model
+6. apply the exact frozen H050 qualification logic
+7. emit H050_0 only when runtime conditions are satisfied
+
+Do not pre-seed expected checkpoint identities from the ledger unless that identity set is genuinely part of the frozen scientific definition of H050.
+
+If an identity allowlist is scientifically required by the original frozen study, document why and distinguish:
+
+* population identity constraint
+    from
+* precomputed signal timing schedule
+
+The runtime must still recompute the feature vector and score at the candidate epoch.
+
+The workflow’s authoritative runtime path is based on causal provider state and event-time feature generation, not retrospective price matching.
+
+⸻
+
+6. Required H050_1 runtime pipeline
+
+After an H050_0 entry:
+
+1. continue normal bar-by-bar state updates
+2. detect R1 live from the regime engine
+3. only after R1 confirmation may an opposing H050_1 become eligible
+4. continue live causal feature calculation and frozen model scoring
+5. select the first qualifying opposing H050_1
+6. immediately freeze that event as the C1 exit signal
+7. if no H050_1 appears, exit at live R2
+
+Never use knowledge of the future R2 timestamp to choose H050_1.
+
+⸻
+
+7. Required regime parity
+
+R1 and R2 must be generated from the live regime runtime.
+
+Do not load the observational R1/R2 timestamps as triggers.
+
+For every trade compare:
+
+* expected R1 direction
+* runtime R1 direction
+* expected R1 timestamp
+* runtime R1 timestamp
+* expected R2 direction
+* runtime R2 direction
+* expected R2 timestamp
+* runtime R2 timestamp
+
+Timestamp differences must be explicit.
+
+The repository’s timestamp contract requires completed-bar causal delivery and specific 1s/1m ordering; preserve those semantics exactly.
+
+⸻
+
+8. Signal parity reconciliation
+
+After the runtime finishes, reconcile against:
+
+studies/nq_h050_to_opposing_h050_exit_lifecycle/results/counter_h0501_exit_ledger.parquet
+
+Do not use this ledger before runtime generation except to define the post-run comparison.
+
+For each expected observational trade classify:
+
+* exact match
+* missing runtime H050_0
+* extra runtime H050_0
+* retimed H050_0
+* score mismatch
+* threshold/qualification mismatch
+* wrong direction
+* R1 mismatch
+* missing runtime H050_1
+* extra runtime H050_1
+* retimed H050_1
+* H050_1 score mismatch
+* wrong first-opposing selection
+* R2 mismatch
+* fallback mismatch
+
+Also capture runtime events that have no observational counterpart.
+
+⸻
+
+9. Required score parity
+
+This is mandatory.
+
+For matched H050_0 and H050_1 events compare:
+
+* frozen expected score
+* runtime live score
+* absolute score difference
+
+Report:
+
+* exact count
+* max absolute difference
+* mean absolute difference
+* median absolute difference
+* number exceeding machine tolerance
+
+If preprocessing or feature ordering differs, fail parity rather than accepting approximate equality.
+
+⸻
+
+10. Required feature parity sample
+
+For a bounded but representative sample of matched events, persist the full live feature vector and compare it with the frozen expected feature vector if the expected vector is available.
+
+At minimum sample:
+
+* 100 H050_0 events
+* all H050_1 events in OOS M4 Top 10%, if feasible
+* both directions
+* early, middle, and late dates within the quarter
+* events near 1m/5m boundaries
+
+For every sampled mismatch identify the first divergent feature.
+
+Do not simply report a final score mismatch.
+
+⸻
+
+11. Genuine NT execution
+
+Once a live H050_0 is emitted:
+
+* submit the market order through the actual NT strategy API
+* let the simulated venue generate fills
+* track positions via NT events
+* exit C0 at live R2
+* exit C1 at live H050_1 or live R2 fallback
+
+Do not use direct array price lookup.
+
+Do not compute synthetic fills outside NT.
+
+⸻
+
+12. Reproduce both C0 and C1
+
+C0
+
+Live H050_0 entry
+→ live R1
+→ live R2 exit
+
+C1
+
+Live H050_0 entry
+→ live R1
+→ first live opposing H050_1 exit
+→ otherwise live R2 fallback
+
+Both policies must operate from the same runtime-generated H050_0 population.
+
+⸻
+
+13. Execution assumptions
+
+Use the same cost assumptions as the recent BacktestEngine test unless a newer frozen project standard exists:
+
+* 1 tick adverse entry slippage
+* 1 tick adverse exit slippage
+* $5.00 round-trip commission/fees
+* $15.00 modeled total round-trip friction
+
+Document exactly how NautilusTrader applies each component.
+
+Do not silently double-apply slippage or fees.
+
+⸻
+
+14. Primary parity targets
+
+Expected observational OOS counts:
+
+* H050_0: 2,422
+* R1: 2,422
+* H050_1 active: use frozen ledger exact count
+* R2: 2,422
+* M4 Top 10%: 411
+* H050_1 active in Top 10%: approximately 154 based on prior study
+
+These are reconciliation targets, not runtime instructions.
+
+⸻
+
+15. Acceptance criteria
+
+Produce three independent verdicts.
+
+A. FEATURE/SCORE PARITY
+
+* FEATURE_SCORE_PARITY_PASS
+* FEATURE_SCORE_PARITY_FAIL
+
+PASS requires live runtime feature vectors and scores to reproduce the frozen H050 scoring contract within documented numerical tolerance.
+
+B. SIGNAL/REGIME PARITY
+
+* SIGNAL_REGIME_PARITY_PASS
+* SIGNAL_REGIME_PARITY_PASS_WITH_EXPLAINED_DIFFERENCES
+* SIGNAL_REGIME_PARITY_FAIL
+
+PASS requires no unexplained missing, extra, duplicated, retimed, directionally wrong, or differently selected H050/R1/R2 events.
+
+C. EXECUTION PARITY
+
+* NT_EXECUTION_PASS
+* NT_EXECUTION_FAIL
+
+This proves genuine BacktestEngine order/fill/position/accounting behavior.
+
+Do not collapse these three verdicts.
+
+⸻
+
+16. Economics are secondary in this run
+
+After parity is established, report the same 2025 Q1 OOS M4 Top-10% economics:
+
+* C0 net win rate
+* C1 net win rate
+* C0/C1 median ATR
+* C0/C1 mean ATR
+* C0/C1 total dollar PnL
+* C0/C1 max drawdown
+* profit factor
+* paired improvement/worsening
+* directional LONG/SHORT results
+
+But do not use economic agreement to excuse parity mismatches.
+
+A profitable result with broken live signal parity is a failed validation.
+
+⸻
+
+17. Explicitly reconcile ATR vs dollar economics
+
+The previous genuine BacktestEngine result showed:
+
+* C0 mean: +0.579 ATR
+* C1 mean: +0.598 ATR
+* yet C0 total dollars: +$68,300
+* C1 total dollars: +$67,225
+
+Explain this explicitly.
+
+Report paired differences in:
+
+* ATR
+* NQ points
+* dollars
+
+and show whether ATR normalization is weighting low-volatility and high-volatility trades differently.
+
+Do not describe C1 as increasing total profitability if dollar PnL declines.
+
+⸻
+
+18. Directional decomposition
+
+Preserve separate:
+
+Counter-LONG
+
+Counter-SHORT
+
+The previous run found:
+
+Counter-LONG:
+
+* mean improved materially
+* median improved
+* win rate improved
+* max drawdown improved
+
+Counter-SHORT:
+
+* mean declined
+* median/win rate improved
+* drawdown improved
+
+Confirm whether those directional results survive true live H050 regeneration.
+
+⸻
+
+19. Artifacts
+
+Create new artifacts rather than overwriting the prior execution-only validation.
+
+Required:
+
+* implementation audit of prior BacktestEngine run
+* live H050 runtime strategy/config
+* model-binding manifest
+* runtime feature/score parity ledger
+* runtime signal parity ledger
+* runtime regime parity ledger
+* C0 NT trades
+* C1 NT trades
+* execution reconciliation
+* Top-10% OOS economics
+* directional economics
+* ATR/points/dollars reconciliation
+* causal timestamp audit
+* final report
+* hashes/manifest
+
+Also add a note to the prior validation artifact clarifying whether it was:
+
+* frozen-signal NT execution validation, or
+* full end-to-end runtime validation
+
+Do not erase the historical result.
+
+⸻
+
+20. Explicit questions to answer
+
+1. Did the prior BacktestEngine strategy use frozen signal timestamps?
+2. Did it generate H050_0 live?
+3. Did it generate H050_1 live?
+4. Did it generate R1 and R2 live?
+5. Can the frozen H050 model be loaded with exact artifact/hash/feature-order parity?
+6. Can the full causal feature vector be recreated live?
+7. Do runtime H050_0 scores match frozen scores?
+8. Do runtime H050_1 scores match frozen scores?
+9. Does runtime generate exactly the expected 2,422 OOS entries?
+10. Are there any extra runtime signals?
+11. Are any signals retimed?
+12. Does R1 match?
+13. Does R2 match?
+14. Does first-opposing H050_1 selection match?
+15. Does the genuine NT execution result remain similar once signals are generated live?
+16. Does C1 still improve median/win rate/drawdown?
+17. Does C1 still improve Counter-LONG mean expectancy?
+18. Does Counter-SHORT still show the mean-vs-distribution tradeoff?
+19. Why does ATR mean improve while total dollars may decline?
+20. Is the full pipeline now validated from historical bars all the way through signal generation and NT fills?
+
+⸻
+
+21. Mandatory stop
+
+When feature parity, score parity, signal parity, regime parity, and NT execution reconciliation are complete:
+
+STOP.
+
+Do not begin:
+
+* stop-loss research
+* 600-second filters
+* directional optimization
+* new model training
+* threshold modification
+* additional OOS periods
+
+The sole purpose of this study is to close the final question:
+
+Can 2025 Q1 historical NQ bars, replayed causally through the actual runtime, independently regenerate the frozen H050_0 -> R1 -> H050_1/R2 lifecycle and execute it through NautilusTrader without using the observational ledger as a signal schedule?
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-09-16T18:07:27-05:00.
+</ADDITIONAL_METADATA>

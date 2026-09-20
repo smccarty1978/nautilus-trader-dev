@@ -1,0 +1,11 @@
+{
+  "status": "PASS_ZERO_LEAKAGE",
+  "audit_timestamp_utc": "2026-09-16T21:21:33Z",
+  "frozen_models_evaluated": [
+    "M0_Binary_Control",
+    "M1_Cost_Sensitive",
+    "M4_Composite_Risk"
+  ],
+  "causal_checkpoint_contract": "All model scores, features, and checkpoint prices are strictly frozen from T_H050. Forward path metrics (MFE, MAE, first touch, terminal PnL) are computed strictly from bars timestamped >= checkpoint_ts up to regime_exit_ts. Zero forward path metrics enter any model scores or ranking assignments.",
+  "clean_quarantine": "Untouched 2025 Q1 OOS sample (N=2,422) evaluated post-fit with frozen thresholds."
+}

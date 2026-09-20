@@ -1,0 +1,152 @@
+[
+  {
+    "feature": "pullback_depth_atr",
+    "family": "Pullback Geometry",
+    "formula": "Depth from running peak extreme in points / frozen start_atr",
+    "timeframe": "1s bar stream",
+    "availability_timestamp": "ts_init of bar breaching checkpoint depth",
+    "reset_policy": "Resets on new running extreme or opposite flip",
+    "causal_justification": "Computed strictly from completed bars prior to checkpoint",
+    "lookahead_audit": "PASS (Zero future leakage)"
+  },
+  {
+    "feature": "pullback_duration_sec",
+    "family": "Pullback Geometry",
+    "formula": "(checkpoint_ts - pullback_start_ts) / 1e9",
+    "timeframe": "1s timestamps",
+    "availability_timestamp": "checkpoint_ts",
+    "reset_policy": "Resets on new running extreme",
+    "causal_justification": "Elapsed duration of current pullback wave",
+    "lookahead_audit": "PASS (Zero future leakage)"
+  },
+  {
+    "feature": "pullback_efficiency",
+    "family": "Pullback Geometry",
+    "formula": "(pullback_depth_atr / pullback_duration_sec) * 60.0 (ATR/min)",
+    "timeframe": "Derived",
+    "availability_timestamp": "checkpoint_ts",
+    "reset_policy": "Resets on new running extreme",
+    "causal_justification": "Rate of adverse movement during the wave",
+    "lookahead_audit": "PASS (Zero future leakage)"
+  },
+  {
+    "feature": "pullback_velocity_atr_sec",
+    "family": "Pullback Geometry",
+    "formula": "pullback_depth_atr / max(pullback_duration_sec, 1.0)",
+    "timeframe": "Derived",
+    "availability_timestamp": "checkpoint_ts",
+    "reset_policy": "Resets on new running extreme",
+    "causal_justification": "Speed of adverse movement per second",
+    "lookahead_audit": "PASS (Zero future leakage)"
+  },
+  {
+    "feature": "pre_pullback_max_mfe_atr",
+    "family": "Regime Maturity",
+    "formula": "Peak prospective MFE achieved by regime prior to this pullback",
+    "timeframe": "1s running extreme",
+    "availability_timestamp": "pullback_start_ts",
+    "reset_policy": "Regime lifetime cumulative",
+    "causal_justification": "Frozen at the start of this pullback wave",
+    "lookahead_audit": "PASS (Zero future leakage)"
+  },
+  {
+    "feature": "pullback_ordinal",
+    "family": "Regime Maturity",
+    "formula": "Ordinal counter of qualifying pullbacks in this regime (1, 2, 3...)",
+    "timeframe": "Regime state",
+    "availability_timestamp": "checkpoint_ts",
+    "reset_policy": "Resets on opposite V_A flip",
+    "causal_justification": "Count of prior pullback waves",
+    "lookahead_audit": "PASS (Zero future leakage)"
+  },
+  {
+    "feature": "regime_age_sec",
+    "family": "Regime Maturity",
+    "formula": "(checkpoint_ts - regime_start_ts) / 1e9",
+    "timeframe": "1s timestamps",
+    "availability_timestamp": "checkpoint_ts",
+    "reset_policy": "Resets on opposite V_A flip",
+    "causal_justification": "Age of the incumbent regime at checkpoint",
+    "lookahead_audit": "PASS (Zero future leakage)"
+  },
+  {
+    "feature": "previous_pullbacks_count",
+    "family": "Regime Maturity",
+    "formula": "Total number of completed prior pullback waves in this regime",
+    "timeframe": "Regime state",
+    "availability_timestamp": "checkpoint_ts",
+    "reset_policy": "Resets on opposite V_A flip",
+    "causal_justification": "Count of previously recovered pullbacks",
+    "lookahead_audit": "PASS (Zero future leakage)"
+  },
+  {
+    "feature": "previous_pullbacks_max_depth_atr",
+    "family": "Regime Maturity",
+    "formula": "Deepest adverse retrace among completed prior pullbacks",
+    "timeframe": "Regime state",
+    "availability_timestamp": "checkpoint_ts",
+    "reset_policy": "Resets on opposite V_A flip",
+    "causal_justification": "Historical depth resilience of this regime",
+    "lookahead_audit": "PASS (Zero future leakage)"
+  },
+  {
+    "feature": "previous_pullbacks_avg_duration_sec",
+    "family": "Regime Maturity",
+    "formula": "Average duration of completed prior pullbacks in this regime",
+    "timeframe": "Regime state",
+    "availability_timestamp": "checkpoint_ts",
+    "reset_policy": "Resets on opposite V_A flip",
+    "causal_justification": "Historical recovery speed of this regime",
+    "lookahead_audit": "PASS (Zero future leakage)"
+  },
+  {
+    "feature": "pullback_depth_vs_max_mfe_ratio",
+    "family": "Pullback Geometry",
+    "formula": "pullback_depth_atr / max(pre_pullback_max_mfe_atr, 0.05)",
+    "timeframe": "Derived",
+    "availability_timestamp": "checkpoint_ts",
+    "reset_policy": "Resets on new running extreme",
+    "causal_justification": "Fraction of accumulated trend given back",
+    "lookahead_audit": "PASS (Zero future leakage)"
+  },
+  {
+    "feature": "pullback_duration_vs_regime_age_ratio",
+    "family": "Pullback Geometry",
+    "formula": "pullback_duration_sec / max(regime_age_sec, 1.0)",
+    "timeframe": "Derived",
+    "availability_timestamp": "checkpoint_ts",
+    "reset_policy": "Resets on new running extreme",
+    "causal_justification": "Proportion of regime's life spent in current retrace",
+    "lookahead_audit": "PASS (Zero future leakage)"
+  },
+  {
+    "feature": "incumbent_expansion_rate_atr_min",
+    "family": "Incumbent Trend Condition",
+    "formula": "pre_pullback_max_mfe_atr / ((regime_age_sec - pullback_duration_sec) / 60.0)",
+    "timeframe": "Derived",
+    "availability_timestamp": "checkpoint_ts",
+    "reset_policy": "Resets on new running extreme",
+    "causal_justification": "Prior speed of trend expansion before pullback began",
+    "lookahead_audit": "PASS (Zero future leakage)"
+  },
+  {
+    "feature": "frozen_atr",
+    "family": "Volatility Context",
+    "formula": "start_atr frozen at regime start T0",
+    "timeframe": "Regime constant",
+    "availability_timestamp": "regime_start_ts",
+    "reset_policy": "Frozen for entire regime",
+    "causal_justification": "Pre-established volatility normalizer",
+    "lookahead_audit": "PASS (Zero future leakage)"
+  },
+  {
+    "feature": "direction_is_long",
+    "family": "Regime Direction",
+    "formula": "1 if direction == 1 else 0",
+    "timeframe": "Regime constant",
+    "availability_timestamp": "regime_start_ts",
+    "reset_policy": "Fixed for regime",
+    "causal_justification": "Direction of incumbent regime",
+    "lookahead_audit": "PASS (Zero future leakage)"
+  }
+]

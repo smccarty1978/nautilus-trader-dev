@@ -1,0 +1,172 @@
+{
+  "LONG_incumbent": {
+    "models": {
+      "M0_Binary_Control": {
+        "roc_auc_exhaustion": 0.5637166138524219,
+        "roc_auc_suppress_ge_2p0": 0.5584615384615385,
+        "top10_n": 118,
+        "top10_P_lt_0p50": 0.5,
+        "top10_P_ge_1p00": 0.3644067796610169,
+        "top10_P_ge_2p00": 0.17796610169491525,
+        "top10_median_mfe": 0.5288403270382097,
+        "top20_n": 235,
+        "top20_P_lt_0p50": 0.4765957446808511,
+        "top20_P_ge_1p00": 0.39574468085106385,
+        "top20_P_ge_2p00": 0.23829787234042554
+      },
+      "M1_Cost_Sensitive": {
+        "roc_auc_exhaustion": 0.5669624264373019,
+        "roc_auc_suppress_ge_2p0": 0.5763421194190426,
+        "top10_n": 118,
+        "top10_P_lt_0p50": 0.5169491525423728,
+        "top10_P_ge_1p00": 0.3728813559322034,
+        "top10_P_ge_2p00": 0.1694915254237288,
+        "top10_median_mfe": 0.42285256805957916,
+        "top20_n": 235,
+        "top20_P_lt_0p50": 0.4595744680851064,
+        "top20_P_ge_1p00": 0.37872340425531914,
+        "top20_P_ge_2p00": 0.2
+      },
+      "M2_Ordinal_ExpSeverity": {
+        "roc_auc_exhaustion": 0.5579900407424174,
+        "roc_auc_suppress_ge_2p0": 0.5691160121929353,
+        "top10_n": 118,
+        "top10_P_lt_0p50": 0.4576271186440678,
+        "top10_P_ge_1p00": 0.3983050847457627,
+        "top10_P_ge_2p00": 0.19491525423728814,
+        "top10_median_mfe": 0.7263317637210531,
+        "top20_n": 235,
+        "top20_P_lt_0p50": 0.451063829787234,
+        "top20_P_ge_1p00": 0.39574468085106385,
+        "top20_P_ge_2p00": 0.22127659574468084
+      },
+      "M2_Ordinal_TailPenalized": {
+        "roc_auc_exhaustion": 0.5569247019767617,
+        "roc_auc_suppress_ge_2p0": 0.5695248341402188,
+        "top10_n": 118,
+        "top10_P_lt_0p50": 0.4491525423728814,
+        "top10_P_ge_1p00": 0.4067796610169492,
+        "top10_P_ge_2p00": 0.19491525423728814,
+        "top10_median_mfe": 0.7373699288103683,
+        "top20_n": 235,
+        "top20_P_lt_0p50": 0.4340425531914894,
+        "top20_P_ge_1p00": 0.4085106382978723,
+        "top20_P_ge_2p00": 0.2297872340425532
+      },
+      "M3_Continuous_Log1p": {
+        "roc_auc_exhaustion": 0.5545616417685227,
+        "roc_auc_suppress_ge_2p0": 0.5685637439483593,
+        "top10_n": 118,
+        "top10_P_lt_0p50": 0.4661016949152542,
+        "top10_P_ge_1p00": 0.4152542372881356,
+        "top10_P_ge_2p00": 0.211864406779661,
+        "top10_median_mfe": 0.7330433337360129,
+        "top20_n": 235,
+        "top20_P_lt_0p50": 0.4340425531914894,
+        "top20_P_ge_1p00": 0.41702127659574467,
+        "top20_P_ge_2p00": 0.2170212765957447
+      },
+      "M4_Composite_Risk": {
+        "roc_auc_exhaustion": 0.5585800513052663,
+        "roc_auc_suppress_ge_2p0": 0.5659350905504752,
+        "top10_n": 118,
+        "top10_P_lt_0p50": 0.5084745762711864,
+        "top10_P_ge_1p00": 0.3474576271186441,
+        "top10_P_ge_2p00": 0.17796610169491525,
+        "top10_median_mfe": 0.43855828090005816,
+        "top20_n": 235,
+        "top20_P_lt_0p50": 0.44680851063829785,
+        "top20_P_ge_1p00": 0.37872340425531914,
+        "top20_P_ge_2p00": 0.20851063829787234
+      }
+    },
+    "oos_n": 1175,
+    "unconditional_oos_base_P_lt_0p50": 0.4,
+    "unconditional_oos_base_P_ge_2p00": 0.28085106382978725
+  },
+  "SHORT_incumbent": {
+    "models": {
+      "M0_Binary_Control": {
+        "roc_auc_exhaustion": 0.6304382429275188,
+        "roc_auc_suppress_ge_2p0": 0.6581375582603286,
+        "top10_n": 125,
+        "top10_P_lt_0p50": 0.56,
+        "top10_P_ge_1p00": 0.344,
+        "top10_P_ge_2p00": 0.176,
+        "top10_median_mfe": 0.343195999023717,
+        "top20_n": 250,
+        "top20_P_lt_0p50": 0.508,
+        "top20_P_ge_1p00": 0.372,
+        "top20_P_ge_2p00": 0.22
+      },
+      "M1_Cost_Sensitive": {
+        "roc_auc_exhaustion": 0.6374567665420248,
+        "roc_auc_suppress_ge_2p0": 0.6737324385731983,
+        "top10_n": 125,
+        "top10_P_lt_0p50": 0.536,
+        "top10_P_ge_1p00": 0.368,
+        "top10_P_ge_2p00": 0.192,
+        "top10_median_mfe": 0.3932414103557636,
+        "top20_n": 250,
+        "top20_P_lt_0p50": 0.528,
+        "top20_P_ge_1p00": 0.348,
+        "top20_P_ge_2p00": 0.188
+      },
+      "M2_Ordinal_ExpSeverity": {
+        "roc_auc_exhaustion": 0.6400197484500705,
+        "roc_auc_suppress_ge_2p0": 0.674264350511913,
+        "top10_n": 125,
+        "top10_P_lt_0p50": 0.576,
+        "top10_P_ge_1p00": 0.328,
+        "top10_P_ge_2p00": 0.176,
+        "top10_median_mfe": 0.307329907765591,
+        "top20_n": 250,
+        "top20_P_lt_0p50": 0.556,
+        "top20_P_ge_1p00": 0.32,
+        "top20_P_ge_2p00": 0.184
+      },
+      "M2_Ordinal_TailPenalized": {
+        "roc_auc_exhaustion": 0.6403084211491872,
+        "roc_auc_suppress_ge_2p0": 0.6753281743893429,
+        "top10_n": 125,
+        "top10_P_lt_0p50": 0.592,
+        "top10_P_ge_1p00": 0.312,
+        "top10_P_ge_2p00": 0.168,
+        "top10_median_mfe": 0.29107194102755896,
+        "top20_n": 250,
+        "top20_P_lt_0p50": 0.556,
+        "top20_P_ge_1p00": 0.324,
+        "top20_P_ge_2p00": 0.18
+      },
+      "M3_Continuous_Log1p": {
+        "roc_auc_exhaustion": 0.6476304557791195,
+        "roc_auc_suppress_ge_2p0": 0.6838207109565527,
+        "top10_n": 125,
+        "top10_P_lt_0p50": 0.528,
+        "top10_P_ge_1p00": 0.336,
+        "top10_P_ge_2p00": 0.176,
+        "top10_median_mfe": 0.45759466536495597,
+        "top20_n": 250,
+        "top20_P_lt_0p50": 0.532,
+        "top20_P_ge_1p00": 0.352,
+        "top20_P_ge_2p00": 0.188
+      },
+      "M4_Composite_Risk": {
+        "roc_auc_exhaustion": 0.6426717602559744,
+        "roc_auc_suppress_ge_2p0": 0.6778252440128659,
+        "top10_n": 125,
+        "top10_P_lt_0p50": 0.528,
+        "top10_P_ge_1p00": 0.344,
+        "top10_P_ge_2p00": 0.168,
+        "top10_median_mfe": 0.4202472939389738,
+        "top20_n": 250,
+        "top20_P_lt_0p50": 0.548,
+        "top20_P_ge_1p00": 0.332,
+        "top20_P_ge_2p00": 0.164
+      }
+    },
+    "oos_n": 1247,
+    "unconditional_oos_base_P_lt_0p50": 0.3921411387329591,
+    "unconditional_oos_base_P_ge_2p00": 0.3640737770649559
+  }
+}

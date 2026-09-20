@@ -1,0 +1,14 @@
+{
+  "study_name": "nq_h050_to_opposing_h050_exit_lifecycle",
+  "study_type": "BOUNDED_OBSERVATIONAL_LIFECYCLE_EXIT_DIAGNOSTIC",
+  "entry_signal": "H050_0 (0.50 ATR giveback from running maxMFE)",
+  "control_exit": "C0: confirmed R2 flip",
+  "candidate_exit": "C1: first valid opposing H050_1 after R1 confirmation if present; else confirmed R2 fallback",
+  "h050_1_selection_rule": "First causal opposing H050 after R1 confirmation and before R2 confirmation",
+  "models_evaluated": [
+    "M4_Composite_Risk",
+    "Unconditional Base"
+  ],
+  "train_split": "2023, 2024 (N=21,493)",
+  "oos_split": "2025 Q1 untouched (N=2,422)"
+}

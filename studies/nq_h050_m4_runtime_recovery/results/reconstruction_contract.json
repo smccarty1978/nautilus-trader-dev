@@ -1,0 +1,95 @@
+{
+  "study_name": "nq_h050_m4_runtime_recovery",
+  "source_historical_study": "nq_h050_asymmetric_regime_exhaustion",
+  "training_dataset": {
+    "path": "c:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\studies\\nq_h050_asymmetric_regime_exhaustion\\results\\checkpoint_target_ledger.parquet",
+    "sha256": "553cab47b8c063ecb822d53ae4ac18e50b9606693302647ff36ced0ad678f2d9",
+    "total_rows": 23915,
+    "h050_rows": 23915,
+    "train_rows": 21493,
+    "oos_rows": 2422
+  },
+  "feature_surface": {
+    "feature_count": 17,
+    "ordered_features": [
+      "pullback_depth_atr",
+      "pullback_duration_sec",
+      "pullback_efficiency",
+      "pullback_velocity_atr_sec",
+      "pre_pullback_max_mfe_atr",
+      "pullback_ordinal",
+      "regime_age_sec",
+      "previous_pullbacks_count",
+      "previous_pullbacks_max_depth_atr",
+      "previous_pullbacks_avg_duration_sec",
+      "pullback_depth_vs_max_mfe_ratio",
+      "pullback_duration_vs_regime_age_ratio",
+      "incumbent_expansion_rate_atr_min",
+      "has_previous_pullbacks",
+      "previous_max_depth_ratio",
+      "frozen_atr",
+      "direction_is_long"
+    ],
+    "dtypes": {
+      "pullback_depth_atr": "float64",
+      "pullback_duration_sec": "float64",
+      "pullback_efficiency": "float64",
+      "pullback_velocity_atr_sec": "float64",
+      "pre_pullback_max_mfe_atr": "float64",
+      "pullback_ordinal": "int64",
+      "regime_age_sec": "float64",
+      "previous_pullbacks_count": "int64",
+      "previous_pullbacks_max_depth_atr": "float64",
+      "previous_pullbacks_avg_duration_sec": "float64",
+      "pullback_depth_vs_max_mfe_ratio": "float64",
+      "pullback_duration_vs_regime_age_ratio": "float64",
+      "incumbent_expansion_rate_atr_min": "float64",
+      "has_previous_pullbacks": "int64",
+      "previous_max_depth_ratio": "float64",
+      "frozen_atr": "float64",
+      "direction_is_long": "int64"
+    },
+    "null_policy": "zero nulls permitted; native LightGBM missing value handling",
+    "preprocessing": "none / raw floating-point features"
+  },
+  "model_architecture": {
+    "family": "LightGBM Gradient Boosted Decision Trees",
+    "lightgbm_version": "4.6.0",
+    "head0": {
+      "target": "additional_mfe_beyond_max_atr < 0.50",
+      "objective": "binary",
+      "score_semantics": "P(continuation < 0.50 ATR | H050 giveback)"
+    },
+    "head1": {
+      "target": "additional_mfe_beyond_max_atr >= 1.00",
+      "objective": "binary",
+      "score_semantics": "P(continuation >= 1.00 ATR | H050 giveback)"
+    },
+    "head2": {
+      "target": "additional_mfe_beyond_max_atr >= 2.00",
+      "objective": "binary",
+      "score_semantics": "P(continuation >= 2.00 ATR | H050 giveback)"
+    },
+    "hyperparameters": {
+      "n_estimators": 100,
+      "learning_rate": 0.03,
+      "max_depth": 4,
+      "num_leaves": 15,
+      "min_child_samples": 50,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "random_state": 42,
+      "verbose": -1
+    },
+    "sample_weight": "uniform (1.0)",
+    "class_weight": null,
+    "boosting_rounds": 100
+  },
+  "composite_formula": "M4 = P0 - 0.5 * P1 - 1.0 * P2",
+  "thresholds_frozen_train": {
+    "top_5pct": 0.050778,
+    "top_10pct": 0.003001,
+    "top_20pct": -0.050213,
+    "top_30pct": -0.096417
+  }
+}

@@ -1,0 +1,158 @@
+{
+  "-1.00A": {
+    "n_total": 240,
+    "new_incumbent_extreme": {
+      "made_new_extreme": {
+        "n": 216,
+        "recovery_be_rate": 0.7777777777777778,
+        "win_rate": 0.4027777777777778,
+        "mean_pnl_atr": -0.08039729611978698,
+        "mean_further_mae_atr": 1.6869054755195962
+      },
+      "no_new_extreme": {
+        "n": 24,
+        "recovery_be_rate": 0.7083333333333334,
+        "win_rate": 0.2916666666666667,
+        "mean_pnl_atr": -1.8088464544419507,
+        "mean_further_mae_atr": 6.284376681573069
+      }
+    },
+    "rebound_status": {
+      "rebounded_ge_015": {
+        "n": 30,
+        "recovery_be_rate": 0.7666666666666667,
+        "win_rate": 0.36666666666666664,
+        "mean_pnl_atr": 0.07640706142879375
+      },
+      "at_trough_lt_005": {
+        "n": 130,
+        "recovery_be_rate": 0.7538461538461538,
+        "win_rate": 0.38461538461538464,
+        "mean_pnl_atr": -0.3524990910620002
+      }
+    },
+    "delta_m4": {
+      "median_threshold": 0.0,
+      "m4_improving": {
+        "n": 98,
+        "recovery_be_rate": 0.7244897959183674,
+        "win_rate": 0.3469387755102041,
+        "mean_pnl_atr": -0.3706871362847866
+      },
+      "m4_deteriorating": {
+        "n": 142,
+        "recovery_be_rate": 0.8028169014084507,
+        "win_rate": 0.4225352112676056,
+        "mean_pnl_atr": -0.1721886726237445
+      }
+    },
+    "elapsed_time": {
+      "median_seconds": 219.0,
+      "fast_touch": {
+        "n": 120,
+        "recovery_be_rate": 0.7833333333333333,
+        "win_rate": 0.43333333333333335,
+        "mean_pnl_atr": -0.3694211478173742
+      },
+      "slow_touch": {
+        "n": 120,
+        "recovery_be_rate": 0.7583333333333333,
+        "win_rate": 0.35,
+        "mean_pnl_atr": -0.13706327608663263
+      }
+    },
+    "trailing_60s_momentum": {
+      "median_threshold": -0.7754670097324463,
+      "favorable_momentum": {
+        "n": 120,
+        "recovery_be_rate": 0.7333333333333333,
+        "win_rate": 0.38333333333333336,
+        "mean_pnl_atr": -0.24914264110373002
+      },
+      "adverse_momentum": {
+        "n": 120,
+        "recovery_be_rate": 0.8083333333333333,
+        "win_rate": 0.4,
+        "mean_pnl_atr": -0.25734178280027675
+      }
+    }
+  },
+  "-1.50A": {
+    "n_total": 175,
+    "new_incumbent_extreme": {
+      "made_new_extreme": {
+        "n": 152,
+        "recovery_be_rate": 0.6447368421052632,
+        "win_rate": 0.26973684210526316,
+        "mean_pnl_atr": -0.6512927255509686,
+        "mean_further_mae_atr": 1.670927811854331
+      },
+      "no_new_extreme": {
+        "n": 23,
+        "recovery_be_rate": 0.6521739130434783,
+        "win_rate": 0.34782608695652173,
+        "mean_pnl_atr": -2.770514787086128,
+        "mean_further_mae_atr": 6.835612670307675
+      }
+    },
+    "rebound_status": {
+      "rebounded_ge_015": {
+        "n": 22,
+        "recovery_be_rate": 0.5454545454545454,
+        "win_rate": 0.09090909090909091,
+        "mean_pnl_atr": -1.336001314235328
+      },
+      "at_trough_lt_005": {
+        "n": 83,
+        "recovery_be_rate": 0.6506024096385542,
+        "win_rate": 0.3132530120481928,
+        "mean_pnl_atr": -0.2111382808885034
+      }
+    },
+    "delta_m4": {
+      "median_threshold": -0.020754436134336834,
+      "m4_improving": {
+        "n": 87,
+        "recovery_be_rate": 0.6781609195402298,
+        "win_rate": 0.2988505747126437,
+        "mean_pnl_atr": -0.8952634762363215
+      },
+      "m4_deteriorating": {
+        "n": 88,
+        "recovery_be_rate": 0.6136363636363636,
+        "win_rate": 0.26136363636363635,
+        "mean_pnl_atr": -0.9639819540246386
+      }
+    },
+    "elapsed_time": {
+      "median_seconds": 385.0,
+      "fast_touch": {
+        "n": 88,
+        "recovery_be_rate": 0.6704545454545454,
+        "win_rate": 0.2727272727272727,
+        "mean_pnl_atr": -0.866379473679537
+      },
+      "slow_touch": {
+        "n": 87,
+        "recovery_be_rate": 0.6206896551724138,
+        "win_rate": 0.28735632183908044,
+        "mean_pnl_atr": -0.9939878241715969
+      }
+    },
+    "trailing_60s_momentum": {
+      "median_threshold": -0.6983019370964977,
+      "favorable_momentum": {
+        "n": 87,
+        "recovery_be_rate": 0.6436781609195402,
+        "win_rate": 0.28735632183908044,
+        "mean_pnl_atr": -0.7322389806182547
+      },
+      "adverse_momentum": {
+        "n": 88,
+        "recovery_be_rate": 0.6477272727272727,
+        "win_rate": 0.2727272727272727,
+        "mean_pnl_atr": -1.1251538985561365
+      }
+    }
+  }
+}

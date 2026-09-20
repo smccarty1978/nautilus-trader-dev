@@ -1,0 +1,456 @@
+{
+  "study_id": "nq_p90_pullback_survival_atlas",
+  "title": "NQ P90 Pullback Survival / Reextension / Reversal Atlas",
+  "timestamp_utc": "2026-09-16T01:47:45Z",
+  "total_regimes_scanned": 6559,
+  "total_5s_checkpoints_scanned": 586897,
+  "total_pullback_episodes": 34603,
+  "total_depth_crossings": 69104,
+  "total_conditioned_5s_observations": 483959,
+  "artifact_hashes": {
+    "pullback_episode_ledger_sha256": "49c4fd5d341499b7b113c6cd17ef0ec1a25f5e09c3df0d981e49bbc699fa64d7",
+    "pullback_depth_crossings_sha256": "e17b2c9e4610ebbfde822040b09652b8caeb1a56407263df6378acc8b7822bf9",
+    "pullback_conditioned_5s_observations_sha256": "e5d0f27f9140238114e255188313e7cba79c895b17b1d864964904806234da58"
+  },
+  "funnel_summary": {
+    "PB0.50": {
+      "depth_threshold_atr": 0.5,
+      "episodes_reaching_depth": 34603,
+      "pct_of_pb05_episodes": 100.0,
+      "regimes_represented": 6548,
+      "excluded_already_flipped": 0,
+      "censored_count": 769
+    },
+    "PB1.00": {
+      "depth_threshold_atr": 1.0,
+      "episodes_reaching_depth": 20284,
+      "pct_of_pb05_episodes": 58.619194867497036,
+      "regimes_represented": 5982,
+      "excluded_already_flipped": 676,
+      "censored_count": 575
+    },
+    "PB1.50": {
+      "depth_threshold_atr": 1.5,
+      "episodes_reaching_depth": 10172,
+      "pct_of_pb05_episodes": 29.396295118920325,
+      "regimes_represented": 4516,
+      "excluded_already_flipped": 2030,
+      "censored_count": 405
+    },
+    "PB2.00": {
+      "depth_threshold_atr": 2.0,
+      "episodes_reaching_depth": 4045,
+      "pct_of_pb05_episodes": 11.689737883998497,
+      "regimes_represented": 2464,
+      "excluded_already_flipped": 3640,
+      "censored_count": 221
+    }
+  },
+  "competing_outcomes_summary": {
+    "PB0.50": {
+      "depth_threshold_atr": 0.5,
+      "sample_size_N": 34603,
+      "reversal_count": 5557,
+      "reversal_pct": 16.059301216657516,
+      "reextension_count": 28277,
+      "reextension_pct": 81.71834812010519,
+      "censored_count": 769,
+      "censored_pct": 2.2223506632372914,
+      "time_to_reversal_median_s": 145.0,
+      "time_to_reversal_p25_s": 79.0,
+      "time_to_reversal_p75_s": 267.0,
+      "time_to_reextension_median_s": 60.0,
+      "time_to_reextension_p25_s": 40.0,
+      "time_to_reextension_p75_s": 70.0
+    },
+    "PB1.00": {
+      "depth_threshold_atr": 1.0,
+      "sample_size_N": 20284,
+      "reversal_count": 4881,
+      "reversal_pct": 24.063301124038652,
+      "reextension_count": 14828,
+      "reextension_pct": 73.10195227765726,
+      "censored_count": 575,
+      "censored_pct": 2.8347465983040823,
+      "time_to_reversal_median_s": 144.0,
+      "time_to_reversal_p25_s": 76.0,
+      "time_to_reversal_p75_s": 266.0,
+      "time_to_reextension_median_s": 60.0,
+      "time_to_reextension_p25_s": 50.0,
+      "time_to_reextension_p75_s": 105.0
+    },
+    "PB1.50": {
+      "depth_threshold_atr": 1.5,
+      "sample_size_N": 10172,
+      "reversal_count": 3527,
+      "reversal_pct": 34.67361384191899,
+      "reextension_count": 6240,
+      "reextension_pct": 61.34486826582777,
+      "censored_count": 405,
+      "censored_pct": 3.981517892253244,
+      "time_to_reversal_median_s": 140.0,
+      "time_to_reversal_p25_s": 70.0,
+      "time_to_reversal_p75_s": 270.0,
+      "time_to_reextension_median_s": 60.0,
+      "time_to_reextension_p25_s": 55.0,
+      "time_to_reextension_p75_s": 120.0
+    },
+    "PB2.00": {
+      "depth_threshold_atr": 2.0,
+      "sample_size_N": 4045,
+      "reversal_count": 1917,
+      "reversal_pct": 47.39184177997528,
+      "reextension_count": 1907,
+      "reextension_pct": 47.14462299134734,
+      "censored_count": 221,
+      "censored_pct": 5.4635352286773795,
+      "time_to_reversal_median_s": 129.0,
+      "time_to_reversal_p25_s": 61.0,
+      "time_to_reversal_p75_s": 268.0,
+      "time_to_reextension_median_s": 60.0,
+      "time_to_reextension_p25_s": 50.0,
+      "time_to_reextension_p75_s": 120.0
+    }
+  },
+  "flip_horizon_summary": {
+    "PB0.50": {
+      "depth_threshold_atr": 0.5,
+      "sample_size_N": 34603,
+      "prob_flip_le_60s": 2.621160015027599,
+      "prob_flip_le_120s": 6.704620986619656,
+      "prob_flip_le_180s": 9.52518567754241,
+      "prob_flip_le_300s": 12.73877987457735,
+      "flip_count_le_60s": 907,
+      "flip_count_le_120s": 2320,
+      "flip_count_le_180s": 3296,
+      "flip_count_le_300s": 4408,
+      "time_to_flip_median_s": 145.0,
+      "time_to_flip_p25_s": 79.0,
+      "time_to_flip_p75_s": 267.0
+    },
+    "PB1.00": {
+      "depth_threshold_atr": 1.0,
+      "sample_size_N": 20284,
+      "prob_flip_le_60s": 4.220074935910077,
+      "prob_flip_le_120s": 10.26424768290278,
+      "prob_flip_le_180s": 14.287122855452575,
+      "prob_flip_le_300s": 19.108657069611517,
+      "flip_count_le_60s": 856,
+      "flip_count_le_120s": 2082,
+      "flip_count_le_180s": 2898,
+      "flip_count_le_300s": 3876,
+      "time_to_flip_median_s": 144.0,
+      "time_to_flip_p25_s": 76.0,
+      "time_to_flip_p75_s": 266.0
+    },
+    "PB1.50": {
+      "depth_threshold_atr": 1.5,
+      "sample_size_N": 10172,
+      "prob_flip_le_60s": 7.137239480928037,
+      "prob_flip_le_120s": 15.247738891073533,
+      "prob_flip_le_180s": 20.841525756979944,
+      "prob_flip_le_300s": 27.290601651592606,
+      "flip_count_le_60s": 726,
+      "flip_count_le_120s": 1551,
+      "flip_count_le_180s": 2120,
+      "flip_count_le_300s": 2776,
+      "time_to_flip_median_s": 140.0,
+      "time_to_flip_p25_s": 70.0,
+      "time_to_flip_p75_s": 270.0
+    },
+    "PB2.00": {
+      "depth_threshold_atr": 2.0,
+      "sample_size_N": 4045,
+      "prob_flip_le_60s": 11.644004944375773,
+      "prob_flip_le_120s": 22.546353522867737,
+      "prob_flip_le_180s": 29.320148331273177,
+      "prob_flip_le_300s": 37.552533992583434,
+      "flip_count_le_60s": 471,
+      "flip_count_le_120s": 912,
+      "flip_count_le_180s": 1186,
+      "flip_count_le_300s": 1519,
+      "time_to_flip_median_s": 129.0,
+      "time_to_flip_p25_s": 61.0,
+      "time_to_flip_p75_s": 268.0
+    }
+  },
+  "sequential_survival_summary": {
+    "transition_probabilities": {
+      "pb05_to_pb10_pct": 58.619194867497036,
+      "pb10_to_pb15_pct": 50.147899822520216,
+      "pb15_to_pb20_pct": 39.76602438065277,
+      "counts": {
+        "reaching_pb05": 34603,
+        "reaching_pb10": 20284,
+        "reaching_pb15": 10172,
+        "reaching_pb20": 4045
+      }
+    },
+    "conditional_on_deepest_stage_reached": {
+      "0.50_to_1.00": {
+        "deepest_stage_range_atr": "0.50 - 1.0",
+        "episodes_count_N": 14319,
+        "reversal_pct": 4.721000069837279,
+        "reextension_pct": 93.92415671485439,
+        "censored_pct": 1.3548432153083316
+      },
+      "1.00_to_1.50": {
+        "deepest_stage_range_atr": "1.00 - 1.5",
+        "episodes_count_N": 10112,
+        "reversal_pct": 13.39003164556962,
+        "reextension_pct": 84.92879746835443,
+        "censored_pct": 1.6811708860759493
+      },
+      "1.50_to_2.00": {
+        "deepest_stage_range_atr": "1.50 - 2.0",
+        "episodes_count_N": 6127,
+        "reversal_pct": 26.277133997062187,
+        "reextension_pct": 70.71976497470214,
+        "censored_pct": 3.0031010282356783
+      },
+      "ge_2.00": {
+        "deepest_stage_range_atr": "2.00 - +",
+        "episodes_count_N": 4045,
+        "reversal_pct": 47.39184177997528,
+        "reextension_pct": 47.14462299134734,
+        "censored_pct": 5.4635352286773795
+      }
+    }
+  },
+  "recovery_failure_summary": {
+    "under_25pct": {
+      "recovery_fraction_range": "0% - 25%",
+      "sample_size_N": 3473,
+      "reversal_count": 3081,
+      "reversal_pct": 88.71292830405989,
+      "reextension_count": 0,
+      "reextension_pct": 0.0,
+      "censored_count": 392,
+      "censored_pct": 11.28707169594011,
+      "time_to_terminal_median_s": 91.0,
+      "time_to_terminal_p25_s": 55.0,
+      "time_to_terminal_p75_s": 168.0
+    },
+    "25_to_50pct": {
+      "recovery_fraction_range": "25% - 50%",
+      "sample_size_N": 1444,
+      "reversal_count": 1274,
+      "reversal_pct": 88.22714681440443,
+      "reextension_count": 0,
+      "reextension_pct": 0.0,
+      "censored_count": 170,
+      "censored_pct": 11.772853185595569,
+      "time_to_terminal_median_s": 156.5,
+      "time_to_terminal_p25_s": 91.0,
+      "time_to_terminal_p75_s": 262.0
+    },
+    "50_to_75pct": {
+      "recovery_fraction_range": "50% - 75%",
+      "sample_size_N": 849,
+      "reversal_count": 719,
+      "reversal_pct": 84.68786808009423,
+      "reextension_count": 0,
+      "reextension_pct": 0.0,
+      "censored_count": 130,
+      "censored_pct": 15.312131919905772,
+      "time_to_terminal_median_s": 220.0,
+      "time_to_terminal_p25_s": 124.0,
+      "time_to_terminal_p75_s": 354.0
+    },
+    "75_to_100pct": {
+      "recovery_fraction_range": "75% - 100%",
+      "sample_size_N": 560,
+      "reversal_count": 483,
+      "reversal_pct": 86.25,
+      "reextension_count": 0,
+      "reextension_pct": 0.0,
+      "censored_count": 77,
+      "censored_pct": 13.750000000000002,
+      "time_to_terminal_median_s": 319.5,
+      "time_to_terminal_p25_s": 191.75,
+      "time_to_terminal_p75_s": 516.5
+    },
+    "new_max_mfe_reextension": {
+      "recovery_fraction_range": "100%+ (New Max MFE Established)",
+      "sample_size_N": 28277,
+      "reversal_count": 0,
+      "reversal_pct": 0.0,
+      "reextension_count": 28277,
+      "reextension_pct": 100.0,
+      "censored_count": 0,
+      "censored_pct": 0.0,
+      "time_to_terminal_median_s": 60.0,
+      "time_to_terminal_p25_s": 40.0,
+      "time_to_terminal_p75_s": 70.0
+    },
+    "in_progress_bounce_progression": {
+      "reaching_ge_25pct_bounce": {
+        "total_episodes": 31130,
+        "proceeds_to_new_max_pct": 90.83520719563123,
+        "fails_and_reverses_pct": 7.953742370703501
+      },
+      "reaching_ge_50pct_bounce": {
+        "total_episodes": 29686,
+        "proceeds_to_new_max_pct": 95.25365492151182,
+        "fails_and_reverses_pct": 4.049046688674796
+      },
+      "reaching_ge_75pct_bounce": {
+        "total_episodes": 28837,
+        "proceeds_to_new_max_pct": 98.0580504213337,
+        "fails_and_reverses_pct": 1.674931511599681
+      }
+    }
+  },
+  "stability_summary": {
+    "year_oos_stability": {
+      "PB0.50": {
+        "2023": {
+          "N": 15375,
+          "reversal_pct": 16.422764227642276,
+          "reextension_pct": 81.37235772357724
+        },
+        "2024": {
+          "N": 15403,
+          "reversal_pct": 15.83457767967279,
+          "reextension_pct": 81.97104460170097
+        },
+        "2025_Q1": {
+          "N": 3825,
+          "reversal_pct": 15.503267973856207,
+          "reextension_pct": 82.09150326797385
+        }
+      },
+      "PB1.00": {
+        "2023": {
+          "N": 8971,
+          "reversal_pct": 24.74640508304537,
+          "reextension_pct": 72.54486679299966
+        },
+        "2024": {
+          "N": 9117,
+          "reversal_pct": 23.45069650104201,
+          "reextension_pct": 73.68651968849403
+        },
+        "2025_Q1": {
+          "N": 2196,
+          "reversal_pct": 23.816029143897996,
+          "reextension_pct": 72.95081967213115
+        }
+      },
+      "PB1.50": {
+        "2023": {
+          "N": 4562,
+          "reversal_pct": 35.29153879877247,
+          "reextension_pct": 60.96010521701009
+        },
+        "2024": {
+          "N": 4551,
+          "reversal_pct": 33.92660953636563,
+          "reextension_pct": 62.052296198637656
+        },
+        "2025_Q1": {
+          "N": 1059,
+          "reversal_pct": 35.2219074598678,
+          "reextension_pct": 59.962228517469306
+        }
+      },
+      "PB2.00": {
+        "2023": {
+          "N": 1816,
+          "reversal_pct": 48.348017621145374,
+          "reextension_pct": 46.86123348017621
+        },
+        "2024": {
+          "N": 1849,
+          "reversal_pct": 45.32179556517036,
+          "reextension_pct": 48.99945916711736
+        },
+        "2025_Q1": {
+          "N": 380,
+          "reversal_pct": 52.89473684210526,
+          "reextension_pct": 39.473684210526315
+        }
+      }
+    },
+    "direction_stability": {
+      "PB0.50": {
+        "BULLISH_REGIME_FADE_BEAR": {
+          "N": 19301,
+          "reversal_pct": 15.02512823169784,
+          "reextension_pct": 82.85062950106212
+        },
+        "BEARISH_REGIME_FADE_BULL": {
+          "N": 15302,
+          "reversal_pct": 17.36374330152921,
+          "reextension_pct": 80.29015814926154
+        }
+      },
+      "PB1.00": {
+        "BULLISH_REGIME_FADE_BEAR": {
+          "N": 10746,
+          "reversal_pct": 23.283082077051926,
+          "reextension_pct": 74.01823934487251
+        },
+        "BEARISH_REGIME_FADE_BULL": {
+          "N": 9538,
+          "reversal_pct": 24.942335919479973,
+          "reextension_pct": 72.0696162717551
+        }
+      },
+      "PB1.50": {
+        "BULLISH_REGIME_FADE_BEAR": {
+          "N": 5040,
+          "reversal_pct": 35.05952380952381,
+          "reextension_pct": 60.952380952380956
+        },
+        "BEARISH_REGIME_FADE_BULL": {
+          "N": 5132,
+          "reversal_pct": 34.294621979735,
+          "reextension_pct": 61.730319563523
+        }
+      },
+      "PB2.00": {
+        "BULLISH_REGIME_FADE_BEAR": {
+          "N": 1856,
+          "reversal_pct": 48.76077586206897,
+          "reextension_pct": 45.366379310344826
+        },
+        "BEARISH_REGIME_FADE_BULL": {
+          "N": 2189,
+          "reversal_pct": 46.231155778894475,
+          "reextension_pct": 48.652352672453176
+        }
+      }
+    },
+    "peak_mfe_context": {
+      "Q1_low_excursion": {
+        "peak_mfe_range": "< 3.00 ATR",
+        "sample_size_N": 8651,
+        "reversal_pct": 15.616691711940817,
+        "reextension_pct": 83.43544098948098,
+        "mean_pullback_to_peak_ratio": 0.22995687878128254
+      },
+      "Q2_mid_low_excursion": {
+        "peak_mfe_range": "3.00 - 4.18 ATR",
+        "sample_size_N": 8650,
+        "reversal_pct": 14.369942196531793,
+        "reextension_pct": 83.97687861271676,
+        "mean_pullback_to_peak_ratio": 0.14005274942305232
+      },
+      "Q3_mid_high_excursion": {
+        "peak_mfe_range": "4.18 - 5.63 ATR",
+        "sample_size_N": 8651,
+        "reversal_pct": 15.223673563749857,
+        "reextension_pct": 82.51069240550225,
+        "mean_pullback_to_peak_ratio": 0.10365614009910615
+      },
+      "Q4_high_excursion": {
+        "peak_mfe_range": ">= 5.63 ATR",
+        "sample_size_N": 8651,
+        "reversal_pct": 19.026702115362387,
+        "reextension_pct": 76.95064154433014,
+        "mean_pullback_to_peak_ratio": 0.07276885213720655
+      }
+    }
+  }
+}

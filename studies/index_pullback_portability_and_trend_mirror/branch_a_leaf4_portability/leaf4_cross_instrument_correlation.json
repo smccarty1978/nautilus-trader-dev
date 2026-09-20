@@ -1,0 +1,42 @@
+{
+  "daily_pnl_correlation": {
+    "ES": {
+      "ES": 1.0,
+      "NQ": -0.099,
+      "YM": 0.2292
+    },
+    "NQ": {
+      "ES": -0.099,
+      "NQ": 1.0,
+      "YM": -0.0123
+    },
+    "YM": {
+      "ES": 0.2292,
+      "NQ": -0.0123,
+      "YM": 1.0
+    }
+  },
+  "monthly_pnl_correlation": {
+    "ES": {
+      "ES": 1.0,
+      "NQ": 0.1113,
+      "YM": 0.3215
+    },
+    "NQ": {
+      "ES": 0.1113,
+      "NQ": 1.0,
+      "YM": 0.2668
+    },
+    "YM": {
+      "ES": 0.3215,
+      "NQ": 0.2668,
+      "YM": 1.0
+    }
+  },
+  "five_minute_clusters": {
+    "total_clusters": 9279,
+    "overlapping_clusters": 2621,
+    "pct_clusters_overlapping": 28.25,
+    "directional_agreement_pct": 59.75
+  }
+}

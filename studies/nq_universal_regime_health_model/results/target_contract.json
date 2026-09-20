@@ -1,0 +1,12 @@
+{
+  "HEAD_1": {
+    "name": "Structural Failure",
+    "column": "OPPOSITE_FLIP_BEFORE_NEW_MAX",
+    "definition": "P(OPPOSITE_REGIME_FLIP occurs before regime establishes NEW_MAX_MFE)"
+  },
+  "HEAD_2": {
+    "name": "Imminent Failure",
+    "column": "OPPOSITE_FLIP_LE_180S",
+    "definition": "P(OPPOSITE_REGIME_FLIP occurs <= 180 seconds from observation timestamp)"
+  }
+}

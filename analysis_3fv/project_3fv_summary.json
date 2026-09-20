@@ -1,0 +1,17 @@
+{
+  "project": "PROJECT 3F-V: ADVERSARIAL CAUSAL VALIDATION OF THE 1-SECOND REVERSAL TRIGGER",
+  "terminal_verdict": "3F_MATCHED_EVENT_ONLY_NOT_LIVE_TRIGGER",
+  "elapsed_seconds": 77.02614784240723,
+  "timestamp_utc": "2026-09-16T01:08:54Z",
+  "trigger_ledger_sha256": "eb5ae2cbeab5d9735ba5f1c38603198f968cd1e3c46ba9ff8e093987a9347b0e",
+  "summary": "The Project 3F edge exists strictly as a retrospective matched-event discriminator (50% synthetic prevalence) between known T0 reversal starts and known continuation pauses. When scanned continuously across all eligible P90 seconds in the natural population, the frozen rules repeatedly fire during trending regimes, incurring severe false positive decay and negative/untradeable economics.",
+  "key_findings": [
+    "Terminal Verdict: 3F_MATCHED_EVENT_ONLY_NOT_LIVE_TRIGGER",
+    "Natural population scanning evaluated 3,703,806 eligible 1s checkpoints across 6,559 P90-armed regimes.",
+    "THRUST_EXHAUSTION_REJECTION generated 20,203 triggers across the natural population (vs 150 reported in 3F's matched sample).",
+    "Under natural streaming, THRUST_EXHAUSTION_REJECTION achieves a pooled all-triggers expectancy of +0.0008 ATR (vs +0.5333 ATR claimed in 3F) and 2025 Q1 OOS expectancy of +0.0204 ATR.",
+    "First trigger only achieves pooled expectancy of -0.0052 ATR and 2025 Q1 OOS expectancy of +0.0233 ATR.",
+    "MBP-1 status remains strictly INCONCLUSIVE due to small sample size (N=100), shuffled cross-validation, and deteriorating PR-AUC (-11.7%).",
+    "Causal audit passed all 12 executable assertions with zero future lookahead."
+  ]
+}

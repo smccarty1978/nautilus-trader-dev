@@ -1,0 +1,39 @@
+{
+  "rule_identity": "NQ_Interpretable_Leaf_4",
+  "frozen_rule_expression": "minutes_from_rth_open <= 380.649994 AND realized_range_15m_atr <= 9.344128 AND current_price_from_prior_mfe_atr__tf_1m <= 1.738367",
+  "features": {
+    "minutes_from_rth_open": {
+      "canonical_definition": "Elapsed session minutes from the canonical RTH opening bell (08:30:00 US/Central).",
+      "session_anchor": "08:30:00 CT (510 minutes from midnight).",
+      "timezone": "America/Chicago (CME Exchange standard).",
+      "availability_timestamp": "Checkpoint timestamp ts_init (end of completed 1s observation bar).",
+      "formula": "(ct_hour * 60 + ct_minute + ct_second / 60.0) - 510.0",
+      "inclusion_exclusion_boundary": "minutes_from_rth_open <= 380.649994 includes trades from 08:30:00 to 14:50:39 CT; excludes the final 14 minutes 21 seconds of the RTH session (up to 15:15:00 CT)."
+    },
+    "realized_range_15m_atr": {
+      "canonical_definition": "Rolling 15-minute high-low range normalized by the incumbent regime's frozen starting ATR.",
+      "numerator_definition": "rolling_15m_high - rolling_15m_low across completed 1m bars (rolling window = 15, min_periods = 1).",
+      "source_bars": "Completed 1m bars resampled from CME 1s bars.",
+      "rolling_window_semantics": "Trailing 15 completed 1m bars up to the latest completed 1m bar prior to or at checkpoint ts.",
+      "atr_denominator": "frozen_atr (the Wilder ATR(14) recorded by DualEmaRegimeTracker at the confirmation bar of the incumbent regime).",
+      "atr_snapshot_timing": "Frozen at regime confirmation / start; does not float during the regime.",
+      "completed_bar_availability": "Strictly prior completed 1m bar (zero lookahead into forming bar).",
+      "boundary": "realized_range_15m_atr <= 9.344128"
+    },
+    "current_price_from_prior_mfe_atr__tf_1m": {
+      "canonical_definition": "Signed distance from current checkpoint price to the maximum favorable excursion (MFE) of the immediately preceding completed 1m regime, normalized by current completed 1m ATR.",
+      "sign_convention": "direction * (checkpoint_price - prior_regime_mfe). Signed positive when current price extends further in the current regime direction than prior regime MFE.",
+      "prior_regime_definition": "The immediately preceding confirmed and completed regime on the completed-bar 1m DualEmaRegimeTracker.",
+      "prior_mfe_definition": "The extreme price achieved in the prior regime's direction before it flipped. Defaults to start price / 0.0 if first regime of session.",
+      "current_price_timestamp": "Checkpoint close price at ts_init.",
+      "atr_denominator": "cur_1m_atr (the latest completed 1m Wilder ATR(14) from DualEmaRegimeTracker).",
+      "availability_timing": "Strictly causal at checkpoint observation.",
+      "boundary": "current_price_from_prior_mfe_atr__tf_1m <= 1.738367"
+    }
+  },
+  "governed_provider_status": {
+    "minutes_from_rth_open": "MISSING_IN_CANONICAL_FEATURE_REGISTRY (Offline research script implementation only)",
+    "realized_range_15m_atr": "MISSING_IN_CANONICAL_FEATURE_REGISTRY (Offline research script implementation only)",
+    "current_price_from_prior_mfe_atr__tf_1m": "MISSING_IN_CANONICAL_FEATURE_REGISTRY (Offline research script implementation only)"
+  }
+}

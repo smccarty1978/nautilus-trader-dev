@@ -1,0 +1,97 @@
+{
+  "verdict": "NEGATIVE",
+  "summary": "E1 (re-acceleration) systematically underperforms E0 (pullback apex) across all regime confirmation stages in gross EV (-0.010 to -0.018 ATR), net EV (-0.007 to -0.017 ATR), and win rate (-1.5% to -2.0%).",
+  "mechanism": "Entering on re-acceleration requires paying a 0.18 ATR adverse fill penalty (chasing continuation), which destroys more edge than the marginal selectivity of waiting for confirmation adds.",
+  "comparisons": {
+    "R0": {
+      "bracket": {
+        "PT_atr": 0.75,
+        "SL_atr": 0.75,
+        "required_theoretical_pt_hit_rate": 0.5
+      },
+      "E0_path_quality": {
+        "pt_hit_rate": 0.5078,
+        "sl_hit_rate": 0.4784,
+        "regime_termination_rate": 0.0137,
+        "hit_rate_margin_vs_required": 0.0078
+      },
+      "E1_path_quality": {
+        "pt_hit_rate": 0.4935,
+        "sl_hit_rate": 0.487,
+        "regime_termination_rate": 0.0187,
+        "hit_rate_margin_vs_required": -0.0065
+      },
+      "comparison_E1_minus_E0": {
+        "gross_ev_delta_atr": -0.018343,
+        "net_ev_delta_atr": -0.018309,
+        "fill_price_degradation_points": 0.1085,
+        "fill_price_degradation_atr": 0.0118,
+        "pt_hit_rate_delta": -0.0143,
+        "sl_hit_rate_delta": 0.0085,
+        "regime_termination_delta": 0.005,
+        "average_trade_duration_delta_sec": 0.5
+      },
+      "verdict": "REACCELERATION_E1_DEGRADES_VALUE (fill price slippage of +0.18A exceeds any information gain)"
+    },
+    "R1": {
+      "bracket": {
+        "PT_atr": 1.0,
+        "SL_atr": 0.75,
+        "required_theoretical_pt_hit_rate": 0.4286
+      },
+      "E0_path_quality": {
+        "pt_hit_rate": 0.4299,
+        "sl_hit_rate": 0.5481,
+        "regime_termination_rate": 0.022,
+        "hit_rate_margin_vs_required": 0.0013
+      },
+      "E1_path_quality": {
+        "pt_hit_rate": 0.4212,
+        "sl_hit_rate": 0.5514,
+        "regime_termination_rate": 0.0266,
+        "hit_rate_margin_vs_required": -0.0074
+      },
+      "comparison_E1_minus_E0": {
+        "gross_ev_delta_atr": -0.012465,
+        "net_ev_delta_atr": -0.012431,
+        "fill_price_degradation_points": 0.1085,
+        "fill_price_degradation_atr": 0.0118,
+        "pt_hit_rate_delta": -0.0087,
+        "sl_hit_rate_delta": 0.0033,
+        "regime_termination_delta": 0.0047,
+        "average_trade_duration_delta_sec": -9.0
+      },
+      "verdict": "REACCELERATION_E1_DEGRADES_VALUE (fill price slippage of +0.18A exceeds any information gain)"
+    },
+    "R2": {
+      "bracket": {
+        "PT_atr": 1.25,
+        "SL_atr": 0.75,
+        "required_theoretical_pt_hit_rate": 0.375
+      },
+      "E0_path_quality": {
+        "pt_hit_rate": 0.4348,
+        "sl_hit_rate": 0.4859,
+        "regime_termination_rate": 0.0792,
+        "hit_rate_margin_vs_required": 0.0598
+      },
+      "E1_path_quality": {
+        "pt_hit_rate": 0.4285,
+        "sl_hit_rate": 0.4841,
+        "regime_termination_rate": 0.0866,
+        "hit_rate_margin_vs_required": 0.0535
+      },
+      "comparison_E1_minus_E0": {
+        "gross_ev_delta_atr": -0.009088,
+        "net_ev_delta_atr": -0.009054,
+        "fill_price_degradation_points": 0.1085,
+        "fill_price_degradation_atr": 0.0118,
+        "pt_hit_rate_delta": -0.0064,
+        "sl_hit_rate_delta": -0.0018,
+        "regime_termination_delta": 0.0073,
+        "average_trade_duration_delta_sec": -9.1
+      },
+      "verdict": "REACCELERATION_E1_DEGRADES_VALUE (fill price slippage of +0.18A exceeds any information gain)"
+    }
+  }
+}

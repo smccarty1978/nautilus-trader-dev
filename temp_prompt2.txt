@@ -1,0 +1,780 @@
+<USER_REQUEST>
+You are running a BOUNDED OBSERVATIONAL FOLLOW-UP STUDY.
+
+This is NOT a strategy backtest.
+This is NOT parameter optimization.
+This is NOT an ML study.
+Do NOT introduce SL/PT logic.
+Do NOT search for new thresholds.
+Do NOT modify A1 or A2.
+
+The purpose is to resolve the remaining selection/economic-information question created by the first-hit transition-confirmation study.
+
+======================================================================
+STUDY NAME
+======================================================================
+
+nq_persistent_q4_confirmation_opportunity_capture
+
+======================================================================
+BACKGROUND
+======================================================================
+
+The prior research chain established:
+
+1. Persistent Q4 identifies a prospective regime-transition region.
+
+2. Prospective discrimination at persistent Q4 itself failed:
+   Q4 timing discrimination at T0 was approximately random
+   (AUC ~0.50).
+
+3. The post-Q4 transition-confirmation atlas showed that causal
+   information emerges after Q4, particularly through actual
+   counter-direction price displacement.
+
+4. The first-hit study then converted fixed checkpoints into causal
+   event-time confirmation and found:
+
+   A1:
+     +0.25 ATR counter-direction displacement from persistent Q4
+     confirmed N = 3,072
+     coverage = 54.8%
+     median first hit = 25s
+     median lead to V_A = 45s
+     median entry advantage vs V_A = +1.50 pts
+     median future old-regime MFE = 0.27 ATR
+     P(future MFE > 1 ATR) = 23.1%
+     Q4_WORSE avoided = 66.4%
+
+   A2:
+     +0.50 ATR counter-direction displacement from persistent Q4
+     confirmed N = 1,943
+     coverage = 34.6%
+     median first hit = 60s
+     median lead to V_A = 40s
+     median entry advantage vs V_A = +1.00 pts
+     median future old-regime MFE = 0.27 ATR
+     P(future MFE > 1 ATR) = 21.0%
+     Q4_WORSE avoided = 86.6%
+
+Both relationships replicated directionally on untouched 2025 Q1 OOS.
+
+However, these statistics do NOT yet establish that A1/A2 are useful
+entry policies.
+
+The key selection issue is:
+
+Many observations classified as avoided Q4_WORSE are
+FLIP_BEFORE_FIRST_HIT.
+
+A policy that waits for A1/A2 would therefore never enter those
+observations before V_A.
+
+That may be desirable, but the same gate may also discard favorable
+Q4_BETTER opportunities.
+
+Therefore we need to measure BOTH sides of the selection tradeoff.
+
+======================================================================
+PRIMARY RESEARCH QUESTION
+======================================================================
+
+Does waiting for first-hit A1 or A2 selectively discard bad persistent-Q4
+opportunities while preserving enough favorable opportunity and enough
+price advantage to justify carrying the confirmation event forward into
+a causal NautilusTrader strategy test?
+
+Equivalently:
+
+What economic information is actually purchased by waiting for
++0.25 ATR or +0.50 ATR of counter-direction displacement?
+
+======================================================================
+FROZEN POPULATION
+======================================================================
+
+Use exactly the same reconciled population as the parent studies:
+
+ALL:
+  N = 5,610
+
+TRAIN:
+  2023-2024
+  N = 5,038
+
+UNTOUCHED OOS:
+  2025 Q1
+  N = 572
+
+Do not recollect or redefine the population unless required by a
+verified artifact defect.
+
+Gate 0 must prove exact reconciliation with the authoritative parent
+artifacts before analysis proceeds.
+
+Reuse the existing first-hit timestamps for A1 and A2 if their
+provenance and hashes reconcile.
+
+Do NOT unnecessarily rerun expensive market-data collection if the
+required event timestamps and outcomes already exist in authoritative
+artifacts.
+
+======================================================================
+KNOWN PARENT DEFECT
+======================================================================
+
+The previous first-hit study identified 46 rows in the older
+fixed-checkpoint B2 calculation affected by uint64 timestamp subtraction
+underflow.
+
+Record this explicitly in provenance.
+
+Do not silently treat the old B2 artifact as clean.
+
+This study is focused on A1/A2, so the B2 defect should not require
+rebuilding unrelated artifacts unless evidence shows contamination of
+A1/A2.
+
+Verify that A1/A2 are unaffected.
+
+======================================================================
+FROZEN CONDITIONS
+======================================================================
+
+A1:
+First causal time after persistent Q4 that price reaches:
+
+    +0.25 ATR
+
+in the prospective new-regime / counter-old-regime direction.
+
+A2:
+First causal time after persistent Q4 that price reaches:
+
+    +0.50 ATR
+
+in the prospective new-regime / counter-old-regime direction.
+
+Use the exact definitions, ATR snapshot, direction conventions,
+timestamps, price semantics, and first-hit rules from the authoritative
+first-hit study.
+
+NO alternative thresholds.
+
+NO optimization.
+
+======================================================================
+CORE COMPETING-EVENT CLASSIFICATION
+======================================================================
+
+For EACH original persistent-Q4 regime and EACH condition A1/A2,
+classify exactly one mutually exclusive outcome:
+
+1. CONFIRM_BEFORE_VA
+   A1/A2 first hit occurs strictly before natural V_A flip.
+
+2. VA_BEFORE_CONFIRM
+   natural V_A flip occurs strictly before A1/A2 first hit.
+
+3. TIE
+   first-hit timestamp equals V_A timestamp under the frozen timestamp
+   semantics.
+
+4. NO_VALID_RESOLUTION
+   only if a genuine data/provenance issue prevents classification.
+
+Do not discard VA_BEFORE_CONFIRM observations.
+
+They are central to this study.
+
+======================================================================
+Q4 OUTCOME CLASSIFICATION
+======================================================================
+
+Within every competing-event group, preserve the authoritative parent
+Q4 outcome classification.
+
+At minimum distinguish:
+
+    Q4_BETTER
+    Q4_WORSE
+
+Use the exact parent definition.
+
+Do not create a new favorable/adverse label.
+
+Also preserve the original continuous quantities required to understand
+severity, including:
+
+    Q4 entry advantage vs V_A
+    residual old-regime MFE
+    maximum adverse point displacement / economic loss proxy
+    natural flip timing
+    direction
+    ATR
+
+Use authoritative parent fields wherever possible rather than
+recomputing them.
+
+======================================================================
+ANALYSIS 1 — RETENTION MATRIX
+======================================================================
+
+For A1 and A2 separately calculate:
+
+                    CONFIRM BEFORE VA    VA BEFORE CONFIRM    TIE
+Q4_BETTER
+Q4_WORSE
+
+Report:
+
+N
+% of row
+% of column
+% of entire original population
+
+Most importantly calculate:
+
+BETTER retention rate:
+    P(CONFIRM_BEFORE_VA | Q4_BETTER)
+
+WORSE retention rate:
+    P(CONFIRM_BEFORE_VA | Q4_WORSE)
+
+BETTER discard rate:
+    P(VA_BEFORE_CONFIRM | Q4_BETTER)
+
+WORSE discard rate:
+    P(VA_BEFORE_CONFIRM | Q4_WORSE)
+
+Then calculate a transparent selectivity ratio such as:
+
+    BETTER retention rate / WORSE retention rate
+
+Do not turn this into an optimized objective function.
+
+It is descriptive only.
+
+======================================================================
+ANALYSIS 2 — WHAT GOOD OPPORTUNITIES ARE LOST?
+======================================================================
+
+This is mandatory.
+
+For Q4_BETTER observations discarded because V_A occurs before
+confirmation, characterize:
+
+N
+share of all Q4_BETTER
+seconds Q4 -> V_A
+Q4 price advantage vs V_A
+residual old-regime MFE
+ATR
+direction
+
+Report distributions:
+
+mean
+median
+P25
+P75
+P90 where appropriate.
+
+Determine whether discarded Q4_BETTER observations are primarily:
+
+A. very fast benign transitions where V_A arrives shortly after Q4,
+
+or
+
+B. economically valuable early entries that confirmation would
+   materially sacrifice.
+
+Do not infer this from aggregate coverage.
+Measure it directly.
+
+======================================================================
+ANALYSIS 3 — OPPORTUNITY CAPTURE
+======================================================================
+
+We need more than event counts.
+
+Quantify how much of the original favorable Q4 opportunity remains
+available after requiring confirmation.
+
+For Q4_BETTER observations, calculate total and distributional original
+Q4 price advantage versus V_A.
+
+Then decompose that opportunity into:
+
+1. Q4_BETTER + CONFIRM_BEFORE_VA
+2. Q4_BETTER + VA_BEFORE_CONFIRM
+3. ties if applicable.
+
+For confirmed observations also calculate:
+
+    confirmation price advantage vs V_A
+
+and:
+
+    confirmation cost =
+        Q4 advantage - confirmation advantage
+
+Report both points and ATR where possible.
+
+Answer:
+
+What percentage of favorable Q4 observations survive?
+
+What percentage of aggregate favorable Q4 price advantage belongs to
+surviving observations?
+
+How much of that advantage remains at the actual confirmation price?
+
+How much advantage was spent waiting for confirmation?
+
+======================================================================
+ANALYSIS 4 — BAD OPPORTUNITY / TAIL DECOMPOSITION
+======================================================================
+
+Perform the symmetric analysis for Q4_WORSE.
+
+For:
+
+Q4_WORSE + CONFIRM_BEFORE_VA
+
+versus:
+
+Q4_WORSE + VA_BEFORE_CONFIRM
+
+report:
+
+N
+Q4 disadvantage
+future old-regime MFE
+maximum adverse point movement
+seconds to V_A
+tail severity
+
+Explicitly measure severe tails using the same frozen severity
+definitions from the parent study.
+
+If parent thresholds include:
+
+<-20 pts
+<-40 pts
+<-60 pts
+
+preserve them.
+
+Do NOT introduce optimized new thresholds.
+
+Show exactly what fraction of severe adverse observations remains
+exposed after A1 and A2.
+
+======================================================================
+ANALYSIS 5 — A1 -> A2 TRANSITION FUNNEL
+======================================================================
+
+This is one of the most important analyses.
+
+A2 is downstream of A1.
+
+For every regime classify:
+
+never reaches A1 before V_A
+
+reaches A1 but not A2 before V_A
+
+reaches A1 then reaches A2 before V_A
+
+ties if necessary.
+
+For the:
+
+    A1_ONLY_BEFORE_VA
+
+and:
+
+    A1_THEN_A2_BEFORE_VA
+
+populations compare:
+
+Q4_BETTER rate
+Q4_WORSE rate
+future old-regime MFE
+tail probabilities
+severe loss incidence
+A1 price advantage vs V_A
+A2 price advantage vs V_A
+A1 -> A2 elapsed seconds
+
+For observations that reach both A1 and A2 calculate:
+
+incremental confirmation cost:
+
+    price_A1 - price_A2
+
+expressed directionally as lost prospective entry advantage.
+
+Also calculate:
+
+incremental tail suppression obtained by waiting from A1 to A2.
+
+The purpose is to answer:
+
+Does the additional +0.25 ATR required by A2 buy genuinely useful
+selection, or mostly consume price and coverage after A1 has already
+identified the transition?
+
+======================================================================
+ANALYSIS 6 — V_A FALLBACK INTERPRETATION
+======================================================================
+
+For observations where V_A occurs before A1/A2, measure whether the
+lost Q4_BETTER opportunities remain naturally capturable at V_A.
+
+Do NOT backtest a fallback strategy.
+
+Simply report:
+
+how many discarded favorable Q4 observations reach V_A quickly
+
+their Q4 -> V_A elapsed time
+
+their foregone Q4 advantage
+
+their severity/risk prior to V_A.
+
+This will tell us whether a future architecture could conceptually be:
+
+Q4 arms transition monitoring
+
+IF A1/A2 first:
+    early confirmation event
+
+ELSE:
+    natural V_A remains the fallback transition event
+
+Do not implement this strategy in the current study.
+
+======================================================================
+ANALYSIS 7 — TIME DEPENDENCE
+======================================================================
+
+The prior work suggests confirmation is a continuous arrival process.
+
+For A1 and A2, bucket first hits using frozen descriptive windows:
+
+<=15s
+16-30s
+31-60s
+61-120s
+121-300s
+>300s
+
+Within each bucket report:
+
+N
+Q4_BETTER rate
+Q4_WORSE rate
+entry advantage at confirmation
+future residual MFE
+P(>1 ATR)
+P(>2 ATR)
+severe-tail incidence
+
+This is descriptive.
+
+Do NOT choose an optimal time cutoff.
+
+The purpose is to determine whether late A1/A2 confirmations have the
+same meaning as early confirmations.
+
+======================================================================
+ANALYSIS 8 — DIRECTIONAL SYMMETRY
+======================================================================
+
+Repeat core A1/A2 retention and opportunity-capture metrics separately
+for:
+
+bullish -> bearish transitions
+
+bearish -> bullish transitions
+
+Use the existing frozen direction semantics.
+
+Flag material asymmetry.
+
+Do not optimize separate directional thresholds.
+
+======================================================================
+ANALYSIS 9 — TEMPORAL REPLICATION
+======================================================================
+
+Report all core results separately for:
+
+2023
+2024
+2025 Q1 untouched OOS
+
+At minimum report per period:
+
+population N
+
+A1 coverage
+A2 coverage
+
+BETTER retention
+WORSE retention
+
+median confirmation advantage
+
+median residual MFE
+
+P(>1 ATR)
+
+severe-tail retention/avoidance
+
+A1 -> A2 conversion rate
+
+Do not rely only on pooled TRAIN vs OOS.
+
+We need to know whether one TRAIN year dominates the result.
+
+======================================================================
+ANALYSIS 10 — SELECTION VERSUS MECHANICAL PRICE IMPROVEMENT
+======================================================================
+
+This is critical.
+
+Because A1/A2 are defined using favorable price displacement, some
+improvement after confirmation is mechanically expected.
+
+Separate, as far as the observational data allows:
+
+A. MECHANICAL CONFIRMATION COST
+   Price moved +0.25/+0.50 ATR before entry could occur.
+
+B. SELECTION EFFECT
+   Regimes that never produce that displacement before V_A are removed.
+
+C. POST-CONFIRMATION INFORMATION
+   Conditional future old-regime behavior after the event.
+
+Do not claim that improved post-event economics prove predictive
+information merely because price has already moved favorably.
+
+Explicitly discuss this identification limitation in the report.
+
+======================================================================
+PRIMARY COMPARISON TABLE
+======================================================================
+
+Produce one compact table containing at minimum:
+
+Metric                     Q4 T0      A1         A2
+------------------------------------------------------
+Original population
+Confirmed before V_A
+Coverage
+BETTER retained
+WORSE retained
+BETTER retention %
+WORSE retention %
+Selectivity ratio
+Median confirmation time
+Median lead to V_A
+Median advantage vs V_A
+Median confirmation cost
+Median future MFE
+P(>1 ATR)
+P(>2 ATR)
+<-20pt tail retained
+<-40pt tail retained
+<-60pt tail retained
+2023 replication
+2024 replication
+2025Q1 OOS replication
+
+Do not create a winner score.
+
+======================================================================
+DECISION GATE
+======================================================================
+
+The study must end with exactly ONE of these evidence classifications:
+
+OUTCOME_A_CONFIRMATION_SELECTION_SUPPORTED
+
+Meaning:
+At least one frozen displacement event shows replicated evidence that
+it preferentially retains favorable Q4 opportunities relative to
+adverse opportunities while preserving meaningful pre-V_A price
+advantage.
+
+OUTCOME_B_CONFIRMATION_MAINLY_MECHANICAL
+
+Meaning:
+Residual improvement primarily reflects requiring favorable price
+movement, with little evidence of useful selection beyond that
+mechanical displacement.
+
+OUTCOME_C_CONFIRMATION_TOO_EXPENSIVE
+
+Meaning:
+A1/A2 suppress adverse events but discard too much favorable
+opportunity and/or consume most meaningful Q4 -> V_A price advantage.
+
+OUTCOME_D_MIXED_OR_UNRESOLVED
+
+Meaning:
+Results are materially unstable across years, direction, or OOS, or
+the observational decomposition cannot distinguish the alternatives.
+
+Do not invent numeric pass thresholds after seeing results.
+
+Base the classification on the complete evidence and explicitly state
+the reasoning.
+
+======================================================================
+DELIVERABLES
+======================================================================
+
+Create:
+
+studies/nq_persistent_q4_confirmation_opportunity_capture/
+
+with at minimum:
+
+CONFIRMATION_OPPORTUNITY_CAPTURE_REPORT.md
+
+results/
+    competing_event_ledger.parquet
+    retention_matrix.json
+    favorable_opportunity_capture.json
+    discarded_better_analysis.json
+    adverse_tail_decomposition.json
+    a1_to_a2_transition_funnel.json
+    va_fallback_analysis.json
+    confirmation_time_buckets.json
+    directional_replication.json
+    yearly_replication.json
+    mechanical_vs_selection_decomposition.json
+    population_reconciliation.json
+    parent_artifact_hashes.json
+    dataset_composite_hashes.json
+    runtime_contract.json
+    study_manifest.json
+
+The row-level ledger must be sufficient to reproduce all headline
+statistics without recollecting market data.
+
+======================================================================
+EFFICIENCY REQUIREMENT
+======================================================================
+
+This should be primarily an ARTIFACT-REUSE study.
+
+Before building anything expensive:
+
+1. locate authoritative parent artifacts
+2. verify hashes/provenance
+3. inspect whether required fields already exist
+4. join/reduce existing ledgers deterministically
+5. access raw bars ONLY for fields genuinely absent from authoritative
+   artifacts
+
+Do not launch a multi-minute raw-data pass merely because previous
+studies did so.
+
+Prefer Polars/Arrow vectorized analysis of existing ledgers.
+
+Do not use an LLM for deterministic calculations.
+
+Persist intermediate results once.
+
+Do not repeatedly reread unchanged large files.
+
+======================================================================
+AUDIT REQUIREMENTS
+======================================================================
+
+Before reporting the decision gate:
+
+1. prove original population = exactly 5,610
+2. prove TRAIN = 5,038
+3. prove untouched OOS = 572
+4. prove no duplicate regime-condition rows
+5. prove every regime receives an A1 and A2 competing-event
+   classification
+6. prove event timestamps cannot occur before persistent Q4
+7. prove CONFIRM_BEFORE_VA actually satisfies event_ts < V_A_ts
+8. prove VA_BEFORE_CONFIRM satisfies the inverse
+9. verify A1/A2 first-hit counts against the authoritative parent study
+10. verify A1/A2 are unaffected by the known B2 uint64 defect
+11. verify all reported TRAIN/OOS/year/direction subsets reconcile to
+    the complete population
+
+If any material reconciliation fails:
+
+STOP.
+
+Do not patch the evidence until the discrepancy is understood and
+documented.
+
+======================================================================
+MANDATORY FINAL QUESTIONS
+======================================================================
+
+The final report must explicitly answer:
+
+1. What fraction of Q4_BETTER survives A1?
+2. What fraction survives A2?
+3. What fraction of Q4_WORSE survives each?
+4. What is the favorable/adverse selectivity change?
+5. How much favorable Q4 opportunity is discarded?
+6. Are discarded favorable events mostly fast V_A transitions?
+7. How much entry advantage remains at A1?
+8. How much remains at A2?
+9. How much advantage is spent moving A1 -> A2?
+10. What additional tail reduction is purchased by A2?
+11. Does A2 add information beyond A1 or mainly add confirmation cost?
+12. Are late A1/A2 confirmations equivalent to early confirmations?
+13. Are results symmetric by transition direction?
+14. Do 2023 and 2024 independently agree?
+15. Does untouched 2025 Q1 agree?
+16. How much of the apparent improvement is mechanical?
+17. How much appears attributable to population selection?
+18. Is there sufficient evidence to carry A1, A2, both, or neither
+    forward as FROZEN CANDIDATES for subsequent NT validation?
+
+For question 18, "carry forward" means only retain as candidates for
+the next validation stage. It does NOT authorize optimization or
+strategy implementation in this study.
+
+======================================================================
+MANDATORY STOP
+======================================================================
+
+After completing this observational decomposition:
+
+STOP.
+
+Do NOT:
+
+- run a NautilusTrader strategy backtest
+- optimize A1/A2
+- introduce intermediate displacement thresholds
+- introduce timing cutoffs
+- add SL/PT
+- train a classifier
+- combine A/B/C conditions
+- create a production strategy
+- use 2025 Q1 to tune parameters
+
+Return the report, artifacts, audit status, and decision-gate
+classification only.
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-09-16T11:02:54-05:00.
+</ADDITIONAL_METADATA>

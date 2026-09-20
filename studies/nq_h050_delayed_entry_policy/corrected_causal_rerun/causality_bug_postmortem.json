@@ -1,0 +1,23 @@
+{
+  "bug_classification": "LOOKAHEAD_FEATURE_LEAKAGE",
+  "leaking_variable": "cur_peak",
+  "owning_script": "scripts/run_delayed_entry_policy_study.py",
+  "owning_lines": "177-183, 367-375",
+  "defect_mechanism": "Inside a depth-scanning loop, cur_peak was iterated to idx_reg_end (the terminal end of the regime). At +30s and +60s, ext_mag was calculated as max(0.0, cur_peak - min(ff_lows)) / frozen_atr, which encoded the eventual maximum future continuation of the incumbent trend into the 30s feature.",
+  "why_existing_audits_missed_it": "The feature formula read innocently as 'magnitude of new extreme', and the execution engine correctly routed orders on the next bar open with 1s latency. The leakage was embedded entirely inside the feature value itself.",
+  "prior_contaminated_artifacts": [
+    "studies/nq_h050_delayed_entry_policy/results/policy_trade_ledger.parquet (F30 and F60 cells)",
+    "studies/nq_h050_delayed_entry_policy/results/fast_failure_overlay_comparison.json",
+    "studies/nq_h050_delayed_entry_policy/results/policy_comparison_matrix.json",
+    "studies/nq_h050_delayed_entry_policy/results/policy_nomination.json"
+  ],
+  "uncontaminated_artifacts": [
+    "All F0 baseline entry results in studies/nq_h050_delayed_entry_policy",
+    "studies/nq_h050_delayed_entry_fast_failure (observational study computed features independently)",
+    "studies/nq_h050_depth_progression (independent progression simulation)"
+  ],
+  "permanent_guardrails_added": [
+    "Canonical feature provider features/providers/causal_fast_failure.py with explicit observation_ts parameter",
+    "Permanent regression test tests/test_causal_fast_failure_invariance.py asserting bit-for-bit invariance under bifurcating future price paths"
+  ]
+}

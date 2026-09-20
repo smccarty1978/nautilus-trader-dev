@@ -1,0 +1,30 @@
+{
+  "study_id": "nq_h050_economic_subpopulation_mining",
+  "timestamp_completed": "2026-09-17 19:06:07 UTC",
+  "total_observations": 23915,
+  "observations_by_period": {
+    "2023": 10605,
+    "2024": 10888,
+    "2025_Q1": 2422
+  },
+  "artifacts": [
+    "population_frequency_summary.json",
+    "economic_target_contract.json",
+    "feature_manifest.json",
+    "oof_model_manifest.json",
+    "ev_rank_metrics.json",
+    "left_tail_rank_metrics.json",
+    "right_tail_rank_metrics.json",
+    "coverage_band_results.json",
+    "direction_age_matrix.json",
+    "interpretable_rule_tree.json",
+    "interpretable_rule_validation.json",
+    "candidate_subpopulation_matrix.json",
+    "drawdown_stress_tests.json",
+    "tail_dependence_tests.json",
+    "monthly_stability.json",
+    "baseline_comparisons.json",
+    "2025_q1_frozen_diagnostic.json",
+    "h050_scored_observation_ledger.parquet"
+  ]
+}

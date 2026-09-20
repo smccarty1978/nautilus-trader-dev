@@ -1,0 +1,21 @@
+{
+  "m4_training_dataset": "studies/nq_h050_asymmetric_regime_exhaustion/results/checkpoint_target_ledger.parquet",
+  "m4_training_split": "TRAIN",
+  "m4_fit_rows": 21493,
+  "m4_fit_years": [
+    "2023",
+    "2024"
+  ],
+  "m4_fit_calendar_start": "2023-01-03",
+  "m4_fit_calendar_end": "2024-12-31",
+  "m4_validation_split_in_training": "None (5-fold CV on full TRAIN, refitted on full TRAIN)",
+  "new_model_training_dataset": "studies/nq_h050_mtf_regime_context_features/results/feature_surface_train.parquet",
+  "new_model_selection_fit_year": "2023 (N=10,605)",
+  "new_model_selection_val_year": "2024 (N=10,888)",
+  "new_model_2024_evaluation_basis": "Original 2023-fit model predictions (legitimate out-of-sample generalization)",
+  "new_model_final_persistence": "Refitted on full 2023-2024 TRAIN (N=21,493)",
+  "comparison_2024_status": "SAME_POPULATION_DIAGNOSTIC_ONLY",
+  "comparison_2024_rationale": "M4 was fitted on full 2023-2024 TRAIN (in-sample for M4), while New Model is evaluated using true 2023-fit generalization.",
+  "comparison_2025_q1_status": "COMMON_FORWARD_DIAGNOSTIC",
+  "comparison_2025_q1_rationale": "2025 Q1 is chronologically forward for both models, completely frozen before scoring. Primary basis for verdicts."
+}

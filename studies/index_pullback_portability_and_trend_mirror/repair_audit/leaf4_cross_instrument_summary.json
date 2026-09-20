@@ -1,0 +1,37 @@
+{
+  "comparison_table": {
+    "NQ": {
+      "trades_pooled": 963,
+      "mean_net_ev_atr": 0.5694,
+      "win_rate": 0.5109,
+      "profit_factor": 1.6696,
+      "total_net_dollars": 66800.0
+    },
+    "ES": {
+      "trades_pooled": 7923,
+      "mean_net_ev_atr": -1.0374,
+      "win_rate": 0.3927,
+      "profit_factor": 0.2326,
+      "total_net_dollars": -716265.0
+    },
+    "YM": {
+      "trades_pooled": 6918,
+      "mean_net_ev_atr": -0.8397,
+      "win_rate": 0.4462,
+      "profit_factor": 0.323,
+      "total_net_dollars": -385435.0
+    }
+  },
+  "portfolio_economics": {
+    "NQ_net_dollars": 66800.0,
+    "ES_net_dollars": -716265.0,
+    "YM_net_dollars": -385435.0,
+    "Combined_net_dollars": -1034900.0
+  },
+  "verdicts": {
+    "LEAF4_ES_PORTABILITY": "NOT_FOUND",
+    "LEAF4_YM_PORTABILITY": "NOT_FOUND",
+    "LEAF4_CROSS_INSTRUMENT_STATE": "NQ_SPECIFIC",
+    "LEAF4_PORTFOLIO_VIABLE": "NO"
+  }
+}

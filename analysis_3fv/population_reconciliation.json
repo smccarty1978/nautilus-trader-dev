@@ -1,0 +1,57 @@
+{
+  "description": "Explicit reconciliation across the three research populations",
+  "populations": {
+    "PROJECT_3E": {
+      "description": "Full P90-armed NQ population at 5-second checkpoints",
+      "timeframe": "5-second checkpoints",
+      "regimes_count": 6559,
+      "total_checkpoints": 586897,
+      "sampling_method": "Complete census of all causal 5s checkpoints after P90 arming",
+      "baseline_win_rate": 0.4239,
+      "baseline_gross_expectancy_atr": -0.0082,
+      "oos_roc_auc": 0.528,
+      "finding": "TRANSITION_UNOBSERVABLE_WITH_5S_PRICE_AND_MODEL_INPUTS"
+    },
+    "PROJECT_3F": {
+      "description": "Matched-event retrospective comparison population at 1-second resolution",
+      "timeframe": "1-second native bars in micro-windows (T-15s to T+10s)",
+      "regimes_count": 5497,
+      "total_checkpoints": 21236,
+      "true_reversal_starts": 10618,
+      "matched_false_pauses": 10618,
+      "total_1s_bar_observations": 534687,
+      "sampling_method": "Retrospective balanced sampling: 10,618 T0 starts of >=30s winning runs matched 1-to-1 with 10,618 continuation pauses selected using future regime MFE extension (rem_max_mfe >= 0.50 ATR)",
+      "reported_ter_win_rate": 0.7333,
+      "reported_ter_expectancy_atr": 0.5333,
+      "reported_oos_roc_auc": 0.7655,
+      "finding": "1S_PRICE_TRIGGER_SUFFICIENT (Synthetic balanced matched events only)"
+    },
+    "PROJECT_3F_V": {
+      "description": "Natural causal 1-second streaming population across all P90-armed regimes",
+      "timeframe": "1-second native streaming bars from P90 arming to regime termination",
+      "regimes_count": 6559,
+      "total_eligible_1s_bars": 3703806,
+      "sampling_method": "Complete causal streaming: no T0 knowledge, no matched pairs, no future lookahead",
+      "results_thrust_exhaustion_rejection": {
+        "total_natural_triggers": 20203,
+        "regimes_triggered": 3471,
+        "all_triggers_pooled_win_rate": 0.42901723796314645,
+        "all_triggers_pooled_expectancy_atr": 0.0007801664355063243,
+        "first_trigger_pooled_win_rate": 0.42560553633217996,
+        "first_trigger_pooled_expectancy_atr": -0.005190311418685034,
+        "first_trigger_2025_q1_expectancy_atr": 0.023255813953488413
+      },
+      "results_volume_absorption": {
+        "total_natural_triggers": 37246,
+        "first_trigger_pooled_expectancy_atr": 0.00616315553563429,
+        "first_trigger_2025_q1_expectancy_atr": 0.03298969072164948
+      },
+      "results_extreme_spike_reversal": {
+        "total_natural_triggers": 35443,
+        "first_trigger_pooled_expectancy_atr": 0.03433355810294447,
+        "first_trigger_2025_q1_expectancy_atr": 0.0529835390946502
+      }
+    }
+  },
+  "why_population_counts_differ": "1. Project 3E evaluated 586,897 discrete 5-second checkpoints across all 6,559 P90-armed regimes.\n2. Project 3F selected only 10,618 points labeled T0 (start of a >=30s winning run) and paired them with 10,618 retrospectively filtered false continuation pauses, discarding all other 576,000+ checkpoints and 1,062 non-qualifying regimes.\n3. Project 3F-V restores the entire continuous timeline: evaluating every single native 1-second bar (~2.3 million bars) from the exact second P90 becomes armed until regime termination, with zero retrospective filtering."
+}

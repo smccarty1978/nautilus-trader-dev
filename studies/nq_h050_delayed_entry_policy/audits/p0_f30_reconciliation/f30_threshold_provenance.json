@@ -1,0 +1,13 @@
+{
+  "verdict": "F30_THRESHOLD_PROVENANCE_PASS",
+  "threshold_value": 0.6980097987618479,
+  "score_name": "risk_score_severe_loss_30s",
+  "score_orientation": "HIGHER_SCORE_MEANS_MORE_FAILURE_RISK",
+  "derivation_population": "2023 TRAIN candidate trades across policies P0-P5 in run_delayed_entry_policy_study.py",
+  "date_range": "2023-01-01 to 2023-12-31",
+  "row_count_derivation": 56128,
+  "percentile_intended": 90.0,
+  "actual_percentile_achieved_in_derivation_pool": 90.0,
+  "ties_present": false,
+  "notes": "Threshold was calculated as np.percentile(train_scores, 90.0) on 2023 training data. Continuous probability scores resulted in zero ties."
+}

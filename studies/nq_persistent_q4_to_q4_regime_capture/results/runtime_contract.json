@@ -1,0 +1,14 @@
+{
+  "study_id": "nq_persistent_q4_to_q4_regime_capture",
+  "instrument": "NQ",
+  "multiplier": 20.0,
+  "commission_round_trip": 5.0,
+  "slippage_per_fill_ticks": 1,
+  "slippage_tick_size": 0.25,
+  "total_friction_round_trip": 15.0,
+  "q4_definition": "H1 >= 0.50 AND H2 >= 0.25 continuously for >= 60 seconds",
+  "control_policy": "Confirmed V_A flip-to-flip (C0)",
+  "experimental_policy": "Persistent Q4-to-Q4 regime capture (Q4Q4)",
+  "train_period": "2023-2024",
+  "oos_period": "2025 Q1"
+}

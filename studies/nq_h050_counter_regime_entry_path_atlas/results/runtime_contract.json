@@ -1,0 +1,15 @@
+{
+  "study_name": "nq_h050_counter_regime_entry_path_atlas",
+  "parent_study": "nq_h050_asymmetric_regime_exhaustion",
+  "horizon": "H050 (0.50 ATR giveback from running maxMFE)",
+  "census_size": 23915,
+  "train_n": 21493,
+  "oos_n": 2422,
+  "market_data": "NQ 1-Second CME Catalog (27.3M bars)",
+  "models_evaluated": [
+    "M0_Binary_Control",
+    "M1_Cost_Sensitive",
+    "M4_Composite_Risk"
+  ],
+  "decision_gate_verdict": "OUTCOME_B_REGIME_EXHAUSTION_INFORMATION_EXISTS_BUT_COUNTER_ENTRY_PATH_IS_NOISY"
+}

@@ -1,0 +1,94 @@
+{
+  "HEAD_1": {
+    "M0-U": {
+      "feature_count": 7,
+      "oos_roc_auc": 0.7231,
+      "oos_pr_auc": 0.6695,
+      "oos_brier": 0.2063,
+      "oos_log_loss": 0.6,
+      "top_decile_obs": 0.8196,
+      "bottom_decile_obs": 0.1565,
+      "decile_spread": 0.6631,
+      "auc_train_to_oos_delta": 0.0031
+    },
+    "M1-U": {
+      "feature_count": 24,
+      "oos_roc_auc": 0.7377,
+      "oos_pr_auc": 0.6887,
+      "oos_brier": 0.2015,
+      "oos_log_loss": 0.5889,
+      "top_decile_obs": 0.8342,
+      "bottom_decile_obs": 0.1449,
+      "decile_spread": 0.6893,
+      "auc_train_to_oos_delta": 0.0084
+    },
+    "M2-U": {
+      "feature_count": 31,
+      "oos_roc_auc": 0.7376,
+      "oos_pr_auc": 0.69,
+      "oos_brier": 0.2013,
+      "oos_log_loss": 0.5884,
+      "top_decile_obs": 0.8373,
+      "bottom_decile_obs": 0.1444,
+      "decile_spread": 0.693,
+      "auc_train_to_oos_delta": 0.0077
+    },
+    "M3-U": {
+      "feature_count": 37,
+      "oos_roc_auc": 0.7375,
+      "oos_pr_auc": 0.6899,
+      "oos_brier": 0.2013,
+      "oos_log_loss": 0.5884,
+      "top_decile_obs": 0.8368,
+      "bottom_decile_obs": 0.1423,
+      "decile_spread": 0.6946,
+      "auc_train_to_oos_delta": 0.0077
+    }
+  },
+  "HEAD_2": {
+    "M0-U": {
+      "feature_count": 7,
+      "oos_roc_auc": 0.7689,
+      "oos_pr_auc": 0.5455,
+      "oos_brier": 0.1462,
+      "oos_log_loss": 0.4573,
+      "top_decile_obs": 0.6647,
+      "bottom_decile_obs": 0.0497,
+      "decile_spread": 0.6151,
+      "auc_train_to_oos_delta": -0.0028
+    },
+    "M1-U": {
+      "feature_count": 24,
+      "oos_roc_auc": 0.795,
+      "oos_pr_auc": 0.5799,
+      "oos_brier": 0.1393,
+      "oos_log_loss": 0.4378,
+      "top_decile_obs": 0.7197,
+      "bottom_decile_obs": 0.0303,
+      "decile_spread": 0.6893,
+      "auc_train_to_oos_delta": -0.0006
+    },
+    "M2-U": {
+      "feature_count": 31,
+      "oos_roc_auc": 0.7949,
+      "oos_pr_auc": 0.5819,
+      "oos_brier": 0.139,
+      "oos_log_loss": 0.4372,
+      "top_decile_obs": 0.7202,
+      "bottom_decile_obs": 0.0298,
+      "decile_spread": 0.6904,
+      "auc_train_to_oos_delta": -0.0021
+    },
+    "M3-U": {
+      "feature_count": 37,
+      "oos_roc_auc": 0.7955,
+      "oos_pr_auc": 0.5827,
+      "oos_brier": 0.1389,
+      "oos_log_loss": 0.4367,
+      "top_decile_obs": 0.7223,
+      "bottom_decile_obs": 0.0288,
+      "decile_spread": 0.6935,
+      "auc_train_to_oos_delta": -0.0014
+    }
+  }
+}

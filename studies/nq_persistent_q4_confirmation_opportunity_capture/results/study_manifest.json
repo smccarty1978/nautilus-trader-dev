@@ -1,0 +1,33 @@
+{
+  "study": "nq_persistent_q4_confirmation_opportunity_capture",
+  "timestamp": "2026-09-16T16:08:29Z",
+  "execution_time_seconds": 2.31,
+  "total_matched_population": 5610,
+  "train_regimes": 5038,
+  "oos_regimes": 572,
+  "years": {
+    "2023": 2529,
+    "2024": 2509,
+    "2025": 572
+  },
+  "total_ledger_rows": 11220,
+  "decision_gate": "OUTCOME_A_CONFIRMATION_SELECTION_SUPPORTED",
+  "artifacts": [
+    "competing_event_ledger.parquet",
+    "retention_matrix.json",
+    "favorable_opportunity_capture.json",
+    "discarded_better_analysis.json",
+    "adverse_tail_decomposition.json",
+    "a1_to_a2_transition_funnel.json",
+    "va_fallback_analysis.json",
+    "confirmation_time_buckets.json",
+    "directional_replication.json",
+    "yearly_replication.json",
+    "mechanical_vs_selection_decomposition.json",
+    "population_reconciliation.json",
+    "runtime_contract.json",
+    "parent_artifact_hashes.json",
+    "dataset_composite_hashes.json",
+    "study_manifest.json"
+  ]
+}

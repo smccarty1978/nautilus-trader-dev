@@ -1,0 +1,54 @@
+{
+  "candidate_entry_policies": {
+    "P0": {
+      "name": "H050 Control",
+      "trigger": "Immediate H050",
+      "description": "Existing counter-regime entry at H050"
+    },
+    "P1": {
+      "name": "T60",
+      "trigger": "H050 + 60s",
+      "description": "Fixed 60s elapsed time waiting condition"
+    },
+    "P2": {
+      "name": "T180",
+      "trigger": "H050 + 180s",
+      "description": "Fixed 180s elapsed time waiting condition"
+    },
+    "P3": {
+      "name": "H100",
+      "trigger": "Pullback >= 1.00 ATR",
+      "description": "Pure depth evidence progression"
+    },
+    "P4": {
+      "name": "Hybrid 60s + H075",
+      "trigger": "Elapsed >= 60s AND Pullback >= 0.75 ATR",
+      "description": "Minimum elapsed time with moderate depth confirmation"
+    },
+    "P5": {
+      "name": "Hybrid 120s + H100",
+      "trigger": "Elapsed >= 120s AND Pullback >= 1.00 ATR",
+      "description": "Slower, stronger-evidence hybrid candidate"
+    }
+  },
+  "exit_variants": {
+    "F0": {
+      "name": "C1 Only",
+      "description": "Canonical C1 exit lifecycle without fast failure"
+    },
+    "F30": {
+      "name": "+30s Fast Failure",
+      "description": "Exit at +30s if predicted failure risk exceeds 2023 TRAIN top 10% threshold"
+    },
+    "F60": {
+      "name": "+60s Fast Failure",
+      "description": "Exit at +60s if predicted failure risk exceeds 2023 TRAIN top 10% threshold"
+    }
+  },
+  "execution_rules": {
+    "fill_pricing": "first causally executable next 1s bar open (next_bar_open)",
+    "decision_to_fill_latency": "1.0 second",
+    "transaction_friction_round_trip": "$15.00 / 0.75 points per contract",
+    "skipped_candidates": "Excluded if regime terminates or C1 exit fires prior to trigger/fill"
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "audit_name": "P0_F30 Forensic Reconciliation Audit",
+  "target_cell": "P0_F30",
+  "baseline_cell": "P0_F0",
+  "root_cause_verdict": "F30_CAUSALITY_LEAKAGE",
+  "secondary_issues": [
+    "F30_POPULATION_DEFINITION_DIFFERENCE"
+  ],
+  "promotion_verdict": "BLOCKED_PENDING_FIX",
+  "reconciliation_matrix": [
+    {
+      "metric": "Fast-Failure Model AUC (Catastrophic)",
+      "prior_observational_f30": 0.6063,
+      "original_policy_report_p0_f30": 0.9279,
+      "recomputed_causal_p0_f30": 0.591,
+      "explanation": "Leaked future cur_peak inflated AUC to 0.9279. Causal evaluation achieves 0.5910, reconciling with prior study."
+    },
+    {
+      "metric": "Catastrophic Capture Rate (Top 10% Risk)",
+      "prior_observational_f30": 0.1834,
+      "original_policy_report_p0_f30": 0.6751,
+      "recomputed_causal_p0_f30": 0.178,
+      "explanation": "Future trend extension leakage caused 67.5% capture. Causal model captures 17.8%, reconciling with prior study."
+    },
+    {
+      "metric": "+2A Winner Collateral Rate",
+      "prior_observational_f30": 0.1155,
+      "original_policy_report_p0_f30": 0.0251,
+      "recomputed_causal_p0_f30": 0.114,
+      "explanation": "Leakage artificially depressed winner collateral to 2.5%. Causal model collateral is 11.4%, reconciling with prior study."
+    },
+    {
+      "metric": "Mean Loss Avoided per Flagged Trade (ATR)",
+      "prior_observational_f30": 0.6072,
+      "original_policy_report_p0_f30": 5.9478,
+      "recomputed_causal_p0_f30": 0.4137,
+      "explanation": "Leaked model flagged runaway losers (mean C1 loss -6.21A). Causal model avoids +0.41A per flagged trade."
+    },
+    {
+      "metric": "Flag Rate (% of All Trades)",
+      "prior_observational_f30": 0.1,
+      "original_policy_report_p0_f30": 0.1149,
+      "recomputed_causal_p0_f30": 0.102,
+      "explanation": "Consistent near 10% threshold across all definitions."
+    },
+    {
+      "metric": "F0 Baseline Catastrophic Rate",
+      "prior_observational_f30": 0.1403,
+      "original_policy_report_p0_f30": 0.14,
+      "recomputed_causal_p0_f30": 0.14,
+      "explanation": "Identical baseline across all studies (~14.0%)."
+    },
+    {
+      "metric": "F30 Realized Catastrophic Rate",
+      "prior_observational_f30": "N/A (Observational)",
+      "original_policy_report_p0_f30": 0.0523,
+      "recomputed_causal_p0_f30": 0.115,
+      "explanation": "Reported reduction to 5.23% was artifact of leakage. True causal reduction is ~2.5 pp (from 14.0% to 11.5%)."
+    },
+    {
+      "metric": "Aggregate Expectancy Improvement (ATR/trade)",
+      "prior_observational_f30": "N/A (Observational)",
+      "original_policy_report_p0_f30": 0.6577,
+      "recomputed_causal_p0_f30": 0.0422,
+      "explanation": "Real causal expectancy delta is ~+0.04 ATR/trade (10.2% * +0.4137A), not +0.6577 ATR/trade."
+    }
+  ]
+}

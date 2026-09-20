@@ -1,0 +1,39 @@
+{
+  "summary": [
+    {
+      "Period": "2023",
+      "Total_Trades": 512,
+      "Entered_Friday_Count": 110,
+      "Held_Over_Weekend_Count": 2,
+      "Weekend_Hold_Trade_IDs": [
+        6280,
+        8899
+      ]
+    },
+    {
+      "Period": "2024",
+      "Total_Trades": 451,
+      "Entered_Friday_Count": 87,
+      "Held_Over_Weekend_Count": 1,
+      "Weekend_Hold_Trade_IDs": [
+        15791
+      ]
+    },
+    {
+      "Period": "2025_Q1",
+      "Total_Trades": 102,
+      "Entered_Friday_Count": 28,
+      "Held_Over_Weekend_Count": 0,
+      "Weekend_Hold_Trade_IDs": []
+    },
+    {
+      "Period": "2025_Q2_canonical",
+      "Total_Trades": 651,
+      "Entered_Friday_Count": 125,
+      "Held_Over_Weekend_Count": 0,
+      "Weekend_Hold_Trade_IDs": []
+    }
+  ],
+  "bug_explanation": "The prior ad-hoc check used `(entry_ct.dt.dayofweek == 4) & (exit_ct.dt.dayofweek > 4)`. Because Monday is dayofweek == 0, `exit_dayofweek > 4` only checks Saturday (5) and Sunday (6), completely missing Monday exits! Correcting this check reveals whether any Friday trades were carried through the CME weekend reopening and closed on Monday.",
+  "WEEKEND_HOLD_AUDIT": "PASS"
+}

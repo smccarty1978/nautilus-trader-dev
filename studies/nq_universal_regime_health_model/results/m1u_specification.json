@@ -1,0 +1,31 @@
+{
+  "name": "M1-U: Structural Path Health",
+  "features": [
+    "current_pullback_atr",
+    "prior_peak_mfe_atr",
+    "is_pb05",
+    "is_pb10",
+    "is_pb15",
+    "is_pb20",
+    "direction",
+    "current_recovery_fraction",
+    "max_recovery_fraction_so_far",
+    "episode_max_recovery_fraction",
+    "recovery_rollover_count",
+    "has_prior_recovery_ge25_num",
+    "has_prior_recovery_ge50_num",
+    "has_prior_recovery_ge75_num",
+    "is_rollover_ge25_num",
+    "is_rollover_ge50_num",
+    "is_rollover_ge75_num",
+    "is_recovering",
+    "is_deteriorating",
+    "is_rollover",
+    "regime_age_seconds",
+    "seconds_since_peak_mfe",
+    "seconds_since_deepest_pullback",
+    "pullback_to_prior_peak_ratio"
+  ],
+  "feature_count": 24,
+  "description": "M0-U plus full causal path history, recovery fractions, rollovers, and duration"
+}

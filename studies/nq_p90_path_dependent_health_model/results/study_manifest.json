@@ -1,0 +1,23 @@
+{
+  "study_id": "nq_p90_path_dependent_health_model",
+  "prior_study_id": "nq_p90_pullback_path_state_atlas",
+  "mode": "OBSERVATION_ENGINE_RESEARCH",
+  "status": "COMPLETED",
+  "decision_outcome": "OUTCOME_B_PATH_STATE_DOMINATES",
+  "input_state_ledger_sha256": "c1934b6830811a6fe38640d3c0055d6537b026aafe01050b7fe1d8498a645d09",
+  "input_outcome_ledger_sha256": "0a54764e5b4f3fa1a55634281792ec502876affd3737605c8447e4a7da65e333",
+  "population": "POPULATION_C_STATE_TRANSITIONS",
+  "n_samples_total": 144174,
+  "n_episodes_total": 33773,
+  "n_samples_train": 128572,
+  "n_samples_oos": 15602,
+  "targets": [
+    "head_1_structural_failure",
+    "head_2_imminent_failure"
+  ],
+  "models": [
+    "M0_depth",
+    "M1_path_state",
+    "M2_full_dynamic"
+  ]
+}

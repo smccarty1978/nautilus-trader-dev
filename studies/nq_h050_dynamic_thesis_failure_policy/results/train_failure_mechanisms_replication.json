@@ -1,0 +1,67 @@
+{
+  "landmark_level": "-1.00A",
+  "sample_size_top10": 1165,
+  "incumbent_extreme_dynamics": {
+    "made_new_extreme": {
+      "n": 1161,
+      "pct": 0.9965665236051502,
+      "recovery_be_rate": 0.6813092161929372,
+      "win_rate": 0.31007751937984496,
+      "mean_final_pnl_atr": -0.8763295734263349,
+      "median_final_pnl_atr": -0.781556881844627,
+      "subsequent_mfe_atr": 1.7236899784479145,
+      "further_mae_atr": 2.50078346543822,
+      "catastrophic_loss_lte_2a_rate": 0.26098191214470284
+    },
+    "no_new_extreme": {
+      "n": 4,
+      "pct": 0.0034334763948497852,
+      "recovery_be_rate": 0.75,
+      "win_rate": 0.0,
+      "mean_final_pnl_atr": -6.101470252930595,
+      "median_final_pnl_atr": -1.110822351210001,
+      "subsequent_mfe_atr": 0.5982155984374056,
+      "further_mae_atr": 10.006500246961465,
+      "catastrophic_loss_lte_2a_rate": 0.25
+    }
+  },
+  "directional_asymmetry": {
+    "counter_long": {
+      "n": 522,
+      "recovery_be_rate": 0.7145593869731801,
+      "win_rate": 0.342911877394636,
+      "mean_final_pnl_atr": -0.7068919871359604,
+      "subsequent_mfe_atr": 2.139874783925727,
+      "further_mae_atr": 2.7206938279635877,
+      "catastrophic_loss_lte_2a_rate": 0.25862068965517243
+    },
+    "counter_short": {
+      "n": 643,
+      "recovery_be_rate": 0.6547433903576982,
+      "win_rate": 0.28149300155520995,
+      "mean_final_pnl_atr": -1.0463870893852658,
+      "subsequent_mfe_atr": 1.3788216021190505,
+      "further_mae_atr": 2.368947785637055,
+      "catastrophic_loss_lte_2a_rate": 0.26283048211508553
+    }
+  },
+  "churn_vs_impulse": {
+    "median_seconds_to_100a": 235.0,
+    "fast_impulse": {
+      "n": 584,
+      "recovery_be_rate": 0.702054794520548,
+      "win_rate": 0.3133561643835616,
+      "mean_final_pnl_atr": -0.9255971643295433,
+      "further_mae_atr": 2.299403357962822
+    },
+    "slow_churn": {
+      "n": 581,
+      "recovery_be_rate": 0.6609294320137694,
+      "win_rate": 0.3046471600688468,
+      "mean_final_pnl_atr": -0.8627810185735695,
+      "further_mae_atr": 2.7548778714480746
+    }
+  },
+  "verdict_extreme_hypothesis_replicated": true,
+  "verdict_directional_asymmetry_replicated": true
+}

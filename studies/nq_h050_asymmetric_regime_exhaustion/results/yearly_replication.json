@@ -1,0 +1,215 @@
+{
+  "2023": {
+    "N": 10605,
+    "models": {
+      "M0_Binary_Control": {
+        "roc_auc_exhaustion": 0.5894248958046929,
+        "pr_auc_exhaustion": 0.46935544955544917,
+        "roc_auc_suppress_ge_2p0": 0.5943367638386547,
+        "top10_n": 1061,
+        "top10_P_lt_0p50": 0.5117813383600377,
+        "top10_P_ge_1p00": 0.36757775683317623,
+        "top10_P_ge_2p00": 0.235626767200754,
+        "top10_median_mfe": 0.4661456844567749,
+        "top10_mean_mfe": 1.2925058062414194
+      },
+      "M1_Cost_Sensitive": {
+        "roc_auc_exhaustion": 0.5928500396072437,
+        "pr_auc_exhaustion": 0.4714861956296975,
+        "roc_auc_suppress_ge_2p0": 0.5988690770273111,
+        "top10_n": 1061,
+        "top10_P_lt_0p50": 0.5183788878416589,
+        "top10_P_ge_1p00": 0.354382657869934,
+        "top10_P_ge_2p00": 0.2224316682375118,
+        "top10_median_mfe": 0.4482844170217071,
+        "top10_mean_mfe": 1.2608534626591974
+      },
+      "M2_Ordinal_ExpSeverity": {
+        "roc_auc_exhaustion": 0.5922550724408311,
+        "pr_auc_exhaustion": 0.471350970591772,
+        "roc_auc_suppress_ge_2p0": 0.6064512407760492,
+        "top10_n": 1061,
+        "top10_P_lt_0p50": 0.5174363807728558,
+        "top10_P_ge_1p00": 0.3600377002827521,
+        "top10_P_ge_2p00": 0.2233741753063148,
+        "top10_median_mfe": 0.4482844170217071,
+        "top10_mean_mfe": 1.2537370053677608
+      },
+      "M2_Ordinal_TailPenalized": {
+        "roc_auc_exhaustion": 0.5922349160827357,
+        "pr_auc_exhaustion": 0.47152746909059323,
+        "roc_auc_suppress_ge_2p0": 0.6071575004433285,
+        "top10_n": 1061,
+        "top10_P_lt_0p50": 0.5193213949104618,
+        "top10_P_ge_1p00": 0.354382657869934,
+        "top10_P_ge_2p00": 0.21866163996229973,
+        "top10_median_mfe": 0.4272885198613255,
+        "top10_mean_mfe": 1.2529217519573588
+      },
+      "M3_Continuous_Log1p": {
+        "roc_auc_exhaustion": 0.5917352623615025,
+        "pr_auc_exhaustion": 0.47146347769973546,
+        "roc_auc_suppress_ge_2p0": 0.6098787074544672,
+        "top10_n": 1061,
+        "top10_P_lt_0p50": 0.5070688030160226,
+        "top10_P_ge_1p00": 0.3477851083883129,
+        "top10_P_ge_2p00": 0.2054665409990575,
+        "top10_median_mfe": 0.4798060656485753,
+        "top10_mean_mfe": 1.1679073050327982
+      },
+      "M4_Composite_Risk": {
+        "roc_auc_exhaustion": 0.5925034062378852,
+        "pr_auc_exhaustion": 0.4718393057933686,
+        "roc_auc_suppress_ge_2p0": 0.6066049238934387,
+        "top10_n": 1061,
+        "top10_P_lt_0p50": 0.5108388312912346,
+        "top10_P_ge_1p00": 0.353440150801131,
+        "top10_P_ge_2p00": 0.21300659754948162,
+        "top10_median_mfe": 0.4644250830784704,
+        "top10_mean_mfe": 1.2264664843478121
+      }
+    }
+  },
+  "2024": {
+    "N": 10888,
+    "models": {
+      "M0_Binary_Control": {
+        "roc_auc_exhaustion": 0.595329539209926,
+        "pr_auc_exhaustion": 0.4685003602915636,
+        "roc_auc_suppress_ge_2p0": 0.6101134146313567,
+        "top10_n": 1089,
+        "top10_P_lt_0p50": 0.5390266299357208,
+        "top10_P_ge_1p00": 0.3544536271808999,
+        "top10_P_ge_2p00": 0.20293847566574838,
+        "top10_median_mfe": 0.3821806846068749,
+        "top10_mean_mfe": 1.1622074516210783
+      },
+      "M1_Cost_Sensitive": {
+        "roc_auc_exhaustion": 0.5991695785783068,
+        "pr_auc_exhaustion": 0.4716181530681937,
+        "roc_auc_suppress_ge_2p0": 0.6154219765438962,
+        "top10_n": 1089,
+        "top10_P_lt_0p50": 0.5408631772268135,
+        "top10_P_ge_1p00": 0.3415977961432507,
+        "top10_P_ge_2p00": 0.18181818181818182,
+        "top10_median_mfe": 0.401356944826827,
+        "top10_mean_mfe": 1.1524002183641229
+      },
+      "M2_Ordinal_ExpSeverity": {
+        "roc_auc_exhaustion": 0.6005678178566352,
+        "pr_auc_exhaustion": 0.4715566166965786,
+        "roc_auc_suppress_ge_2p0": 0.6213338495475691,
+        "top10_n": 1089,
+        "top10_P_lt_0p50": 0.5353535353535354,
+        "top10_P_ge_1p00": 0.34618916437098257,
+        "top10_P_ge_2p00": 0.18457300275482094,
+        "top10_median_mfe": 0.40377441182153756,
+        "top10_mean_mfe": 1.1193770931275204
+      },
+      "M2_Ordinal_TailPenalized": {
+        "roc_auc_exhaustion": 0.6006047292868186,
+        "pr_auc_exhaustion": 0.471526072703487,
+        "roc_auc_suppress_ge_2p0": 0.6219945961443296,
+        "top10_n": 1089,
+        "top10_P_lt_0p50": 0.5371900826446281,
+        "top10_P_ge_1p00": 0.34251606978879706,
+        "top10_P_ge_2p00": 0.1827364554637282,
+        "top10_median_mfe": 0.3963688069317655,
+        "top10_mean_mfe": 1.11914763122674
+      },
+      "M3_Continuous_Log1p": {
+        "roc_auc_exhaustion": 0.5950701944274746,
+        "pr_auc_exhaustion": 0.46815982156907787,
+        "roc_auc_suppress_ge_2p0": 0.6180199371545387,
+        "top10_n": 1089,
+        "top10_P_lt_0p50": 0.5325987144168962,
+        "top10_P_ge_1p00": 0.34251606978879706,
+        "top10_P_ge_2p00": 0.1854912764003673,
+        "top10_median_mfe": 0.42343115456980707,
+        "top10_mean_mfe": 1.069518499466226
+      },
+      "M4_Composite_Risk": {
+        "roc_auc_exhaustion": 0.5993343400541793,
+        "pr_auc_exhaustion": 0.472198099013526,
+        "roc_auc_suppress_ge_2p0": 0.6196917430884861,
+        "top10_n": 1089,
+        "top10_P_lt_0p50": 0.5325987144168962,
+        "top10_P_ge_1p00": 0.34710743801652894,
+        "top10_P_ge_2p00": 0.1928374655647383,
+        "top10_median_mfe": 0.40951632097191154,
+        "top10_mean_mfe": 1.1131946222869602
+      }
+    }
+  },
+  "2025_Q1_OOS": {
+    "N": 2422,
+    "models": {
+      "M0_Binary_Control": {
+        "roc_auc_exhaustion": 0.5978323854949726,
+        "pr_auc_exhaustion": 0.48184829220295344,
+        "roc_auc_suppress_ge_2p0": 0.6178612699658618,
+        "top10_n": 243,
+        "top10_P_lt_0p50": 0.5185185185185185,
+        "top10_P_ge_1p00": 0.3497942386831276,
+        "top10_P_ge_2p00": 0.1934156378600823,
+        "top10_median_mfe": 0.4335104002518077,
+        "top10_mean_mfe": 1.0521109125537111
+      },
+      "M1_Cost_Sensitive": {
+        "roc_auc_exhaustion": 0.6022845767371314,
+        "pr_auc_exhaustion": 0.485496571095978,
+        "roc_auc_suppress_ge_2p0": 0.633684449054347,
+        "top10_n": 243,
+        "top10_P_lt_0p50": 0.49794238683127573,
+        "top10_P_ge_1p00": 0.37037037037037035,
+        "top10_P_ge_2p00": 0.1934156378600823,
+        "top10_median_mfe": 0.5444314320592745,
+        "top10_mean_mfe": 1.0500869338889531
+      },
+      "M2_Ordinal_ExpSeverity": {
+        "roc_auc_exhaustion": 0.6001673536386231,
+        "pr_auc_exhaustion": 0.48247391416720353,
+        "roc_auc_suppress_ge_2p0": 0.6318626809698238,
+        "top10_n": 243,
+        "top10_P_lt_0p50": 0.51440329218107,
+        "top10_P_ge_1p00": 0.3662551440329218,
+        "top10_P_ge_2p00": 0.18930041152263374,
+        "top10_median_mfe": 0.4202472939389738,
+        "top10_mean_mfe": 1.0237161646275548
+      },
+      "M2_Ordinal_TailPenalized": {
+        "roc_auc_exhaustion": 0.5998074150206305,
+        "pr_auc_exhaustion": 0.48232685235324346,
+        "roc_auc_suppress_ge_2p0": 0.632597773541651,
+        "top10_n": 243,
+        "top10_P_lt_0p50": 0.51440329218107,
+        "top10_P_ge_1p00": 0.36213991769547327,
+        "top10_P_ge_2p00": 0.18518518518518517,
+        "top10_median_mfe": 0.4202472939389738,
+        "top10_mean_mfe": 1.0228454668131197
+      },
+      "M3_Continuous_Log1p": {
+        "roc_auc_exhaustion": 0.6017788807975955,
+        "pr_auc_exhaustion": 0.4783113029028215,
+        "roc_auc_suppress_ge_2p0": 0.6385890894819466,
+        "top10_n": 243,
+        "top10_P_lt_0p50": 0.4732510288065844,
+        "top10_P_ge_1p00": 0.3950617283950617,
+        "top10_P_ge_2p00": 0.205761316872428,
+        "top10_median_mfe": 0.6232806302041571,
+        "top10_mean_mfe": 1.1141720630322252
+      },
+      "M4_Composite_Risk": {
+        "roc_auc_exhaustion": 0.6011463154045888,
+        "pr_auc_exhaustion": 0.4838916524023703,
+        "roc_auc_suppress_ge_2p0": 0.6322598178465524,
+        "top10_n": 243,
+        "top10_P_lt_0p50": 0.5102880658436214,
+        "top10_P_ge_1p00": 0.35390946502057613,
+        "top10_P_ge_2p00": 0.17695473251028807,
+        "top10_median_mfe": 0.4347149320967082,
+        "top10_mean_mfe": 0.9946703957780801
+      }
+    }
+  }
+}

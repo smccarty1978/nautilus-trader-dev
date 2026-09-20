@@ -1,0 +1,32 @@
+{
+  "contract_name": "NQ_LEAF4_FROZEN_SPECIFICATION",
+  "source_model": "DecisionTreeRegressor(max_depth=4, min_samples_leaf=150, random_state=42)",
+  "discovery_study": "nq_h050_economic_subpopulation_mining",
+  "leaf_id": 4,
+  "conditions": [
+    {
+      "feature": "minutes_from_rth_open",
+      "operator": "<=",
+      "threshold": 380.649994,
+      "description": "Elapsed session minutes from RTH open (08:30:00 US/Central). Excludes last 14m 21s."
+    },
+    {
+      "feature": "realized_range_15m_atr",
+      "operator": "<=",
+      "threshold": 9.344128,
+      "description": "Trailing 15 completed 1m bars high-low range normalized by regime starting frozen ATR."
+    },
+    {
+      "feature": "current_price_from_prior_mfe_atr__tf_1m",
+      "operator": "<=",
+      "threshold": 1.738367,
+      "description": "Signed distance from checkpoint price to prior completed 1m regime MFE / cur_1m_atr."
+    }
+  ],
+  "canonical_lifecycle": "C1 (counter-regime entry at H050_0 -> first opposing H050_1 in R1 if present -> R2 fallback)",
+  "transaction_costs": {
+    "NQ": "0.75 pts RT (.00: 1 tick adverse slippage per side + .00 commission)",
+    "ES": "0.60 pts RT (.00: 2 ticks adverse slippage + .00 commission)",
+    "YM": "3.00 pts RT (.00: 2 ticks adverse slippage + .00 commission)"
+  }
+}

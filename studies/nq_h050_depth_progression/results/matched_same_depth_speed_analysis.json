@@ -1,0 +1,48 @@
+{
+  "H075": {
+    "fast_<=30s": {
+      "N": 12782,
+      "terminal_rate": 0.4086,
+      "catastrophic_rate": 0.1442,
+      "mean_c1_pnl_atr": -0.2404,
+      "mean_remaining_mfe_atr": 1.9255
+    },
+    "medium_30-90s": {
+      "N": 5018,
+      "terminal_rate": 0.4428,
+      "catastrophic_rate": 0.1244,
+      "mean_c1_pnl_atr": -0.0937,
+      "mean_remaining_mfe_atr": 1.5296
+    },
+    "slow_>90s": {
+      "N": 3662,
+      "terminal_rate": 0.4519,
+      "catastrophic_rate": 0.1182,
+      "mean_c1_pnl_atr": -0.0435,
+      "mean_remaining_mfe_atr": 1.3855
+    }
+  },
+  "H100": {
+    "fast_<=30s": {
+      "N": 6412,
+      "terminal_rate": 0.4509,
+      "catastrophic_rate": 0.1567,
+      "mean_c1_pnl_atr": -0.3686,
+      "mean_remaining_mfe_atr": 2.0809
+    },
+    "medium_30-90s": {
+      "N": 6227,
+      "terminal_rate": 0.5235,
+      "catastrophic_rate": 0.1225,
+      "mean_c1_pnl_atr": -0.1018,
+      "mean_remaining_mfe_atr": 1.3732
+    },
+    "slow_>90s": {
+      "N": 8725,
+      "terminal_rate": 0.5531,
+      "catastrophic_rate": 0.1022,
+      "mean_c1_pnl_atr": -0.0514,
+      "mean_remaining_mfe_atr": 1.163
+    }
+  }
+}

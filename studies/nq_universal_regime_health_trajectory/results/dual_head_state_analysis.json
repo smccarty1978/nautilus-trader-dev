@@ -1,0 +1,185 @@
+{
+  "description": "Joint structural (H1) and imminent (H2) failure state grid analysis",
+  "thresholds": {
+    "H1_cut": 0.45,
+    "H2_cut": 0.2
+  },
+  "TRAIN_2023_2024": {
+    "Q1_LOW_H1_LOW_H2": {
+      "obs_count": 87912,
+      "obs_share_pct": 54.99,
+      "mean_H1": 0.2905,
+      "mean_H2": 0.1032,
+      "mean_pb_depth": 0.56,
+      "h1_structural_failure_rate": {
+        "mean": 0.2852,
+        "ci_lower": 0.2807,
+        "ci_upper": 0.2899,
+        "n_regimes": 12945,
+        "n_obs": 87912
+      },
+      "h2_imminent_failure_rate": {
+        "mean": 0.1005,
+        "ci_lower": 0.0978,
+        "ci_upper": 0.1031,
+        "n_regimes": 12945,
+        "n_obs": 87912
+      }
+    },
+    "Q2_HIGH_H1_LOW_H2": {
+      "obs_count": 6240,
+      "obs_share_pct": 3.9,
+      "mean_H1": 0.4988,
+      "mean_H2": 0.154,
+      "mean_pb_depth": 1.36,
+      "h1_structural_failure_rate": {
+        "mean": 0.4984,
+        "ci_lower": 0.4843,
+        "ci_upper": 0.5138,
+        "n_regimes": 3406,
+        "n_obs": 6240
+      },
+      "h2_imminent_failure_rate": {
+        "mean": 0.1335,
+        "ci_lower": 0.1243,
+        "ci_upper": 0.1428,
+        "n_regimes": 3406,
+        "n_obs": 6240
+      }
+    },
+    "Q3_LOW_H1_HIGH_H2": {
+      "obs_count": 12835,
+      "obs_share_pct": 8.03,
+      "mean_H1": 0.3955,
+      "mean_H2": 0.2438,
+      "mean_pb_depth": 0.6,
+      "h1_structural_failure_rate": {
+        "mean": 0.3986,
+        "ci_lower": 0.3888,
+        "ci_upper": 0.4085,
+        "n_regimes": 6521,
+        "n_obs": 12835
+      },
+      "h2_imminent_failure_rate": {
+        "mean": 0.2395,
+        "ci_lower": 0.2306,
+        "ci_upper": 0.2484,
+        "n_regimes": 6521,
+        "n_obs": 12835
+      }
+    },
+    "Q4_HIGH_H1_HIGH_H2": {
+      "obs_count": 52868,
+      "obs_share_pct": 33.07,
+      "mean_H1": 0.6739,
+      "mean_H2": 0.4735,
+      "mean_pb_depth": 1.44,
+      "h1_structural_failure_rate": {
+        "mean": 0.6821,
+        "ci_lower": 0.6759,
+        "ci_upper": 0.6884,
+        "n_regimes": 14697,
+        "n_obs": 52868
+      },
+      "h2_imminent_failure_rate": {
+        "mean": 0.4815,
+        "ci_lower": 0.4752,
+        "ci_upper": 0.488,
+        "n_regimes": 14697,
+        "n_obs": 52868
+      }
+    }
+  },
+  "OOS_2025_Q1": {
+    "Q1_LOW_H1_LOW_H2": {
+      "obs_count": 10550,
+      "obs_share_pct": 55.18,
+      "mean_H1": 0.2913,
+      "mean_H2": 0.1028,
+      "mean_pb_depth": 0.57,
+      "h1_structural_failure_rate": {
+        "mean": 0.2795,
+        "ci_lower": 0.2657,
+        "ci_upper": 0.2941,
+        "n_regimes": 1525,
+        "n_obs": 10550
+      },
+      "h2_imminent_failure_rate": {
+        "mean": 0.1013,
+        "ci_lower": 0.0942,
+        "ci_upper": 0.1095,
+        "n_regimes": 1525,
+        "n_obs": 10550
+      }
+    },
+    "Q2_HIGH_H1_LOW_H2": {
+      "obs_count": 831,
+      "obs_share_pct": 4.35,
+      "mean_H1": 0.4995,
+      "mean_H2": 0.1543,
+      "mean_pb_depth": 1.39,
+      "h1_structural_failure_rate": {
+        "mean": 0.444,
+        "ci_lower": 0.4025,
+        "ci_upper": 0.4887,
+        "n_regimes": 419,
+        "n_obs": 831
+      },
+      "h2_imminent_failure_rate": {
+        "mean": 0.148,
+        "ci_lower": 0.1208,
+        "ci_upper": 0.1799,
+        "n_regimes": 419,
+        "n_obs": 831
+      }
+    },
+    "Q3_LOW_H1_HIGH_H2": {
+      "obs_count": 1379,
+      "obs_share_pct": 7.21,
+      "mean_H1": 0.3948,
+      "mean_H2": 0.2459,
+      "mean_pb_depth": 0.6,
+      "h1_structural_failure_rate": {
+        "mean": 0.3735,
+        "ci_lower": 0.3394,
+        "ci_upper": 0.4011,
+        "n_regimes": 693,
+        "n_obs": 1379
+      },
+      "h2_imminent_failure_rate": {
+        "mean": 0.2379,
+        "ci_lower": 0.2117,
+        "ci_upper": 0.264,
+        "n_regimes": 693,
+        "n_obs": 1379
+      }
+    },
+    "Q4_HIGH_H1_HIGH_H2": {
+      "obs_count": 6359,
+      "obs_share_pct": 33.26,
+      "mean_H1": 0.6726,
+      "mean_H2": 0.468,
+      "mean_pb_depth": 1.45,
+      "h1_structural_failure_rate": {
+        "mean": 0.6731,
+        "ci_lower": 0.6534,
+        "ci_upper": 0.6932,
+        "n_regimes": 1732,
+        "n_obs": 6359
+      },
+      "h2_imminent_failure_rate": {
+        "mean": 0.4771,
+        "ci_lower": 0.4584,
+        "ci_upper": 0.4966,
+        "n_regimes": 1732,
+        "n_obs": 6359
+      }
+    }
+  },
+  "lead_lag_analysis": {
+    "structural_leads_imminent_pct": 3.9,
+    "imminent_spikes_without_structural_pct": 8.03,
+    "correlation_h1_h2_train": 0.937,
+    "correlation_h1_h2_oos": 0.9345
+  }
+}

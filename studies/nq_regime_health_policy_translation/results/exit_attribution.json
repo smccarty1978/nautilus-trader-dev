@@ -1,0 +1,185 @@
+{
+  "ALL": {
+    "P1": {
+      "counts": {
+        "AVOIDED_TERMINAL_LOSS": 9488,
+        "PREMATURE_EXIT_REEXTENDED": 4148,
+        "BENEFICIAL_EARLY_EXIT": 1883,
+        "NEUTRAL": 1042,
+        "WHIPSAW": 145
+      },
+      "percentages": {
+        "AVOIDED_TERMINAL_LOSS": 0.5679396623967436,
+        "PREMATURE_EXIT_REEXTENDED": 0.24829402609840776,
+        "BENEFICIAL_EARLY_EXIT": 0.11271399497186639,
+        "NEUTRAL": 0.06237280019154795,
+        "WHIPSAW": 0.008679516341434216
+      },
+      "mean_pnl_delta": -1.4321201963366454,
+      "total_pnl_delta": -23925.0,
+      "mean_lead_seconds": 575.1077457201005
+    },
+    "P2": {
+      "counts": {
+        "NEUTRAL": 11771,
+        "AVOIDED_TERMINAL_LOSS": 2734,
+        "PREMATURE_EXIT_REEXTENDED": 1060,
+        "BENEFICIAL_EARLY_EXIT": 794,
+        "WHIPSAW": 347
+      },
+      "percentages": {
+        "NEUTRAL": 0.7045971507242906,
+        "AVOIDED_TERMINAL_LOSS": 0.16365377708607687,
+        "PREMATURE_EXIT_REEXTENDED": 0.06345025739255357,
+        "BENEFICIAL_EARLY_EXIT": 0.04752783431102598,
+        "WHIPSAW": 0.020770980486052915
+      },
+      "mean_pnl_delta": -1.9876092421884353,
+      "total_pnl_delta": -33205.0,
+      "mean_lead_seconds": 124.32060337603257
+    },
+    "P3": {
+      "counts": {
+        "NEUTRAL": 11782,
+        "AVOIDED_TERMINAL_LOSS": 2670,
+        "PREMATURE_EXIT_REEXTENDED": 1034,
+        "BENEFICIAL_EARLY_EXIT": 787,
+        "WHIPSAW": 331,
+        "RECOVERY_PRESERVED_TREND": 102
+      },
+      "percentages": {
+        "NEUTRAL": 0.7052555967915719,
+        "AVOIDED_TERMINAL_LOSS": 0.15982281814916796,
+        "PREMATURE_EXIT_REEXTENDED": 0.06189393032443433,
+        "BENEFICIAL_EARLY_EXIT": 0.04710882317730157,
+        "WHIPSAW": 0.01981324075182569,
+        "RECOVERY_PRESERVED_TREND": 0.006105590805698551
+      },
+      "mean_pnl_delta": -2.2022028013887227,
+      "total_pnl_delta": -36790.0,
+      "mean_lead_seconds": 122.17556566503053
+    }
+  },
+  "TRAIN": {
+    "P1": {
+      "counts": {
+        "AVOIDED_TERMINAL_LOSS": 8491,
+        "PREMATURE_EXIT_REEXTENDED": 3693,
+        "BENEFICIAL_EARLY_EXIT": 1683,
+        "NEUTRAL": 950,
+        "WHIPSAW": 128
+      },
+      "percentages": {
+        "AVOIDED_TERMINAL_LOSS": 0.5681498829039813,
+        "PREMATURE_EXIT_REEXTENDED": 0.24710605553696888,
+        "BENEFICIAL_EARLY_EXIT": 0.11261291401806624,
+        "NEUTRAL": 0.06356641017062563,
+        "WHIPSAW": 0.00856473737035798
+      },
+      "mean_pnl_delta": -1.4386082301773169,
+      "total_pnl_delta": -21500.0,
+      "mean_lead_seconds": 570.3917698226832
+    },
+    "P2": {
+      "counts": {
+        "NEUTRAL": 10543,
+        "AVOIDED_TERMINAL_LOSS": 2459,
+        "PREMATURE_EXIT_REEXTENDED": 939,
+        "BENEFICIAL_EARLY_EXIT": 692,
+        "WHIPSAW": 312
+      },
+      "percentages": {
+        "NEUTRAL": 0.7054533288725326,
+        "AVOIDED_TERMINAL_LOSS": 0.1645366343258615,
+        "PREMATURE_EXIT_REEXTENDED": 0.06283037805286049,
+        "BENEFICIAL_EARLY_EXIT": 0.04630311140849783,
+        "WHIPSAW": 0.020876547340247575
+      },
+      "mean_pnl_delta": -2.850117096018735,
+      "total_pnl_delta": -42595.0,
+      "mean_lead_seconds": 124.33322181331549
+    },
+    "P3": {
+      "counts": {
+        "NEUTRAL": 10553,
+        "AVOIDED_TERMINAL_LOSS": 2402,
+        "PREMATURE_EXIT_REEXTENDED": 916,
+        "BENEFICIAL_EARLY_EXIT": 685,
+        "WHIPSAW": 299,
+        "RECOVERY_PRESERVED_TREND": 90
+      },
+      "percentages": {
+        "NEUTRAL": 0.7061224489795919,
+        "AVOIDED_TERMINAL_LOSS": 0.16072264971562394,
+        "PREMATURE_EXIT_REEXTENDED": 0.06129140180662429,
+        "BENEFICIAL_EARLY_EXIT": 0.045834727333556376,
+        "WHIPSAW": 0.02000669120107059,
+        "RECOVERY_PRESERVED_TREND": 0.006022080963532954
+      },
+      "mean_pnl_delta": -2.9652057544329207,
+      "total_pnl_delta": -44315.0,
+      "mean_lead_seconds": 122.1254600200736
+    }
+  },
+  "OOS": {
+    "P1": {
+      "counts": {
+        "AVOIDED_TERMINAL_LOSS": 997,
+        "PREMATURE_EXIT_REEXTENDED": 455,
+        "BENEFICIAL_EARLY_EXIT": 200,
+        "NEUTRAL": 92,
+        "WHIPSAW": 17
+      },
+      "percentages": {
+        "AVOIDED_TERMINAL_LOSS": 0.5661555934128336,
+        "PREMATURE_EXIT_REEXTENDED": 0.25837592277115273,
+        "BENEFICIAL_EARLY_EXIT": 0.1135718341851221,
+        "NEUTRAL": 0.05224304372515616,
+        "WHIPSAW": 0.009653605905735378
+      },
+      "mean_pnl_delta": -1.3770584894946054,
+      "total_pnl_delta": -2425.0,
+      "mean_lead_seconds": 615.1306076093128
+    },
+    "P2": {
+      "counts": {
+        "NEUTRAL": 1228,
+        "AVOIDED_TERMINAL_LOSS": 275,
+        "PREMATURE_EXIT_REEXTENDED": 121,
+        "BENEFICIAL_EARLY_EXIT": 102,
+        "WHIPSAW": 35
+      },
+      "percentages": {
+        "NEUTRAL": 0.6973310618966496,
+        "AVOIDED_TERMINAL_LOSS": 0.15616127200454288,
+        "PREMATURE_EXIT_REEXTENDED": 0.06871095968199886,
+        "BENEFICIAL_EARLY_EXIT": 0.05792163543441227,
+        "WHIPSAW": 0.019875070982396367
+      },
+      "mean_pnl_delta": 5.3321976149914825,
+      "total_pnl_delta": 9390.0,
+      "mean_lead_seconds": 124.21351504826804
+    },
+    "P3": {
+      "counts": {
+        "NEUTRAL": 1229,
+        "AVOIDED_TERMINAL_LOSS": 268,
+        "PREMATURE_EXIT_REEXTENDED": 118,
+        "BENEFICIAL_EARLY_EXIT": 102,
+        "WHIPSAW": 32,
+        "RECOVERY_PRESERVED_TREND": 12
+      },
+      "percentages": {
+        "NEUTRAL": 0.6978989210675752,
+        "AVOIDED_TERMINAL_LOSS": 0.1521862578080636,
+        "PREMATURE_EXIT_REEXTENDED": 0.06700738216922203,
+        "BENEFICIAL_EARLY_EXIT": 0.05792163543441227,
+        "WHIPSAW": 0.018171493469619535,
+        "RECOVERY_PRESERVED_TREND": 0.0068143100511073255
+      },
+      "mean_pnl_delta": 4.273140261215219,
+      "total_pnl_delta": 7525.0,
+      "mean_lead_seconds": 122.60079500283929
+    }
+  }
+}

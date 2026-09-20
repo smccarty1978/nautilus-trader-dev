@@ -1,0 +1,69 @@
+{
+  "status": "PASS",
+  "audit_timestamp_utc": "2026-09-16T01:08:54Z",
+  "trigger_ledger_sha256": "eb5ae2cbeab5d9735ba5f1c38603198f968cd1e3c46ba9ff8e093987a9347b0e",
+  "checks": {
+    "1_feature_timestamp_availability": {
+      "passed": true,
+      "assertion": "min(trigger_ts - p90_arm_ts) >= 0",
+      "computed_metric": 0.0
+    },
+    "2_current_bar_completion_semantics": {
+      "passed": true,
+      "assertion": "Decision uses completed bar close C_t; entry evaluated strictly at O_{t+1}",
+      "computed_metric": "Verified index offset = +1 bar"
+    },
+    "3_running_extreme_causality": {
+      "passed": true,
+      "assertion": "sec_since_extreme >= 0 for all triggers",
+      "computed_metric": 0
+    },
+    "4_no_future_regime_extreme": {
+      "passed": true,
+      "assertion": "Zero future regime MFE or flip info passed to trigger condition",
+      "computed_metric": "Verified pure forward-only causal accumulator"
+    },
+    "5_label_isolation": {
+      "passed": true,
+      "assertion": "Trigger ledger persisted and SHA256 frozen prior to outcome calculation",
+      "computed_metric": "SHA256: eb5ae2cbeab5d973..."
+    },
+    "6_train_oos_isolation": {
+      "passed": true,
+      "assertion": "No parameter tuning or threshold optimization performed on 2025 Q1 OOS",
+      "computed_metric": "Hard freeze verified"
+    },
+    "7_event_matching_isolation": {
+      "passed": true,
+      "assertion": "Natural population streamed sequentially without matched-pair filtering",
+      "computed_metric": "Total natural triggers evaluated: 92,892"
+    },
+    "8_duplicate_event_handling": {
+      "passed": true,
+      "assertion": "First trigger and all triggers tracked with explicit sequence indexing",
+      "computed_metric": "Max trigger sequence: 79"
+    },
+    "9_p90_arm_timestamp_causality": {
+      "passed": true,
+      "assertion": "All triggers satisfy seconds_since_p90 >= 0",
+      "computed_metric": 0.0
+    },
+    "10_entry_after_decision": {
+      "passed": true,
+      "assertion": "Next-bar entry price = O_{t+1} at ts >= trigger_ts + 1s",
+      "computed_metric": "Verified next-bar open execution"
+    },
+    "11_outcome_join_after_trigger_freeze": {
+      "passed": true,
+      "assertion": "Trigger ledger hash generated before barrier outcome attachment",
+      "computed_metric": "Verified ledger frozen before outcome join"
+    },
+    "12_native_unfilled_1s_catalog": {
+      "passed": true,
+      "assertion": "Bars sourced from NQ_1S_V2_GLOBEX catalog with immutable schema",
+      "computed_metric": "Verified native catalog files"
+    }
+  },
+  "critical_violations": 0,
+  "warnings": 0
+}

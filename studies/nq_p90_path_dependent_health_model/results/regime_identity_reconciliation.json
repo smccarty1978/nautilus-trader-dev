@@ -1,0 +1,92 @@
+{
+  "period_breakdown": {
+    "2023": {
+      "n_natural_all": 28029,
+      "n_natural_rth": 7671,
+      "n_natural_rth_duration_ge_120s": 7585,
+      "n_natural_rth_mfe_ge_10_atr": 6850,
+      "n_regimes_in_candidates": 2956,
+      "n_regimes_with_pullback_episode": 2952,
+      "n_regimes_in_state_ledger": 2952,
+      "n_regimes_in_population_c": 2952,
+      "coverage_pct_natural_all": 10.55,
+      "coverage_pct_natural_rth": 38.53,
+      "coverage_pct_natural_rth_mfe10": 43.15,
+      "p90_entry_diagnostics": {
+        "total_regimes": 2956,
+        "first_is_p90": 2956,
+        "pct": 100.0,
+        "mean_first_age_s": 705.7188768606225,
+        "median_first_age_s": 640.0,
+        "mean_first_mfe_atr": 3.6644039112642295,
+        "mean_first_ckpt_idx": 140.14377537212448
+      }
+    },
+    "2024": {
+      "n_natural_all": 27515,
+      "n_natural_rth": 7281,
+      "n_natural_rth_duration_ge_120s": 7185,
+      "n_natural_rth_mfe_ge_10_atr": 6565,
+      "n_regimes_in_candidates": 2888,
+      "n_regimes_with_pullback_episode": 2883,
+      "n_regimes_in_state_ledger": 2883,
+      "n_regimes_in_population_c": 2883,
+      "coverage_pct_natural_all": 10.5,
+      "coverage_pct_natural_rth": 39.66,
+      "coverage_pct_natural_rth_mfe10": 43.99,
+      "p90_entry_diagnostics": {
+        "total_regimes": 2888,
+        "first_is_p90": 2888,
+        "pct": 100.0,
+        "mean_first_age_s": 719.3923130193906,
+        "median_first_age_s": 650.0,
+        "mean_first_mfe_atr": 3.661062231346907,
+        "mean_first_ckpt_idx": 142.87846260387812
+      }
+    },
+    "2025_Q1": {
+      "n_natural_all": 6430,
+      "n_natural_rth": 1761,
+      "n_natural_rth_duration_ge_120s": 1735,
+      "n_natural_rth_mfe_ge_10_atr": 1600,
+      "n_regimes_in_candidates": 715,
+      "n_regimes_with_pullback_episode": 713,
+      "n_regimes_in_state_ledger": 713,
+      "n_regimes_in_population_c": 713,
+      "coverage_pct_natural_all": 11.12,
+      "coverage_pct_natural_rth": 40.6,
+      "coverage_pct_natural_rth_mfe10": 44.69,
+      "p90_entry_diagnostics": {
+        "total_regimes": 715,
+        "first_is_p90": 715,
+        "pct": 100.0,
+        "mean_first_age_s": 735.020979020979,
+        "median_first_age_s": 670.0,
+        "mean_first_mfe_atr": 3.705665471726564,
+        "mean_first_ckpt_idx": 146.0041958041958
+      }
+    },
+    "TRAIN_COMBINED_2023_2024": {
+      "n_natural_all": 55544,
+      "n_natural_rth": 14952,
+      "n_natural_rth_mfe_ge_10_atr": 13415,
+      "n_regimes_in_candidates": 5844,
+      "n_regimes_with_pullback_episode": 5835,
+      "n_regimes_in_population_c": 5835,
+      "coverage_pct_natural_rth": 39.09,
+      "coverage_pct_natural_rth_mfe10": 43.56
+    }
+  },
+  "audit_checks": {
+    "check_1_source_regime_creation": "Dual-EMA(3,9) on completed 1m high/low bars with 14-period Wilder ATR.",
+    "check_2_pullback_episode_creation": "Observed pullback >= 0.50 ATR from running Max MFE within candidate checkpoints.",
+    "check_3_p90_requirement": "YES: Candidate collection strictly required TriggerEngine state == ARMED (Model C >= P90).",
+    "check_4_p90_role": "P90 determines BOTH which regimes exist in the dataset AND left-truncates observation emission within them.",
+    "check_5_regimes_without_p90_reconstructible": "YES from raw 1m catalog bars, but NO in the existing candidates.parquet.",
+    "check_6_regimes_with_no_p90_represented": "FALSE: Exactly 0 regimes with no P90 exist in candidates/state ledgers.",
+    "check_7_regimes_never_reaching_pb05": "Only represented if they reached P90, but generate 0 pullback episodes.",
+    "check_8_early_portions_missing": "TRUE: First ~12 minutes (mean 706s) and first 3.66 ATR of MFE are missing.",
+    "check_9_p90_left_truncation": "TRUE: P90 occurs partway through the regime and completely left-truncates prior history.",
+    "check_10_multiple_p90_events": "State stays ARMED until regime flip; multiple P90 events do not split regimes."
+  }
+}

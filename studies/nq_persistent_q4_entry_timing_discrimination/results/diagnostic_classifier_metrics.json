@@ -1,0 +1,32 @@
+{
+  "D0_Instantaneous": {
+    "feature_count": 26,
+    "train_oof_roc_auc": 0.5202320787269744,
+    "train_oof_pr_auc": 0.6836849736214279,
+    "train_oof_brier": 0.22260808084319517,
+    "oos_roc_auc": 0.5240926640926641,
+    "oos_pr_auc": 0.7074833013646533,
+    "oos_brier": 0.21933422759623966,
+    "incremental_oos_auc_vs_d0": 0.0
+  },
+  "D1_Plus_30s_Context": {
+    "feature_count": 34,
+    "train_oof_roc_auc": 0.5197000051049185,
+    "train_oof_pr_auc": 0.6818978037237529,
+    "train_oof_brier": 0.22325627788538333,
+    "oos_roc_auc": 0.47811583011583014,
+    "oos_pr_auc": 0.6862710153288999,
+    "oos_brier": 0.22216105849278514,
+    "incremental_oos_auc_vs_d0": -0.04597683397683394
+  },
+  "D2_Full_Trajectory_Context": {
+    "feature_count": 60,
+    "train_oof_roc_auc": 0.5257441456337798,
+    "train_oof_pr_auc": 0.6910166035020544,
+    "train_oof_brier": 0.22276885305390554,
+    "oos_roc_auc": 0.5012046332046333,
+    "oos_pr_auc": 0.7029647917035281,
+    "oos_brier": 0.22093428344021915,
+    "incremental_oos_auc_vs_d0": -0.02288803088803082
+  }
+}

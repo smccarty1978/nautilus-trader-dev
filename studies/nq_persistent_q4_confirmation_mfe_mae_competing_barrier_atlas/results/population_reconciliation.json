@@ -1,0 +1,47 @@
+{
+  "gate_0_verdict": "PASS_ZERO_DIVERGENCE",
+  "total_parent_regimes": 5610,
+  "a1_confirmed_population": 3065,
+  "a2_confirmed_population": 1938,
+  "a1_expected": 3065,
+  "a2_expected": 1938,
+  "a1_divergence": 0,
+  "a2_divergence": 0,
+  "reconciled_fields": [
+    "regime_id",
+    "direction",
+    "year",
+    "split",
+    "q4_ts",
+    "q4_price",
+    "atr_frozen",
+    "a1_ts",
+    "a1_price",
+    "a2_ts",
+    "a2_price",
+    "va_ts",
+    "va_price",
+    "fill_ts",
+    "fill_price",
+    "exit_fill_ts",
+    "exit_fill_price",
+    "gross_pnl",
+    "net_pnl"
+  ],
+  "subperiod_counts": {
+    "A1": {
+      "2023": 1353,
+      "2024": 1372,
+      "2025_Q1": 340,
+      "TRAIN": 2725,
+      "OOS": 340
+    },
+    "A2": {
+      "2023": 828,
+      "2024": 873,
+      "2025_Q1": 237,
+      "TRAIN": 1701,
+      "OOS": 237
+    }
+  }
+}

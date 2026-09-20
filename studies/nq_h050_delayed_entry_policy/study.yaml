@@ -1,0 +1,51 @@
+study_id: nq_h050_delayed_entry_policy
+description: Bounded Executable Policy Study for NQ H050 Delayed-Entry Lineage
+status: COMPLETED
+lineage:
+  parent_studies:
+    - studies/nq_h050_delayed_entry_fast_failure
+    - studies/nq_h050_depth_progression
+  baseline_models:
+    m4_runtime_recovery: studies/nq_h050_m4_runtime_recovery
+  historical_ledgers:
+    checkpoint_target_ledger: studies/nq_h050_asymmetric_regime_exhaustion/results/checkpoint_target_ledger.parquet
+    counter_h0501_exit_ledger: studies/nq_h050_to_opposing_h050_exit_lifecycle/results/counter_h0501_exit_ledger.parquet
+entry_policies:
+  - P0: H050 Control (Baseline)
+  - P1: T60 (Fixed 60s Elapsed Time)
+  - P2: T180 (Fixed 180s Elapsed Time)
+  - P3: H100 (Pullback Depth >= 1.00 ATR)
+  - P4: Hybrid 60s + H075 (Elapsed >= 60s AND Depth >= 0.75 ATR)
+  - P5: Hybrid 120s + H100 (Elapsed >= 120s AND Depth >= 1.00 ATR)
+exit_variants:
+  - F0: Canonical C1 Exit
+  - F30: +30s Fast-Failure Overlay (TRAIN 2023 Top 10% Risk Cutoff)
+  - F60: +60s Fast-Failure Overlay (TRAIN 2023 Top 10% Risk Cutoff)
+population:
+  dataset: NQ Dense 1s CME Futures (2023-2025 Q1)
+  chronological_protocol:
+    fit_year: "2023 (N=10,605)"
+    validation_year: "2024 (N=10,888)"
+    forward_diagnostic: "2025 Q1 (N=2,422)"
+execution_contract:
+  fill_pricing: "First causally executable next 1s bar open (next_bar_open)"
+  decision_to_fill_latency: "1.0 second"
+  transaction_friction_round_trip: "$15.00 / 0.75 points per contract"
+artifacts:
+  policy_contracts: results/policy_contracts.json
+  execution_contract_audit: results/execution_contract_audit.json
+  policy_population_census: results/policy_population_census.json
+  entry_trigger_diagnostics: results/entry_trigger_diagnostics.json
+  policy_metrics_2023: results/policy_metrics_2023.json
+  policy_metrics_2024: results/policy_metrics_2024.json
+  policy_metrics_pooled: results/policy_metrics_pooled.json
+  policy_metrics_2025_q1_forward: results/policy_metrics_2025_q1_forward.json
+  directional_breakdown: results/directional_breakdown.json
+  regime_age_breakdown: results/regime_age_breakdown.json
+  opportunity_retention: results/opportunity_retention.json
+  fast_failure_overlay_comparison: results/fast_failure_overlay_comparison.json
+  policy_comparison_matrix: results/policy_comparison_matrix.json
+  policy_nomination: results/policy_nomination.json
+  policy_trade_ledger: results/policy_trade_ledger.parquet
+  study_manifest: results/study_manifest.json
+  report: H050_DELAYED_ENTRY_POLICY_REPORT.md

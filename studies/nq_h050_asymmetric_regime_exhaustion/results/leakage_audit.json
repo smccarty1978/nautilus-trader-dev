@@ -1,0 +1,43 @@
+{
+  "status": "PASS_ZERO_LEAKAGE",
+  "timestamp_utc": "2026-09-16T21:10:42Z",
+  "prohibited_forward_fields_inspected": [
+    "additional_mfe_beyond_max_atr",
+    "additional_mfe_beyond_max_points",
+    "outcome",
+    "time_to_max_mfe_recovery_sec",
+    "time_to_va_sec",
+    "giveback_remaining_atr",
+    "giveback_remaining_points",
+    "final_regime_max_mfe_atr",
+    "final_regime_giveback_atr",
+    "final_regime_giveback_points",
+    "is_final_pullback",
+    "target_y050_success",
+    "target_material_continuation",
+    "target_y100_dangerous",
+    "target_y200_severe",
+    "severity_state"
+  ],
+  "feature_set": [
+    "pullback_depth_atr",
+    "pullback_duration_sec",
+    "pullback_efficiency",
+    "pullback_velocity_atr_sec",
+    "pre_pullback_max_mfe_atr",
+    "pullback_ordinal",
+    "regime_age_sec",
+    "previous_pullbacks_count",
+    "previous_pullbacks_max_depth_atr",
+    "previous_pullbacks_avg_duration_sec",
+    "pullback_depth_vs_max_mfe_ratio",
+    "pullback_duration_vs_regime_age_ratio",
+    "incumbent_expansion_rate_atr_min",
+    "has_previous_pullbacks",
+    "previous_max_depth_ratio",
+    "frozen_atr",
+    "direction_is_long"
+  ],
+  "causal_availability": "All 17 features strictly known at or before checkpoint_ts.",
+  "oos_quarantine": "2025 Q1 (N=2,422) quarantined from all training, loss weighting, and parameter estimation."
+}

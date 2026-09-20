@@ -1,0 +1,75 @@
+{
+  "description": "Evaluation of whether hazard reduction from peak materially improves subsequent survival",
+  "TRAIN_2023_2024": {
+    "H1_structural_recovery": {
+      "still_elevated": {
+        "mean": 0.7737,
+        "ci_lower": 0.768,
+        "ci_upper": 0.7795,
+        "n_regimes": 14240,
+        "n_obs": 30651
+      },
+      "recovered_ge15": {
+        "mean": 0.3436,
+        "ci_lower": 0.3355,
+        "ci_upper": 0.3511,
+        "n_regimes": 5963,
+        "n_obs": 42247
+      },
+      "recovery_benefit_pct": 43.02
+    },
+    "H2_imminent_recovery": {
+      "still_elevated": {
+        "mean": 0.6025,
+        "ci_lower": 0.5965,
+        "ci_upper": 0.6088,
+        "n_regimes": 14115,
+        "n_obs": 30990
+      },
+      "recovered_ge15": {
+        "mean": 0.1521,
+        "ci_lower": 0.1473,
+        "ci_upper": 0.1578,
+        "n_regimes": 6458,
+        "n_obs": 46331
+      },
+      "recovery_benefit_pct": 45.03
+    }
+  },
+  "OOS_2025_Q1": {
+    "H1_structural_recovery": {
+      "still_elevated": {
+        "mean": 0.762,
+        "ci_lower": 0.7449,
+        "ci_upper": 0.7806,
+        "n_regimes": 1675,
+        "n_obs": 3613
+      },
+      "recovered_ge15": {
+        "mean": 0.3296,
+        "ci_lower": 0.3096,
+        "ci_upper": 0.3499,
+        "n_regimes": 717,
+        "n_obs": 5261
+      },
+      "recovery_benefit_pct": 43.24
+    },
+    "H2_imminent_recovery": {
+      "still_elevated": {
+        "mean": 0.5918,
+        "ci_lower": 0.5716,
+        "ci_upper": 0.6129,
+        "n_regimes": 1652,
+        "n_obs": 3648
+      },
+      "recovered_ge15": {
+        "mean": 0.145,
+        "ci_lower": 0.1315,
+        "ci_upper": 0.1592,
+        "n_regimes": 773,
+        "n_obs": 5739
+      },
+      "recovery_benefit_pct": 44.69
+    }
+  }
+}

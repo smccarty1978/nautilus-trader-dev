@@ -1,0 +1,24 @@
+{
+  "study": "nq_persistent_q4_post_q4_transition_confirmation_atlas",
+  "timestamp": "2026-09-16T14:29:27Z",
+  "execution_time_seconds": 418.83,
+  "sub_runtimes": {
+    "reconciliation_seconds": 0.22,
+    "checkpoint_construction_seconds": 410.3,
+    "atlas_analysis_seconds": 2.47
+  },
+  "artifacts": [
+    "checkpoint_observation_ledger.parquet",
+    "checkpoint_survival_atlas.json",
+    "waiting_cost_tail_reduction.json",
+    "conditional_path_atlas.json",
+    "post_q4_feature_discrimination.json",
+    "early_flip_analysis.json",
+    "train_oos_replication.json",
+    "population_reconciliation.json",
+    "runtime_contract.json",
+    "parent_artifact_hashes.json",
+    "diagnostic_classifier_metrics.json",
+    "diagnostic_classifier_predictions.parquet"
+  ]
+}

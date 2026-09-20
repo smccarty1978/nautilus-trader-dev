@@ -1,0 +1,54 @@
+{
+  "head_1_structural_failure": {
+    "M0_depth": {
+      "roc_auc": 0.7115,
+      "pr_auc": 0.4246,
+      "brier_score": 0.1542,
+      "log_loss": 0.4791,
+      "base_rate": 0.2215,
+      "sample_size": 15602
+    },
+    "M1_path_state": {
+      "roc_auc": 0.7811,
+      "pr_auc": 0.573,
+      "brier_score": 0.1355,
+      "log_loss": 0.4298,
+      "base_rate": 0.2215,
+      "sample_size": 15602
+    },
+    "M2_full_dynamic": {
+      "roc_auc": 0.7901,
+      "pr_auc": 0.5824,
+      "brier_score": 0.134,
+      "log_loss": 0.4247,
+      "base_rate": 0.2215,
+      "sample_size": 15602
+    }
+  },
+  "head_2_imminent_failure": {
+    "M0_depth": {
+      "roc_auc": 0.7144,
+      "pr_auc": 0.2598,
+      "brier_score": 0.1002,
+      "log_loss": 0.3405,
+      "base_rate": 0.1224,
+      "sample_size": 15602
+    },
+    "M1_path_state": {
+      "roc_auc": 0.7767,
+      "pr_auc": 0.3494,
+      "brier_score": 0.0937,
+      "log_loss": 0.3158,
+      "base_rate": 0.1224,
+      "sample_size": 15602
+    },
+    "M2_full_dynamic": {
+      "roc_auc": 0.7828,
+      "pr_auc": 0.3609,
+      "brier_score": 0.093,
+      "log_loss": 0.3132,
+      "base_rate": 0.1224,
+      "sample_size": 15602
+    }
+  }
+}

@@ -1,0 +1,42 @@
+study_id: nq_h050_six_model_remaining_mfe
+description: Bounded Six-Model Remaining MFE & Terminal Exhaustion Training Study
+status: COMPLETED
+lineage:
+  parent_study: nq_h050_mtf_regime_context_features
+  feature_surface: studies/nq_h050_mtf_regime_context_features/results/feature_surface_train.parquet
+benchmarks:
+- Benchmark_A_Pooled
+- Benchmark_B_Directional
+- Benchmark_C_Six_Cell
+cells:
+  Counter-LONG:
+  - L1 (0-300s)
+  - L2 (>300-900s)
+  - L3 (>900s)
+  Counter-SHORT:
+  - S1 (0-300s)
+  - S2 (>300-900s)
+  - S3 (>900s)
+heads:
+- terminal_mfe_within_0p25a
+- remaining_mfe_gte_0p5a
+- remaining_mfe_gte_1p0a
+- remaining_mfe_gte_2p0a
+- remaining_mfe_continuous
+population:
+  train_2023_count: 10605
+  val_2024_count: 10888
+  total_train_count: 21493
+features:
+  total_audited_features: 183
+  exact_algebraic_duplicates_pruned: 20
+  clean_causal_features: 163
+  pooled_features_with_direction: 164
+formal_verdicts:
+  TARGET_CONSTRUCTION_CAUSALITY_PASS: PASS
+  MODEL_PERSISTENCE_PASS: PASS
+  TERMINAL_MFE_PREDICTION_USEFUL: WEAK
+  REMAINING_MFE_PREDICTION_USEFUL: WEAK
+  YOUNG_REGIME_FALSE_EXHAUSTION_SEPARATION_FOUND: NOT_FOUND
+  SIX_MODEL_SPECIALIZATION_SUPPORTED: POOLED_MODEL_SUFFICIENT
+  POST_ENTRY_RESCORING_ARCHITECTURE_FEASIBLE: FEASIBLE

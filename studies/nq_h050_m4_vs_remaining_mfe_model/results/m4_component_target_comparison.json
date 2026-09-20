@@ -1,0 +1,42 @@
+{
+  "2024_validation": {
+    "P_y050_success": {
+      "auc_terminal_lt_0p25a": 0.627273150892291,
+      "auc_remaining_gte_0p5a": 0.3647265047044565,
+      "auc_remaining_gte_1p0a": 0.3747701383939211,
+      "auc_remaining_gte_2p0a": 0.37130079506142344
+    },
+    "P_y100_dangerous": {
+      "auc_terminal_lt_0p25a": 0.37861076038800834,
+      "auc_remaining_gte_0p5a": 0.6300352702472326,
+      "auc_remaining_gte_1p0a": 0.6436536803653504,
+      "auc_remaining_gte_2p0a": 0.6464716337608685
+    },
+    "P_y200_severe": {
+      "auc_terminal_lt_0p25a": 0.3925488362151295,
+      "auc_remaining_gte_0p5a": 0.6157773102329955,
+      "auc_remaining_gte_1p0a": 0.6277384857290853,
+      "auc_remaining_gte_2p0a": 0.6598692803729553
+    }
+  },
+  "2025_q1_forward": {
+    "P_y050_success": {
+      "auc_terminal_lt_0p25a": 0.5967848170827446,
+      "auc_remaining_gte_0p5a": 0.40216761450502736,
+      "auc_remaining_gte_1p0a": 0.3983566210195256,
+      "auc_remaining_gte_2p0a": 0.3821387300341382
+    },
+    "P_y100_dangerous": {
+      "auc_terminal_lt_0p25a": 0.40571753807505107,
+      "auc_remaining_gte_0p5a": 0.6004934366440321,
+      "auc_remaining_gte_1p0a": 0.6067558178264099,
+      "auc_remaining_gte_2p0a": 0.6243338223567816
+    },
+    "P_y200_severe": {
+      "auc_terminal_lt_0p25a": 0.4145136599152144,
+      "auc_remaining_gte_0p5a": 0.5936727780205087,
+      "auc_remaining_gte_1p0a": 0.6012649199536977,
+      "auc_remaining_gte_2p0a": 0.6352862344571528
+    }
+  }
+}

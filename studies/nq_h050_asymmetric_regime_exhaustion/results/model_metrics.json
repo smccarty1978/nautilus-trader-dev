@@ -1,0 +1,98 @@
+{
+  "M0_Binary_Control": {
+    "train": {
+      "n": 21493,
+      "roc_auc_exhaustion_lt_0p5": 0.5923257517316407,
+      "pr_auc_exhaustion_lt_0p5": 0.46880921162442585,
+      "roc_auc_suppress_ge_1p0": 0.5937870375470867,
+      "roc_auc_suppress_ge_2p0": 0.602338571675591
+    },
+    "oos": {
+      "n": 2422,
+      "roc_auc_exhaustion_lt_0p5": 0.5978323854949726,
+      "pr_auc_exhaustion_lt_0p5": 0.48184829220295344,
+      "roc_auc_suppress_ge_1p0": 0.6016433789804745,
+      "roc_auc_suppress_ge_2p0": 0.6178612699658618
+    }
+  },
+  "M1_Cost_Sensitive": {
+    "train": {
+      "n": 21493,
+      "roc_auc_exhaustion_lt_0p5": 0.5959394063371372,
+      "pr_auc_exhaustion_lt_0p5": 0.47137523091526273,
+      "roc_auc_suppress_ge_1p0": 0.598382018923729,
+      "roc_auc_suppress_ge_2p0": 0.6072535325979513
+    },
+    "oos": {
+      "n": 2422,
+      "roc_auc_exhaustion_lt_0p5": 0.6022845767371314,
+      "pr_auc_exhaustion_lt_0p5": 0.485496571095978,
+      "roc_auc_suppress_ge_1p0": 0.6109970160092605,
+      "roc_auc_suppress_ge_2p0": 0.633684449054347
+    }
+  },
+  "M2_Ordinal_ExpSeverity": {
+    "train": {
+      "n": 21493,
+      "roc_auc_exhaustion_lt_0p5": 0.5963291070721299,
+      "pr_auc_exhaustion_lt_0p5": 0.4713204860913438,
+      "roc_auc_suppress_ge_1p0": 0.6004418955047915,
+      "roc_auc_suppress_ge_2p0": 0.613967608424459
+    },
+    "oos": {
+      "n": 2422,
+      "roc_auc_exhaustion_lt_0p5": 0.6001673536386231,
+      "pr_auc_exhaustion_lt_0p5": 0.48247391416720353,
+      "roc_auc_suppress_ge_1p0": 0.6049966146857118,
+      "roc_auc_suppress_ge_2p0": 0.6318626809698238
+    }
+  },
+  "M2_Ordinal_TailPenalized": {
+    "train": {
+      "n": 21493,
+      "roc_auc_exhaustion_lt_0p5": 0.5963449901246665,
+      "pr_auc_exhaustion_lt_0p5": 0.4714149244474781,
+      "roc_auc_suppress_ge_1p0": 0.600683482947268,
+      "roc_auc_suppress_ge_2p0": 0.614647405697883
+    },
+    "oos": {
+      "n": 2422,
+      "roc_auc_exhaustion_lt_0p5": 0.5998074150206305,
+      "pr_auc_exhaustion_lt_0p5": 0.48232685235324346,
+      "roc_auc_suppress_ge_1p0": 0.6047195103306687,
+      "roc_auc_suppress_ge_2p0": 0.632597773541651
+    }
+  },
+  "M3_Continuous_Log1p": {
+    "train": {
+      "n": 21493,
+      "roc_auc_exhaustion_lt_0p5": 0.5931688542833079,
+      "pr_auc_exhaustion_lt_0p5": 0.46939760157629595,
+      "roc_auc_suppress_ge_1p0": 0.5995815330985104,
+      "roc_auc_suppress_ge_2p0": 0.6138177787772559
+    },
+    "oos": {
+      "n": 2422,
+      "roc_auc_exhaustion_lt_0p5": 0.6017788807975955,
+      "pr_auc_exhaustion_lt_0p5": 0.4783113029028215,
+      "roc_auc_suppress_ge_1p0": 0.6090791262613025,
+      "roc_auc_suppress_ge_2p0": 0.6385890894819466
+    }
+  },
+  "M4_Composite_Risk": {
+    "train": {
+      "n": 21493,
+      "roc_auc_exhaustion_lt_0p5": 0.5958440121759115,
+      "pr_auc_exhaustion_lt_0p5": 0.47184681428084696,
+      "roc_auc_suppress_ge_1p0": 0.6003957658407673,
+      "roc_auc_suppress_ge_2p0": 0.613211687864714
+    },
+    "oos": {
+      "n": 2422,
+      "roc_auc_exhaustion_lt_0p5": 0.6011463154045888,
+      "pr_auc_exhaustion_lt_0p5": 0.4838916524023703,
+      "roc_auc_suppress_ge_1p0": 0.6077031598086752,
+      "roc_auc_suppress_ge_2p0": 0.6322598178465524
+    }
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "total_trading_days": 577,
+  "raw_counts": {
+    "NQ_total": 1065,
+    "ES_total": 8786,
+    "YM_total": 7744,
+    "combined_total": 17595,
+    "NQ_per_day": 1.85,
+    "ES_per_day": 15.23,
+    "YM_per_day": 13.42,
+    "combined_per_day": 30.49
+  },
+  "clustering": {
+    "same_second": {
+      "window_seconds": 0.0,
+      "total_raw_signals": 17595,
+      "raw_signals_per_day": 30.49,
+      "unique_clusters_total": 17031,
+      "unique_clusters_per_day": 29.52,
+      "avg_instruments_per_cluster": 1.03,
+      "avg_events_per_cluster": 1.03,
+      "pct_multi_instrument_clusters": 3.29,
+      "multi_instrument_cluster_count": 560
+    },
+    "same_minute": {
+      "window_seconds": 60.0,
+      "total_raw_signals": 17595,
+      "raw_signals_per_day": 30.49,
+      "unique_clusters_total": 13556,
+      "unique_clusters_per_day": 23.49,
+      "avg_instruments_per_cluster": 1.16,
+      "avg_events_per_cluster": 1.3,
+      "pct_multi_instrument_clusters": 15.28,
+      "multi_instrument_cluster_count": 2072
+    },
+    "within_5_minutes": {
+      "window_seconds": 300.0,
+      "total_raw_signals": 17595,
+      "raw_signals_per_day": 30.49,
+      "unique_clusters_total": 9279,
+      "unique_clusters_per_day": 16.08,
+      "avg_instruments_per_cluster": 1.3,
+      "avg_events_per_cluster": 1.9,
+      "pct_multi_instrument_clusters": 28.25,
+      "multi_instrument_cluster_count": 2621
+    }
+  },
+  "frequency_verdict": ">=5_PER_DAY"
+}

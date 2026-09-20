@@ -1,0 +1,37 @@
+{
+  "study_id": "nq_h050_delayed_entry_policy",
+  "policy_under_audit": "P0_F30",
+  "baseline_control": "P0_F0",
+  "p0_f0_contract": {
+    "entry_definition": "Immediate counter-regime market entry at H050 checkpoint on next 1s bar open",
+    "entry_trigger_time": "t_H050 (checkpoint_ts)",
+    "entry_fill_time": "t_H050 + 1s (ts_1s_arr[idx_t0 + 1])",
+    "entry_fill_price": "open of 1s bar at fill_ts",
+    "exit_definition": "Canonical C1 exit (opposing H050 first-arrival or regime termination)",
+    "exit_source": "studies/nq_h050_to_opposing_h050_exit_lifecycle/results/counter_h0501_exit_ledger.parquet",
+    "friction_model": "0.75 NQ index points per round-turn contract ($15.00 RT), $20.00/point",
+    "atr_normalizer": "frozen_atr established at H050 checkpoint"
+  },
+  "p0_f30_contract": {
+    "entry_definition": "Identical to P0_F0",
+    "fast_failure_evaluation_time": "fill_ts + 30s",
+    "fast_failure_decision_mechanism": "LightGBM probability score >= frozen 90th percentile threshold",
+    "fast_failure_feature_set": [
+      "post_entry_adverse_excursion_atr",
+      "post_entry_favorable_excursion_atr",
+      "post_entry_mfe_mae_ratio",
+      "has_new_incumbent_extreme_post_entry",
+      "magnitude_new_incumbent_extreme_post_entry",
+      "incumbent_bars_count_post_entry",
+      "counter_bars_count_post_entry"
+    ],
+    "score_name": "risk_score_severe_loss_30s",
+    "frozen_threshold_value": 0.6980097987618479,
+    "threshold_provenance": "Fitted on 2023 TRAIN across candidate entry policies, frozen for 2024 and 2025",
+    "exit_timing_if_flagged": "fill_ts + 31s (next 1s bar open after evaluation)",
+    "exit_price_if_flagged": "open of 1s bar at fill_ts + 31s",
+    "exit_reason_if_flagged": "FAST_FAILURE_30S",
+    "exit_behavior_if_unflagged": "Continue to canonical C1 exit",
+    "ineligible_trade_behavior": "If C1 occurs before +30s, exit at C1 (reason C1_BEFORE_FF30, identical to F0)"
+  }
+}

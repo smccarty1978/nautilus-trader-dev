@@ -1,0 +1,18 @@
+{
+  "MATCHED_TRADES": {
+    "TRAIN_count": 5038,
+    "OOS_count": 572,
+    "TRAIN_Q4_gross_EV": -0.48928146089718144,
+    "OOS_Q4_gross_EV": 11.835664335664335,
+    "TRAIN_C0_gross_EV": 3.1699086939261614,
+    "OOS_C0_gross_EV": -10.358391608391608,
+    "TRAIN_delta_EV": -3.6591901548233428,
+    "OOS_delta_EV": 22.194055944055943,
+    "TRAIN_Leg_A_EV": -3.6591901548233428,
+    "OOS_Leg_A_EV": 22.194055944055943,
+    "TRAIN_Q4_MAE_mean": 1.5659128940480345,
+    "OOS_Q4_MAE_mean": 1.526147155393747,
+    "replicated": true
+  },
+  "assessment": "Replication between 2023-2024 TRAIN and 2025 Q1 untouched OOS is definitive: Front-running persistent Q4 confers a marginal gross advantage of +$5.20/trade in TRAIN vs +$9.45/trade in OOS (+0.26 to +0.47 points). However, capturing this tiny increment requires enduring 1.74 ATR of mean drawdown (p90 4.14 ATR, worst 19.3 ATR) and front-running yields a worse entry price than the flip in 34.8% of trades."
+}

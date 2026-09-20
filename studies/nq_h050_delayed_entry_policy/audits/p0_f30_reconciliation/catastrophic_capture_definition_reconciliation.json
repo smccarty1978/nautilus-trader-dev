@@ -1,0 +1,27 @@
+{
+  "prior_observational_study": {
+    "study_id": "nq_h050_delayed_entry_fast_failure",
+    "artifact": "results/fast_failure_30s.json",
+    "reported_catastrophic_capture_rate": 0.1834,
+    "formula": "top10['is_catastrophic_loss'].sum() / total_cat_in_validation_set",
+    "population": "ALL 6 HORIZONS POOLED (T0, T30, T60, T120, T180, T300) in 2024 (N=61,537 rows)",
+    "total_catastrophic_events_in_pool": 8255,
+    "flagged_catastrophic_events": 1514
+  },
+  "policy_study_as_reported": {
+    "study_id": "nq_h050_delayed_entry_policy",
+    "artifact": "results/fast_failure_overlay_comparison.json",
+    "reported_val_2024_catastrophic_capture_rate": 0.6751,
+    "formula": "df_val[flagged]['is_catastrophic_loss'].sum() / df_val['is_catastrophic_loss'].sum()",
+    "population": "P0-P5 candidate trades in 2024 Validation (N=58,079)",
+    "on_p0_only_in_2024": {
+      "total_p0_catastrophics": 1528,
+      "flagged_p0_catastrophics": 1032,
+      "realized_capture_rate": 0.67539
+    }
+  },
+  "reconciliation_verdict": {
+    "root_cause_of_capture_jump": "CRITICAL_MODEL_LEAKAGE",
+    "explanation": "The jump in catastrophic capture from 18.34% to 67.51% is NOT due to a denominator definition difference. Both used captured_cat / total_cat. The jump is directly caused by future lookahead leakage in `scripts/run_delayed_entry_policy_study.py`. Specifically, `magnitude_new_incumbent_extreme_post_entry` incorporated `cur_peak`, which had been iterated to the end of the multi-hour regime (idx_reg_end). When recomputed on the exact same P0 rows using strictly causal features available at +30s, the catastrophic capture is 17.80%, perfectly reconciling with the prior observational study's 18.34%."
+  }
+}

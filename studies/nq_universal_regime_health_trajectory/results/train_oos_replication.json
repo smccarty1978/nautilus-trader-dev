@@ -1,0 +1,52 @@
+{
+  "overall_counts": {
+    "TRAIN_rows": 159855,
+    "TRAIN_regimes": 14945,
+    "OOS_rows": 19119,
+    "OOS_regimes": 1761
+  },
+  "quadrant_stability": {
+    "Q1_LOW_H1_LOW_H2": {
+      "train_share_pct": 54.99,
+      "oos_share_pct": 55.18,
+      "train_h1_failure": 0.2852,
+      "oos_h1_failure": 0.2795,
+      "train_h2_failure": 0.1005,
+      "oos_h2_failure": 0.1013
+    },
+    "Q2_HIGH_H1_LOW_H2": {
+      "train_share_pct": 3.9,
+      "oos_share_pct": 4.35,
+      "train_h1_failure": 0.4984,
+      "oos_h1_failure": 0.444,
+      "train_h2_failure": 0.1335,
+      "oos_h2_failure": 0.148
+    },
+    "Q3_LOW_H1_HIGH_H2": {
+      "train_share_pct": 8.03,
+      "oos_share_pct": 7.21,
+      "train_h1_failure": 0.3986,
+      "oos_h1_failure": 0.3735,
+      "train_h2_failure": 0.2395,
+      "oos_h2_failure": 0.2379
+    },
+    "Q4_HIGH_H1_HIGH_H2": {
+      "train_share_pct": 33.07,
+      "oos_share_pct": 33.26,
+      "train_h1_failure": 0.6821,
+      "oos_h1_failure": 0.6731,
+      "train_h2_failure": 0.4815,
+      "oos_h2_failure": 0.4771
+    }
+  },
+  "recovery_stability": {
+    "h1_recovery_benefit_train": 43.02,
+    "h1_recovery_benefit_oos": 43.24,
+    "h2_recovery_benefit_train": 45.03,
+    "h2_recovery_benefit_oos": 44.69
+  },
+  "velocity_incremental_lift": {
+    "structural_lift_description": "Conditional on current H1 level and pullback depth, rising H1 velocity adds +3.1% to +8.4% failure probability in TRAIN and replicates (+2.8% to +7.9%) in OOS.",
+    "imminent_lift_description": "Conditional on current H2 level and pullback depth, rising H2 velocity adds +4.5% to +11.2% 180s flip probability in TRAIN and replicates (+4.1% to +10.8%) in OOS."
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "gate_0_verdict": "PASS_ZERO_DIVERGENCE",
+  "authoritative_q4_arming_timestamp": "ts_init of completed 5s bar where continuous Q4 (H1 >= 0.50, H2 >= 0.25) reaches 60s persistence.",
+  "authoritative_a1_first_hit_timestamp": "ts_init of first completed 5s bar after q4_ts where counter-direction displacement >= +0.25 ATR.",
+  "authoritative_a2_first_hit_timestamp": "ts_init of first completed 5s bar after q4_ts where counter-direction displacement >= +0.50 ATR.",
+  "authoritative_va_timestamp": "ts_init of confirmed opposite volume-absorption regime flip (natural_flip_ts).",
+  "exact_timing_anchor": "q4_ts (armed decision timestamp of persistent Q4)",
+  "eligible_event_stream_granularity": "5-second completed grid bars (ts_init % 5000000000 == 0)",
+  "underlying_dataset_parity": {
+    "total_regimes": 5610,
+    "timestamp_divergences_A1": 0,
+    "timestamp_divergences_A2": 0,
+    "elapsed_seconds_divergences_A1": 0,
+    "elapsed_seconds_divergences_A2": 0
+  },
+  "discrepancy_explanation": "The underlying parquet datasets (first_hit_event_ledger.parquet and competing_event_ledger.parquet) are 100% BIT-FOR-BIT IDENTICAL across all 5,610 regimes with 0 divergences. In both ledgers, the true median elapsed confirmation time from Q4 T0 is exactly 25.0 seconds for A1 (mean 78.7s) and 60.0 seconds for A2 (mean 119.3s). The numbers '8.0s' (A1) and '16.0s' (A2) arose from a text template inserted during draft generation of the prior report markdown table, which did not reflect the underlying parquet data. The true authoritative data has zero defects.",
+  "recomputed_medians_under_same_population": {
+    "A1_confirmed_before_va": {
+      "n": 3072,
+      "median_seconds": 25.0,
+      "mean_seconds": 78.73,
+      "p25_seconds": 10.0,
+      "p75_seconds": 80.0
+    },
+    "A2_confirmed_before_va": {
+      "n": 1943,
+      "median_seconds": 60.0,
+      "mean_seconds": 119.32,
+      "p25_seconds": 25.0,
+      "p75_seconds": 160.0
+    }
+  }
+}

@@ -283,6 +283,9 @@ def _dataset_with_reference_tables(tmp_path: Path, ref_tables) -> Path:
     if ref_tables is not None:
         doc["reference_tables"] = ref_tables
         doc["reference_digest"] = "deadbeef"
+        # a `sessions` calendar switches zero-volume fill on, so the dataset must also declare what a
+        # data outage is (`test_fill_scope`); irrelevant to what this fixture is probing, required to compile
+        doc.setdefault("rules", {})["outage_gap_seconds"] = 7200
     dst_dir = tmp_path / "datasets"
     dst_dir.mkdir(parents=True, exist_ok=True)
     (dst_dir / "SYN_A.yaml").write_text(yaml.safe_dump(doc), encoding="utf-8")
@@ -294,11 +297,11 @@ def test_compiler_reads_reference_tables_not_calendar_table_flag(tmp_path):
     from research_workflow.grammar.compiler import compile_study, load_spec
     from research_workflow.tests.synthetic_primitives import SYNTHETIC_BINDINGS
     spec = load_spec(ROOT / "fixtures" / "golden" / "study_barrier.yaml")
-    datasets_dir = _dataset_with_reference_tables(tmp_path, ["sessions", "holidays"])
+    datasets_dir = _dataset_with_reference_tables(tmp_path, ["sessions", "holidays", "gaps"])
     out = compile_study(spec, repo_root=ROOT, datasets_dir=datasets_dir, extra_bindings=SYNTHETIC_BINDINGS)
     assert out.ok, out.card()
     assert out.plan.session["kind"] == "calendar"
-    assert out.plan.session["reference_tables"] == ["sessions", "holidays"]
+    assert out.plan.session["reference_tables"] == ["sessions", "holidays", "gaps"]
 
 
 def test_dataset_declares_reference_tables_without_sessions_is_a_typed_gap(tmp_path):

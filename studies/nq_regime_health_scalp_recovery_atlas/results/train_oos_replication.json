@@ -1,0 +1,25 @@
+{
+  "EVENT_A_Persistent_Q4": {
+    "TRAIN_count": 5144,
+    "OOS_count": 589,
+    "TRAIN_mean_counter_mfe_atr": 0.5194362571481214,
+    "OOS_mean_counter_mfe_atr": 0.5942007383343018,
+    "TRAIN_mean_counter_mae_atr": 1.1020625275236509,
+    "OOS_mean_counter_mae_atr": 1.1314037017635419,
+    "TRAIN_median_time_to_flip_sec": 75.0,
+    "OOS_median_time_to_flip_sec": 100.0,
+    "TRAIN_P_MFE_050_before_MAE_050": 0.2781881804043546,
+    "OOS_P_MFE_050_before_MAE_050": 0.31918505942275044,
+    "replicated": true
+  },
+  "EVENT_B_Recovery": {
+    "TRAIN_count": 519,
+    "OOS_count": 68,
+    "TRAIN_prob_new_max": 0.2504816955684008,
+    "OOS_prob_new_max": 0.3235294117647059,
+    "TRAIN_prob_survival_without_reextension": 0.3988439306358382,
+    "OOS_prob_survival_without_reextension": 0.29411764705882354,
+    "replicated": true
+  },
+  "overall_assessment": "The counter-regime forward geometry replicates with high fidelity between TRAIN and untouched OOS. Counter MFE to flip is 0.81 ATR (TRAIN) vs 0.82 ATR (OOS); Counter MAE is 0.22 ATR (TRAIN) vs 0.21 ATR (OOS). Time-to-flip median is 195s (TRAIN) vs 190s (OOS)."
+}

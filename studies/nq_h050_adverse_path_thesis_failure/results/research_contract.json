@@ -1,0 +1,21 @@
+{
+  "study_name": "nq_h050_adverse_path_thesis_failure",
+  "study_type": "observational_risk_architecture",
+  "frozen_authority": "studies/nq_h050_m4_runtime_recovery",
+  "cohort": "2025 Q1 untouched OOS",
+  "total_population": 2422,
+  "primary_decision_cohort": "Top 10% M4 Composite (score >= 0.003001, N=411)",
+  "adverse_landmarks_atr": [
+    -0.5,
+    -0.75,
+    -1.0,
+    -1.25,
+    -1.5
+  ],
+  "lifecycle_policy": "C1 (no-stop control: H050_0 -> H050_1 / R2 fallback)",
+  "stop_execution": "NONE (observational landmarks only)",
+  "normalization": "frozen_atr snapshotted at regime start",
+  "entry_fill_reference": "nt_entry_fill_px from NautilusTrader event-driven matching engine",
+  "direction_handling": "Counter-LONG and Counter-SHORT maintained strictly separate",
+  "pre_vs_post_r1_separation": true
+}

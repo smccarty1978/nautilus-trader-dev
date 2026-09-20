@@ -1,0 +1,17 @@
+{
+  "study_name": "nq_regime_pullback_exhaustion_max_mfe_atlas",
+  "observation_unit": "pullback_checkpoint",
+  "checkpoint_depths_atr": [
+    0.25,
+    0.5,
+    0.75,
+    1.0
+  ],
+  "outcome_labels": {
+    "RESUME": "Price subsequently exceeds pre-pullback running maxMFE before opposite V_A flip",
+    "EXHAUST": "Price never exceeds pre-pullback running maxMFE again before opposite V_A flip"
+  },
+  "tick_size": 0.25,
+  "multiplier": 20.0,
+  "round_turn_friction": 15.0
+}

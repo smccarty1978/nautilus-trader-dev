@@ -1,0 +1,50 @@
+{
+  "P1": {
+    "all_regimes": {
+      "n_matched": 5610,
+      "median_entry_improvement_pts": 0.0,
+      "mean_entry_improvement_pts": -0.06764705882352941,
+      "median_pnl_difference_dollars": 0.0,
+      "mean_pnl_difference_dollars": -1.3529411764705883,
+      "p_policy_beats_c0_pct": 33.92,
+      "p_policy_worse_c0_pct": 19.55,
+      "p_tie_pct": 46.52
+    },
+    "early_confirmed_subset": {
+      "n_matched": 3065,
+      "median_entry_improvement_pts": 1.25,
+      "mean_entry_improvement_pts": -0.12381729200652529,
+      "median_pnl_difference_dollars": 25.0,
+      "mean_pnl_difference_dollars": -2.476345840130506,
+      "total_pnl_difference_dollars": -7590.0,
+      "p_policy_beats_c0_pct": 62.09,
+      "p_policy_worse_c0_pct": 35.79,
+      "p_tie_pct": 2.12
+    },
+    "why_entry_advantage_fails_to_translate": "While 59-62% of early confirmed entries achieve a favorable entry price (median +1.00 to +1.25 pts), the remaining 36-38% of entries enter prematurely during continuation pauses, suffering severe adverse price movement before the true transition flip. The mean entry improvement is negative (-0.12 pts for A1, -0.03 pts for A2), which translates directly into net underperformance relative to C0."
+  },
+  "P2": {
+    "all_regimes": {
+      "n_matched": 5610,
+      "median_entry_improvement_pts": 0.0,
+      "mean_entry_improvement_pts": -0.00909090909090909,
+      "median_pnl_difference_dollars": 0.0,
+      "mean_pnl_difference_dollars": -0.18181818181818182,
+      "p_policy_beats_c0_pct": 20.41,
+      "p_policy_worse_c0_pct": 13.28,
+      "p_tie_pct": 66.31
+    },
+    "early_confirmed_subset": {
+      "n_matched": 1938,
+      "median_entry_improvement_pts": 1.0,
+      "mean_entry_improvement_pts": -0.02631578947368421,
+      "median_pnl_difference_dollars": 20.0,
+      "mean_pnl_difference_dollars": -0.5263157894736842,
+      "total_pnl_difference_dollars": -1020.0,
+      "p_policy_beats_c0_pct": 59.08,
+      "p_policy_worse_c0_pct": 38.44,
+      "p_tie_pct": 2.48
+    },
+    "why_entry_advantage_fails_to_translate": "While 59-62% of early confirmed entries achieve a favorable entry price (median +1.00 to +1.25 pts), the remaining 36-38% of entries enter prematurely during continuation pauses, suffering severe adverse price movement before the true transition flip. The mean entry improvement is negative (-0.12 pts for A1, -0.03 pts for A2), which translates directly into net underperformance relative to C0."
+  }
+}

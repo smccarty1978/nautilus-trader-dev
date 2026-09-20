@@ -1,0 +1,404 @@
+{
+  "verdict": "FEATURE_PARITY_PASS",
+  "slices_evaluated": 24,
+  "total_expected_checkpoints": 383,
+  "total_emitted_checkpoints": 383,
+  "total_matched_checkpoints": 383,
+  "feature_parity_metrics": {
+    "pullback_depth_atr": {
+      "total_evaluated": 383,
+      "exact_matches": 383,
+      "exact_match_pct": 1.0,
+      "max_abs_error": 0.0,
+      "mean_abs_error": 0.0,
+      "median_abs_error": 0.0,
+      "verdict": "PASS"
+    },
+    "pullback_duration_sec": {
+      "total_evaluated": 383,
+      "exact_matches": 383,
+      "exact_match_pct": 1.0,
+      "max_abs_error": 0.0,
+      "mean_abs_error": 0.0,
+      "median_abs_error": 0.0,
+      "verdict": "PASS"
+    },
+    "pullback_efficiency": {
+      "total_evaluated": 383,
+      "exact_matches": 383,
+      "exact_match_pct": 1.0,
+      "max_abs_error": 0.0,
+      "mean_abs_error": 0.0,
+      "median_abs_error": 0.0,
+      "verdict": "PASS"
+    },
+    "pullback_velocity_atr_sec": {
+      "total_evaluated": 383,
+      "exact_matches": 383,
+      "exact_match_pct": 1.0,
+      "max_abs_error": 0.0,
+      "mean_abs_error": 0.0,
+      "median_abs_error": 0.0,
+      "verdict": "PASS"
+    },
+    "pre_pullback_max_mfe_atr": {
+      "total_evaluated": 383,
+      "exact_matches": 383,
+      "exact_match_pct": 1.0,
+      "max_abs_error": 0.0,
+      "mean_abs_error": 0.0,
+      "median_abs_error": 0.0,
+      "verdict": "PASS"
+    },
+    "pullback_ordinal": {
+      "total_evaluated": 383,
+      "exact_matches": 383,
+      "exact_match_pct": 1.0,
+      "max_abs_error": 0.0,
+      "mean_abs_error": 0.0,
+      "median_abs_error": 0.0,
+      "verdict": "PASS"
+    },
+    "regime_age_sec": {
+      "total_evaluated": 383,
+      "exact_matches": 383,
+      "exact_match_pct": 1.0,
+      "max_abs_error": 0.0,
+      "mean_abs_error": 0.0,
+      "median_abs_error": 0.0,
+      "verdict": "PASS"
+    },
+    "previous_pullbacks_count": {
+      "total_evaluated": 383,
+      "exact_matches": 383,
+      "exact_match_pct": 1.0,
+      "max_abs_error": 0.0,
+      "mean_abs_error": 0.0,
+      "median_abs_error": 0.0,
+      "verdict": "PASS"
+    },
+    "previous_pullbacks_max_depth_atr": {
+      "total_evaluated": 383,
+      "exact_matches": 383,
+      "exact_match_pct": 1.0,
+      "max_abs_error": 0.0,
+      "mean_abs_error": 0.0,
+      "median_abs_error": 0.0,
+      "verdict": "PASS"
+    },
+    "previous_pullbacks_avg_duration_sec": {
+      "total_evaluated": 383,
+      "exact_matches": 383,
+      "exact_match_pct": 1.0,
+      "max_abs_error": 0.0,
+      "mean_abs_error": 0.0,
+      "median_abs_error": 0.0,
+      "verdict": "PASS"
+    },
+    "pullback_depth_vs_max_mfe_ratio": {
+      "total_evaluated": 383,
+      "exact_matches": 383,
+      "exact_match_pct": 1.0,
+      "max_abs_error": 0.0,
+      "mean_abs_error": 0.0,
+      "median_abs_error": 0.0,
+      "verdict": "PASS"
+    },
+    "pullback_duration_vs_regime_age_ratio": {
+      "total_evaluated": 383,
+      "exact_matches": 383,
+      "exact_match_pct": 1.0,
+      "max_abs_error": 0.0,
+      "mean_abs_error": 0.0,
+      "median_abs_error": 0.0,
+      "verdict": "PASS"
+    },
+    "incumbent_expansion_rate_atr_min": {
+      "total_evaluated": 383,
+      "exact_matches": 383,
+      "exact_match_pct": 1.0,
+      "max_abs_error": 0.0,
+      "mean_abs_error": 0.0,
+      "median_abs_error": 0.0,
+      "verdict": "PASS"
+    },
+    "has_previous_pullbacks": {
+      "total_evaluated": 383,
+      "exact_matches": 383,
+      "exact_match_pct": 1.0,
+      "max_abs_error": 0.0,
+      "mean_abs_error": 0.0,
+      "median_abs_error": 0.0,
+      "verdict": "PASS"
+    },
+    "previous_max_depth_ratio": {
+      "total_evaluated": 383,
+      "exact_matches": 383,
+      "exact_match_pct": 1.0,
+      "max_abs_error": 0.0,
+      "mean_abs_error": 0.0,
+      "median_abs_error": 0.0,
+      "verdict": "PASS"
+    },
+    "frozen_atr": {
+      "total_evaluated": 383,
+      "exact_matches": 383,
+      "exact_match_pct": 1.0,
+      "max_abs_error": 0.0,
+      "mean_abs_error": 0.0,
+      "median_abs_error": 0.0,
+      "verdict": "PASS"
+    },
+    "direction_is_long": {
+      "total_evaluated": 383,
+      "exact_matches": 383,
+      "exact_match_pct": 1.0,
+      "max_abs_error": 0.0,
+      "mean_abs_error": 0.0,
+      "median_abs_error": 0.0,
+      "verdict": "PASS"
+    }
+  },
+  "slice_details": [
+    {
+      "regime_id": 1687544820000000000,
+      "year": "2023",
+      "direction": "LONG",
+      "expected_ckpts": 33,
+      "emitted_ckpts": 33,
+      "matched_ckpts": 33,
+      "max_abs_feature_error": 0.0,
+      "parity_status": "PASS"
+    },
+    {
+      "regime_id": 1678982640000000000,
+      "year": "2023",
+      "direction": "LONG",
+      "expected_ckpts": 36,
+      "emitted_ckpts": 36,
+      "matched_ckpts": 36,
+      "max_abs_feature_error": 0.0,
+      "parity_status": "PASS"
+    },
+    {
+      "regime_id": 1677859860000000000,
+      "year": "2023",
+      "direction": "LONG",
+      "expected_ckpts": 15,
+      "emitted_ckpts": 15,
+      "matched_ckpts": 15,
+      "max_abs_feature_error": 0.0,
+      "parity_status": "PASS"
+    },
+    {
+      "regime_id": 1697474160000000000,
+      "year": "2023",
+      "direction": "LONG",
+      "expected_ckpts": 8,
+      "emitted_ckpts": 8,
+      "matched_ckpts": 8,
+      "max_abs_feature_error": 0.0,
+      "parity_status": "PASS"
+    },
+    {
+      "regime_id": 1694625180000000000,
+      "year": "2023",
+      "direction": "SHORT",
+      "expected_ckpts": 8,
+      "emitted_ckpts": 8,
+      "matched_ckpts": 8,
+      "max_abs_feature_error": 0.0,
+      "parity_status": "PASS"
+    },
+    {
+      "regime_id": 1685639280000000000,
+      "year": "2023",
+      "direction": "SHORT",
+      "expected_ckpts": 8,
+      "emitted_ckpts": 8,
+      "matched_ckpts": 8,
+      "max_abs_feature_error": 0.0,
+      "parity_status": "PASS"
+    },
+    {
+      "regime_id": 1672863480000000000,
+      "year": "2023",
+      "direction": "SHORT",
+      "expected_ckpts": 41,
+      "emitted_ckpts": 41,
+      "matched_ckpts": 41,
+      "max_abs_feature_error": 0.0,
+      "parity_status": "PASS"
+    },
+    {
+      "regime_id": 1695832920000000000,
+      "year": "2023",
+      "direction": "SHORT",
+      "expected_ckpts": 11,
+      "emitted_ckpts": 11,
+      "matched_ckpts": 11,
+      "max_abs_feature_error": 0.0,
+      "parity_status": "PASS"
+    },
+    {
+      "regime_id": 1732899660000000000,
+      "year": "2024",
+      "direction": "LONG",
+      "expected_ckpts": 10,
+      "emitted_ckpts": 10,
+      "matched_ckpts": 10,
+      "max_abs_feature_error": 0.0,
+      "parity_status": "PASS"
+    },
+    {
+      "regime_id": 1730825460000000000,
+      "year": "2024",
+      "direction": "LONG",
+      "expected_ckpts": 10,
+      "emitted_ckpts": 10,
+      "matched_ckpts": 10,
+      "max_abs_feature_error": 0.0,
+      "parity_status": "PASS"
+    },
+    {
+      "regime_id": 1715022060000000000,
+      "year": "2024",
+      "direction": "LONG",
+      "expected_ckpts": 9,
+      "emitted_ckpts": 9,
+      "matched_ckpts": 9,
+      "max_abs_feature_error": 0.0,
+      "parity_status": "PASS"
+    },
+    {
+      "regime_id": 1723564860000000000,
+      "year": "2024",
+      "direction": "LONG",
+      "expected_ckpts": 27,
+      "emitted_ckpts": 27,
+      "matched_ckpts": 27,
+      "max_abs_feature_error": 0.0,
+      "parity_status": "PASS"
+    },
+    {
+      "regime_id": 1728495660000000000,
+      "year": "2024",
+      "direction": "SHORT",
+      "expected_ckpts": 29,
+      "emitted_ckpts": 29,
+      "matched_ckpts": 29,
+      "max_abs_feature_error": 0.0,
+      "parity_status": "PASS"
+    },
+    {
+      "regime_id": 1727722500000000000,
+      "year": "2024",
+      "direction": "SHORT",
+      "expected_ckpts": 9,
+      "emitted_ckpts": 9,
+      "matched_ckpts": 9,
+      "max_abs_feature_error": 0.0,
+      "parity_status": "PASS"
+    },
+    {
+      "regime_id": 1712080140000000000,
+      "year": "2024",
+      "direction": "SHORT",
+      "expected_ckpts": 17,
+      "emitted_ckpts": 17,
+      "matched_ckpts": 17,
+      "max_abs_feature_error": 0.0,
+      "parity_status": "PASS"
+    },
+    {
+      "regime_id": 1709665740000000000,
+      "year": "2024",
+      "direction": "SHORT",
+      "expected_ckpts": 8,
+      "emitted_ckpts": 8,
+      "matched_ckpts": 8,
+      "max_abs_feature_error": 0.0,
+      "parity_status": "PASS"
+    },
+    {
+      "regime_id": 1738859220000000000,
+      "year": "2025_Q1",
+      "direction": "LONG",
+      "expected_ckpts": 6,
+      "emitted_ckpts": 6,
+      "matched_ckpts": 6,
+      "max_abs_feature_error": 0.0,
+      "parity_status": "PASS"
+    },
+    {
+      "regime_id": 1740593760000000000,
+      "year": "2025_Q1",
+      "direction": "LONG",
+      "expected_ckpts": 7,
+      "emitted_ckpts": 7,
+      "matched_ckpts": 7,
+      "max_abs_feature_error": 0.0,
+      "parity_status": "PASS"
+    },
+    {
+      "regime_id": 1740499200000000000,
+      "year": "2025_Q1",
+      "direction": "LONG",
+      "expected_ckpts": 24,
+      "emitted_ckpts": 24,
+      "matched_ckpts": 24,
+      "max_abs_feature_error": 0.0,
+      "parity_status": "PASS"
+    },
+    {
+      "regime_id": 1739472060000000000,
+      "year": "2025_Q1",
+      "direction": "LONG",
+      "expected_ckpts": 25,
+      "emitted_ckpts": 25,
+      "matched_ckpts": 25,
+      "max_abs_feature_error": 0.0,
+      "parity_status": "PASS"
+    },
+    {
+      "regime_id": 1741885200000000000,
+      "year": "2025_Q1",
+      "direction": "SHORT",
+      "expected_ckpts": 21,
+      "emitted_ckpts": 21,
+      "matched_ckpts": 21,
+      "max_abs_feature_error": 0.0,
+      "parity_status": "PASS"
+    },
+    {
+      "regime_id": 1739208300000000000,
+      "year": "2025_Q1",
+      "direction": "SHORT",
+      "expected_ckpts": 5,
+      "emitted_ckpts": 5,
+      "matched_ckpts": 5,
+      "max_abs_feature_error": 0.0,
+      "parity_status": "PASS"
+    },
+    {
+      "regime_id": 1736180880000000000,
+      "year": "2025_Q1",
+      "direction": "SHORT",
+      "expected_ckpts": 4,
+      "emitted_ckpts": 4,
+      "matched_ckpts": 4,
+      "max_abs_feature_error": 0.0,
+      "parity_status": "PASS"
+    },
+    {
+      "regime_id": 1743432420000000000,
+      "year": "2025_Q1",
+      "direction": "SHORT",
+      "expected_ckpts": 12,
+      "emitted_ckpts": 12,
+      "matched_ckpts": 12,
+      "max_abs_feature_error": 0.0,
+      "parity_status": "PASS"
+    }
+  ]
+}

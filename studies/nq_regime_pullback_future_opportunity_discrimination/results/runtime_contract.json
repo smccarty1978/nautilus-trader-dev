@@ -1,0 +1,24 @@
+{
+  "study_name": "nq_regime_pullback_future_opportunity_discrimination",
+  "parent_study": "nq_regime_pullback_exhaustion_max_mfe_atlas",
+  "observation_horizons": {
+    "H050": 0.5,
+    "H075": 0.75,
+    "H100": 1.0,
+    "reference_H025": 0.25
+  },
+  "target_definition": "additional_mfe_beyond_max_atr = max MFE beyond pre-pullback maxMFE before opposite V_A flip",
+  "primary_target_t050": {
+    "LOW_FUTURE_OPPORTUNITY": "additional_mfe_beyond_max_atr < 0.50",
+    "MATERIAL_CONTINUATION": "additional_mfe_beyond_max_atr >= 0.50"
+  },
+  "secondary_targets": [
+    "T025 (>=0.25)",
+    "T100 (>=1.00)",
+    "T150 (>=1.50)",
+    "T200 (>=2.00)"
+  ],
+  "model_architecture": "LightGBM Classifier (n_estimators=100, learning_rate=0.03, max_depth=4, num_leaves=15, min_child_samples=50, subsample=0.8, colsample_bytree=0.8, seed=42)",
+  "train_split": "2023, 2024",
+  "oos_split": "2025 Q1 untouched"
+}

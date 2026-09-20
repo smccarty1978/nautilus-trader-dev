@@ -1,0 +1,16 @@
+{
+  "head_1": {
+    "name": "head_1_structural_failure",
+    "column": "flip_before_new_max",
+    "description": "P(OPPOSITE_REGIME_FLIP occurs before NEW_MAX)",
+    "base_rate_train": 0.2161,
+    "base_rate_oos": 0.2215
+  },
+  "head_2": {
+    "name": "head_2_imminent_failure",
+    "column": "flip_le_180s",
+    "description": "P(OPPOSITE_REGIME_FLIP <= 180s)",
+    "base_rate_train": 0.1178,
+    "base_rate_oos": 0.1224
+  }
+}

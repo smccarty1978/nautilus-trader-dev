@@ -1,0 +1,33 @@
+{
+  "model_horizon_seconds": 30,
+  "feature_set": [
+    "post_entry_adverse_excursion_atr",
+    "post_entry_favorable_excursion_atr",
+    "post_entry_mfe_mae_ratio",
+    "has_new_incumbent_extreme_post_entry",
+    "magnitude_new_incumbent_extreme_post_entry",
+    "incumbent_bars_count_post_entry",
+    "counter_bars_count_post_entry"
+  ],
+  "hyperparameters": {
+    "objective": "binary",
+    "learning_rate": 0.05,
+    "num_leaves": 15,
+    "min_child_samples": 50,
+    "random_state": 42,
+    "verbose": -1,
+    "n_estimators": 100
+  },
+  "training_cohort": "2023 TRAIN",
+  "training_samples_count": 61607,
+  "frozen_90th_percentile_threshold": 0.2790886683479025,
+  "validation_cohort": "2024 Validation",
+  "validation_samples_count": 63540,
+  "validation_severe_auc": 0.5969692621243435,
+  "validation_catastrophic_auc": 0.6058152522423595,
+  "validation_flag_rate_pct": 9.974819011646208,
+  "validation_catastrophic_capture_pct": 18.8049853372434,
+  "validation_winner_2a_collateral_pct": 11.730257320319431,
+  "validation_winner_3a_collateral_pct": 14.059348890809565,
+  "validation_loss_avoided_atr": 0.5526877696270519
+}

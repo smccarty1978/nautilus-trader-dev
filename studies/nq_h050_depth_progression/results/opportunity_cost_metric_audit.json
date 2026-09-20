@@ -1,0 +1,35 @@
+{
+ "audit_verdict": "OPPORTUNITY_COST_METRIC_AUDIT_PASS",
+ "comparability_checks": {
+  "both_are_maxima_over_the_window": "yes -- symmetric treatment, so the two are directly comparable as upper bounds",
+  "both_dimensionless_atr_multiples": true,
+  "same_anchor": true,
+  "same_direction_normalisation": true,
+  "same_frozen_atr_denominator": true,
+  "same_time_window": true
+ },
+ "conclusion": "The opportunity-cost balance sheet is sound and the two quantities are legitimately comparable. Policy conclusions are not blocked by this metric.",
+ "formulas_as_implemented": {
+  "counter_mfe_missed_atr": "max(0, counter_dir * (extreme_price - anchor_fill_px)) / frozen_atr over [anchor_fill, delayed_fill]",
+  "incumbent_mae_avoided_atr": "max(0, -counter_dir * (extreme_price - anchor_fill_px)) / frozen_atr over the SAME window",
+  "net_waiting_cushion_atr": "incumbent_mae_avoided_atr - counter_mfe_missed_atr"
+ },
+ "interpretation_caveats": [
+  "both metrics are MAXIMA over the window, so each is an upper bound: the forfeited move would only be captured by an exit at the exact peak, and the avoided drawdown assumes the trade would have been held through the trough",
+  "the anchor is the T0/H050 fill, which in the DELAYED-ENTRY study inherits the non-executable close fill; because the same anchor enters both terms symmetrically, comparability is preserved and the cushion is unaffected in sign",
+  "the cushion is not a realized P&L quantity: +0.3988 ATR of cushion between H050 and H100 corresponds to only +0.0067 ATR of realized mean C1 improvement (see realized_vs_cushion_reconciliation)"
+ ],
+ "realized_vs_cushion_reconciliation": {
+  "claim_checked": "does net_waiting_cushion_atr predict the realized economic benefit of waiting?",
+  "conclusion": "The cushion overstates the realized benefit of waiting by roughly sixty to one. Both legs are MAXIMA over the window, so neither is a realized cash flow: the forfeited MFE is only lost if you would have exited at the exact peak, and the avoided MAE is only saved if the position would have been closed at the trough. Under the C1 lifecycle, which has no stop, an adverse excursion that recovers costs nothing. The cushion therefore measures the value of waiting ONLY to a policy that has a stop, and no stop exists in this study.",
+  "cushion_h050_to_h100_atr": 0.3988,
+  "ratio_cushion_to_realized": 59.5,
+  "realized_c1_mean_pnl_h050_atr": -0.1667,
+  "realized_c1_mean_pnl_h100_atr": -0.16,
+  "realized_improvement_atr": 0.0067,
+  "status_effect": "Does not change the verdict. The metric is correctly defined, causal and comparable as specified in \u00a74, and \u00a712 already designates it diagnostic-only. This block records that it must not be read as an economic benefit estimate."
+ },
+ "sanity_check_passed": "at H050 (zero waiting) the two quantities are near-identical (0.0654 vs 0.0651) and the cushion is -0.0003, i.e. ~0 as it must be when no time elapses; this is a strong indication the window and anchor are wired consistently",
+ "status": "PASS",
+ "verification_method": "formulas read directly from scripts/run_delayed_entry_fast_failure_study.py and scripts/run_depth_progression_study.py, not taken from the prior audit text"
+}

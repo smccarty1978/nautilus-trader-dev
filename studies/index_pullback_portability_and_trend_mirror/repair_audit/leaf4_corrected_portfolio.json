@@ -1,0 +1,11 @@
+{
+  "status": "EVALUATED_NON_VIABLE",
+  "verdict": "LEAF4_PORTFOLIO_VIABLE = NO",
+  "rationale": "While NQ Leaf 4 is solidly positive (+0.57A net pooled 2023-2024; +$66,800 net dollars), both ES and YM suffer large negative net expectancies (-1.03A on ES; -0.84A on YM) under the canonical C1 lifecycle. Combining NQ with ES and YM dilutes and destroys NQ's net edge, resulting in a net negative combined portfolio. Therefore, Leaf 4 cannot be ported across instruments as a naive multi-index portfolio.",
+  "combined_portfolio_economics_pooled_2023_2024": {
+    "NQ_net_dollars": 66800.0,
+    "ES_net_dollars": -716265.0,
+    "YM_net_dollars": -385435.0,
+    "Combined_net_dollars": -1034900.0
+  }
+}

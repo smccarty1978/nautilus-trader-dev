@@ -1,0 +1,219 @@
+[
+  {
+    "claim": "10,618 TRUE reversal-run starts",
+    "source_artifact": "project_verdict.json",
+    "source_fields": [
+      "metrics.true_reversal_starts"
+    ],
+    "computed_value": 10618,
+    "reported_value": 10618,
+    "difference": 0,
+    "status": "COMPUTED_AND_VERIFIED"
+  },
+  {
+    "claim": "10,618 matched FALSE continuation pauses",
+    "source_artifact": "project_verdict.json",
+    "source_fields": [
+      "metrics.matched_false_pauses"
+    ],
+    "computed_value": 10618,
+    "reported_value": 10618,
+    "difference": 0,
+    "status": "COMPUTED_AND_VERIFIED"
+  },
+  {
+    "claim": "5,497 P90-armed regimes in 3F event study",
+    "source_artifact": "project_verdict.json",
+    "source_fields": [
+      "metrics.population_regimes"
+    ],
+    "computed_value": 5497,
+    "reported_value": 5497,
+    "difference": 0,
+    "status": "COMPUTED_AND_VERIFIED"
+  },
+  {
+    "claim": "534,687 aligned 1s observations",
+    "source_artifact": "aligned_1s_trajectories.parquet",
+    "source_fields": [
+      "len(df_traj)"
+    ],
+    "computed_value": 534687,
+    "reported_value": 534687,
+    "difference": 0,
+    "status": "COMPUTED_AND_VERIFIED"
+  },
+  {
+    "claim": "OOS ROC-AUC = 0.7655",
+    "source_artifact": "diagnostic_model_results.json",
+    "source_fields": [
+      "gradient_boosting.oos_roc_auc"
+    ],
+    "computed_value": 0.7655,
+    "reported_value": 0.7655,
+    "difference": 0.0,
+    "status": "COMPUTED_AND_VERIFIED"
+  },
+  {
+    "claim": "OOS PR-AUC = 0.7651",
+    "source_artifact": "diagnostic_model_results.json",
+    "source_fields": [
+      "gradient_boosting.oos_pr_auc"
+    ],
+    "computed_value": 0.7651,
+    "reported_value": 0.7651,
+    "difference": -4.3e-05,
+    "status": "COMPUTED_AND_VERIFIED"
+  },
+  {
+    "claim": "Top-decile Win Rate = 87.0%",
+    "source_artifact": "diagnostic_model_results.json",
+    "source_fields": [
+      "decile_table[9].win_rate"
+    ],
+    "computed_value": 87.0,
+    "reported_value": 87.0,
+    "difference": -0.004,
+    "status": "COMPUTED_AND_VERIFIED"
+  },
+  {
+    "claim": "Top-decile Expectancy = +0.7724 ATR",
+    "source_artifact": "diagnostic_model_results.json",
+    "source_fields": [
+      "decile_table[9].expectancy_atr"
+    ],
+    "computed_value": 0.7724,
+    "reported_value": 0.7724,
+    "difference": 2.2e-05,
+    "status": "COMPUTED_AND_VERIFIED"
+  },
+  {
+    "claim": "THRUST_EXHAUSTION_REJECTION: WR 73.3%, EV +0.5333 ATR",
+    "source_artifact": "interpretable_1s_frontier.json",
+    "source_fields": [
+      "THRUST_EXHAUSTION_REJECTION.win_rate",
+      "expectancy_atr"
+    ],
+    "computed_value": {
+      "win_rate": 73.3,
+      "expectancy_atr": 0.5333
+    },
+    "reported_value": {
+      "win_rate": 73.3,
+      "expectancy_atr": 0.5333
+    },
+    "difference": 0.0,
+    "status": "COMPUTED_AND_VERIFIED"
+  },
+  {
+    "claim": "VOLUME_ABSORPTION: WR 69.8%, EV +0.4717 ATR",
+    "source_artifact": "interpretable_1s_frontier.json",
+    "source_fields": [
+      "VOLUME_ABSORPTION.win_rate",
+      "expectancy_atr"
+    ],
+    "computed_value": {
+      "win_rate": 69.8,
+      "expectancy_atr": 0.4717
+    },
+    "reported_value": {
+      "win_rate": 69.8,
+      "expectancy_atr": 0.4717
+    },
+    "difference": 0.0,
+    "status": "COMPUTED_AND_VERIFIED"
+  },
+  {
+    "claim": "EXTREME_SPIKE_REVERSAL: WR 64.3%, EV +0.3752 ATR",
+    "source_artifact": "interpretable_1s_frontier.json",
+    "source_fields": [
+      "EXTREME_SPIKE_REVERSAL.win_rate",
+      "expectancy_atr"
+    ],
+    "computed_value": {
+      "win_rate": 64.3,
+      "expectancy_atr": 0.3752
+    },
+    "reported_value": {
+      "win_rate": 64.3,
+      "expectancy_atr": 0.3752
+    },
+    "difference": 0.0,
+    "status": "COMPUTED_AND_VERIFIED"
+  },
+  {
+    "claim": "Terminal extreme predominantly T-3s to T-1s",
+    "source_artifact": "true_vs_false_event_comparison.json",
+    "source_fields": [
+      "features.is_new_extreme"
+    ],
+    "computed_value": {
+      "T-3s": 24.2,
+      "T-2s": 27.0,
+      "T-1s": 28.9
+    },
+    "reported_value": "predominantly T-3s to T-1s",
+    "difference": null,
+    "status": "HARDCODED_BUT_VERIFIED_FROM_ARTIFACT"
+  },
+  {
+    "claim": "Mode of terminal extreme at T-2s (approx 27%)",
+    "source_artifact": "true_vs_false_event_comparison.json / aligned_1s_trajectories.parquet",
+    "source_fields": [
+      "is_new_extreme.mean()"
+    ],
+    "computed_value": {
+      "T-2s": 27.0,
+      "T-1s": 28.9,
+      "T0": 30.3
+    },
+    "reported_value": "Mode at T-2s (27.0%)",
+    "difference": "T-1s (28.9%) and T0 (30.3%) have higher new extreme probabilities than T-2s (27.0%); T-2s is NOT the statistical mode",
+    "status": "INCORRECT"
+  },
+  {
+    "claim": "~40% range expansion between T-5s and T-3s over 10s baseline",
+    "source_artifact": "aligned_1s_trajectories.parquet",
+    "source_fields": [
+      "range_1s",
+      "range_10s"
+    ],
+    "computed_value": 171.0,
+    "reported_value": 40.0,
+    "difference": 131.0,
+    "status": "UNSUPPORTED"
+  },
+  {
+    "claim": "Cohen's d fade close location = +0.42 at T-1s",
+    "source_artifact": "true_vs_false_event_comparison.json",
+    "source_fields": [
+      "-1.features.fade_close_loc.cohen_d"
+    ],
+    "computed_value": -0.195,
+    "reported_value": 0.42,
+    "difference": -0.615,
+    "status": "INCORRECT"
+  },
+  {
+    "claim": "Cohen's d distance from running extreme = -0.385 at T0",
+    "source_artifact": "true_vs_false_event_comparison.json",
+    "source_fields": [
+      "0.features.dist_from_ext_pts.cohen_d"
+    ],
+    "computed_value": -0.385,
+    "reported_value": -0.385,
+    "difference": 0.0001,
+    "status": "COMPUTED_AND_VERIFIED"
+  },
+  {
+    "claim": "Before T-3s, TRUE and FALSE are indistinguishable (Cohen's d < 0.08)",
+    "source_artifact": "true_vs_false_event_comparison.json",
+    "source_fields": [
+      "-4.features.ret_1s_fade.cohen_d"
+    ],
+    "computed_value": 0.3515,
+    "reported_value": 0.08,
+    "difference": 0.2715,
+    "status": "INCORRECT"
+  }
+]

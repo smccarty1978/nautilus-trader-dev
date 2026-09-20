@@ -1,0 +1,47 @@
+{
+  "study_id": "nq_universal_regime_health_trajectory",
+  "parent_model": "M1-U: Structural Path Health",
+  "trajectory_variables": {
+    "level": [
+      "H1",
+      "H2"
+    ],
+    "velocity": [
+      "delta_h1_5s",
+      "delta_h1_15s",
+      "delta_h1_30s",
+      "delta_h1_60s",
+      "delta_h1_120s",
+      "delta_h2_5s",
+      "delta_h2_15s",
+      "delta_h2_30s",
+      "delta_h2_60s",
+      "delta_h2_120s"
+    ],
+    "acceleration": [
+      "acc_h1_30s",
+      "acc_h2_30s"
+    ],
+    "peaks": [
+      "running_max_h1",
+      "running_max_h2",
+      "h1_drawdown_from_peak",
+      "h2_drawdown_from_peak",
+      "seconds_since_peak_h1",
+      "seconds_since_peak_h2"
+    ],
+    "persistence": [
+      "time_continuously_above_h1_50",
+      "time_continuously_above_h2_25"
+    ],
+    "reversals": [
+      "h1_recovery_count",
+      "h2_recovery_count"
+    ],
+    "dual_head": [
+      "h1_h2_divergence",
+      "h2_to_h1_ratio",
+      "dual_head_quadrant"
+    ]
+  }
+}

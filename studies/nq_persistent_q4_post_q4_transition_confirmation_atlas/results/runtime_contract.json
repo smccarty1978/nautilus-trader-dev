@@ -1,0 +1,30 @@
+{
+  "study_id": "nq_persistent_q4_post_q4_transition_confirmation_atlas",
+  "instrument": "NQ",
+  "total_matched_population": 5610,
+  "train_period": "2023-2024",
+  "oos_period": "2025 Q1",
+  "checkpoints_seconds": [
+    0,
+    15,
+    30,
+    45,
+    60,
+    90,
+    120,
+    180,
+    300
+  ],
+  "checkpoint_labels": [
+    "T0",
+    "T+15s",
+    "T+30s",
+    "T+45s",
+    "T+60s",
+    "T+90s",
+    "T+120s",
+    "T+180s",
+    "T+300s"
+  ],
+  "execution_mode": "Pure Observational & Diagnostic Transition Confirmation (Zero Optimization)"
+}

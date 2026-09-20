@@ -1,0 +1,15 @@
+{
+  "rt_total_trades": 1065,
+  "matched_to_nt_trades": 1065,
+  "unmatched": 0,
+  "duplicate_keys": 0,
+  "join_keys": [
+    "checkpoint_ts == entry_signal_ts"
+  ],
+  "timestamp_tolerance": "0 ns (exact equality)",
+  "BASELINE_NT_FILL_REUSE": "VALID",
+  "LATENCY_EVIDENCE_CLASS": "PRICE_SHIFT",
+  "latency_rationale": "Execution robustness evaluated fill price slippage by sampling future 1s bars (T+1s, T+2s, T+5s) rather than injecting queuing delays into BacktestEngine order books. Therefore it is accurately classified as HISTORICAL_PRICE_DELAY_SENSITIVITY.",
+  "MBP1_EVIDENCE": "POINT_IN_TIME_LIQUIDITY_CHECK",
+  "mbp1_rationale": "MBP-1 depth inspection performed point-in-time BBO depth lookups around trade timestamps via parquet row-group seeks rather than continuous streamed L2/L3 order-book queue simulation."
+}

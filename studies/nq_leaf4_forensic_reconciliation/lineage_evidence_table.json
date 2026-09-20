@@ -1,0 +1,74 @@
+[
+  {
+    "Stage": "Original Mining",
+    "Period": "2023-2024",
+    "Population_Source": "studies/nq_h050_asymmetric_regime_exhaustion",
+    "Feature_Source": "studies/nq_h050_mtf_regime_context_features",
+    "Lifecycle_Source": "C1 Opposing H050",
+    "Execution_Source": "Observational next-bar fill",
+    "N": 963,
+    "EV_ATR": 0.178,
+    "Dollar_PnL": 50950.0,
+    "Status": "AUTHORITATIVE"
+  },
+  {
+    "Stage": "Historical TRAIN 2023",
+    "Period": "2023",
+    "Population_Source": "studies/nq_h050_asymmetric_regime_exhaustion",
+    "Feature_Source": "studies/nq_h050_mtf_regime_context_features",
+    "Lifecycle_Source": "C1 Opposing H050",
+    "Execution_Source": "NT BacktestEngine",
+    "N": 512,
+    "EV_ATR": 0.3556,
+    "Dollar_PnL": 34260.0,
+    "Status": "AUTHORITATIVE"
+  },
+  {
+    "Stage": "Historical TRAIN 2024",
+    "Period": "2024",
+    "Population_Source": "studies/nq_h050_asymmetric_regime_exhaustion",
+    "Feature_Source": "studies/nq_h050_mtf_regime_context_features",
+    "Lifecycle_Source": "C1 Opposing H050",
+    "Execution_Source": "NT BacktestEngine",
+    "N": 451,
+    "EV_ATR": -0.0339,
+    "Dollar_PnL": 16690.0,
+    "Status": "AUTHORITATIVE"
+  },
+  {
+    "Stage": "Untouched OOS 2025 Q1",
+    "Period": "2025 Q1",
+    "Population_Source": "studies/nq_h050_asymmetric_regime_exhaustion",
+    "Feature_Source": "studies/nq_h050_m4_vs_remaining_mfe_model",
+    "Lifecycle_Source": "C1 Opposing H050",
+    "Execution_Source": "NT BacktestEngine",
+    "N": 102,
+    "EV_ATR": 0.0319,
+    "Dollar_PnL": 8130.0,
+    "Status": "AUTHORITATIVE"
+  },
+  {
+    "Stage": "Alleged 2025 Q2 (Ad-Hoc)",
+    "Period": "2025 Q2",
+    "Population_Source": "studies/nq_h050_dynamic_thesis_failure_policy_q2_oos (unconditioned)",
+    "Feature_Source": "Manual ad-hoc 1m script",
+    "Lifecycle_Source": "C1 no-stop raw",
+    "Execution_Source": "Ad-hoc PnL calculation",
+    "N": 651,
+    "EV_ATR": -0.1644,
+    "Dollar_PnL": -42440.0,
+    "Status": "INVALID"
+  },
+  {
+    "Stage": "Execution Robustness",
+    "Period": "2023-2025 Q1",
+    "Population_Source": "studies/nq_leaf4_runtime_validation_and_distribution_diagnostic",
+    "Feature_Source": "Frozen contract features",
+    "Lifecycle_Source": "C1 Opposing H050",
+    "Execution_Source": "NT c1_nt_trades_ledger join",
+    "N": 1065,
+    "EV_ATR": 0.1602,
+    "Dollar_PnL": 59080.0,
+    "Status": "VALID_BUT_DERIVED"
+  }
+]

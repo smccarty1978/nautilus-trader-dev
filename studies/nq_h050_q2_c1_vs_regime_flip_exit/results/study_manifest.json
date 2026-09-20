@@ -1,0 +1,28 @@
+{
+  "study_id": "nq_h050_q2_c1_vs_regime_flip_exit",
+  "description": "Bounded exit-architecture comparison on 2025 Q2 H050 population: C1 (opposing H050_1) vs Pure confirmed V_A regime flip (R2)",
+  "evaluation_window": "2025 Q2 (2025-04-01 to 2025-06-30)",
+  "source_cohorts": {
+    "c1_baseline": "studies/nq_h050_dynamic_thesis_failure_policy_q2_oos/results/c1_nostop_q2_oos_trades.parquet",
+    "m4_models": "studies/nq_h050_m4_runtime_recovery/results/",
+    "regimes_store": "studies/regime_complete_canonical_store/_work/monthly/year=2025/month={04,05,06}/canonical_regimes.parquet"
+  },
+  "artifacts": {
+    "paired_trade_comparison.parquet": {
+      "sha256": "5167e384f16ae57ec697182f988d4ab7b5fa674550da9f7185ca5eb2356a469a",
+      "size_bytes": 663432
+    },
+    "exit_architecture_summary.json": {
+      "sha256": "cb094182390a969d63b585e68b834e04ef51e6af1d0baf01d2dd7afab459f4be",
+      "size_bytes": 4814
+    },
+    "directional_summary.json": {
+      "sha256": "241ad36532fe5c499d361ae9a22a3cef96ebf033b91c6b5b29de77b1a174dd29",
+      "size_bytes": 3122
+    },
+    "monthly_summary.json": {
+      "sha256": "ce51de49edca38d28ff04dece7e8a3a3a59115acbc0063ec4d60814970d897a1",
+      "size_bytes": 4727
+    }
+  }
+}

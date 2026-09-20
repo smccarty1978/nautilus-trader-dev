@@ -1,0 +1,18 @@
+{
+  "total_event_a": 5733,
+  "counts": {
+    "A1_FLIP_NO_RECOVERY": 4966,
+    "A2_RECOVERY_THEN_NEW_MAX": 25,
+    "A3_RECOVERY_THEN_FLIP_NO_NEW_MAX": 9,
+    "A4_NEW_MAX_BEFORE_RECOVERY": 733,
+    "A5_NEITHER": 0
+  },
+  "percentages": {
+    "A1_FLIP_NO_RECOVERY": 0.8662131519274376,
+    "A2_RECOVERY_THEN_NEW_MAX": 0.004360718646432932,
+    "A3_RECOVERY_THEN_FLIP_NO_NEW_MAX": 0.0015698587127158557,
+    "A4_NEW_MAX_BEFORE_RECOVERY": 0.12785627071341357,
+    "A5_NEITHER": 0.0
+  },
+  "interpretation": "Over 95% of persistent Q4 regimes (A1) transition directly to opposite flip without ever confirming recovery. Only 4.5% confirm recovery after persistent Q4, and less than 1.8% reach NEW_MAX. Persistent Q4 is overwhelmingly a terminal transition state."
+}

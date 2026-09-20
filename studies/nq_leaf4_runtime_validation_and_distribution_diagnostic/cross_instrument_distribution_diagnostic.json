@@ -1,0 +1,82 @@
+{
+  "hypothesis_1_eval": {
+    "statement": "The exact same normalized value represents comparable states across instruments but economics differ.",
+    "supported": false,
+    "evidence": "Distributional variance is extreme: 1.738A is at the 4.7th percentile in NQ, but at the 13.2nd percentile in ES and 11.3rd percentile in YM. The state is NOT distributionally equivalent."
+  },
+  "hypothesis_2_eval": {
+    "statement": "The same numeric threshold represents very different distributional states across instruments.",
+    "supported": true,
+    "evidence": "Confirmed. The numerical threshold of 1.738367 ATR on NQ isolates a rare, deep-exhaustion extreme tail (top 4.7% deepest relative pullbacks), whereas on ES and YM, 1.738 ATR sits in the ordinary body of the distribution (11.3%-13.2%), allowing routine pullbacks to pass."
+  },
+  "base_population_effect": {
+    "NQ_h050_per_day": 42.4,
+    "ES_h050_per_day": 123.0,
+    "YM_h050_per_day": 127.9,
+    "base_multiplier_ES_vs_NQ": 2.9,
+    "base_multiplier_YM_vs_NQ": 3.02,
+    "conclusion": "ES and YM baseline regime engines generate roughly 3x more H050 pullback opportunities per session than NQ."
+  },
+  "retention_effect": {
+    "NQ_leaf4_retention_pct": 4.45,
+    "ES_leaf4_retention_pct": 12.66,
+    "YM_leaf4_retention_pct": 10.74,
+    "retention_multiplier_ES_vs_NQ": 2.85,
+    "retention_multiplier_YM_vs_NQ": 2.41,
+    "critical_divergence_feature": "current_price_from_prior_mfe_atr__tf_1m",
+    "conclusion": "The Prior-MFE condition is 2.8x more permissive on ES and 2.4x more permissive on YM than on NQ."
+  },
+  "combined_explosion_factor": {
+    "ES_total_multiplier": 8.27,
+    "YM_total_multiplier": 7.28,
+    "observed_ratio_ES_trades_per_day": 8.24,
+    "observed_ratio_YM_trades_per_day": 7.26
+  },
+  "economic_consequence": {
+    "NQ_mean_net_atr": 0.4815,
+    "ES_mean_net_atr": -1.0292,
+    "YM_mean_net_atr": -0.8439,
+    "diagnosis": "BOTH. ES/YM failures occur because the threshold captures ordinary-body noise rather than tail exhaustion (distributional shift), AND because the underlying index microstructures lack the massive fat-tail regime runs that fund NQ counter-regime edges."
+  },
+  "prior_mfe_deep_dive": {
+    "NQ": {
+      "threshold": 1.738367,
+      "threshold_percentile": 4.66,
+      "below_threshold_N": 1115,
+      "below_threshold_mean_pnl_atr": 0.4468,
+      "below_threshold_median_pnl_atr": -0.0543,
+      "above_threshold_N": 22800,
+      "above_threshold_mean_pnl_atr": -0.1744,
+      "above_threshold_median_pnl_atr": 0.1764,
+      "delta_ev_below_minus_above_atr": 0.6211,
+      "below_threshold_counter_long_ev_atr": 0.5353,
+      "below_threshold_counter_short_ev_atr": 0.3545
+    },
+    "ES": {
+      "threshold": 1.738367,
+      "threshold_percentile": 13.17,
+      "below_threshold_N": 9137,
+      "below_threshold_mean_pnl_atr": -1.6699,
+      "below_threshold_median_pnl_atr": -0.8747,
+      "above_threshold_N": 60257,
+      "above_threshold_mean_pnl_atr": -1.4062,
+      "above_threshold_median_pnl_atr": -0.5501,
+      "delta_ev_below_minus_above_atr": -0.2637,
+      "below_threshold_counter_long_ev_atr": -1.6884,
+      "below_threshold_counter_short_ev_atr": -1.6492
+    },
+    "YM": {
+      "threshold": 1.738367,
+      "threshold_percentile": 11.3,
+      "below_threshold_N": 8147,
+      "below_threshold_mean_pnl_atr": -1.5433,
+      "below_threshold_median_pnl_atr": -0.7398,
+      "above_threshold_N": 63979,
+      "above_threshold_mean_pnl_atr": -1.4179,
+      "above_threshold_median_pnl_atr": -0.4379,
+      "delta_ev_below_minus_above_atr": -0.1255,
+      "below_threshold_counter_long_ev_atr": -1.5429,
+      "below_threshold_counter_short_ev_atr": -1.5438
+    }
+  }
+}

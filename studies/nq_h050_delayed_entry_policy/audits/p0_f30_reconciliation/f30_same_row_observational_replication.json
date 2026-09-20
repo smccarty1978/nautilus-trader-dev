@@ -1,0 +1,51 @@
+{
+  "evaluation_cohort": "2024 Validation P0 Trades (N=10,887 scored)",
+  "models": {
+    "prior_observational_study_report": {
+      "severe_auc": 0.5972,
+      "catastrophic_auc": 0.6063,
+      "catastrophic_capture_pct": 18.34,
+      "winner_2a_collateral_pct": 11.55,
+      "flagged_imm_exit_pnl_atr": -0.8134,
+      "flagged_held_c1_pnl_atr": -1.4206,
+      "net_loss_avoided_atr": 0.6072
+    },
+    "original_policy_study_report_leaked": {
+      "severe_auc": 0.9286,
+      "catastrophic_auc": 0.9279,
+      "catastrophic_capture_pct": 67.51,
+      "winner_2a_collateral_pct": 2.51,
+      "flagged_imm_exit_pnl_atr": -0.2659,
+      "flagged_held_c1_pnl_atr": -6.2137,
+      "net_loss_avoided_atr": 5.9478
+    },
+    "replicated_policy_model_on_p0_leaked": {
+      "severe_auc": 0.933,
+      "catastrophic_auc": 0.934,
+      "catastrophic_capture_pct": 64.53,
+      "winner_2a_collateral_pct": 2.22,
+      "flagged_imm_exit_pnl_atr": -0.2417,
+      "flagged_held_c1_pnl_atr": -6.3704,
+      "net_loss_avoided_atr": 6.1287
+    },
+    "strictly_causal_model_on_p0": {
+      "severe_auc": 0.5809,
+      "catastrophic_auc": 0.591,
+      "catastrophic_capture_pct": 17.8,
+      "winner_2a_collateral_pct": 11.4,
+      "flagged_imm_exit_pnl_atr": -0.7528,
+      "flagged_held_c1_pnl_atr": -1.1666,
+      "net_loss_avoided_atr": 0.4137
+    },
+    "simple_3_feature_causal_model_on_p0": {
+      "severe_auc": 0.576,
+      "catastrophic_auc": 0.5825,
+      "catastrophic_capture_pct": 18.19,
+      "winner_2a_collateral_pct": 11.85,
+      "flagged_imm_exit_pnl_atr": -0.7102,
+      "flagged_held_c1_pnl_atr": -1.2208,
+      "net_loss_avoided_atr": 0.5106
+    }
+  },
+  "conclusion": "When evaluated on the exact same P0 rows with causal features, performance matches the observational study within statistical noise (AUC ~0.59 vs 0.60, capture ~17.8% vs 18.3%, loss avoided ~+0.41A vs +0.61A). The reported policy edge was 100% an artifact of future leakage."
+}

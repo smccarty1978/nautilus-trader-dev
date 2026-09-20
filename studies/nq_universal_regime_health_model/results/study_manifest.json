@@ -1,0 +1,17 @@
+{
+  "study_id": "nq_universal_regime_health_model",
+  "timestamp_utc": "2026-09-16 03:38:16",
+  "execution_mode": "Causal Observation Engine / Modeling (Zero Backtesting / No PnL)",
+  "decision_framework": {
+    "verdict": "OUTCOME_A_PARSIMONIOUS_PATH_HISTORY_SUFFICIENT",
+    "description": "M1-U (Structural Path History) captures >98% of all learnable predictive signal over baseline. Adding prospective strength features (M2-U) and observed P90 state (M3-U) yields zero incremental OOS AUC lift (-0.0001 on both heads). M1-U is selected as the parsimonious Universal Regime Health Model.",
+    "incremental_oos_lifts_head1": {
+      "M0_to_M1_path_history_lift": 0.0146,
+      "M1_to_M2_prospective_strength_lift": -0.0001,
+      "M2_to_M3_observed_p90_lift": -0.0001
+    }
+  },
+  "recommended_model": "M1-U: Structural Path Health",
+  "recommended_feature_count": 24,
+  "governance_status": "STOPPED_AT_DECISION_GATE"
+}

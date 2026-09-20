@@ -1,0 +1,58 @@
+{
+  "T60": {
+    "type": "FIXED_TIME",
+    "survivor_pct": 99.16,
+    "median_delay_sec": 60.0,
+    "terminal_auc": 0.7008,
+    "gte_1a_auc": 0.6691,
+    "gte_2a_auc": 0.6553,
+    "c1_mean_pnl_atr": -0.1773,
+    "catastrophic_rate": 0.1328,
+    "mfe_missed_atr": 0.5475,
+    "mae_avoided_atr": 0.5929,
+    "plus_2a_retention_pct": 79.29,
+    "plus_3a_retention_pct": 85.32
+  },
+  "T180": {
+    "type": "FIXED_TIME",
+    "survivor_pct": 90.31,
+    "median_delay_sec": 180.0,
+    "terminal_auc": 0.7363,
+    "gte_1a_auc": 0.6936,
+    "gte_2a_auc": 0.672,
+    "c1_mean_pnl_atr": -0.1828,
+    "catastrophic_rate": 0.1272,
+    "mfe_missed_atr": 0.8116,
+    "mae_avoided_atr": 1.0581,
+    "plus_2a_retention_pct": 72.59,
+    "plus_3a_retention_pct": 80.65
+  },
+  "H075": {
+    "type": "EVIDENCE_DEPTH",
+    "survivor_pct": 99.86,
+    "median_delay_sec": 19.0,
+    "terminal_auc": 0.5894,
+    "gte_1a_auc": 0.5931,
+    "gte_2a_auc": 0.6107,
+    "c1_mean_pnl_atr": -0.1722,
+    "catastrophic_rate": 0.1351,
+    "mfe_missed_atr": 0.2762,
+    "mae_avoided_atr": 0.4986,
+    "plus_2a_retention_pct": 85.07,
+    "plus_3a_retention_pct": 89.73
+  },
+  "H100": {
+    "type": "EVIDENCE_DEPTH",
+    "survivor_pct": 99.42,
+    "median_delay_sec": 65.0,
+    "terminal_auc": 0.6174,
+    "gte_1a_auc": 0.6209,
+    "gte_2a_auc": 0.6239,
+    "c1_mean_pnl_atr": -0.16,
+    "catastrophic_rate": 0.1245,
+    "mfe_missed_atr": 0.4382,
+    "mae_avoided_atr": 0.837,
+    "plus_2a_retention_pct": 78.6,
+    "plus_3a_retention_pct": 85.23
+  }
+}

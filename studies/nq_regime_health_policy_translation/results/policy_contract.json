@@ -1,0 +1,31 @@
+{
+  "study": "nq_regime_health_policy_translation",
+  "instrument": "NQ",
+  "point_value": 20.0,
+  "commission_round_turn": 5.0,
+  "slippage_round_turn_pts": 0.5,
+  "total_friction_per_trade_dollars": 15.0,
+  "policies": {
+    "P0": {
+      "name": "Natural Baseline",
+      "description": "Hold until natural opposite V_A regime flip under baseline contract. Control policy."
+    },
+    "P1": {
+      "name": "Immediate Q4 Exit",
+      "description": "Exit immediately at the first causally observed observation in Q4 (H1 >= 0.50 and H2 >= 0.25)."
+    },
+    "P2": {
+      "name": "Q4 + 60s Continuous Persistence",
+      "description": "First Q4 entry arms invalidation watch. Exit only when Q4 remains continuously active for >= 60 seconds. Reset on drop below threshold. Natural flip fallback."
+    },
+    "P3": {
+      "name": "Q4 + 60s Persistence + Recovery Cancellation",
+      "description": "Q4 arms watch; exit at >= 60s continuous Q4. If running_peak_hazard - current_hazard >= 0.15 before 60s, disarm watch and reset clock. Natural flip fallback."
+    },
+    "P4": {
+      "name": "Staged H1 -> H2 Confirmation",
+      "status": "OMITTED",
+      "rationale": "Omitted per instruction as parent contracts did not define unambiguous frozen thresholds."
+    }
+  }
+}

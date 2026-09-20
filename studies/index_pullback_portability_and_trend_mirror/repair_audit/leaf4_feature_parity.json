@@ -1,0 +1,24 @@
+{
+  "gate_identity": "LEAF4_FEATURE_PARITY",
+  "verdict": "PASS_OBSERVATIONAL_REPRODUCTION",
+  "features_evaluated": [
+    {
+      "feature": "minutes_from_rth_open",
+      "parity_status": "PASS",
+      "max_absolute_error": 0.0,
+      "notes": "Exact match to RTH 08:30 CT elapsed minute formula."
+    },
+    {
+      "feature": "realized_range_15m_atr",
+      "parity_status": "PASS",
+      "max_absolute_error": 0.0,
+      "notes": "Confirmed formula uses frozen_atr denominator (DualEmaRegimeTracker starting ATR)."
+    },
+    {
+      "feature": "current_price_from_prior_mfe_atr__tf_1m",
+      "parity_status": "PASS",
+      "max_absolute_error": 0.0,
+      "notes": "Confirmed formula uses cur_1m_atr denominator and signed displacement from prior completed regime MFE."
+    }
+  ]
+}

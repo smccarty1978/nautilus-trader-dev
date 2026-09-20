@@ -1,0 +1,26 @@
+{
+  "contract_name": "PROSPECTIVE_HAZARD_RECOVERY_EVENT_CONTRACT_V1",
+  "h1_acute_stress": {
+    "threshold": 0.6,
+    "feature": "running_max_h1",
+    "event_trigger": "Earliest timestamp t within regime where running_max_h1 >= 0.60 (T_PEAK_H1)"
+  },
+  "h2_acute_stress": {
+    "threshold": 0.35,
+    "feature": "running_max_h2",
+    "event_trigger": "Earliest timestamp t within regime where running_max_h2 >= 0.35 (T_PEAK_H2)"
+  },
+  "h1_recovery_confirmation": {
+    "delta_threshold": 0.15,
+    "event_trigger": "Earliest timestamp t > T_PEAK_H1 where (running_max_h1 - H1(t)) >= 0.15 (T_RECOVERY_CONFIRM_H1)",
+    "prospective_horizon": "All forward opportunity, terminal events, and excursions measured strictly from T_RECOVERY_CONFIRM_H1 forward."
+  },
+  "h2_recovery_confirmation": {
+    "delta_threshold": 0.15,
+    "event_trigger": "Earliest timestamp t > T_PEAK_H2 where (running_max_h2 - H2(t)) >= 0.15 (T_RECOVERY_CONFIRM_H2)",
+    "prospective_horizon": "All forward opportunity, terminal events, and excursions measured strictly from T_RECOVERY_CONFIRM_H2 forward."
+  },
+  "control_group_matching": {
+    "description": "To isolate the true recovery effect without immortal-time bias, compare regimes confirming recovery against non-recovering stressed regimes that survived to an identical elapsed duration from peak, or match on pre-recovery severity (prior peak hazard, pullback depth, regime age)."
+  }
+}

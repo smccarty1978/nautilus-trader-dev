@@ -1,0 +1,73 @@
+{
+  "prior_peak_mfe_split": {
+    "prior_peak_mfe_low_lt_2atr": {
+      "N": 17482,
+      "flip_before_new_max_pct": 11.022766273881707,
+      "flip_le_180s_pct": 9.220912939022995
+    },
+    "prior_peak_mfe_high_ge_2atr": {
+      "N": 447308,
+      "flip_before_new_max_pct": 21.271249340499164,
+      "flip_le_180s_pct": 10.982365618321156
+    }
+  },
+  "pullback_episode_age_split": {
+    "episode_age_lt_60s": {
+      "N": 297782,
+      "flip_before_new_max_pct": 16.09331658730212,
+      "flip_le_180s_pct": 9.394456347260748
+    },
+    "episode_age_60_to_180s": {
+      "N": 115100,
+      "flip_before_new_max_pct": 26.259774109470023,
+      "flip_le_180s_pct": 13.04083405734144
+    },
+    "episode_age_gt_180s": {
+      "N": 51908,
+      "flip_before_new_max_pct": 36.46258765508207,
+      "flip_le_180s_pct": 14.93411420204978
+    }
+  },
+  "seconds_since_max_mfe_split": {
+    "sec_since_max_mfe_lt_60s": {
+      "N": 285951,
+      "flip_before_new_max_pct": 15.850617763183203,
+      "flip_le_180s_pct": 9.347405674398761
+    },
+    "sec_since_max_mfe_60_to_180s": {
+      "N": 124010,
+      "flip_before_new_max_pct": 25.693089266994594,
+      "flip_le_180s_pct": 12.790097572776387
+    },
+    "sec_since_max_mfe_gt_180s": {
+      "N": 54829,
+      "flip_before_new_max_pct": 36.27277535610717,
+      "flip_le_180s_pct": 14.858925021430263
+    }
+  },
+  "deep_pb_x_regime_maturity_interaction": {
+    "deep_pb_ge_1_5_high_mfe_ge_2": {
+      "N": 90469,
+      "flip_before_new_max_pct": 40.41605411798517,
+      "flip_le_180s_pct": 22.347986603145827
+    },
+    "deep_pb_ge_1_5_low_mfe_lt_2": {
+      "N": 0,
+      "flip_before_new_max_pct": NaN,
+      "flip_le_180s_pct": NaN
+    }
+  },
+  "p90_model_score_variation": {
+    "overall_p90_median": 0.2036218876315562,
+    "high_p90_score_ge_median": {
+      "N": 232395,
+      "flip_before_new_max_pct": 24.215236988747606,
+      "flip_le_180s_pct": 14.019234492996837
+    },
+    "low_p90_score_lt_median": {
+      "N": 232395,
+      "flip_before_new_max_pct": 17.556315755502485,
+      "flip_le_180s_pct": 7.812990813055358
+    }
+  }
+}

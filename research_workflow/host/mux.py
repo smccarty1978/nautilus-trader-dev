@@ -30,11 +30,19 @@ on that name and refuses one it does not know.
   finer context before coarser).  A window with no source bar emits a zero-volume bar
   (O=H=L=C = the previous close) -- NautilusTrader 1.230 ``TimeBarAggregator``'s default
   ``build_with_no_updates=True`` -- but only when the plan declares
-  ``empty_window: zero_volume_in_trading_day`` and the window overlaps a trading day of the
-  dataset calendar, and never before the first member.  NT's timer also fires through
+  ``empty_window: zero_volume_in_trading_day`` and the window overlaps the dataset calendar's
+  FILL SCOPE, and never before the first member.  NT's timer also fires through
   weekend/holiday/maintenance closures; this does not (owner decision D3b, 2026-09-14).
+
   ``empty_window: none`` emits nothing for an empty window, which equals NT only with
   ``DataEngineConfig(time_bars_build_with_no_updates=False)``.
+
+  The fill scope (``research_workflow.sessions.FillScopeTable``) is the trading day MINUS the
+  declared maintenance halts and MINUS the declared data outages -- not the trading-day row, which
+  is the whole session, halt included, because that is what censoring means.  A window inside a halt
+  or inside a data hole is not a quiet market, so it is suppressed rather than filled, and counted by
+  reason (``windows_suppressed``) so an outage is countable instead of inferred: a published count
+  alone cannot tell a hole from a calm session.
 * ``complete_bucket`` (sealed plans only; the compiler never emits it again).  Publishes a
   bucket only when every expected member is present; an incomplete bucket is discarded
   when its successor opens (``collectors/collector_v2/aggregator.py`` semantics).  Kept
@@ -161,6 +169,10 @@ class ClosedWindowAggregator:
         self._frontier: Optional[int] = None        # close_ts of the latest window accounted for
         self._last_close: Optional[float] = None
         self.empty_windows_published = 0
+        # Windows a trading-day calendar would have filled but the fill scope excludes, by reason.
+        # "closed" (weekend / holiday / the nightly break) is not suppression and is never counted:
+        # those are skipped in one jump, not iterated.
+        self.windows_suppressed: Dict[str, int] = {"halt": 0, "outage": 0}
 
     @property
     def due_ns(self) -> Optional[int]:
@@ -178,17 +190,26 @@ class ClosedWindowAggregator:
 
     def _fill_empty_through(self, max_close: int, out: List[BarView]) -> None:
         """Zero-volume bars for every empty window with ``close_ts <= max_close`` (aligned) that
-        overlaps a trading day; windows inside a closure are skipped, not iterated."""
+        overlaps the fill scope.  A window the scope excludes because of a declared halt or a
+        declared data outage is counted and stepped over one window at a time, so the counter is the
+        real number of windows the hole cost; a window outside every trading day (a closure) is
+        skipped in one jump, not iterated."""
         if self._days is None or self._frontier is None or self._last_close is None:
             return
         bn = self.bucket_ns
         o = self._frontier
+        reason_of = getattr(self._days, "skip_reason", None)
         while o < max_close:
             c = o + bn
             if self._days.overlaps(o, c):
                 px = self._last_close
                 out.append(BarView(self.key, o, c, px, px, px, px, 0.0))
                 self.empty_windows_published += 1
+                o = c
+                continue
+            reason = reason_of(o, c) if reason_of is not None else "closed"
+            if reason in self.windows_suppressed:
+                self.windows_suppressed[reason] += 1
                 o = c
                 continue
             nxt = self._days.next_row_after(o)
@@ -239,7 +260,8 @@ class ClosedWindowAggregator:
 class StreamMux:
     """Orders and gates bars; delivers ``BarView``s through ``deliver`` in causal order.
 
-    ``trading_days`` is the dataset calendar's trading-day table (``overlaps``/``next_row_after``);
+    ``trading_days`` is the dataset calendar's FILL SCOPE table (``overlaps``/``next_row_after``, and
+    optionally ``skip_reason`` for suppression counting) -- trading days minus declared halts and outages;
     a plan whose derived stream declares ``empty_window: zero_volume_in_trading_day`` cannot be
     run without it.  ``require_calendar=False`` is the compiler's dry construction only."""
 
@@ -275,6 +297,14 @@ class StreamMux:
             if s.aggregation == "complete_bucket":
                 agg: Any = BucketAggregator(s.key, s.duration_ns, src.duration_ns)
             elif s.aggregation == "closed_window":
+                if src.source == "derived":
+                    # W2: a closed-window sweep runs before the child aggregator's own output is
+                    # applied, so a second-level window sees its source bars out of order and dies
+                    # with OUT_OF_ORDER_SOURCE_BAR mid-run. The compiler never emits this layout;
+                    # refuse it here so its dry construction cannot accept one either.
+                    raise CausalOrderViolation(
+                        f"DERIVED_FROM_DERIVED_CLOSED_WINDOW: {s.key} aggregates {s.derived_from!r}, which is "
+                        f"itself derived; a closed_window stream must aggregate an external stream")
                 if s.empty_window not in EMPTY_WINDOW_RULES:
                     raise CausalOrderViolation(
                         f"EMPTY_WINDOW_RULE_UNDECLARED: {s.key} (closed_window) declares empty_window={s.empty_window!r}; "
@@ -284,7 +314,7 @@ class StreamMux:
                     if trading_days is None and require_calendar:
                         raise CausalOrderViolation(
                             f"TRADING_DAY_CALENDAR_ABSENT: {s.key} fills empty windows inside trading days, "
-                            f"but the run was given no trading-day calendar")
+                            f"but the run was given no fill-scope calendar")
                     days = trading_days
                 agg = ClosedWindowAggregator(s.key, s.duration_ns, src.duration_ns, trading_days=days)
                 self._sweepers.append((agg, src.key, self._rank.get(src.key)))
@@ -322,6 +352,13 @@ class StreamMux:
             else:
                 keep.append(b)
         self._context_queue = keep
+
+    def windows_suppressed(self) -> Dict[str, Dict[str, int]]:
+        """Per closed-window stream, the empty windows NOT filled because the fill scope excludes
+        them, by reason (``halt`` / ``outage``).  Separate from ``empty_windows_published`` on
+        purpose: a published count cannot distinguish an outage from a quiet market."""
+        return {agg.key: dict(agg.windows_suppressed) for agg, _src, _rank in self._sweepers
+                if any(agg.windows_suppressed.values())}
 
     def empty_windows_published(self) -> Dict[str, int]:
         """Zero-volume bars published per closed-window derived stream (the calendar-aware fill, D3a/D3b)."""

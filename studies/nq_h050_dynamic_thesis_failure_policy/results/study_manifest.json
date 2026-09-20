@@ -1,0 +1,37 @@
+{
+  "study_id": "nq_h050_dynamic_thesis_failure_policy",
+  "timestamp_utc": "2026-09-17T03:10:00Z",
+  "title": "NQ H050 Dynamic Thesis-Failure Risk Policy Study (Candidate Freeze Audit)",
+  "train_mechanism_replication": "PASS",
+  "policy_causality": "PASS",
+  "policy_persistence": "PASS",
+  "train_policy_evidence": "PROMISING",
+  "retrospective_2025q1_replay": "SUPPORTIVE",
+  "independent_oos": "NOT_AVAILABLE",
+  "overall_status": "DYNAMIC_THESIS_FAILURE_POLICY_CANDIDATE_FROZEN_AWAITING_NEW_OOS",
+  "scientific_status_note": "2025 Q1 was previously opened during adverse-path discovery and informed candidate failure mechanisms; therefore it serves as retrospective known-sample replay evidence, not independent OOS validation. The policy remains a frozen candidate awaiting new untouched OOS.",
+  "policy_contract_id": "H050_DYNAMIC_THESIS_FAILURE_POLICY_V1",
+  "policy_type": "Bounded Diagnostic Risk Classifier",
+  "policy_threshold": 0.65,
+  "target_definition": "THESIS_FAILURE = (recovered_be == False) & (final_c1_pnl_atr <= -1.00)",
+  "feature_count": 9,
+  "features": [
+    "landmark_level_atr",
+    "counter_direction",
+    "is_pre_r1",
+    "seconds_since_h050",
+    "rebound_from_adverse_extreme_atr",
+    "trailing_15s_return_atr",
+    "trailing_30s_return_atr",
+    "trailing_15s_range_atr",
+    "trailing_30s_range_atr"
+  ],
+  "next_validation_periods_provenance": {
+    "2025_Q1": "PREVIOUSLY_OPENED (Tainted for risk policy discovery)",
+    "2025_Q2": "UNTOUCHED_AVAILABLE (3,163,350 1s bars in catalog; upstream V_A regime definitions required)",
+    "2025_Q3": "UNTOUCHED_AVAILABLE (2,849,382 1s bars in catalog; upstream V_A regime definitions required)",
+    "2025_Q4": "UNTOUCHED_AVAILABLE (3,000,755 1s bars in catalog; upstream V_A regime definitions required)",
+    "2026_runtime_oos": "UNTOUCHED_AVAILABLE (4,255,466 1s bars in catalog; upstream V_A regime definitions required)"
+  },
+  "next_valid_candidate_validation_period": "2025 Q2"
+}

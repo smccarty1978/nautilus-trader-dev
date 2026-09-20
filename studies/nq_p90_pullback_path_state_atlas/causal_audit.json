@@ -1,0 +1,64 @@
+{
+  "status": "PASS",
+  "audit_timestamp_utc": "2026-09-16T02:39:26Z",
+  "critical_violations": 0,
+  "warnings": 0,
+  "checks": {
+    "1_running_max_mfe_past_only": {
+      "passed": true,
+      "metric": "Online forward-only tracking verified"
+    },
+    "2_deepest_pb_past_only": {
+      "passed": true,
+      "metric": "deepest_pullback_atr uses only information <= t"
+    },
+    "3_recovery_fractions_causal": {
+      "passed": true,
+      "metric": "current_recovery_fraction evaluated strictly at close C_t"
+    },
+    "4_rollover_no_future_leakage": {
+      "passed": true,
+      "metric": "Rollover declared on immediate transition without lookahead"
+    },
+    "5_state_transition_first_bar": {
+      "passed": true,
+      "metric": "First bar close C_t where condition satisfied"
+    },
+    "6_original_regime_active": {
+      "passed": true,
+      "metric": "All observations belong to active prevailing regime"
+    },
+    "7_strict_t_obs_lt_t_flip": {
+      "passed": true,
+      "metric": "Min(time_to_flip) = 1.0s > 0.0s (strictly positive)"
+    },
+    "8_outcomes_attached_post_freeze": {
+      "passed": true,
+      "metric": "State ledger frozen separately (SHA256: c1934b6830811a6f...)"
+    },
+    "9_no_future_episode_extrema_in_features": {
+      "passed": true,
+      "metric": "All metrics use running max/min only"
+    },
+    "10_no_eventual_outcome_in_features": {
+      "passed": true,
+      "metric": "Features completely decoupled from forward outcomes"
+    },
+    "11_oos_isolation_2025_q1": {
+      "passed": true,
+      "metric": "Fixed non-tuned thresholds, 2025 Q1 evaluation only"
+    },
+    "12_directional_symmetry": {
+      "passed": true,
+      "metric": "Bullish and bearish pullback definitions directionally normalized"
+    },
+    "13_repeated_obs_identified": {
+      "passed": true,
+      "metric": "Unique observation_id, episode_id, checkpoint_index tracked"
+    },
+    "14_prior_artifact_hashes_verified": {
+      "passed": true,
+      "metric": "All 3 prior artifact SHA256 hashes matched"
+    }
+  }
+}

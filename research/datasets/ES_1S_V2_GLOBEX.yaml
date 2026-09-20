@@ -37,6 +37,14 @@ provenance:
 rules:
   forward_fill: false
   native_rows_only: true
+  # A closed-window derived stream fills an empty in-session window with a zero-volume bar. Every
+  # empty window is inside some run of the `gaps` reference table (native rows only), so the only
+  # thing that separates a quiet market from a data hole is how long the run is. On this tape the
+  # quiet-market maximum in an outage-free year is 299 s (2023) and 119 s (2022); every genuine
+  # hole is >= 7200 s, and the widest excluded run is 4867 s (2020-03-16 COVID limit-lock, a real
+  # pinned-price state, not missing data). Runs at or above this are not filled; they are counted
+  # (`windows_suppressed.outage`) and left to the tracker staleness columns.
+  outage_gap_seconds: 7200
   session_calendar:
     name: CME Globex Equity
     authority: CME Globex equity-index product trading/holiday schedule (pandas_market_calendars

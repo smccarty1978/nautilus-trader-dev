@@ -1,0 +1,77 @@
+{
+  "manifest_name": "causal_feature_manifest",
+  "study": "nq_h050_adverse_path_thesis_failure",
+  "observation_policy": "First touch of adverse excursion landmark [-0.50A, -0.75A, -1.00A, -1.25A, -1.50A] from actual NT entry fill",
+  "feature_groups": {
+    "original_h050_state": [
+      "m4_h050_score",
+      "p0_h050",
+      "p1_h050",
+      "p2_h050",
+      "frozen_atr",
+      "h050_entry_fill_px"
+    ],
+    "live_m4_state": [
+      "current_p0",
+      "current_p1",
+      "current_p2",
+      "current_m4",
+      "delta_m4"
+    ],
+    "regime_macro_state": [
+      "incumbent_regime_age_sec",
+      "current_regime_mfe_atr",
+      "current_distance_from_extreme_atr",
+      "made_new_extreme_since_h050",
+      "seconds_since_last_extreme",
+      "incumbent_expansion_rate"
+    ],
+    "pullback_micro_state": [
+      "current_pullback_depth_atr",
+      "current_pullback_duration_sec",
+      "current_pullback_velocity_atr_sec",
+      "current_pullback_efficiency",
+      "current_pullback_ordinal",
+      "current_previous_pullbacks_count",
+      "current_previous_pullbacks_max_depth_atr"
+    ],
+    "short_horizon_price_dynamics": [
+      "rebound_from_adverse_extreme_atr",
+      "is_at_trough",
+      "trailing_5s_return_atr",
+      "trailing_15s_return_atr",
+      "trailing_30s_return_atr",
+      "trailing_60s_return_atr",
+      "trailing_5s_range_atr",
+      "trailing_15s_range_atr",
+      "trailing_30s_range_atr",
+      "trailing_60s_range_atr",
+      "trailing_5s_efficiency",
+      "trailing_15s_efficiency",
+      "trailing_30s_efficiency",
+      "trailing_60s_efficiency"
+    ]
+  },
+  "forward_outcome_targets": [
+    "final_c1_pnl_atr",
+    "final_c1_pnl_pts",
+    "final_c1_pnl_dollars",
+    "terminal_win",
+    "recovered_be",
+    "reached_plus_025a",
+    "reached_plus_050a",
+    "reached_plus_100a",
+    "reached_plus_200a",
+    "eventual_r1_confirmed",
+    "seconds_to_r1",
+    "eventual_h050_1_exit",
+    "seconds_to_exit",
+    "fallback_to_r2",
+    "subsequent_mfe_atr",
+    "subsequent_mae_atr",
+    "further_mae_atr",
+    "time_to_be_sec",
+    "time_to_plus_050a_sec",
+    "terminal_failure_label"
+  ]
+}

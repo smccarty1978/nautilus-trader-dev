@@ -1,0 +1,536 @@
+{
+  "A1": {
+    "ALL": {
+      "le_15s": {
+        "n": 1161,
+        "median_entry_advantage_pts": 1.0,
+        "mean_entry_advantage_pts": -0.2883290267011197,
+        "median_future_residual_mfe_atr": 0.2785747647932048,
+        "p_mfe_gt_100_atr": 21.619293712316967,
+        "p_mfe_gt_200_atr": 13.178294573643413,
+        "median_time_to_flip_sec": 40.0
+      },
+      "le_30s": {
+        "n": 1682,
+        "median_entry_advantage_pts": 1.0,
+        "mean_entry_advantage_pts": -0.05841260404280618,
+        "median_future_residual_mfe_atr": 0.26914482320592636,
+        "p_mfe_gt_100_atr": 21.819262782401903,
+        "p_mfe_gt_200_atr": 12.841854934601665,
+        "median_time_to_flip_sec": 40.0
+      },
+      "le_60s": {
+        "n": 2151,
+        "median_entry_advantage_pts": 1.25,
+        "mean_entry_advantage_pts": -0.05079033007903301,
+        "median_future_residual_mfe_atr": 0.26868287738513996,
+        "p_mfe_gt_100_atr": 22.408182240818224,
+        "p_mfe_gt_200_atr": 12.97071129707113,
+        "median_time_to_flip_sec": 45.0
+      }
+    },
+    "TRAIN": {
+      "le_15s": {
+        "n": 1042,
+        "median_entry_advantage_pts": 1.0,
+        "mean_entry_advantage_pts": -0.28430902111324374,
+        "median_future_residual_mfe_atr": 0.27373239091497154,
+        "p_mfe_gt_100_atr": 21.401151631477926,
+        "p_mfe_gt_200_atr": 13.051823416506716,
+        "median_time_to_flip_sec": 40.0
+      },
+      "le_30s": {
+        "n": 1491,
+        "median_entry_advantage_pts": 1.0,
+        "mean_entry_advantage_pts": -0.1807511737089202,
+        "median_future_residual_mfe_atr": 0.2676982846722392,
+        "p_mfe_gt_100_atr": 21.52917505030181,
+        "p_mfe_gt_200_atr": 12.877263581488934,
+        "median_time_to_flip_sec": 40.0
+      },
+      "le_60s": {
+        "n": 1911,
+        "median_entry_advantage_pts": 1.0,
+        "mean_entry_advantage_pts": -0.12964416535845108,
+        "median_future_residual_mfe_atr": 0.26804979482468844,
+        "p_mfe_gt_100_atr": 22.344322344322347,
+        "p_mfe_gt_200_atr": 13.029827315541601,
+        "median_time_to_flip_sec": 40.0
+      }
+    },
+    "OOS": {
+      "le_15s": {
+        "n": 119,
+        "median_entry_advantage_pts": 1.75,
+        "mean_entry_advantage_pts": -0.3235294117647059,
+        "median_future_residual_mfe_atr": 0.3312724192723794,
+        "p_mfe_gt_100_atr": 23.52941176470588,
+        "p_mfe_gt_200_atr": 14.285714285714285,
+        "median_time_to_flip_sec": 50.0
+      },
+      "le_30s": {
+        "n": 191,
+        "median_entry_advantage_pts": 2.0,
+        "mean_entry_advantage_pts": 0.8965968586387435,
+        "median_future_residual_mfe_atr": 0.2905736291904817,
+        "p_mfe_gt_100_atr": 24.083769633507853,
+        "p_mfe_gt_200_atr": 12.56544502617801,
+        "median_time_to_flip_sec": 50.0
+      },
+      "le_60s": {
+        "n": 240,
+        "median_entry_advantage_pts": 2.0,
+        "mean_entry_advantage_pts": 0.5770833333333333,
+        "median_future_residual_mfe_atr": 0.27061572166214676,
+        "p_mfe_gt_100_atr": 22.916666666666664,
+        "p_mfe_gt_200_atr": 12.5,
+        "median_time_to_flip_sec": 45.0
+      }
+    }
+  },
+  "A2": {
+    "ALL": {
+      "le_15s": {
+        "n": 311,
+        "median_entry_advantage_pts": 0.25,
+        "mean_entry_advantage_pts": -0.09967845659163987,
+        "median_future_residual_mfe_atr": 0.3447548993283914,
+        "p_mfe_gt_100_atr": 18.006430868167204,
+        "p_mfe_gt_200_atr": 10.610932475884244,
+        "median_time_to_flip_sec": 35.0
+      },
+      "le_30s": {
+        "n": 645,
+        "median_entry_advantage_pts": 0.5,
+        "mean_entry_advantage_pts": 0.17325581395348838,
+        "median_future_residual_mfe_atr": 0.2869769196906927,
+        "p_mfe_gt_100_atr": 17.209302325581397,
+        "p_mfe_gt_200_atr": 10.077519379844961,
+        "median_time_to_flip_sec": 30.0
+      },
+      "le_60s": {
+        "n": 1010,
+        "median_entry_advantage_pts": 0.75,
+        "mean_entry_advantage_pts": -0.2089108910891089,
+        "median_future_residual_mfe_atr": 0.2841389720884017,
+        "p_mfe_gt_100_atr": 19.504950495049506,
+        "p_mfe_gt_200_atr": 11.386138613861387,
+        "median_time_to_flip_sec": 35.0
+      }
+    },
+    "TRAIN": {
+      "le_15s": {
+        "n": 277,
+        "median_entry_advantage_pts": 0.25,
+        "mean_entry_advantage_pts": -0.06046931407942238,
+        "median_future_residual_mfe_atr": 0.35659046046562526,
+        "p_mfe_gt_100_atr": 18.4115523465704,
+        "p_mfe_gt_200_atr": 10.469314079422382,
+        "median_time_to_flip_sec": 35.0
+      },
+      "le_30s": {
+        "n": 572,
+        "median_entry_advantage_pts": 0.5,
+        "mean_entry_advantage_pts": 0.22683566433566432,
+        "median_future_residual_mfe_atr": 0.28859193397292454,
+        "p_mfe_gt_100_atr": 16.783216783216783,
+        "p_mfe_gt_200_atr": 9.615384615384617,
+        "median_time_to_flip_sec": 30.0
+      },
+      "le_60s": {
+        "n": 892,
+        "median_entry_advantage_pts": 0.75,
+        "mean_entry_advantage_pts": -0.34024663677130046,
+        "median_future_residual_mfe_atr": 0.28612756027868613,
+        "p_mfe_gt_100_atr": 19.170403587443946,
+        "p_mfe_gt_200_atr": 11.09865470852018,
+        "median_time_to_flip_sec": 35.0
+      }
+    },
+    "OOS": {
+      "le_15s": {
+        "n": 34,
+        "median_entry_advantage_pts": 1.0,
+        "mean_entry_advantage_pts": -0.41911764705882354,
+        "median_future_residual_mfe_atr": 0.26856277804182893,
+        "p_mfe_gt_100_atr": 14.705882352941178,
+        "p_mfe_gt_200_atr": 11.76470588235294,
+        "median_time_to_flip_sec": 40.0
+      },
+      "le_30s": {
+        "n": 73,
+        "median_entry_advantage_pts": 1.5,
+        "mean_entry_advantage_pts": -0.2465753424657534,
+        "median_future_residual_mfe_atr": 0.273313510321065,
+        "p_mfe_gt_100_atr": 20.54794520547945,
+        "p_mfe_gt_200_atr": 13.698630136986301,
+        "median_time_to_flip_sec": 40.0
+      },
+      "le_60s": {
+        "n": 118,
+        "median_entry_advantage_pts": 2.0,
+        "mean_entry_advantage_pts": 0.7838983050847458,
+        "median_future_residual_mfe_atr": 0.266063862589035,
+        "p_mfe_gt_100_atr": 22.033898305084744,
+        "p_mfe_gt_200_atr": 13.559322033898304,
+        "median_time_to_flip_sec": 40.0
+      }
+    }
+  },
+  "B1": {
+    "ALL": {
+      "le_15s": {
+        "n": 1584,
+        "median_entry_advantage_pts": 1.5,
+        "mean_entry_advantage_pts": 0.19491792929292928,
+        "median_future_residual_mfe_atr": 0.23980706477033484,
+        "p_mfe_gt_100_atr": 23.295454545454543,
+        "p_mfe_gt_200_atr": 13.573232323232324,
+        "median_time_to_flip_sec": 40.0
+      },
+      "le_30s": {
+        "n": 3115,
+        "median_entry_advantage_pts": 1.75,
+        "mean_entry_advantage_pts": -0.17287319422150882,
+        "median_future_residual_mfe_atr": 0.2989171390268176,
+        "p_mfe_gt_100_atr": 28.154093097913325,
+        "p_mfe_gt_200_atr": 16.436597110754413,
+        "median_time_to_flip_sec": 65.0
+      },
+      "le_60s": {
+        "n": 4134,
+        "median_entry_advantage_pts": 2.25,
+        "mean_entry_advantage_pts": -0.07728592162554426,
+        "median_future_residual_mfe_atr": 0.3682380530588033,
+        "p_mfe_gt_100_atr": 31.881954523463957,
+        "p_mfe_gt_200_atr": 19.013062409288825,
+        "median_time_to_flip_sec": 110.0
+      }
+    },
+    "TRAIN": {
+      "le_15s": {
+        "n": 1414,
+        "median_entry_advantage_pts": 1.25,
+        "mean_entry_advantage_pts": 0.0967114568599717,
+        "median_future_residual_mfe_atr": 0.2310944322159773,
+        "p_mfe_gt_100_atr": 22.772277227722775,
+        "p_mfe_gt_200_atr": 13.719943422913719,
+        "median_time_to_flip_sec": 40.0
+      },
+      "le_30s": {
+        "n": 2761,
+        "median_entry_advantage_pts": 1.75,
+        "mean_entry_advantage_pts": -0.31012314378848244,
+        "median_future_residual_mfe_atr": 0.29707454017050217,
+        "p_mfe_gt_100_atr": 27.960883737776165,
+        "p_mfe_gt_200_atr": 16.370880115900036,
+        "median_time_to_flip_sec": 65.0
+      },
+      "le_60s": {
+        "n": 3685,
+        "median_entry_advantage_pts": 2.0,
+        "mean_entry_advantage_pts": -0.1798507462686567,
+        "median_future_residual_mfe_atr": 0.37238954670853897,
+        "p_mfe_gt_100_atr": 31.831750339213027,
+        "p_mfe_gt_200_atr": 19.077340569877883,
+        "median_time_to_flip_sec": 105.0
+      }
+    },
+    "OOS": {
+      "le_15s": {
+        "n": 170,
+        "median_entry_advantage_pts": 3.0,
+        "mean_entry_advantage_pts": 1.011764705882353,
+        "median_future_residual_mfe_atr": 0.33159881761724974,
+        "p_mfe_gt_100_atr": 27.647058823529413,
+        "p_mfe_gt_200_atr": 12.352941176470589,
+        "median_time_to_flip_sec": 62.5
+      },
+      "le_30s": {
+        "n": 354,
+        "median_entry_advantage_pts": 3.0,
+        "mean_entry_advantage_pts": 0.8975988700564972,
+        "median_future_residual_mfe_atr": 0.3124518717232645,
+        "p_mfe_gt_100_atr": 29.66101694915254,
+        "p_mfe_gt_200_atr": 16.94915254237288,
+        "median_time_to_flip_sec": 82.5
+      },
+      "le_60s": {
+        "n": 449,
+        "median_entry_advantage_pts": 3.5,
+        "mean_entry_advantage_pts": 0.7644766146993318,
+        "median_future_residual_mfe_atr": 0.3457084998913247,
+        "p_mfe_gt_100_atr": 32.29398663697104,
+        "p_mfe_gt_200_atr": 18.485523385300667,
+        "median_time_to_flip_sec": 130.0
+      }
+    }
+  },
+  "B2": {
+    "ALL": {
+      "le_15s": {
+        "n": 0,
+        "median_entry_advantage_pts": 0.0,
+        "mean_entry_advantage_pts": 0.0,
+        "median_future_residual_mfe_atr": 0.0,
+        "p_mfe_gt_100_atr": 0.0,
+        "p_mfe_gt_200_atr": 0.0,
+        "median_time_to_flip_sec": 0.0
+      },
+      "le_30s": {
+        "n": 924,
+        "median_entry_advantage_pts": 1.25,
+        "mean_entry_advantage_pts": 0.4661796536796537,
+        "median_future_residual_mfe_atr": 0.2361613325620731,
+        "p_mfe_gt_100_atr": 23.26839826839827,
+        "p_mfe_gt_200_atr": 12.770562770562771,
+        "median_time_to_flip_sec": 30.0
+      },
+      "le_60s": {
+        "n": 2423,
+        "median_entry_advantage_pts": 2.0,
+        "mean_entry_advantage_pts": 0.09110606685926537,
+        "median_future_residual_mfe_atr": 0.34324743399998475,
+        "p_mfe_gt_100_atr": 30.251754023937266,
+        "p_mfe_gt_200_atr": 17.62278167560875,
+        "median_time_to_flip_sec": 90.0
+      }
+    },
+    "TRAIN": {
+      "le_15s": {
+        "n": 0,
+        "median_entry_advantage_pts": 0.0,
+        "mean_entry_advantage_pts": 0.0,
+        "median_future_residual_mfe_atr": 0.0,
+        "p_mfe_gt_100_atr": 0.0,
+        "p_mfe_gt_200_atr": 0.0,
+        "median_time_to_flip_sec": 0.0
+      },
+      "le_30s": {
+        "n": 820,
+        "median_entry_advantage_pts": 1.25,
+        "mean_entry_advantage_pts": 0.2942073170731707,
+        "median_future_residual_mfe_atr": 0.23564433584948957,
+        "p_mfe_gt_100_atr": 23.414634146341466,
+        "p_mfe_gt_200_atr": 13.170731707317074,
+        "median_time_to_flip_sec": 30.0
+      },
+      "le_60s": {
+        "n": 2152,
+        "median_entry_advantage_pts": 2.0,
+        "mean_entry_advantage_pts": -0.046468401486988845,
+        "median_future_residual_mfe_atr": 0.3488876374416765,
+        "p_mfe_gt_100_atr": 30.576208178438662,
+        "p_mfe_gt_200_atr": 17.843866171003718,
+        "median_time_to_flip_sec": 90.0
+      }
+    },
+    "OOS": {
+      "le_15s": {
+        "n": 0,
+        "median_entry_advantage_pts": 0.0,
+        "mean_entry_advantage_pts": 0.0,
+        "median_future_residual_mfe_atr": 0.0,
+        "p_mfe_gt_100_atr": 0.0,
+        "p_mfe_gt_200_atr": 0.0,
+        "median_time_to_flip_sec": 0.0
+      },
+      "le_30s": {
+        "n": 104,
+        "median_entry_advantage_pts": 2.25,
+        "mean_entry_advantage_pts": 1.8221153846153846,
+        "median_future_residual_mfe_atr": 0.2364650763114406,
+        "p_mfe_gt_100_atr": 22.115384615384613,
+        "p_mfe_gt_200_atr": 9.615384615384617,
+        "median_time_to_flip_sec": 47.5
+      },
+      "le_60s": {
+        "n": 271,
+        "median_entry_advantage_pts": 3.0,
+        "mean_entry_advantage_pts": 1.183579335793358,
+        "median_future_residual_mfe_atr": 0.3038581168319399,
+        "p_mfe_gt_100_atr": 27.67527675276753,
+        "p_mfe_gt_200_atr": 15.867158671586715,
+        "median_time_to_flip_sec": 85.0
+      }
+    }
+  },
+  "B3": {
+    "ALL": {
+      "le_15s": {
+        "n": 0,
+        "median_entry_advantage_pts": 0.0,
+        "mean_entry_advantage_pts": 0.0,
+        "median_future_residual_mfe_atr": 0.0,
+        "p_mfe_gt_100_atr": 0.0,
+        "p_mfe_gt_200_atr": 0.0,
+        "median_time_to_flip_sec": 0.0
+      },
+      "le_30s": {
+        "n": 0,
+        "median_entry_advantage_pts": 0.0,
+        "mean_entry_advantage_pts": 0.0,
+        "median_future_residual_mfe_atr": 0.0,
+        "p_mfe_gt_100_atr": 0.0,
+        "p_mfe_gt_200_atr": 0.0,
+        "median_time_to_flip_sec": 0.0
+      },
+      "le_60s": {
+        "n": 250,
+        "median_entry_advantage_pts": 2.5,
+        "mean_entry_advantage_pts": 0.564,
+        "median_future_residual_mfe_atr": 0.4950576496790141,
+        "p_mfe_gt_100_atr": 34.4,
+        "p_mfe_gt_200_atr": 20.4,
+        "median_time_to_flip_sec": 150.0
+      }
+    },
+    "TRAIN": {
+      "le_15s": {
+        "n": 0,
+        "median_entry_advantage_pts": 0.0,
+        "mean_entry_advantage_pts": 0.0,
+        "median_future_residual_mfe_atr": 0.0,
+        "p_mfe_gt_100_atr": 0.0,
+        "p_mfe_gt_200_atr": 0.0,
+        "median_time_to_flip_sec": 0.0
+      },
+      "le_30s": {
+        "n": 0,
+        "median_entry_advantage_pts": 0.0,
+        "mean_entry_advantage_pts": 0.0,
+        "median_future_residual_mfe_atr": 0.0,
+        "p_mfe_gt_100_atr": 0.0,
+        "p_mfe_gt_200_atr": 0.0,
+        "median_time_to_flip_sec": 0.0
+      },
+      "le_60s": {
+        "n": 218,
+        "median_entry_advantage_pts": 2.5,
+        "mean_entry_advantage_pts": 0.3967889908256881,
+        "median_future_residual_mfe_atr": 0.4950576496790141,
+        "p_mfe_gt_100_atr": 34.403669724770644,
+        "p_mfe_gt_200_atr": 21.55963302752294,
+        "median_time_to_flip_sec": 150.0
+      }
+    },
+    "OOS": {
+      "le_15s": {
+        "n": 0,
+        "median_entry_advantage_pts": 0.0,
+        "mean_entry_advantage_pts": 0.0,
+        "median_future_residual_mfe_atr": 0.0,
+        "p_mfe_gt_100_atr": 0.0,
+        "p_mfe_gt_200_atr": 0.0,
+        "median_time_to_flip_sec": 0.0
+      },
+      "le_30s": {
+        "n": 0,
+        "median_entry_advantage_pts": 0.0,
+        "mean_entry_advantage_pts": 0.0,
+        "median_future_residual_mfe_atr": 0.0,
+        "p_mfe_gt_100_atr": 0.0,
+        "p_mfe_gt_200_atr": 0.0,
+        "median_time_to_flip_sec": 0.0
+      },
+      "le_60s": {
+        "n": 32,
+        "median_entry_advantage_pts": 5.25,
+        "mean_entry_advantage_pts": 1.703125,
+        "median_future_residual_mfe_atr": 0.4776469799145666,
+        "p_mfe_gt_100_atr": 34.375,
+        "p_mfe_gt_200_atr": 12.5,
+        "median_time_to_flip_sec": 137.5
+      }
+    }
+  },
+  "C": {
+    "ALL": {
+      "le_15s": {
+        "n": 4248,
+        "median_entry_advantage_pts": 2.0,
+        "mean_entry_advantage_pts": 0.04955273069679849,
+        "median_future_residual_mfe_atr": 0.2974233195518444,
+        "p_mfe_gt_100_atr": 28.31920903954802,
+        "p_mfe_gt_200_atr": 15.889830508474576,
+        "median_time_to_flip_sec": 65.0
+      },
+      "le_30s": {
+        "n": 4531,
+        "median_entry_advantage_pts": 2.0,
+        "mean_entry_advantage_pts": 0.0796733612888987,
+        "median_future_residual_mfe_atr": 0.31367316048278177,
+        "p_mfe_gt_100_atr": 29.24299271683955,
+        "p_mfe_gt_200_atr": 16.486426837342748,
+        "median_time_to_flip_sec": 75.0
+      },
+      "le_60s": {
+        "n": 4813,
+        "median_entry_advantage_pts": 2.25,
+        "mean_entry_advantage_pts": 0.20345938084354873,
+        "median_future_residual_mfe_atr": 0.3312724192723794,
+        "p_mfe_gt_100_atr": 30.085185954706006,
+        "p_mfe_gt_200_atr": 17.05796800332433,
+        "median_time_to_flip_sec": 85.0
+      }
+    },
+    "TRAIN": {
+      "le_15s": {
+        "n": 3819,
+        "median_entry_advantage_pts": 2.0,
+        "mean_entry_advantage_pts": -0.05145326001571092,
+        "median_future_residual_mfe_atr": 0.3036820719620372,
+        "p_mfe_gt_100_atr": 28.305839224927993,
+        "p_mfe_gt_200_atr": 15.946582875098192,
+        "median_time_to_flip_sec": 65.0
+      },
+      "le_30s": {
+        "n": 4062,
+        "median_entry_advantage_pts": 2.0,
+        "mean_entry_advantage_pts": -0.011016740521910389,
+        "median_future_residual_mfe_atr": 0.31696203997374117,
+        "p_mfe_gt_100_atr": 29.19743968488429,
+        "p_mfe_gt_200_atr": 16.469719350073856,
+        "median_time_to_flip_sec": 75.0
+      },
+      "le_60s": {
+        "n": 4308,
+        "median_entry_advantage_pts": 2.0,
+        "mean_entry_advantage_pts": 0.053156917363045494,
+        "median_future_residual_mfe_atr": 0.3353015488931405,
+        "p_mfe_gt_100_atr": 30.10677808727948,
+        "p_mfe_gt_200_atr": 17.061281337047355,
+        "median_time_to_flip_sec": 85.0
+      }
+    },
+    "OOS": {
+      "le_15s": {
+        "n": 429,
+        "median_entry_advantage_pts": 3.0,
+        "mean_entry_advantage_pts": 0.9487179487179487,
+        "median_future_residual_mfe_atr": 0.26927958117005973,
+        "p_mfe_gt_100_atr": 28.438228438228435,
+        "p_mfe_gt_200_atr": 15.384615384615385,
+        "median_time_to_flip_sec": 70.0
+      },
+      "le_30s": {
+        "n": 469,
+        "median_entry_advantage_pts": 3.0,
+        "mean_entry_advantage_pts": 0.8651385927505331,
+        "median_future_residual_mfe_atr": 0.29104908711777755,
+        "p_mfe_gt_100_atr": 29.637526652452024,
+        "p_mfe_gt_200_atr": 16.631130063965884,
+        "median_time_to_flip_sec": 80.0
+      },
+      "le_60s": {
+        "n": 505,
+        "median_entry_advantage_pts": 3.5,
+        "mean_entry_advantage_pts": 1.4856435643564356,
+        "median_future_residual_mfe_atr": 0.29433562769985594,
+        "p_mfe_gt_100_atr": 29.9009900990099,
+        "p_mfe_gt_200_atr": 17.02970297029703,
+        "median_time_to_flip_sec": 95.0
+      }
+    }
+  }
+}

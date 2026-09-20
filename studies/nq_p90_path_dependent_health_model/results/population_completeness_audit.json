@@ -1,0 +1,91 @@
+{
+  "gate_0_verdict": "C_P90_CONDITIONED_REGIME_POPULATION",
+  "verdict_enum": "C",
+  "primary_justification": "The existing pullback population is strictly conditioned on upstream P90 qualification. In nq_p90_reversal_entry_quality, candidate collection was gated by TriggerEngine state == 'ARMED', which required both regime qualification (age >= 120s, MFE >= 1.0 ATR, progress windows >= 2, retention >= 0.50) AND direction-specific Model C score reaching P90 (0.295601 Long / 0.300094 Short). 100% of regimes in candidates.parquet satisfy Model C score >= P90 at their very first candidate record. Regimes that never hit P90 are completely missing (0% representation). Furthermore, for regimes that do hit P90, observation begins only at the moment of P90 entry (mean regime age at first candidate is ~706 seconds / 11.7 minutes, mean prior MFE is 3.66 ATR), left-truncating all initial regime development and any pullbacks prior to P90.",
+  "natural_regime_definition": "DualEmaRegimeTracker(timeframe='1m', short_period=3, long_period=9, atr_period=14)",
+  "population_funnel": {
+    "2023": {
+      "n_natural_all": 28029,
+      "n_natural_rth": 7671,
+      "n_natural_rth_duration_ge_120s": 7585,
+      "n_natural_rth_mfe_ge_10_atr": 6850,
+      "n_regimes_in_candidates": 2956,
+      "n_regimes_with_pullback_episode": 2952,
+      "n_regimes_in_state_ledger": 2952,
+      "n_regimes_in_population_c": 2952,
+      "coverage_pct_natural_all": 10.55,
+      "coverage_pct_natural_rth": 38.53,
+      "coverage_pct_natural_rth_mfe10": 43.15,
+      "p90_entry_diagnostics": {
+        "total_regimes": 2956,
+        "first_is_p90": 2956,
+        "pct": 100.0,
+        "mean_first_age_s": 705.7188768606225,
+        "median_first_age_s": 640.0,
+        "mean_first_mfe_atr": 3.6644039112642295,
+        "mean_first_ckpt_idx": 140.14377537212448
+      }
+    },
+    "2024": {
+      "n_natural_all": 27515,
+      "n_natural_rth": 7281,
+      "n_natural_rth_duration_ge_120s": 7185,
+      "n_natural_rth_mfe_ge_10_atr": 6565,
+      "n_regimes_in_candidates": 2888,
+      "n_regimes_with_pullback_episode": 2883,
+      "n_regimes_in_state_ledger": 2883,
+      "n_regimes_in_population_c": 2883,
+      "coverage_pct_natural_all": 10.5,
+      "coverage_pct_natural_rth": 39.66,
+      "coverage_pct_natural_rth_mfe10": 43.99,
+      "p90_entry_diagnostics": {
+        "total_regimes": 2888,
+        "first_is_p90": 2888,
+        "pct": 100.0,
+        "mean_first_age_s": 719.3923130193906,
+        "median_first_age_s": 650.0,
+        "mean_first_mfe_atr": 3.661062231346907,
+        "mean_first_ckpt_idx": 142.87846260387812
+      }
+    },
+    "2025_Q1": {
+      "n_natural_all": 6430,
+      "n_natural_rth": 1761,
+      "n_natural_rth_duration_ge_120s": 1735,
+      "n_natural_rth_mfe_ge_10_atr": 1600,
+      "n_regimes_in_candidates": 715,
+      "n_regimes_with_pullback_episode": 713,
+      "n_regimes_in_state_ledger": 713,
+      "n_regimes_in_population_c": 713,
+      "coverage_pct_natural_all": 11.12,
+      "coverage_pct_natural_rth": 40.6,
+      "coverage_pct_natural_rth_mfe10": 44.69,
+      "p90_entry_diagnostics": {
+        "total_regimes": 715,
+        "first_is_p90": 715,
+        "pct": 100.0,
+        "mean_first_age_s": 735.020979020979,
+        "median_first_age_s": 670.0,
+        "mean_first_mfe_atr": 3.705665471726564,
+        "mean_first_ckpt_idx": 146.0041958041958
+      }
+    },
+    "TRAIN_COMBINED_2023_2024": {
+      "n_natural_all": 55544,
+      "n_natural_rth": 14952,
+      "n_natural_rth_mfe_ge_10_atr": 13415,
+      "n_regimes_in_candidates": 5844,
+      "n_regimes_with_pullback_episode": 5835,
+      "n_regimes_in_population_c": 5835,
+      "coverage_pct_natural_rth": 39.09,
+      "coverage_pct_natural_rth_mfe10": 43.56
+    }
+  },
+  "reconciliation_summary": {
+    "is_complete_natural_regimes": false,
+    "has_p90_conditioning": true,
+    "has_left_truncation": true,
+    "regimes_without_p90_represented": 0,
+    "regimes_without_p90_population_c_observations": 0
+  }
+}

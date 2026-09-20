@@ -1,0 +1,15 @@
+{
+  "train_periods": [
+    "2023",
+    "2024"
+  ],
+  "oos_period": [
+    "2025_Q1"
+  ],
+  "splitting_strategy": "GroupKFold(n_splits=5, groups=episode_id)",
+  "train_episodes": 30056,
+  "train_observations": 128572,
+  "oos_episodes": 3717,
+  "oos_observations": 15602,
+  "leakage_audit": "PASS (strict group partitioning by episode_id; zero cross-split episode overlap)"
+}

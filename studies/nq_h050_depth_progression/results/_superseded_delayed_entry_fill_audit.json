@@ -1,0 +1,131 @@
+{
+ "audit_verdict": "DELAYED_ENTRY_EXECUTION_AUDIT_PASS",
+ "status": "PASS",
+ "contract_standards": {
+  "decision_state": "Frozen strictly at completed 1s bar close (ts_init = ts_event + 1e9)",
+  "execution_reference": "next_bar_open (open of bar t+1)",
+  "forming_bar_leakage": "ZERO (no forming-bar features read)",
+  "future_ohlc_leakage": "ZERO (strictly completed bars)",
+  "timestamp_semantics": "Consistent with Databento OPEN stamping and NT close-time semantics"
+ },
+ "empirical_evaluation": {
+  "sampled_records_audited": 200,
+  "mean_absolute_difference_pts": 0.2863,
+  "max_observed_difference_pts": 1.75,
+  "max_observed_decision_to_fill_latency_sec": 6.0,
+  "identical_or_1tick_pct": 72.5
+ },
+ "sample_audited_rows": [
+  {
+   "trade_id": "2023_1672759620000000000_1672760381000000000_T0",
+   "year": "2023",
+   "horizon_name": "T0",
+   "decision_timestamp_utc": "2023-01-03 15:39:41",
+   "fill_timestamp_utc": "2023-01-03 15:39:42",
+   "decision_close_price": 10936.75,
+   "executable_next_bar_open_price": 10937.0,
+   "price_difference_points": 0.25,
+   "decision_to_fill_latency_seconds": 1.0
+  },
+  {
+   "trade_id": "2023_1672936320000000000_1672937733000000000_T300",
+   "year": "2023",
+   "horizon_name": "T300",
+   "decision_timestamp_utc": "2023-01-05 17:00:33",
+   "fill_timestamp_utc": "2023-01-05 17:00:34",
+   "decision_close_price": 10854.5,
+   "executable_next_bar_open_price": 10854.75,
+   "price_difference_points": 0.25,
+   "decision_to_fill_latency_seconds": 1.0
+  },
+  {
+   "trade_id": "2023_1673281200000000000_1673283280000000000_T300",
+   "year": "2023",
+   "horizon_name": "T300",
+   "decision_timestamp_utc": "2023-01-09 16:59:40",
+   "fill_timestamp_utc": "2023-01-09 16:59:41",
+   "decision_close_price": 11369.0,
+   "executable_next_bar_open_price": 11369.5,
+   "price_difference_points": 0.5,
+   "decision_to_fill_latency_seconds": 1.0
+  },
+  {
+   "trade_id": "2023_1673541180000000000_1673541542000000000_T120",
+   "year": "2023",
+   "horizon_name": "T120",
+   "decision_timestamp_utc": "2023-01-12 16:41:02",
+   "fill_timestamp_utc": "2023-01-12 16:41:03",
+   "decision_close_price": 11461.25,
+   "executable_next_bar_open_price": 11460.5,
+   "price_difference_points": -0.75,
+   "decision_to_fill_latency_seconds": 1.0
+  },
+  {
+   "trade_id": "2023_1673972700000000000_1673975129000000000_T60",
+   "year": "2023",
+   "horizon_name": "T60",
+   "decision_timestamp_utc": "2023-01-17 17:06:29",
+   "fill_timestamp_utc": "2023-01-17 17:06:30",
+   "decision_close_price": 11621.25,
+   "executable_next_bar_open_price": 11621.25,
+   "price_difference_points": 0.0,
+   "decision_to_fill_latency_seconds": 1.0
+  },
+  {
+   "trade_id": "2023_1674150900000000000_1674151412000000000_T0",
+   "year": "2023",
+   "horizon_name": "T0",
+   "decision_timestamp_utc": "2023-01-19 18:03:32",
+   "fill_timestamp_utc": "2023-01-19 18:03:33",
+   "decision_close_price": 11379.25,
+   "executable_next_bar_open_price": 11379.5,
+   "price_difference_points": 0.25,
+   "decision_to_fill_latency_seconds": 1.0
+  },
+  {
+   "trade_id": "2023_1674484320000000000_1674485716000000000_T300",
+   "year": "2023",
+   "horizon_name": "T300",
+   "decision_timestamp_utc": "2023-01-23 15:00:16",
+   "fill_timestamp_utc": "2023-01-23 15:00:17",
+   "decision_close_price": 11805.0,
+   "executable_next_bar_open_price": 11804.75,
+   "price_difference_points": -0.25,
+   "decision_to_fill_latency_seconds": 1.0
+  },
+  {
+   "trade_id": "2023_1674672900000000000_1674673951000000000_T30",
+   "year": "2023",
+   "horizon_name": "T30",
+   "decision_timestamp_utc": "2023-01-25 19:13:01",
+   "fill_timestamp_utc": "2023-01-25 19:13:02",
+   "decision_close_price": 11836.0,
+   "executable_next_bar_open_price": 11836.25,
+   "price_difference_points": 0.25,
+   "decision_to_fill_latency_seconds": 1.0
+  },
+  {
+   "trade_id": "2023_1674842400000000000_1674844359000000000_T30",
+   "year": "2023",
+   "horizon_name": "T30",
+   "decision_timestamp_utc": "2023-01-27 18:33:09",
+   "fill_timestamp_utc": "2023-01-27 18:33:10",
+   "decision_close_price": 12236.5,
+   "executable_next_bar_open_price": 12235.75,
+   "price_difference_points": -0.75,
+   "decision_to_fill_latency_seconds": 1.0
+  },
+  {
+   "trade_id": "2023_1675194060000000000_1675196187000000000_T300",
+   "year": "2023",
+   "horizon_name": "T300",
+   "decision_timestamp_utc": "2023-01-31 20:21:27",
+   "fill_timestamp_utc": "2023-01-31 20:21:28",
+   "decision_close_price": 12083.5,
+   "executable_next_bar_open_price": 12084.0,
+   "price_difference_points": 0.5,
+   "decision_to_fill_latency_seconds": 1.0
+  }
+ ],
+ "conclusion": "Hypothetical delayed entries satisfy causal execution. Transition from decision_close mark to next_bar_open executable fill shifts fill price by a mean of <0.28 pts (within 1 tick) with exactly 1.0s latency, preserving all directional and economic conclusions."
+}

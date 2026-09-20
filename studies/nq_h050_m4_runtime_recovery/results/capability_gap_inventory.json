@@ -1,0 +1,24 @@
+{
+  "existing_canonical_features": [
+    "frozen_atr",
+    "direction_is_long"
+  ],
+  "state_machine_derived_features": [
+    "pullback_depth_atr",
+    "pullback_duration_sec",
+    "pullback_efficiency",
+    "pullback_velocity_atr_sec",
+    "pre_pullback_max_mfe_atr",
+    "pullback_ordinal",
+    "regime_age_sec",
+    "previous_pullbacks_count",
+    "previous_pullbacks_max_depth_atr",
+    "previous_pullbacks_avg_duration_sec",
+    "pullback_depth_vs_max_mfe_ratio",
+    "pullback_duration_vs_regime_age_ratio",
+    "incumbent_expansion_rate_atr_min",
+    "has_previous_pullbacks",
+    "previous_max_depth_ratio"
+  ],
+  "capability_status": "EXACT_PARITY_IMPLEMENTABLE_IN_STREAMING_PULLBACK_STATE_MACHINE"
+}

@@ -1,0 +1,108 @@
+{
+  "gate_0a_verdict": "BOUNDARY_EXTRAS_BENIGN",
+  "expected_observations": 6641,
+  "observed_observations": 6648,
+  "matched_observations": 6641,
+  "extra_count": 7,
+  "extra_records": [
+    {
+      "observation_id": "1672951440000000000_6_PB150_1672952105000000000",
+      "regime_id": 1672951440000000000,
+      "timestamp": 1672952105000000000,
+      "datetime_utc": "2023-01-05 20:55:05",
+      "current_milestone": "PB1.50",
+      "path_state": "DETERIORATING",
+      "current_pullback_atr": 1.7511472131641184,
+      "regime_start_dt": "2023-01-05 20:44:00",
+      "regime_end_dt": "2023-01-05 21:05:00",
+      "regime_in_sample_regs": true,
+      "obs_in_auth_full_2023_2024": false
+    },
+    {
+      "observation_id": "1673640180000000000_3_PB150_1673640700000000000",
+      "regime_id": 1673640180000000000,
+      "timestamp": 1673640700000000000,
+      "datetime_utc": "2023-01-13 20:11:40",
+      "current_milestone": "PB1.50",
+      "path_state": "DETERIORATING",
+      "current_pullback_atr": 1.7519078882139543,
+      "regime_start_dt": "2023-01-13 20:03:00",
+      "regime_end_dt": "2023-01-13 20:47:00",
+      "regime_in_sample_regs": true,
+      "obs_in_auth_full_2023_2024": false
+    },
+    {
+      "observation_id": "1673891100000000000_3_PB150_1673891625000000000",
+      "regime_id": 1673891100000000000,
+      "timestamp": 1673891625000000000,
+      "datetime_utc": "2023-01-16 17:53:45",
+      "current_milestone": "PB1.50",
+      "path_state": "DETERIORATING",
+      "current_pullback_atr": 1.8363396120606978,
+      "regime_start_dt": "2023-01-16 17:45:00",
+      "regime_end_dt": "2023-01-16 23:01:00",
+      "regime_in_sample_regs": true,
+      "obs_in_auth_full_2023_2024": false
+    },
+    {
+      "observation_id": "1674237360000000000_2_PB150_1674237605000000000",
+      "regime_id": 1674237360000000000,
+      "timestamp": 1674237605000000000,
+      "datetime_utc": "2023-01-20 18:00:05",
+      "current_milestone": "PB1.50",
+      "path_state": "DETERIORATING",
+      "current_pullback_atr": 2.537601205837479,
+      "regime_start_dt": "2023-01-20 17:56:00",
+      "regime_end_dt": "2023-01-20 18:03:00",
+      "regime_in_sample_regs": true,
+      "obs_in_auth_full_2023_2024": false
+    },
+    {
+      "observation_id": "1674237360000000000_2_PB200_1674237605000000000",
+      "regime_id": 1674237360000000000,
+      "timestamp": 1674237605000000000,
+      "datetime_utc": "2023-01-20 18:00:05",
+      "current_milestone": "PB2.00",
+      "path_state": "DETERIORATING",
+      "current_pullback_atr": 2.537601205837479,
+      "regime_start_dt": "2023-01-20 17:56:00",
+      "regime_end_dt": "2023-01-20 18:03:00",
+      "regime_in_sample_regs": true,
+      "obs_in_auth_full_2023_2024": false
+    },
+    {
+      "observation_id": "1674247740000000000_1_PB150_1674247805000000000",
+      "regime_id": 1674247740000000000,
+      "timestamp": 1674247805000000000,
+      "datetime_utc": "2023-01-20 20:50:05",
+      "current_milestone": "PB1.50",
+      "path_state": "DETERIORATING",
+      "current_pullback_atr": 1.8470478363267133,
+      "regime_start_dt": "2023-01-20 20:49:00",
+      "regime_end_dt": "2023-01-20 21:01:00",
+      "regime_in_sample_regs": true,
+      "obs_in_auth_full_2023_2024": false
+    },
+    {
+      "observation_id": "1674496140000000000_2_PB150_1674496310000000000",
+      "regime_id": 1674496140000000000,
+      "timestamp": 1674496310000000000,
+      "datetime_utc": "2023-01-23 17:51:50",
+      "current_milestone": "PB1.50",
+      "path_state": "DETERIORATING",
+      "current_pullback_atr": 1.870456233840869,
+      "regime_start_dt": "2023-01-23 17:49:00",
+      "regime_end_dt": "2023-01-23 17:52:00",
+      "regime_in_sample_regs": true,
+      "obs_in_auth_full_2023_2024": false
+    }
+  ],
+  "root_cause": "Forensic root cause identified: In the authoritative Population-U atlas generator (run_unconditioned_atlas_engine.py), when a new pullback episode initialized (gb_atr >= 0.50), it contained an immediate multi-milestone emission clause for PB1.00 (if gb_atr >= 1.00: emit PB1.00), but lacked initial-bar emission clauses for PB1.50 or PB2.00 on that same first bar (those were only checked on continuation bars). In run_gate1_streaming_parity.py, the streaming author anticipated large 5s gap bars and added initialization checks for PB1.50 and PB2.00 (lines 304-315). In January 2023, exactly 6 episodes experienced a fast 5s impulse that jumped directly from <0.50 ATR to >=1.50 ATR (and in one case >=2.00 ATR) on the very first 5s bar, causing run_gate1 to emit 7 extra multi-milestone initial-bar records (6 x PB1.50, 1 x PB2.00). All 6,641 authoritative records matched with zero error (0.00e+00). This is a benign single-bar multi-milestone gap emission difference in the parity test harness, not a runtime population semantics mismatch.",
+  "can_occur_in_full_period_runtime": false,
+  "is_true_population_mismatch": false,
+  "gap_jump_episodes_count": 6,
+  "extra_milestones_breakdown": {
+    "PB1.50": 6,
+    "PB2.00": 1
+  }
+}

@@ -194,6 +194,10 @@ class OutcomeSpec(_Strict):
     precedence: List[str] = Field(default_factory=list)
     fill_model: Optional[FillModelSpec] = None
     label_column: Optional[str] = None             # name of the primary label column
+    # C1: per-side friction in POINTS for the canonical lifecycle terminal. Omitted means the
+    # research contract supplies no cost assumption -- gross economics stay canonical and net
+    # economics are emitted as explicitly unavailable (null) rather than guessed.
+    cost_points_per_side: Optional[float] = None
 
 
 class WarmupSpec(_Strict):

@@ -1,0 +1,32 @@
+{
+  "study_name": "nq_h050_m4_runtime_recovery",
+  "type": "model_recovery_and_streaming_runtime_parity",
+  "authority": "frozen_historical_m4_and_c1_lifecycles",
+  "verdicts": {
+    "m4_reconstruction": "M4_EXACT_RECONSTRUCTION_PASS",
+    "feature_parity": "FEATURE_PARITY_PASS",
+    "score_parity": "M4_SCORE_PARITY_PASS",
+    "signal_parity": "H050_SIGNAL_PARITY_PASS",
+    "regime_parity": "VA_REGIME_PARITY_PASS",
+    "streaming_nt_validation": "STREAMING_NT_VALIDATION_PASS"
+  },
+  "oos_summary": {
+    "period": "2025 Q1",
+    "census_regimes": 572,
+    "h050_checkpoints": 2422,
+    "missing_signals": 0,
+    "extra_signals": 0,
+    "score_parity_max_diff": 0.0,
+    "top10_agreement_pct": 1.0,
+    "opposing_h050_1_match_pct": 1.0
+  },
+  "artifact_count": 24,
+  "streaming_nt_summary": {
+    "c0_positions_matched": 2422,
+    "c1_positions_matched": 2422,
+    "c1_h050_1_active_exits": 845,
+    "c1_r2_fallback_exits": 1577,
+    "scheduled_vs_streaming_fill_parity": "100.00% (2,422/2,422 exact matches)",
+    "scheduled_vs_streaming_pnl_parity": "100.00% (2,422/2,422 exact matches)"
+  }
+}

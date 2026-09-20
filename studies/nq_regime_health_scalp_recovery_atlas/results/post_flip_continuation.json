@@ -1,0 +1,161 @@
+{
+  "ALL": {
+    "horizons": {
+      "30s": {
+        "mean_mfe_atr": 0.31351852545437875,
+        "mean_mae_atr": 0.30155557386356796,
+        "mean_net_atr": 0.0005575705505812979,
+        "prob_continuation_ge_025": 0.4550845979417408,
+        "prob_continuation_ge_050": 0.22780394208965637,
+        "prob_continuation_ge_100": 0.04587476016047445
+      },
+      "60s": {
+        "mean_mfe_atr": 0.4400105310993889,
+        "mean_mae_atr": 0.422123866497317,
+        "mean_net_atr": -0.0036967057793911144,
+        "prob_continuation_ge_025": 0.5756148613291471,
+        "prob_continuation_ge_050": 0.3511250654107797,
+        "prob_continuation_ge_100": 0.10221524507238793
+      },
+      "120s": {
+        "mean_mfe_atr": 0.635200599239815,
+        "mean_mae_atr": 0.622491886361823,
+        "mean_net_atr": -0.0023262179375012773,
+        "prob_continuation_ge_025": 0.6858538287109716,
+        "prob_continuation_ge_050": 0.4971219256933543,
+        "prob_continuation_ge_100": 0.21315192743764172
+      },
+      "180s": {
+        "mean_mfe_atr": 0.7866147998424314,
+        "mean_mae_atr": 0.7747843981607179,
+        "mean_net_atr": -0.005884657928046019,
+        "prob_continuation_ge_025": 0.73992673992674,
+        "prob_continuation_ge_050": 0.5742194313622885,
+        "prob_continuation_ge_100": 0.2926914355485784
+      },
+      "300s": {
+        "mean_mfe_atr": 1.0292856335396894,
+        "mean_mae_atr": 1.0250035947319283,
+        "mean_net_atr": -0.008317225438021627,
+        "prob_continuation_ge_025": 0.7920809349380777,
+        "prob_continuation_ge_050": 0.6565497994069422,
+        "prob_continuation_ge_100": 0.4060701203558346
+      },
+      "600s": {
+        "mean_mfe_atr": 1.4804124775675747,
+        "mean_mae_atr": 1.475029855529557,
+        "mean_net_atr": -0.005176138193589712,
+        "prob_continuation_ge_025": 0.851561137275423,
+        "prob_continuation_ge_050": 0.7474271759986045,
+        "prob_continuation_ge_100": 0.5454386882958312
+      }
+    },
+    "reversal_frequency": 0.8452817024245596
+  },
+  "TRAIN": {
+    "horizons": {
+      "30s": {
+        "mean_mfe_atr": 0.31413397907105806,
+        "mean_mae_atr": 0.3004642744041646,
+        "mean_net_atr": 0.003541234810464166,
+        "prob_continuation_ge_025": 0.45664852255054433,
+        "prob_continuation_ge_050": 0.22881026438569207,
+        "prob_continuation_ge_100": 0.046267496111975115
+      },
+      "60s": {
+        "mean_mfe_atr": 0.4415055226650951,
+        "mean_mae_atr": 0.4218066158855487,
+        "mean_net_atr": -0.0004249274669831692,
+        "prob_continuation_ge_025": 0.578538102643857,
+        "prob_continuation_ge_050": 0.35439346811819594,
+        "prob_continuation_ge_100": 0.1036158631415241
+      },
+      "120s": {
+        "mean_mfe_atr": 0.6374484134776661,
+        "mean_mae_atr": 0.6211907887504771,
+        "mean_net_atr": 0.00015193754509797828,
+        "prob_continuation_ge_025": 0.687208398133748,
+        "prob_continuation_ge_050": 0.49825038880248834,
+        "prob_continuation_ge_100": 0.21384136858475894
+      },
+      "180s": {
+        "mean_mfe_atr": 0.7879662423438124,
+        "mean_mae_atr": 0.7730615425111219,
+        "mean_net_atr": -0.001906429195639785,
+        "prob_continuation_ge_025": 0.7406687402799378,
+        "prob_continuation_ge_050": 0.5748444790046656,
+        "prob_continuation_ge_100": 0.29335147744945567
+      },
+      "300s": {
+        "mean_mfe_atr": 1.030344011953928,
+        "mean_mae_atr": 1.023177603579032,
+        "mean_net_atr": -0.006976454305742137,
+        "prob_continuation_ge_025": 0.7929626749611197,
+        "prob_continuation_ge_050": 0.6570762052877138,
+        "prob_continuation_ge_100": 0.4072706065318818
+      },
+      "600s": {
+        "mean_mfe_atr": 1.4843894857292597,
+        "mean_mae_atr": 1.4713473578178708,
+        "mean_net_atr": -0.000645559175716443,
+        "prob_continuation_ge_025": 0.8512830482115086,
+        "prob_continuation_ge_050": 0.7478615863141524,
+        "prob_continuation_ge_100": 0.5466562986003111
+      }
+    },
+    "reversal_frequency": 0.8483670295489891
+  },
+  "OOS": {
+    "horizons": {
+      "30s": {
+        "mean_mfe_atr": 0.3081434942078615,
+        "mean_mae_atr": 0.31108637932905314,
+        "mean_net_atr": -0.02550010169532276,
+        "prob_continuation_ge_025": 0.44142614601018676,
+        "prob_continuation_ge_050": 0.21901528013582344,
+        "prob_continuation_ge_100": 0.042444821731748725
+      },
+      "60s": {
+        "mean_mfe_atr": 0.4269541022131541,
+        "mean_mae_atr": 0.4248945577484814,
+        "mean_net_atr": -0.03227060669454641,
+        "prob_continuation_ge_025": 0.5500848896434635,
+        "prob_continuation_ge_050": 0.3225806451612903,
+        "prob_continuation_ge_100": 0.0899830220713073
+      },
+      "120s": {
+        "mean_mfe_atr": 0.6155694338077169,
+        "mean_mae_atr": 0.6338549527671943,
+        "mean_net_atr": -0.023969056311848654,
+        "prob_continuation_ge_025": 0.6740237691001698,
+        "prob_continuation_ge_050": 0.4872665534804754,
+        "prob_continuation_ge_100": 0.2071307300509338
+      },
+      "180s": {
+        "mean_mfe_atr": 0.7748120490324097,
+        "mean_mae_atr": 0.7898308658373259,
+        "mean_net_atr": -0.04062830580495209,
+        "prob_continuation_ge_025": 0.733446519524618,
+        "prob_continuation_ge_050": 0.568760611205433,
+        "prob_continuation_ge_100": 0.2869269949066214
+      },
+      "300s": {
+        "mean_mfe_atr": 1.020042342261517,
+        "mean_mae_atr": 1.040950790810876,
+        "mean_net_atr": -0.02002677841670705,
+        "prob_continuation_ge_025": 0.7843803056027164,
+        "prob_continuation_ge_050": 0.6519524617996605,
+        "prob_continuation_ge_100": 0.39558573853989815
+      },
+      "600s": {
+        "mean_mfe_atr": 1.4456794894797853,
+        "mean_mae_atr": 1.5071907523528363,
+        "mean_net_atr": -0.04474370774866641,
+        "prob_continuation_ge_025": 0.8539898132427843,
+        "prob_continuation_ge_050": 0.7436332767402377,
+        "prob_continuation_ge_100": 0.534804753820034
+      }
+    },
+    "reversal_frequency": 0.8183361629881154
+  }
+}

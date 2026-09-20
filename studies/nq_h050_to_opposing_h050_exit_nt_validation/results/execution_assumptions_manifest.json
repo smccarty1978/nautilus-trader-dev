@@ -1,0 +1,19 @@
+{
+  "execution_model": "NautilusTrader Next-Bar Simulated Execution",
+  "bar_timeframe": "1-second completed bars (NQ.XCME-1-SECOND-LAST-EXTERNAL)",
+  "signal_decision_timestamp": "ts_init of completed bar triggering H050 or regime flip",
+  "order_submission_timestamp": "ts_init of completed signal bar (immediate synchronous dispatch)",
+  "order_fill_timestamp": "ts_init of next sequential completed 1s bar (t_submit + 1s)",
+  "order_fill_price_model": "Next-bar open price + 1 tick adverse slippage",
+  "slippage_per_side_ticks": 1,
+  "slippage_per_side_points": 0.25,
+  "slippage_per_side_dollars": 5.0,
+  "commission_per_side_dollars": 2.5,
+  "total_round_trip_cost_dollars": 15.0,
+  "total_round_trip_cost_points": 0.75,
+  "policies_compared": {
+    "C0": "Confirmed flip exit control (H050_0 entry -> R2 flip exit)",
+    "C1": "Opposing H050 exit (H050_0 entry -> first valid opposing H050_1 -> R2 fallback)"
+  },
+  "stop_loss_policy": "NONE (Explicitly forbidden by contract)"
+}

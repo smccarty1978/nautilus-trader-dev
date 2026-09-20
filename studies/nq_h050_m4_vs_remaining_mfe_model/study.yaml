@@ -1,0 +1,47 @@
+study_id: nq_h050_m4_vs_remaining_mfe_model
+description: Bounded Frozen-Model Comparison between M4 H050 Stack and New Pooled Remaining-MFE Stack (Strict Forward Metrics)
+status: COMPLETED
+lineage:
+  m4_study: studies/nq_h050_m4_runtime_recovery
+  new_model_study: studies/nq_h050_six_model_remaining_mfe
+  feature_surface_train: studies/nq_h050_mtf_regime_context_features/results/feature_surface_train.parquet
+  feature_surface_2025_q1: studies/nq_h050_m4_vs_remaining_mfe_model/feature_surface_2025_q1.parquet
+  m4_checkpoint_ledger: studies/nq_h050_asymmetric_regime_exhaustion/results/checkpoint_target_ledger.parquet
+
+cohorts:
+  2024_validation:
+    count: 10888
+    status: SAME_POPULATION_DIAGNOSTIC_ONLY
+    rationale: M4 was trained on full 2023-2024 TRAIN (in-sample for M4). New model evaluated using legitimate original 2023-fit generalization.
+  2025_q1_forward:
+    count: 2422
+    status: COMMON_FORWARD_DIAGNOSTIC
+    rationale: Forward out-of-sample quarter for both models, completely frozen before scoring. Primary basis for formal verdicts.
+
+models_evaluated:
+  m4:
+    type: LightGBM 3-Head Stack (17 canonical features)
+    heads:
+    - m4_head0_model.txt (target_y050_success)
+    - m4_head1_model.txt (target_y100_dangerous)
+    - m4_head2_model.txt (target_y200_severe)
+    composite_score: P0 - 0.5 * P1 - 1.0 * P2
+  new_pooled:
+    type: LightGBM 5-Head Stack (164 MTF causal features)
+    heads:
+    - terminal_mfe_within_0p25a
+    - remaining_mfe_gte_0p5a
+    - remaining_mfe_gte_1p0a
+    - remaining_mfe_gte_2p0a
+    - remaining_mfe_continuous
+    evaluation_variants:
+    - 2023_fit: used for 2024 validation diagnostic (genuine out-of-sample)
+    - 2023_2024_refit: used for 2025 Q1 forward diagnostic
+
+formal_verdicts:
+  COMMON_POPULATION_PARITY: COMMON_POPULATION_PARITY_PASS
+  M4_PROVENANCE_COMPARISON: DIAGNOSTIC_ONLY
+  NEW_MODEL_TERMINAL_MFE_RANKING: SIMILAR
+  NEW_MODEL_REMAINING_MFE_RANKING: SIMILAR
+  INCREMENTAL_INFORMATION: NEW_MODEL_MOSTLY_DUPLICATES_M4
+  DELAYED_ENTRY_MODEL_INPUT_RECOMMENDATION: M4_ONLY
