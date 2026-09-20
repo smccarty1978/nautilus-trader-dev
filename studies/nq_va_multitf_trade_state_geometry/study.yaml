@@ -163,6 +163,41 @@ outcome:
   session: RTH
   session_end: truncate
   label_column: target_next_flip_1m
+  # --- MILESTONE FIRST PASSAGE across the WHOLE flip-to-flip lifecycle -------------------
+  # Each arm is an INDEPENDENT one-sided first-passage probe, not a competing label. The kernel
+  # requires both a favorable and an adverse level per arm (BarrierArm.adverse_atr is a required
+  # float; there is no native one-sided item), so the unused side is parked at 99.0 ATR -- ~2,000
+  # to 6,000 NQ points, unreachable inside the window. This is an ENCODING, and the current
+  # Platform V2-compatible one.
+  #   favorable arm: _disposition == POSITIVE  <=> price first reached +X ATR
+  #   adverse   arm: _disposition == NEGATIVE  <=> price first reached -X ATR
+  #   _resolution_seconds is the first-passage time from the EXECUTABLE ENTRY FILL in both cases.
+  # Arms carry their OWN 24h horizon, independent of population.cadence.max_age, and
+  # LabelOutcomeKernel._complete holds the row until EVERY arm and the flip have resolved -- so
+  # first passage is NOT truncated at T300. composition: OR only satisfies the compiler's
+  # requirement that arms and an event declare one; the composite label is not a deliverable.
+  composition: OR
+  same_bar_rule: ambiguous_censor
+  barrier:
+    primary: fav_1p00
+    expiry: censor
+    arms:
+      - {id: fav_0p25, favorable_atr: 0.25, adverse_atr: 99.0, horizon: 24h, expiry: censor, prefix: fp_fav_0p25}
+      - {id: fav_0p50, favorable_atr: 0.50, adverse_atr: 99.0, horizon: 24h, expiry: censor, prefix: fp_fav_0p50}
+      - {id: fav_0p75, favorable_atr: 0.75, adverse_atr: 99.0, horizon: 24h, expiry: censor, prefix: fp_fav_0p75}
+      - {id: fav_1p00, favorable_atr: 1.00, adverse_atr: 99.0, horizon: 24h, expiry: censor, prefix: fp_fav_1p00}
+      - {id: fav_1p50, favorable_atr: 1.50, adverse_atr: 99.0, horizon: 24h, expiry: censor, prefix: fp_fav_1p50}
+      - {id: fav_2p00, favorable_atr: 2.00, adverse_atr: 99.0, horizon: 24h, expiry: censor, prefix: fp_fav_2p00}
+      - {id: fav_3p00, favorable_atr: 3.00, adverse_atr: 99.0, horizon: 24h, expiry: censor, prefix: fp_fav_3p00}
+      - {id: fav_4p00, favorable_atr: 4.00, adverse_atr: 99.0, horizon: 24h, expiry: censor, prefix: fp_fav_4p00}
+      - {id: fav_5p00, favorable_atr: 5.00, adverse_atr: 99.0, horizon: 24h, expiry: censor, prefix: fp_fav_5p00}
+      - {id: adv_0p25, favorable_atr: 99.0, adverse_atr: 0.25, horizon: 24h, expiry: censor, prefix: fp_adv_0p25}
+      - {id: adv_0p50, favorable_atr: 99.0, adverse_atr: 0.50, horizon: 24h, expiry: censor, prefix: fp_adv_0p50}
+      - {id: adv_0p75, favorable_atr: 99.0, adverse_atr: 0.75, horizon: 24h, expiry: censor, prefix: fp_adv_0p75}
+      - {id: adv_1p00, favorable_atr: 99.0, adverse_atr: 1.00, horizon: 24h, expiry: censor, prefix: fp_adv_1p00}
+      - {id: adv_1p50, favorable_atr: 99.0, adverse_atr: 1.50, horizon: 24h, expiry: censor, prefix: fp_adv_1p50}
+      - {id: adv_2p00, favorable_atr: 99.0, adverse_atr: 2.00, horizon: 24h, expiry: censor, prefix: fp_adv_2p00}
+      - {id: adv_3p00, favorable_atr: 99.0, adverse_atr: 3.00, horizon: 24h, expiry: censor, prefix: fp_adv_3p00}
 
 chronology:
   train: [2023]          # discovery / descriptive analysis

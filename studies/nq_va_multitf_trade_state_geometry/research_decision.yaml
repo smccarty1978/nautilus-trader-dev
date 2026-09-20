@@ -6,7 +6,7 @@ research_question: >
   5m / 15m / 1h regime state, higher-timeframe regime geometry, normalized structural levels,
   and fixed-time path information? The purpose is to decide whether the data supports separate
   ensemble heads for (1) initial risk, (2) trend health / giveback, (3) runner preservation.
-status: COMPILED
+status: BLOCKED_PENDING_C1_REPAIR
 phase: A
 dataset_id: NQ_1S_V2_GLOBEX
 source_platform_commit: d83be2fd00c351fdf187bf4451d2efa123e9f664
@@ -110,18 +110,54 @@ residual_limitations:
       ENTRY_FILL_CONTRACT is satisfiable: the compiled plan carries entry_reference: next_bar_open,
       the executable reference. The decision-close defect found in the H050 audit is not repeated.
 
-  first_passage_census_not_composed:
-    blocks_spec_sections: [6, 19, 20, 21]
+  first_passage_census_composed_and_proven:
+    status: DONE
+    blocks_spec_sections: []
+    decision: >
+      The 16 milestone arms (+0.25/0.50/0.75/1.00/1.50/2.00/3.00/4.00/5.00 ATR and
+      -0.25/0.50/0.75/1.00/1.50/2.00/3.00 ATR) are composed, each with its own 24h horizon,
+      expiry: censor, and composition: OR. The kernel becomes 'composite'.
+    encoding: >
+      BarrierArm.adverse_atr is a required float and there is no native one-sided first-passage
+      item, so each arm parks its unused side at 99.0 ATR (~2,000-6,000 NQ points, unreachable in
+      the window). This IS the current Platform V2-compatible mechanism, but it is an encoding.
+      Polarity: a favorable arm resolves POSITIVE when +X ATR is first reached; an adverse arm
+      resolves NEGATIVE when -X ATR is first reached. _resolution_seconds is measured from the
+      EXECUTABLE ENTRY FILL in both cases.
+    not_truncated_at_T300: >
+      Arms carry their own horizon, independent of population.cadence.max_age, and
+      LabelOutcomeKernel._complete holds the row until EVERY arm and the flip resolve. Proven:
+      fixture case milestone_past_T300 records first passage at 1201 s, matching the oracle.
+    proof: >
+      fixtures/first_passage_parity.py drives the real LabelOutcomeKernel against synthetic bars
+      and compares all 16 arms to an independent brute-force oracle. FIRST_PASSAGE_INTEGRITY =
+      PASS over 4 cases (favorable-then-adverse order, adverse-then-favorable order, milestone
+      past T300, parked side never fires): every first-passage second matches the oracle exactly
+      and every disposition polarity is correct. Card: fixtures/first_passage_parity.json.
+    trap_for_analysis: >
+      The ROW-LEVEL composite columns are meaningless here. Any arm that never touches expires
+      CENSORED, and _compose returns CENSORED if any child is unresolved, so row `censored` is 1
+      and `disposition` is CENSORED on virtually every row. Read the per-arm
+      fp_*_disposition / fp_*_resolution_seconds columns, never the row-level composite label.
+
+  composite_kernel_discards_the_flip_terminal:
+    status: BLOCKING_DEFECT_FOUND_BY_THE_FIXTURE
+    blocks_spec_sections: [2, 19, 20, 21]
     finding: >
-      The +0.25A..+5.00A / -0.25A..-3.00A milestone first-passage arms are NOT in this plan. A
-      barrier arm requires a horizon and, combined with an event outcome, an explicit
-      outcome.composition; encoding a one-sided first passage also requires parking the unused
-      barrier at an unreachable distance. Composed that way the arms compile, but the semantics are
-      an encoding rather than a native first-passage item, so the decision was deferred rather than
-      taken silently.
-    available_instead: >
-      mfe_atr_1m and mae_atr_1m are carried at all 21 checkpoints, so first passage is recoverable
-      at 15 s resolution out to 300 s. Finer or longer first passage needs the arms or a native item.
+      research_workflow/host/outcomes.py LabelOutcomeKernel._emit, for kernel 'composite', sets
+      flip_ts = at if disp == POSITIVE else None -- discarding the p.flip_ts the kernel already
+      recorded. Because the composite disposition is CENSORED on virtually every row (see the
+      trap above), flip_ts and time_to_flip_seconds are NULL on virtually every row.
+      Measured: null in 4 of 4 fixture cases, including cases where a qualifying opposite flip
+      was delivered to on_flip and correctly stored in p.flip_ts.
+    consequence: >
+      Composing the milestone arms COSTS the terminal-flip timestamp that the pure flip kernel
+      provided. With the current kernel the study can have exact milestones OR the lifecycle
+      terminal, not both. This is why the repair is a prerequisite and not an optimisation.
+    fix_scope: >
+      One line in _emit (carry p.flip_ts through for composite), plus the C1 exit fill and
+      realized PnL below. Both live in research_workflow/host/outcomes.py; emitting new columns
+      also needs research_workflow/grammar/compiler.py.
 
   checkpoint_window_is_300s:
     finding: >
@@ -141,7 +177,7 @@ residual_limitations:
 platform_notes:
   base_branch: main
   base_commit: d83be2fd
-  plan_sha256: 9c49a06f0a3d4fae53922c169ad9db88d8f8f97bddfa0d7de297a7f6657e7bf6
+  plan_sha256: 587b8423063802c213df4acaa6ee2b685de5ed7cb6b375a9bbfd28de0f24cfed  # kernel composite, 16 milestone arms
   closure_sha256: 4e28ee0a8adf712acc52373811af61c4fd6bc2806c97b2b4894c7e458f84ac03
   reference_study: >
     studies/nq_mtf_regime_atlas_pilot2023 shares this closure and proved the multi-timeframe
@@ -161,3 +197,39 @@ autonomy_decisions:
   calendar_reference_parity: common_interval_exact
   frozen_parent_model: rescore_if_authenticated
   protected_period: never_expand_authority
+
+# --------------------------------------------------------------------------------------------
+# OWNER DIRECTIVE 2026-09-20: do NOT seal or launch. Close C1/T1 first.
+# --------------------------------------------------------------------------------------------
+prerequisite_repair_c1:
+  status: BLOCKED_BY_A_LIVE_CHORE_CLAIM
+  required_by_owner:
+    - persist an executable TERMINAL exit fill and realized gross/net PnL
+    - continue lifecycle / MFE / MAE / milestone tracking after T300 to the next confirmed opposite flip
+    - keep T0/T15/T30/T60/T120/T300 as the fixed-time feature observations (UNCHANGED)
+    - prove first-passage timestamp/order parity on fixtures before collection
+    - change no research threshold, no feature definition, no chronology, no MTF design
+  already_done_in_this_session:
+    milestone_arms: composed and compiled (plan 587b8423, kernel composite)
+    first_passage_parity: PASS -- fixtures/first_passage_parity.json
+    post_T300_tracking: proven not truncated (first passage recorded at 1201 s)
+  still_blocked:
+    terminal_exit_fill_and_realized_pnl: >
+      Needs research_workflow/host/outcomes.py (no exit price exists anywhere in _Pending or
+      _emit; entry_price/entry_ts do) AND research_workflow/grammar/compiler.py (the observation
+      column contract is built there).
+    composite_flip_terminal: >
+      Needs the same _emit fix; see composite_kernel_discards_the_flip_terminal above.
+  blocker:
+    code: PLATFORM_SURFACE_OWNED_BY_ANOTHER_AGENT
+    detail: >
+      `ws chore claim fill_outcome_session --paths research_workflow/host/outcomes.py
+      research_workflow/grammar/compiler.py ...` was REFUSED: the chore is live under
+      Scott McCarty@NUCBOX_K10 agent=claude session=9b44787b-1baa-4a24-aa61-f91758ac9e9f, holding
+      research_workflow/grammar/compiler.py, host/mux.py, host/strategy.py, sessions.py and
+      research/datasets. C1 is that chore's OWN next packet -- its DESIGN.md lists
+      "C1 realized outcome to the next flip" as not started.
+    resolution_required_from_owner: >
+      Either that session releases the claim (`ws chore release fill_outcome_session`), or the
+      owner force-releases it, or C1 is implemented inside that chore by its holder.
+      WORKFLOW.md M.4 forbids taking over a live claim unilaterally, so this session stops here.
