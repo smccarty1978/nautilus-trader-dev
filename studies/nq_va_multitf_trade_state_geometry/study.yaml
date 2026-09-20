@@ -1,0 +1,142 @@
+# Platform-v2 study: a composition of registered primitives (see `research cap list`).
+# Descriptive multi-timeframe trade-state geometry over the canonical confirmed 1m V_A
+# flip-to-flip population. No model, no policy, no thresholds.
+study:
+  id: nq_va_multitf_trade_state_geometry
+  tier: 2
+  question: "How do canonical confirmed 1m V_A flip-to-flip trades evolve through quick failure, slow deterioration and trend-runner states when viewed jointly with 5m/15m/1h regime state, higher-timeframe regime geometry, normalized structural levels and fixed-time path information?"
+  description: >
+    Descriptive dataset build for later ensemble trade management. Untreated flip-to-flip path:
+    no stop, no target, no trailing exit, no higher-timeframe exit, no entry filter. Fixed-time
+    observations are primary (§5); milestone first-passage is secondary (§6).
+
+streams:
+  - {dataset: NQ_1S_V2_GLOBEX, timeframes: [1s, 1m, 5m, 15m, 1h]}
+
+context:
+  # §9: canonical V_A regime state on every required timeframe. 1m is the trade timeframe.
+  regime_1m:  {tracker: regime.dual_ema, timeframe: 1m}
+  regime_5m:  {tracker: regime.dual_ema, timeframe: 5m}
+  regime_15m: {tracker: regime.dual_ema, timeframe: 15m}
+  regime_1h:  {tracker: regime.dual_ema, timeframe: 1h}
+  # §10/§11: completed + running regime state for all four timeframes, causally frozen.
+  mtf_state:  {tracker: regime.completed_state_feed, timeframes: [1m, 5m, 15m, 1h], atr_period: 14}
+  # §7/§16: ATR coordinate system and running excursion from the 1m flip.
+  excursion:  {tracker: regime.excursion, bars: 1s, regime: regime_1m}
+  # §17: pullback depth/speed measured at fixed time, never used to trigger observation.
+  pullback:   {tracker: pullback.depth_since_extreme, threshold_atr: 0.0, bars: 1s,
+               regime: regime_1m, atr_source: regime_1m, intermediate: regime_5m}
+
+population:
+  # §2: every confirmed 1m V_A transition. No entry filter, no qualify predicate.
+  session: RTH
+  # §5: fixed causal time checkpoints anchored at the confirmed flip. 15s grid is the
+  # coarsest common divisor of T0/T15/T30/T60/T120/T300 and emits them as a superset.
+  cadence: {every: 15s, anchor: regime_1m.start_ns, max_age: 300s, index_column: checkpoint_index}
+  direction: regime_1m.dir
+  anchor_identity: regime_1m.start_ns
+
+triggers: every_candidate
+
+features:
+  host: provider_host
+  instances:
+    # §10/§12: current-regime geometry on every timeframe, ATR-normalized.
+    - {feature: regime_age_min,                     over: {timeframe: [1m, 5m, 15m, 1h]}, context: current}
+    - {feature: regime_duration_min,                over: {timeframe: [1m, 5m, 15m, 1h]}, context: current}
+    - {feature: regime_mfe_atr,                     over: {timeframe: [1m, 5m, 15m, 1h]}, context: current}
+    - {feature: regime_range_atr,                   over: {timeframe: [1m, 5m, 15m, 1h]}, context: current}
+    - {feature: regime_net_directional_move_atr,    over: {timeframe: [1m, 5m, 15m, 1h]}, context: current}
+    - {feature: regime_directional_displacement_atr, over: {timeframe: [1m, 5m, 15m, 1h]}, context: current}
+    - {feature: regime_efficiency,                  over: {timeframe: [1m, 5m, 15m, 1h]}, context: current}
+    - {feature: regime_net_move_atr_per_min,        over: {timeframe: [1m, 5m, 15m, 1h]}, context: current}
+    - {feature: regime_range_atr_per_min,           over: {timeframe: [1m, 5m, 15m, 1h]}, context: current}
+    # §11/§13: prior completed regime geometry and the prior/current relationship.
+    - {feature: regime_mfe_atr,                     over: {timeframe: [5m, 15m, 1h]}, context: prior}
+    - {feature: regime_range_atr,                   over: {timeframe: [5m, 15m, 1h]}, context: prior}
+    - {feature: regime_net_directional_move_atr,    over: {timeframe: [5m, 15m, 1h]}, context: prior}
+    - {feature: regime_efficiency,                  over: {timeframe: [5m, 15m, 1h]}, context: prior}
+    - {feature: regime_duration_min,                over: {timeframe: [5m, 15m, 1h]}, context: prior}
+    - {feature: fraction_of_counter_regime_move_recovered,   over: {timeframe: [5m, 15m, 1h]}}
+    - {feature: recovery_from_counter_regime_extreme_atr,    over: {timeframe: [5m, 15m, 1h]}}
+    # §9: exact MTF directional configuration, pairwise agreement.
+    - {feature: regime_direction,  over: {timeframe: [1m, 5m, 15m, 1h]}, context: current}
+    - {feature: regime_alignment,  over: {source_timeframe: [1m], reference_timeframe: [5m, 15m, 1h]}, context: current}
+    # §12/§14: structural expansion, giveback and retention on the active HTF regime.
+    - {feature: structural_current_expansion_atr,   over: {context: [current]}}
+    - {feature: structural_max_expansion_atr,       over: {context: [current]}}
+    - {feature: structural_giveback_atr,            over: {context: [current]}}
+    - {feature: structural_retention_ratio,         over: {context: [current]}}
+    - {feature: structural_expansion_atr_per_min,   over: {context: [current]}}
+    # §15: canonical contextual price levels, signed ATR distance.
+    - {feature: distance_to_completed_range_high_atr, over: {reference_timeframe: [5m]}, bar_state: completed}
+    - {feature: distance_to_completed_range_low_atr,  over: {reference_timeframe: [5m]}, bar_state: completed}
+    # §16/§17: fixed-time path state. Depth and speed are MEASURED here, never triggered on.
+    - {feature: rolling_giveback_atr, over: {window: [60s, 300s]}, update_every: 1s}
+  metadata:
+    # §3: decision instant and the executable fill instant are persisted separately.
+    decision_ts_init:            epoch.T
+    checkpoint_seconds_since_flip: regime_1m.age_s
+    flip_start_ns:               regime_1m.start_ns
+    trade_direction:             regime_1m.dir
+    # §7: the frozen 1m entry ATR is the primary coordinate system.
+    atr_entry_1m:                excursion.frozen_atr
+    atr_current_1m:              regime_1m.atr
+    # §16: running, causal excursion from the flip.
+    running_mfe_atr:             excursion.mfe_atr
+    running_mae_atr:             excursion.mae_atr
+    # §17: pullback depth at fixed time (measured, not conditioned on).
+    pullback_depth_atr:          pullback.depth_atr
+  bindings:
+    snapshot:
+      atr: regime_1m.atr
+      family_a_atr: excursion.frozen_atr
+      episode_state: {prevailing_direction: regime_1m.dir}
+
+outcome:
+  # §2/§3: the realized UNTREATED trade. Entry and exit both at the canonical executable
+  # fill; the terminal event is the next confirmed opposite 1m V_A flip, not a horizon.
+  kind: trade
+  entry_reference: next_bar_open
+  direction: regime_1m.dir
+  relation: continuation
+  atr: excursion.frozen_atr
+  atr_availability: through_decision_ts
+  event: regime_1m.flipped
+  horizon: 3600s
+  session_end: truncate
+  session: RTH
+  fill_model: {order_type: market, latency_bars: 0, slippage_ticks: 0, spread_ticks: 0}
+  # §6/§19/§20: milestone first-passage census. Secondary to the fixed-time samples.
+  # OR: each arm is an INDEPENDENT first-passage probe; the composite label is not the
+  # deliverable -- the per-arm _resolution_seconds columns are (see research_decision.yaml).
+  composition: OR
+  barrier:
+    primary: fav_1p00
+    expiry: censor
+    arms:
+      - {id: fav_0p25, favorable_atr: 0.25, adverse_atr: 99.0, prefix: fp_fav_0p25, horizon: 3600s}
+      - {id: fav_0p50, favorable_atr: 0.50, adverse_atr: 99.0, prefix: fp_fav_0p50, horizon: 3600s}
+      - {id: fav_0p75, favorable_atr: 0.75, adverse_atr: 99.0, prefix: fp_fav_0p75, horizon: 3600s}
+      - {id: fav_1p00, favorable_atr: 1.00, adverse_atr: 99.0, prefix: fp_fav_1p00, horizon: 3600s}
+      - {id: fav_1p50, favorable_atr: 1.50, adverse_atr: 99.0, prefix: fp_fav_1p50, horizon: 3600s}
+      - {id: fav_2p00, favorable_atr: 2.00, adverse_atr: 99.0, prefix: fp_fav_2p00, horizon: 3600s}
+      - {id: fav_3p00, favorable_atr: 3.00, adverse_atr: 99.0, prefix: fp_fav_3p00, horizon: 3600s}
+      - {id: fav_4p00, favorable_atr: 4.00, adverse_atr: 99.0, prefix: fp_fav_4p00, horizon: 3600s}
+      - {id: fav_5p00, favorable_atr: 5.00, adverse_atr: 99.0, prefix: fp_fav_5p00, horizon: 3600s}
+      - {id: adv_0p25, favorable_atr: 99.0, adverse_atr: 0.25, prefix: fp_adv_0p25, horizon: 3600s}
+      - {id: adv_0p50, favorable_atr: 99.0, adverse_atr: 0.50, prefix: fp_adv_0p50, horizon: 3600s}
+      - {id: adv_0p75, favorable_atr: 99.0, adverse_atr: 0.75, prefix: fp_adv_0p75, horizon: 3600s}
+      - {id: adv_1p00, favorable_atr: 99.0, adverse_atr: 1.00, prefix: fp_adv_1p00, horizon: 3600s}
+      - {id: adv_1p50, favorable_atr: 99.0, adverse_atr: 1.50, prefix: fp_adv_1p50, horizon: 3600s}
+      - {id: adv_2p00, favorable_atr: 99.0, adverse_atr: 2.00, prefix: fp_adv_2p00, horizon: 3600s}
+      - {id: adv_3p00, favorable_atr: 99.0, adverse_atr: 3.00, prefix: fp_adv_3p00, horizon: 3600s}
+
+chronology:
+  train: [2023]          # discovery / descriptive analysis
+  dev: [2024]            # frozen validation; opened only by the oos stage
+  prohibited: [2025, 2026]
+  warmup: {days_before_partition: 5}
+  authorized_dates: ['2023-10-02']
+
+model: none

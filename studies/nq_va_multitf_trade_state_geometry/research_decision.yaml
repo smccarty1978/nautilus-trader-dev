@@ -1,0 +1,174 @@
+# Authoritative decision contract (research_decision.yaml > SPEC.md > study.yaml > compiled_study.json > code)
+study_id: nq_va_multitf_trade_state_geometry
+research_question: >
+  How do canonical confirmed 1-minute V_A flip-to-flip trades evolve through quick failure,
+  slow/grinding deterioration, and large trend-runner states when viewed jointly with
+  5m / 15m / 1h regime state, higher-timeframe regime geometry, normalized structural levels,
+  and fixed-time path information? The purpose is to decide whether the data supports separate
+  ensemble heads for (1) initial risk, (2) trend health / giveback, (3) runner preservation.
+status: BLOCKED_ON_CAPABILITY_GAP
+phase: A
+dataset_id: NQ_1S_V2_GLOBEX
+source_platform_commit: d83be2fd00c351fdf187bf4451d2efa123e9f664
+
+# --------------------------------------------------------------------------------------------
+# Chronology (spec §1). 2025 is SEALED and 2026 is PROHIBITED; neither is opened by this study.
+# --------------------------------------------------------------------------------------------
+chronology_roles:
+  train: [2023]            # discovery / descriptive analysis
+  dev: [2024]              # frozen validation; bucket boundaries defined on 2023 apply UNCHANGED
+  prohibited: [2025, 2026]
+  note: >
+    2024 is a dev year and is opened only by the oos stage after the TRAIN freeze. Spec §26
+    requires 2023-defined descriptive bucket boundaries to be applied unchanged to 2024; that is
+    the oos pattern and is compatible with the role assignment. No tuning on 2024 (§1).
+
+# --------------------------------------------------------------------------------------------
+# Semantic decisions taken in Phase A. Each one is a choice, not a default.
+# --------------------------------------------------------------------------------------------
+terminal_decisions:
+
+  session_scope:
+    decision: population.session = RTH
+    rationale: >
+      The spec does not name a session. RTH is the canonical emission scope of every prior V_A
+      flip-to-flip study in this lineage, so RTH keeps this population comparable with them.
+    reversible: true
+    flagged_to_user: true
+
+  fixed_time_grid:
+    decision: "population.cadence = {every: 15s, anchor: regime_1m.start_ns, max_age: 300s}"
+    rationale: >
+      Spec §5 requires observations at T0/T15/T30/T60/T120/T300. 15s is the coarsest grid whose
+      multiples contain all six, so the grid emits them as a superset (21 checkpoints/trade).
+      Observation entry is NOT conditioned on reaching any pullback depth (§5, and the H050
+      depth-audit finding that triggering on depth destroys depth's predictive variation).
+    reversible: true
+
+  atr_coordinate_system:
+    decision: atr_entry_1m = excursion.frozen_atr, frozen at the confirmed 1m flip; atr_availability = through_decision_ts
+    rationale: spec §7. A coarser bar closing exactly at T is applied before the ATR is frozen.
+
+  entry_fill:
+    decision: outcome.entry_reference = next_bar_open (executable)
+    rationale: >
+      Spec §3. entry.next_bar_open is the only executable reference verified for both the label
+      and trade contracts. entry.decision_close is a research mark and is explicitly NOT used --
+      that is the defect the H050 audit found in scripts/run_delayed_entry_fast_failure_study.py.
+
+  barrier_arm_horizon:
+    decision: every first-passage arm carries a BOUNDING horizon of 3600s with session_end = truncate
+    rationale: >
+      The compiler requires a horizon on every barrier arm and on an event outcome. The true
+      terminal is the next confirmed opposite 1m V_A flip, not a clock. 3600s is a bound, not a
+      time stop: session_end = truncate means an event at or before the session close resolves at
+      its own instant. Any trade still alive at 3600s is CENSORED, not scored -- so the
+      first-passage census is right-censored at 1h and that must be reported, not hidden.
+    limitation: true
+
+  barrier_composition:
+    decision: outcome.composition = OR
+    rationale: >
+      The compiler requires a composition when barrier arms and an event outcome are declared
+      together. The composite label is NOT the deliverable; the per-arm _resolution_seconds and
+      _disposition columns are (spec §6, §19, §20). OR avoids AND's monotone worst-status
+      censoring, which would censor a whole row whenever any single arm censored.
+    limitation: true
+
+  one_sided_first_passage:
+    decision: each milestone arm sets its opposite barrier to 99.0 ATR
+    rationale: >
+      Spec §19 asks for one-sided first passage ("did it EVER reach +1.00A"). The barrier kernel
+      races a favorable against an adverse level, so the unused side is set far enough away to be
+      unreachable. This is a faithful encoding, but it is an encoding, and a native one-sided
+      first-passage item would be cleaner.
+    limitation: true
+
+# --------------------------------------------------------------------------------------------
+# What this plan CANNOT deliver at platform commit d83be2fd. These are not scope reductions the
+# study chose; they are capability gaps, enumerated so the next session does not rediscover them.
+# --------------------------------------------------------------------------------------------
+unbuildable_at_source_commit:
+
+  higher_timeframe_regime_geometry:
+    blocks_spec_sections: [9, 10, 11, 12, 13, 14, 20, 22, 23, 24, 25, 26, 27]
+    gap_kind: INVALID_PARAMETERIZATION (UNSUPPORTED_TIMEFRAME_PARAMETER)
+    count: 39
+    finding: >
+      The whole structural_regime_geometry feature family supports timeframes ('1m','5m','5s')
+      only. 15m and 1h do not exist for ANY of the 13 features this study needs:
+      regime_age_min, regime_duration_min, regime_mfe_atr, regime_range_atr,
+      regime_net_directional_move_atr, regime_directional_displacement_atr, regime_efficiency,
+      regime_net_move_atr_per_min, regime_range_atr_per_min, regime_direction, regime_alignment,
+      fraction_of_counter_regime_move_recovered, recovery_from_counter_regime_extreme_atr.
+      The constraint is a whitelist in each features/definitions/canonical/<name>.py record
+      (supported_timeframes + supported_parameter_combinations), and underneath it
+      collectors.collector_v2.aggregator.TIMEFRAME_TO_BUCKET_NS knows only
+      ('5s','30s','1m','3m','5m') -- there is no 15m or 1h bucket to aggregate into.
+    consequence: >
+      The higher-timeframe half of the study -- which is its entire premise -- cannot be
+      expressed. This is the blocking gap.
+
+  current_context_below_5m:
+    blocks_spec_sections: [10, 12]
+    gap_kind: INVALID_PARAMETERIZATION (UNSUPPORTED_FEATURE_PARAMETER_COMBINATION)
+    count: 11
+    finding: >
+      context: current is whitelisted only at timeframe 5m for 8 of the geometry features
+      (regime_mfe_atr, regime_range_atr, regime_duration_min, regime_efficiency,
+      regime_net_directional_move_atr, regime_directional_displacement_atr,
+      regime_net_move_atr_per_min, regime_range_atr_per_min). Spec §10 requires running,
+      causal current-regime state on every timeframe including 1m.
+
+  mtf_completed_state_feed:
+    blocks_spec_sections: [9, 10, 11]
+    gap_kind: MISSING_CAPABILITY
+    count: 1
+    finding: >
+      tracker.regime.completed_state_feed appears in research_workflow/capabilities_index.yaml
+      (implementation research_workflow.completed_regime_state.CompletedRegimeStateFeed,
+      status verified, parameters timeframes/atr_period) but the compiler cannot resolve it:
+      "no registered tracker". Its closest registered neighbour is tracker.regime.dual_ema.
+      Even once registered, its timeframes are validated against TIMEFRAME_TO_BUCKET_NS, so it
+      would reject 15m and 1h for the same reason as above.
+
+  realized_flip_to_flip_trade:
+    blocks_spec_sections: [2, 3, 16, 19, 20, 21, 25, 27, 30]
+    gap_kind: NO_SINK (compiles, produces nothing)
+    finding: >
+      outcome.kind = trade compiles to a typed TradeExecutionContract but HAS NO SINK
+      (docs/RESEARCH_YAML_REFERENCE.md line 182; outcome.trade.contract is status 'candidate',
+      "typed only in this phase -- no sink"). There is therefore no exit fill, no realized
+      terminal PnL and no EXIT_FILL_CONTRACT to audit. Every "terminal EV" the spec asks for
+      (§20, §21, §25, §27) depends on it.
+      This is item C1 ("realized outcome to the next flip") on chore/fill_outcome_session, which
+      that chore's own DESIGN.md records as NOT STARTED.
+    severity: >
+      This one does NOT surface as a compiler gap -- it compiles silently and yields no columns.
+      It must not be discovered at the collection stage.
+
+# --------------------------------------------------------------------------------------------
+# Platform state this study is bound to.
+# --------------------------------------------------------------------------------------------
+platform_notes:
+  base_branch: main
+  base_commit: d83be2fd
+  not_included: >
+    chore/fill_outcome_session carries C0 (fill scope excludes declared maintenance halts and
+    data holes) and is NOT merged to main. C0 is immaterial for this study's years: that chore's
+    DESIGN.md records that 2023 has no halt and no outage (max gap run 299s). C1-C4 of that chore
+    are not started; C1 is the realized-outcome-to-next-flip gap above.
+  chore_claim_live: >
+    fill_outcome_session holds a live chore claim on research_workflow/host/mux.py, sessions.py,
+    grammar/compiler.py, host/strategy.py and research/datasets/. A capability session for THIS
+    study's gap must claim a disjoint surface (features/definitions/canonical/,
+    features/trackers/, collectors/collector_v2/aggregator.py) or wait.
+
+# Predeclared fork policy (WORKFLOW.md §N.4).
+autonomy_decisions:
+  on_capability_gap: stop_and_handoff
+  platform_change_required: chore_branch_and_fresh_session
+  deterministic_defect: auto_fix
+  calendar_reference_parity: common_interval_exact
+  frozen_parent_model: rescore_if_authenticated
+  protected_period: never_expand_authority

@@ -1,0 +1,1645 @@
+{
+  "schema_version": 1,
+  "kind": "CAPABILITY_GAP_HANDOFF",
+  "generated_at_utc": "2026-09-20T18:46:00.245767+00:00",
+  "study_id": "nq_va_multitf_trade_state_geometry",
+  "study_branch": "study/nq_va_multitf_trade_state_geometry",
+  "study_worktree": "C:/Users/Scott McCarty/Projects/Nautilus Trader-nq_va_multitf_trade_state_geometry",
+  "source_platform_commit": "d83be2fd00c351fdf187bf4451d2efa123e9f664",
+  "research_question": "# NQ V_A multi-timeframe trade-state geometry (descriptive)\n\nHow do canonical confirmed 1-minute V_A flip-to-flip trades evolve through quick failure,\nslow/grinding deterioration, and large trend-runner states when viewed jointly with 5m / 15m / 1h\nregime state, higher-timeframe regime geometry, normalized structural levels, and fixed-time path\ninformation?\n\nThe purpose is to build a causal, ATR-normalized map of the full UNTREATED flip-to-flip trade path\ninside 5m/15m/1h current and prior regime geometry, using fixed-time observations (T0/T15/T30/T60/\nT120/T300) so that informative depth and speed variation is preserved, and to determine whether the\ndata supports separate ensemble heads for (1) initial risk, (2) trend health / giveback, and\n(3) runner preservation.\n\nDescriptive only. Not an entry-filter search, not exit optimization, not a stop/PT sweep, not a\npolicy study. No stop, no target, no trailing exit, no higher-timeframe exit, no entry filter.\n2023 discovery, 2024 frozen validation, 2025 SEALED, 2026 prohibited.",
+  "gap_kinds": [
+    "INVALID_PARAMETERIZATION",
+    "MISSING_CAPABILITY"
+  ],
+  "gaps": [
+    {
+      "kind": "MISSING_CAPABILITY",
+      "where": "context.mtf_state",
+      "message": "no registered tracker 'tracker.regime.completed_state_feed'",
+      "detail": {
+        "capability": "tracker.regime.completed_state_feed"
+      },
+      "closest": "tracker.regime.dual_ema"
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[2]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_age_min supports ['1m', '5m', '5s'], not '15m'",
+      "detail": {
+        "feature": "regime_age_min",
+        "parameters": {
+          "context": "current",
+          "timeframe": "15m"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[3]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_age_min supports ['1m', '5m', '5s'], not '1h'",
+      "detail": {
+        "feature": "regime_age_min",
+        "parameters": {
+          "context": "current",
+          "timeframe": "1h"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[4]",
+      "message": "UNSUPPORTED_FEATURE_PARAMETER_COMBINATION: regime_duration_min: {'context': 'current', 'timeframe': '1m', 'bar_state': 'completed'}",
+      "detail": {
+        "feature": "regime_duration_min",
+        "parameters": {
+          "context": "current",
+          "timeframe": "1m"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[5]",
+      "message": "UNSUPPORTED_FEATURE_PARAMETER_COMBINATION: regime_duration_min: {'context': 'current', 'timeframe': '5m', 'bar_state': 'completed'}",
+      "detail": {
+        "feature": "regime_duration_min",
+        "parameters": {
+          "context": "current",
+          "timeframe": "5m"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[6]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_duration_min supports ['1m', '5m', '5s'], not '15m'",
+      "detail": {
+        "feature": "regime_duration_min",
+        "parameters": {
+          "context": "current",
+          "timeframe": "15m"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[7]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_duration_min supports ['1m', '5m', '5s'], not '1h'",
+      "detail": {
+        "feature": "regime_duration_min",
+        "parameters": {
+          "context": "current",
+          "timeframe": "1h"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[8]",
+      "message": "UNSUPPORTED_FEATURE_PARAMETER_COMBINATION: regime_mfe_atr: {'context': 'current', 'timeframe': '1m', 'bar_state': 'completed'}",
+      "detail": {
+        "feature": "regime_mfe_atr",
+        "parameters": {
+          "context": "current",
+          "timeframe": "1m"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[10]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_mfe_atr supports ['1m', '5m', '5s'], not '15m'",
+      "detail": {
+        "feature": "regime_mfe_atr",
+        "parameters": {
+          "context": "current",
+          "timeframe": "15m"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[11]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_mfe_atr supports ['1m', '5m', '5s'], not '1h'",
+      "detail": {
+        "feature": "regime_mfe_atr",
+        "parameters": {
+          "context": "current",
+          "timeframe": "1h"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[12]",
+      "message": "UNSUPPORTED_FEATURE_PARAMETER_COMBINATION: regime_range_atr: {'context': 'current', 'timeframe': '1m', 'bar_state': 'completed'}",
+      "detail": {
+        "feature": "regime_range_atr",
+        "parameters": {
+          "context": "current",
+          "timeframe": "1m"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[14]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_range_atr supports ['1m', '5m', '5s'], not '15m'",
+      "detail": {
+        "feature": "regime_range_atr",
+        "parameters": {
+          "context": "current",
+          "timeframe": "15m"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[15]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_range_atr supports ['1m', '5m', '5s'], not '1h'",
+      "detail": {
+        "feature": "regime_range_atr",
+        "parameters": {
+          "context": "current",
+          "timeframe": "1h"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[16]",
+      "message": "UNSUPPORTED_FEATURE_PARAMETER_COMBINATION: regime_net_directional_move_atr: {'context': 'current', 'timeframe': '1m', 'bar_state': 'completed'}",
+      "detail": {
+        "feature": "regime_net_directional_move_atr",
+        "parameters": {
+          "context": "current",
+          "timeframe": "1m"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[17]",
+      "message": "UNSUPPORTED_FEATURE_PARAMETER_COMBINATION: regime_net_directional_move_atr: {'context': 'current', 'timeframe': '5m', 'bar_state': 'completed'}",
+      "detail": {
+        "feature": "regime_net_directional_move_atr",
+        "parameters": {
+          "context": "current",
+          "timeframe": "5m"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[18]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_net_directional_move_atr supports ['1m', '5m', '5s'], not '15m'",
+      "detail": {
+        "feature": "regime_net_directional_move_atr",
+        "parameters": {
+          "context": "current",
+          "timeframe": "15m"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[19]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_net_directional_move_atr supports ['1m', '5m', '5s'], not '1h'",
+      "detail": {
+        "feature": "regime_net_directional_move_atr",
+        "parameters": {
+          "context": "current",
+          "timeframe": "1h"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[20]",
+      "message": "UNSUPPORTED_FEATURE_PARAMETER_COMBINATION: regime_directional_displacement_atr: {'context': 'current', 'timeframe': '1m', 'bar_state': 'completed'}",
+      "detail": {
+        "feature": "regime_directional_displacement_atr",
+        "parameters": {
+          "context": "current",
+          "timeframe": "1m"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[22]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_directional_displacement_atr supports ['1m', '5m', '5s'], not '15m'",
+      "detail": {
+        "feature": "regime_directional_displacement_atr",
+        "parameters": {
+          "context": "current",
+          "timeframe": "15m"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[23]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_directional_displacement_atr supports ['1m', '5m', '5s'], not '1h'",
+      "detail": {
+        "feature": "regime_directional_displacement_atr",
+        "parameters": {
+          "context": "current",
+          "timeframe": "1h"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[24]",
+      "message": "UNSUPPORTED_FEATURE_PARAMETER_COMBINATION: regime_efficiency: {'context': 'current', 'timeframe': '1m', 'bar_state': 'completed'}",
+      "detail": {
+        "feature": "regime_efficiency",
+        "parameters": {
+          "context": "current",
+          "timeframe": "1m"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[26]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_efficiency supports ['1m', '5m', '5s'], not '15m'",
+      "detail": {
+        "feature": "regime_efficiency",
+        "parameters": {
+          "context": "current",
+          "timeframe": "15m"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[27]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_efficiency supports ['1m', '5m', '5s'], not '1h'",
+      "detail": {
+        "feature": "regime_efficiency",
+        "parameters": {
+          "context": "current",
+          "timeframe": "1h"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[28]",
+      "message": "UNSUPPORTED_FEATURE_PARAMETER_COMBINATION: regime_net_move_atr_per_min: {'context': 'current', 'timeframe': '1m', 'bar_state': 'completed'}",
+      "detail": {
+        "feature": "regime_net_move_atr_per_min",
+        "parameters": {
+          "context": "current",
+          "timeframe": "1m"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[29]",
+      "message": "UNSUPPORTED_FEATURE_PARAMETER_COMBINATION: regime_net_move_atr_per_min: {'context': 'current', 'timeframe': '5m', 'bar_state': 'completed'}",
+      "detail": {
+        "feature": "regime_net_move_atr_per_min",
+        "parameters": {
+          "context": "current",
+          "timeframe": "5m"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[30]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_net_move_atr_per_min supports ['1m', '5m', '5s'], not '15m'",
+      "detail": {
+        "feature": "regime_net_move_atr_per_min",
+        "parameters": {
+          "context": "current",
+          "timeframe": "15m"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[31]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_net_move_atr_per_min supports ['1m', '5m', '5s'], not '1h'",
+      "detail": {
+        "feature": "regime_net_move_atr_per_min",
+        "parameters": {
+          "context": "current",
+          "timeframe": "1h"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[32]",
+      "message": "UNSUPPORTED_FEATURE_PARAMETER_COMBINATION: regime_range_atr_per_min: {'context': 'current', 'timeframe': '1m', 'bar_state': 'completed'}",
+      "detail": {
+        "feature": "regime_range_atr_per_min",
+        "parameters": {
+          "context": "current",
+          "timeframe": "1m"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[34]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_range_atr_per_min supports ['1m', '5m', '5s'], not '15m'",
+      "detail": {
+        "feature": "regime_range_atr_per_min",
+        "parameters": {
+          "context": "current",
+          "timeframe": "15m"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[35]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_range_atr_per_min supports ['1m', '5m', '5s'], not '1h'",
+      "detail": {
+        "feature": "regime_range_atr_per_min",
+        "parameters": {
+          "context": "current",
+          "timeframe": "1h"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[37]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_mfe_atr supports ['1m', '5m', '5s'], not '15m'",
+      "detail": {
+        "feature": "regime_mfe_atr",
+        "parameters": {
+          "context": "prior",
+          "timeframe": "15m"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[38]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_mfe_atr supports ['1m', '5m', '5s'], not '1h'",
+      "detail": {
+        "feature": "regime_mfe_atr",
+        "parameters": {
+          "context": "prior",
+          "timeframe": "1h"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[40]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_range_atr supports ['1m', '5m', '5s'], not '15m'",
+      "detail": {
+        "feature": "regime_range_atr",
+        "parameters": {
+          "context": "prior",
+          "timeframe": "15m"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[41]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_range_atr supports ['1m', '5m', '5s'], not '1h'",
+      "detail": {
+        "feature": "regime_range_atr",
+        "parameters": {
+          "context": "prior",
+          "timeframe": "1h"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[43]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_net_directional_move_atr supports ['1m', '5m', '5s'], not '15m'",
+      "detail": {
+        "feature": "regime_net_directional_move_atr",
+        "parameters": {
+          "context": "prior",
+          "timeframe": "15m"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[44]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_net_directional_move_atr supports ['1m', '5m', '5s'], not '1h'",
+      "detail": {
+        "feature": "regime_net_directional_move_atr",
+        "parameters": {
+          "context": "prior",
+          "timeframe": "1h"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[46]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_efficiency supports ['1m', '5m', '5s'], not '15m'",
+      "detail": {
+        "feature": "regime_efficiency",
+        "parameters": {
+          "context": "prior",
+          "timeframe": "15m"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[47]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_efficiency supports ['1m', '5m', '5s'], not '1h'",
+      "detail": {
+        "feature": "regime_efficiency",
+        "parameters": {
+          "context": "prior",
+          "timeframe": "1h"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[49]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_duration_min supports ['1m', '5m', '5s'], not '15m'",
+      "detail": {
+        "feature": "regime_duration_min",
+        "parameters": {
+          "context": "prior",
+          "timeframe": "15m"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[50]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_duration_min supports ['1m', '5m', '5s'], not '1h'",
+      "detail": {
+        "feature": "regime_duration_min",
+        "parameters": {
+          "context": "prior",
+          "timeframe": "1h"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[51]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: fraction_of_counter_regime_move_recovered supports ['5s'], not '5m'",
+      "detail": {
+        "feature": "fraction_of_counter_regime_move_recovered",
+        "parameters": {
+          "timeframe": "5m"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[52]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: fraction_of_counter_regime_move_recovered supports ['5s'], not '15m'",
+      "detail": {
+        "feature": "fraction_of_counter_regime_move_recovered",
+        "parameters": {
+          "timeframe": "15m"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[53]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: fraction_of_counter_regime_move_recovered supports ['5s'], not '1h'",
+      "detail": {
+        "feature": "fraction_of_counter_regime_move_recovered",
+        "parameters": {
+          "timeframe": "1h"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[54]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: recovery_from_counter_regime_extreme_atr supports ['5s'], not '5m'",
+      "detail": {
+        "feature": "recovery_from_counter_regime_extreme_atr",
+        "parameters": {
+          "timeframe": "5m"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[55]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: recovery_from_counter_regime_extreme_atr supports ['5s'], not '15m'",
+      "detail": {
+        "feature": "recovery_from_counter_regime_extreme_atr",
+        "parameters": {
+          "timeframe": "15m"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[56]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: recovery_from_counter_regime_extreme_atr supports ['5s'], not '1h'",
+      "detail": {
+        "feature": "recovery_from_counter_regime_extreme_atr",
+        "parameters": {
+          "timeframe": "1h"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[57]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_direction supports ['5m'], not '1m'",
+      "detail": {
+        "feature": "regime_direction",
+        "parameters": {
+          "context": "current",
+          "timeframe": "1m"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[59]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_direction supports ['5m'], not '15m'",
+      "detail": {
+        "feature": "regime_direction",
+        "parameters": {
+          "context": "current",
+          "timeframe": "15m"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[60]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_direction supports ['5m'], not '1h'",
+      "detail": {
+        "feature": "regime_direction",
+        "parameters": {
+          "context": "current",
+          "timeframe": "1h"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[62]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_alignment supports ['1m', '5m'], not '15m'",
+      "detail": {
+        "feature": "regime_alignment",
+        "parameters": {
+          "context": "current",
+          "source_timeframe": "1m",
+          "reference_timeframe": "15m"
+        }
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "features.instances[63]",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_alignment supports ['1m', '5m'], not '1h'",
+      "detail": {
+        "feature": "regime_alignment",
+        "parameters": {
+          "context": "current",
+          "source_timeframe": "1m",
+          "reference_timeframe": "1h"
+        }
+      },
+      "closest": null
+    }
+  ],
+  "requested_semantics": [
+    {
+      "where": "context.mtf_state",
+      "kind": "MISSING_CAPABILITY",
+      "requested": {
+        "tracker": "regime.completed_state_feed",
+        "timeframes": [
+          "1m",
+          "5m",
+          "15m",
+          "1h"
+        ],
+        "atr_period": 14
+      },
+      "message": "no registered tracker 'tracker.regime.completed_state_feed'",
+      "detail": {
+        "capability": "tracker.regime.completed_state_feed"
+      }
+    },
+    {
+      "where": "features.instances[2]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": {
+        "feature": "regime_mfe_atr",
+        "over": {
+          "timeframe": [
+            "1m",
+            "5m",
+            "15m",
+            "1h"
+          ]
+        },
+        "context": "current"
+      },
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_age_min supports ['1m', '5m', '5s'], not '15m'",
+      "detail": {
+        "feature": "regime_age_min",
+        "parameters": {
+          "context": "current",
+          "timeframe": "15m"
+        }
+      }
+    },
+    {
+      "where": "features.instances[3]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": {
+        "feature": "regime_range_atr",
+        "over": {
+          "timeframe": [
+            "1m",
+            "5m",
+            "15m",
+            "1h"
+          ]
+        },
+        "context": "current"
+      },
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_age_min supports ['1m', '5m', '5s'], not '1h'",
+      "detail": {
+        "feature": "regime_age_min",
+        "parameters": {
+          "context": "current",
+          "timeframe": "1h"
+        }
+      }
+    },
+    {
+      "where": "features.instances[4]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": {
+        "feature": "regime_net_directional_move_atr",
+        "over": {
+          "timeframe": [
+            "1m",
+            "5m",
+            "15m",
+            "1h"
+          ]
+        },
+        "context": "current"
+      },
+      "message": "UNSUPPORTED_FEATURE_PARAMETER_COMBINATION: regime_duration_min: {'context': 'current', 'timeframe': '1m', 'bar_state': 'completed'}",
+      "detail": {
+        "feature": "regime_duration_min",
+        "parameters": {
+          "context": "current",
+          "timeframe": "1m"
+        }
+      }
+    },
+    {
+      "where": "features.instances[5]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": {
+        "feature": "regime_directional_displacement_atr",
+        "over": {
+          "timeframe": [
+            "1m",
+            "5m",
+            "15m",
+            "1h"
+          ]
+        },
+        "context": "current"
+      },
+      "message": "UNSUPPORTED_FEATURE_PARAMETER_COMBINATION: regime_duration_min: {'context': 'current', 'timeframe': '5m', 'bar_state': 'completed'}",
+      "detail": {
+        "feature": "regime_duration_min",
+        "parameters": {
+          "context": "current",
+          "timeframe": "5m"
+        }
+      }
+    },
+    {
+      "where": "features.instances[6]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": {
+        "feature": "regime_efficiency",
+        "over": {
+          "timeframe": [
+            "1m",
+            "5m",
+            "15m",
+            "1h"
+          ]
+        },
+        "context": "current"
+      },
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_duration_min supports ['1m', '5m', '5s'], not '15m'",
+      "detail": {
+        "feature": "regime_duration_min",
+        "parameters": {
+          "context": "current",
+          "timeframe": "15m"
+        }
+      }
+    },
+    {
+      "where": "features.instances[7]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": {
+        "feature": "regime_net_move_atr_per_min",
+        "over": {
+          "timeframe": [
+            "1m",
+            "5m",
+            "15m",
+            "1h"
+          ]
+        },
+        "context": "current"
+      },
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_duration_min supports ['1m', '5m', '5s'], not '1h'",
+      "detail": {
+        "feature": "regime_duration_min",
+        "parameters": {
+          "context": "current",
+          "timeframe": "1h"
+        }
+      }
+    },
+    {
+      "where": "features.instances[8]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": {
+        "feature": "regime_range_atr_per_min",
+        "over": {
+          "timeframe": [
+            "1m",
+            "5m",
+            "15m",
+            "1h"
+          ]
+        },
+        "context": "current"
+      },
+      "message": "UNSUPPORTED_FEATURE_PARAMETER_COMBINATION: regime_mfe_atr: {'context': 'current', 'timeframe': '1m', 'bar_state': 'completed'}",
+      "detail": {
+        "feature": "regime_mfe_atr",
+        "parameters": {
+          "context": "current",
+          "timeframe": "1m"
+        }
+      }
+    },
+    {
+      "where": "features.instances[10]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": {
+        "feature": "regime_range_atr",
+        "over": {
+          "timeframe": [
+            "5m",
+            "15m",
+            "1h"
+          ]
+        },
+        "context": "prior"
+      },
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_mfe_atr supports ['1m', '5m', '5s'], not '15m'",
+      "detail": {
+        "feature": "regime_mfe_atr",
+        "parameters": {
+          "context": "current",
+          "timeframe": "15m"
+        }
+      }
+    },
+    {
+      "where": "features.instances[11]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": {
+        "feature": "regime_net_directional_move_atr",
+        "over": {
+          "timeframe": [
+            "5m",
+            "15m",
+            "1h"
+          ]
+        },
+        "context": "prior"
+      },
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_mfe_atr supports ['1m', '5m', '5s'], not '1h'",
+      "detail": {
+        "feature": "regime_mfe_atr",
+        "parameters": {
+          "context": "current",
+          "timeframe": "1h"
+        }
+      }
+    },
+    {
+      "where": "features.instances[12]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": {
+        "feature": "regime_efficiency",
+        "over": {
+          "timeframe": [
+            "5m",
+            "15m",
+            "1h"
+          ]
+        },
+        "context": "prior"
+      },
+      "message": "UNSUPPORTED_FEATURE_PARAMETER_COMBINATION: regime_range_atr: {'context': 'current', 'timeframe': '1m', 'bar_state': 'completed'}",
+      "detail": {
+        "feature": "regime_range_atr",
+        "parameters": {
+          "context": "current",
+          "timeframe": "1m"
+        }
+      }
+    },
+    {
+      "where": "features.instances[14]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": {
+        "feature": "fraction_of_counter_regime_move_recovered",
+        "over": {
+          "timeframe": [
+            "5m",
+            "15m",
+            "1h"
+          ]
+        }
+      },
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_range_atr supports ['1m', '5m', '5s'], not '15m'",
+      "detail": {
+        "feature": "regime_range_atr",
+        "parameters": {
+          "context": "current",
+          "timeframe": "15m"
+        }
+      }
+    },
+    {
+      "where": "features.instances[15]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": {
+        "feature": "recovery_from_counter_regime_extreme_atr",
+        "over": {
+          "timeframe": [
+            "5m",
+            "15m",
+            "1h"
+          ]
+        }
+      },
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_range_atr supports ['1m', '5m', '5s'], not '1h'",
+      "detail": {
+        "feature": "regime_range_atr",
+        "parameters": {
+          "context": "current",
+          "timeframe": "1h"
+        }
+      }
+    },
+    {
+      "where": "features.instances[16]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": {
+        "feature": "regime_direction",
+        "over": {
+          "timeframe": [
+            "1m",
+            "5m",
+            "15m",
+            "1h"
+          ]
+        },
+        "context": "current"
+      },
+      "message": "UNSUPPORTED_FEATURE_PARAMETER_COMBINATION: regime_net_directional_move_atr: {'context': 'current', 'timeframe': '1m', 'bar_state': 'completed'}",
+      "detail": {
+        "feature": "regime_net_directional_move_atr",
+        "parameters": {
+          "context": "current",
+          "timeframe": "1m"
+        }
+      }
+    },
+    {
+      "where": "features.instances[17]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": {
+        "feature": "regime_alignment",
+        "over": {
+          "source_timeframe": [
+            "1m"
+          ],
+          "reference_timeframe": [
+            "5m",
+            "15m",
+            "1h"
+          ]
+        },
+        "context": "current"
+      },
+      "message": "UNSUPPORTED_FEATURE_PARAMETER_COMBINATION: regime_net_directional_move_atr: {'context': 'current', 'timeframe': '5m', 'bar_state': 'completed'}",
+      "detail": {
+        "feature": "regime_net_directional_move_atr",
+        "parameters": {
+          "context": "current",
+          "timeframe": "5m"
+        }
+      }
+    },
+    {
+      "where": "features.instances[18]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": {
+        "feature": "structural_current_expansion_atr",
+        "over": {
+          "context": [
+            "current"
+          ]
+        }
+      },
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_net_directional_move_atr supports ['1m', '5m', '5s'], not '15m'",
+      "detail": {
+        "feature": "regime_net_directional_move_atr",
+        "parameters": {
+          "context": "current",
+          "timeframe": "15m"
+        }
+      }
+    },
+    {
+      "where": "features.instances[19]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": {
+        "feature": "structural_max_expansion_atr",
+        "over": {
+          "context": [
+            "current"
+          ]
+        }
+      },
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_net_directional_move_atr supports ['1m', '5m', '5s'], not '1h'",
+      "detail": {
+        "feature": "regime_net_directional_move_atr",
+        "parameters": {
+          "context": "current",
+          "timeframe": "1h"
+        }
+      }
+    },
+    {
+      "where": "features.instances[20]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": {
+        "feature": "structural_giveback_atr",
+        "over": {
+          "context": [
+            "current"
+          ]
+        }
+      },
+      "message": "UNSUPPORTED_FEATURE_PARAMETER_COMBINATION: regime_directional_displacement_atr: {'context': 'current', 'timeframe': '1m', 'bar_state': 'completed'}",
+      "detail": {
+        "feature": "regime_directional_displacement_atr",
+        "parameters": {
+          "context": "current",
+          "timeframe": "1m"
+        }
+      }
+    },
+    {
+      "where": "features.instances[22]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": {
+        "feature": "structural_expansion_atr_per_min",
+        "over": {
+          "context": [
+            "current"
+          ]
+        }
+      },
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_directional_displacement_atr supports ['1m', '5m', '5s'], not '15m'",
+      "detail": {
+        "feature": "regime_directional_displacement_atr",
+        "parameters": {
+          "context": "current",
+          "timeframe": "15m"
+        }
+      }
+    },
+    {
+      "where": "features.instances[23]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": {
+        "feature": "distance_to_completed_range_high_atr",
+        "over": {
+          "reference_timeframe": [
+            "5m"
+          ]
+        },
+        "bar_state": "completed"
+      },
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_directional_displacement_atr supports ['1m', '5m', '5s'], not '1h'",
+      "detail": {
+        "feature": "regime_directional_displacement_atr",
+        "parameters": {
+          "context": "current",
+          "timeframe": "1h"
+        }
+      }
+    },
+    {
+      "where": "features.instances[24]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": {
+        "feature": "distance_to_completed_range_low_atr",
+        "over": {
+          "reference_timeframe": [
+            "5m"
+          ]
+        },
+        "bar_state": "completed"
+      },
+      "message": "UNSUPPORTED_FEATURE_PARAMETER_COMBINATION: regime_efficiency: {'context': 'current', 'timeframe': '1m', 'bar_state': 'completed'}",
+      "detail": {
+        "feature": "regime_efficiency",
+        "parameters": {
+          "context": "current",
+          "timeframe": "1m"
+        }
+      }
+    },
+    {
+      "where": "features.instances[26]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_efficiency supports ['1m', '5m', '5s'], not '15m'",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_efficiency supports ['1m', '5m', '5s'], not '15m'",
+      "detail": {
+        "feature": "regime_efficiency",
+        "parameters": {
+          "context": "current",
+          "timeframe": "15m"
+        }
+      }
+    },
+    {
+      "where": "features.instances[27]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_efficiency supports ['1m', '5m', '5s'], not '1h'",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_efficiency supports ['1m', '5m', '5s'], not '1h'",
+      "detail": {
+        "feature": "regime_efficiency",
+        "parameters": {
+          "context": "current",
+          "timeframe": "1h"
+        }
+      }
+    },
+    {
+      "where": "features.instances[28]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": "UNSUPPORTED_FEATURE_PARAMETER_COMBINATION: regime_net_move_atr_per_min: {'context': 'current', 'timeframe': '1m', 'bar_state': 'completed'}",
+      "message": "UNSUPPORTED_FEATURE_PARAMETER_COMBINATION: regime_net_move_atr_per_min: {'context': 'current', 'timeframe': '1m', 'bar_state': 'completed'}",
+      "detail": {
+        "feature": "regime_net_move_atr_per_min",
+        "parameters": {
+          "context": "current",
+          "timeframe": "1m"
+        }
+      }
+    },
+    {
+      "where": "features.instances[29]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": "UNSUPPORTED_FEATURE_PARAMETER_COMBINATION: regime_net_move_atr_per_min: {'context': 'current', 'timeframe': '5m', 'bar_state': 'completed'}",
+      "message": "UNSUPPORTED_FEATURE_PARAMETER_COMBINATION: regime_net_move_atr_per_min: {'context': 'current', 'timeframe': '5m', 'bar_state': 'completed'}",
+      "detail": {
+        "feature": "regime_net_move_atr_per_min",
+        "parameters": {
+          "context": "current",
+          "timeframe": "5m"
+        }
+      }
+    },
+    {
+      "where": "features.instances[30]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_net_move_atr_per_min supports ['1m', '5m', '5s'], not '15m'",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_net_move_atr_per_min supports ['1m', '5m', '5s'], not '15m'",
+      "detail": {
+        "feature": "regime_net_move_atr_per_min",
+        "parameters": {
+          "context": "current",
+          "timeframe": "15m"
+        }
+      }
+    },
+    {
+      "where": "features.instances[31]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_net_move_atr_per_min supports ['1m', '5m', '5s'], not '1h'",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_net_move_atr_per_min supports ['1m', '5m', '5s'], not '1h'",
+      "detail": {
+        "feature": "regime_net_move_atr_per_min",
+        "parameters": {
+          "context": "current",
+          "timeframe": "1h"
+        }
+      }
+    },
+    {
+      "where": "features.instances[32]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": "UNSUPPORTED_FEATURE_PARAMETER_COMBINATION: regime_range_atr_per_min: {'context': 'current', 'timeframe': '1m', 'bar_state': 'completed'}",
+      "message": "UNSUPPORTED_FEATURE_PARAMETER_COMBINATION: regime_range_atr_per_min: {'context': 'current', 'timeframe': '1m', 'bar_state': 'completed'}",
+      "detail": {
+        "feature": "regime_range_atr_per_min",
+        "parameters": {
+          "context": "current",
+          "timeframe": "1m"
+        }
+      }
+    },
+    {
+      "where": "features.instances[34]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_range_atr_per_min supports ['1m', '5m', '5s'], not '15m'",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_range_atr_per_min supports ['1m', '5m', '5s'], not '15m'",
+      "detail": {
+        "feature": "regime_range_atr_per_min",
+        "parameters": {
+          "context": "current",
+          "timeframe": "15m"
+        }
+      }
+    },
+    {
+      "where": "features.instances[35]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_range_atr_per_min supports ['1m', '5m', '5s'], not '1h'",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_range_atr_per_min supports ['1m', '5m', '5s'], not '1h'",
+      "detail": {
+        "feature": "regime_range_atr_per_min",
+        "parameters": {
+          "context": "current",
+          "timeframe": "1h"
+        }
+      }
+    },
+    {
+      "where": "features.instances[37]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_mfe_atr supports ['1m', '5m', '5s'], not '15m'",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_mfe_atr supports ['1m', '5m', '5s'], not '15m'",
+      "detail": {
+        "feature": "regime_mfe_atr",
+        "parameters": {
+          "context": "prior",
+          "timeframe": "15m"
+        }
+      }
+    },
+    {
+      "where": "features.instances[38]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_mfe_atr supports ['1m', '5m', '5s'], not '1h'",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_mfe_atr supports ['1m', '5m', '5s'], not '1h'",
+      "detail": {
+        "feature": "regime_mfe_atr",
+        "parameters": {
+          "context": "prior",
+          "timeframe": "1h"
+        }
+      }
+    },
+    {
+      "where": "features.instances[40]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_range_atr supports ['1m', '5m', '5s'], not '15m'",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_range_atr supports ['1m', '5m', '5s'], not '15m'",
+      "detail": {
+        "feature": "regime_range_atr",
+        "parameters": {
+          "context": "prior",
+          "timeframe": "15m"
+        }
+      }
+    },
+    {
+      "where": "features.instances[41]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_range_atr supports ['1m', '5m', '5s'], not '1h'",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_range_atr supports ['1m', '5m', '5s'], not '1h'",
+      "detail": {
+        "feature": "regime_range_atr",
+        "parameters": {
+          "context": "prior",
+          "timeframe": "1h"
+        }
+      }
+    },
+    {
+      "where": "features.instances[43]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_net_directional_move_atr supports ['1m', '5m', '5s'], not '15m'",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_net_directional_move_atr supports ['1m', '5m', '5s'], not '15m'",
+      "detail": {
+        "feature": "regime_net_directional_move_atr",
+        "parameters": {
+          "context": "prior",
+          "timeframe": "15m"
+        }
+      }
+    },
+    {
+      "where": "features.instances[44]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_net_directional_move_atr supports ['1m', '5m', '5s'], not '1h'",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_net_directional_move_atr supports ['1m', '5m', '5s'], not '1h'",
+      "detail": {
+        "feature": "regime_net_directional_move_atr",
+        "parameters": {
+          "context": "prior",
+          "timeframe": "1h"
+        }
+      }
+    },
+    {
+      "where": "features.instances[46]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_efficiency supports ['1m', '5m', '5s'], not '15m'",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_efficiency supports ['1m', '5m', '5s'], not '15m'",
+      "detail": {
+        "feature": "regime_efficiency",
+        "parameters": {
+          "context": "prior",
+          "timeframe": "15m"
+        }
+      }
+    },
+    {
+      "where": "features.instances[47]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_efficiency supports ['1m', '5m', '5s'], not '1h'",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_efficiency supports ['1m', '5m', '5s'], not '1h'",
+      "detail": {
+        "feature": "regime_efficiency",
+        "parameters": {
+          "context": "prior",
+          "timeframe": "1h"
+        }
+      }
+    },
+    {
+      "where": "features.instances[49]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_duration_min supports ['1m', '5m', '5s'], not '15m'",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_duration_min supports ['1m', '5m', '5s'], not '15m'",
+      "detail": {
+        "feature": "regime_duration_min",
+        "parameters": {
+          "context": "prior",
+          "timeframe": "15m"
+        }
+      }
+    },
+    {
+      "where": "features.instances[50]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_duration_min supports ['1m', '5m', '5s'], not '1h'",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_duration_min supports ['1m', '5m', '5s'], not '1h'",
+      "detail": {
+        "feature": "regime_duration_min",
+        "parameters": {
+          "context": "prior",
+          "timeframe": "1h"
+        }
+      }
+    },
+    {
+      "where": "features.instances[51]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": "UNSUPPORTED_TIMEFRAME_PARAMETER: fraction_of_counter_regime_move_recovered supports ['5s'], not '5m'",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: fraction_of_counter_regime_move_recovered supports ['5s'], not '5m'",
+      "detail": {
+        "feature": "fraction_of_counter_regime_move_recovered",
+        "parameters": {
+          "timeframe": "5m"
+        }
+      }
+    },
+    {
+      "where": "features.instances[52]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": "UNSUPPORTED_TIMEFRAME_PARAMETER: fraction_of_counter_regime_move_recovered supports ['5s'], not '15m'",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: fraction_of_counter_regime_move_recovered supports ['5s'], not '15m'",
+      "detail": {
+        "feature": "fraction_of_counter_regime_move_recovered",
+        "parameters": {
+          "timeframe": "15m"
+        }
+      }
+    },
+    {
+      "where": "features.instances[53]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": "UNSUPPORTED_TIMEFRAME_PARAMETER: fraction_of_counter_regime_move_recovered supports ['5s'], not '1h'",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: fraction_of_counter_regime_move_recovered supports ['5s'], not '1h'",
+      "detail": {
+        "feature": "fraction_of_counter_regime_move_recovered",
+        "parameters": {
+          "timeframe": "1h"
+        }
+      }
+    },
+    {
+      "where": "features.instances[54]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": "UNSUPPORTED_TIMEFRAME_PARAMETER: recovery_from_counter_regime_extreme_atr supports ['5s'], not '5m'",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: recovery_from_counter_regime_extreme_atr supports ['5s'], not '5m'",
+      "detail": {
+        "feature": "recovery_from_counter_regime_extreme_atr",
+        "parameters": {
+          "timeframe": "5m"
+        }
+      }
+    },
+    {
+      "where": "features.instances[55]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": "UNSUPPORTED_TIMEFRAME_PARAMETER: recovery_from_counter_regime_extreme_atr supports ['5s'], not '15m'",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: recovery_from_counter_regime_extreme_atr supports ['5s'], not '15m'",
+      "detail": {
+        "feature": "recovery_from_counter_regime_extreme_atr",
+        "parameters": {
+          "timeframe": "15m"
+        }
+      }
+    },
+    {
+      "where": "features.instances[56]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": "UNSUPPORTED_TIMEFRAME_PARAMETER: recovery_from_counter_regime_extreme_atr supports ['5s'], not '1h'",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: recovery_from_counter_regime_extreme_atr supports ['5s'], not '1h'",
+      "detail": {
+        "feature": "recovery_from_counter_regime_extreme_atr",
+        "parameters": {
+          "timeframe": "1h"
+        }
+      }
+    },
+    {
+      "where": "features.instances[57]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_direction supports ['5m'], not '1m'",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_direction supports ['5m'], not '1m'",
+      "detail": {
+        "feature": "regime_direction",
+        "parameters": {
+          "context": "current",
+          "timeframe": "1m"
+        }
+      }
+    },
+    {
+      "where": "features.instances[59]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_direction supports ['5m'], not '15m'",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_direction supports ['5m'], not '15m'",
+      "detail": {
+        "feature": "regime_direction",
+        "parameters": {
+          "context": "current",
+          "timeframe": "15m"
+        }
+      }
+    },
+    {
+      "where": "features.instances[60]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_direction supports ['5m'], not '1h'",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_direction supports ['5m'], not '1h'",
+      "detail": {
+        "feature": "regime_direction",
+        "parameters": {
+          "context": "current",
+          "timeframe": "1h"
+        }
+      }
+    },
+    {
+      "where": "features.instances[62]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_alignment supports ['1m', '5m'], not '15m'",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_alignment supports ['1m', '5m'], not '15m'",
+      "detail": {
+        "feature": "regime_alignment",
+        "parameters": {
+          "context": "current",
+          "source_timeframe": "1m",
+          "reference_timeframe": "15m"
+        }
+      }
+    },
+    {
+      "where": "features.instances[63]",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_alignment supports ['1m', '5m'], not '1h'",
+      "message": "UNSUPPORTED_TIMEFRAME_PARAMETER: regime_alignment supports ['1m', '5m'], not '1h'",
+      "detail": {
+        "feature": "regime_alignment",
+        "parameters": {
+          "context": "current",
+          "source_timeframe": "1m",
+          "reference_timeframe": "1h"
+        }
+      }
+    }
+  ],
+  "compiler_evidence": {
+    "STATUS": "CAPABILITY_GAP",
+    "study_id": "nq_va_multitf_trade_state_geometry",
+    "kinds": [
+      "INVALID_PARAMETERIZATION",
+      "MISSING_CAPABILITY"
+    ],
+    "count": 51
+  },
+  "affected_yaml_fields": [
+    "context.mtf_state",
+    "features.instances[10]",
+    "features.instances[11]",
+    "features.instances[12]",
+    "features.instances[14]",
+    "features.instances[15]",
+    "features.instances[16]",
+    "features.instances[17]",
+    "features.instances[18]",
+    "features.instances[19]",
+    "features.instances[20]",
+    "features.instances[22]",
+    "features.instances[23]",
+    "features.instances[24]",
+    "features.instances[26]",
+    "features.instances[27]",
+    "features.instances[28]",
+    "features.instances[29]",
+    "features.instances[2]",
+    "features.instances[30]",
+    "features.instances[31]",
+    "features.instances[32]",
+    "features.instances[34]",
+    "features.instances[35]",
+    "features.instances[37]",
+    "features.instances[38]",
+    "features.instances[3]",
+    "features.instances[40]",
+    "features.instances[41]",
+    "features.instances[43]",
+    "features.instances[44]",
+    "features.instances[46]",
+    "features.instances[47]",
+    "features.instances[49]",
+    "features.instances[4]",
+    "features.instances[50]",
+    "features.instances[51]",
+    "features.instances[52]",
+    "features.instances[53]",
+    "features.instances[54]",
+    "features.instances[55]",
+    "features.instances[56]",
+    "features.instances[57]",
+    "features.instances[59]",
+    "features.instances[5]",
+    "features.instances[60]",
+    "features.instances[62]",
+    "features.instances[63]",
+    "features.instances[6]",
+    "features.instances[7]",
+    "features.instances[8]"
+  ],
+  "existing_nearest_capabilities": [
+    "tracker.regime.dual_ema"
+  ],
+  "capability_lookup": "python scripts/research.py cap search <term>; python scripts/research.py cap describe <id>",
+  "scientific_decisions_already_resolved": {
+    "terminal_decisions": {},
+    "autonomy_decisions": {
+      "on_capability_gap": "stop_and_handoff",
+      "platform_change_required": "chore_branch_and_fresh_session",
+      "deterministic_defect": "auto_fix",
+      "calendar_reference_parity": "common_interval_exact",
+      "frozen_parent_model": "rescore_if_authenticated",
+      "protected_period": "never_expand_authority"
+    }
+  },
+  "prohibited_changes": [
+    "modifying research_workflow/ (grammar, compiler, host, controller, outcomes, provider bindings)",
+    "modifying features/ or the capability registry seeds from the study branch",
+    "building the missing capability inside the study session",
+    "patching around the gap with study Python",
+    "continuing to accumulate context after this handoff: END THE SESSION"
+  ],
+  "suggested_platform_files": [
+    "features/definitions/canonical/<name>.py",
+    "features/definitions/golden/<name>.json",
+    "features/definitions/promotions/<name>.json (written by `research feature promote`)",
+    "features/trackers/",
+    "features/trackers/host_bindings.py",
+    "research_workflow/capabilities_index.yaml",
+    "research_workflow/grammar/compiler.py",
+    "research_workflow/provider_host.py"
+  ],
+  "proposed_chore_topic": "nq_va_multitf_trade_state_geometry-missing_capability",
+  "written_by": {
+    "owner": "Scott McCarty@NUCBOX_K10",
+    "agent": "claude",
+    "session_id": "12ddc008-9410-40d1-8cdb-fd121574d299"
+  },
+  "next_action": {
+    "study_owner": "END THIS SESSION. Do not implement. Commit study.yaml + research_decision.yaml + this handoff on the study branch first.",
+    "capability_session": [
+      "python scripts/research.py ws chore claim nq_va_multitf_trade_state_geometry-missing_capability --paths features/definitions/canonical/<name>.py features/definitions/golden/<name>.json features/definitions/promotions/<name>.json (written by `research feature promote`) --surface \"<one line>\" --as <agent>",
+      "git worktree add \"../<repo>-nq_va_multitf_trade_state_geometry-missing_capability\" -b chore/nq_va_multitf_trade_state_geometry-missing_capability main",
+      "implement ONLY the capability named above; targeted tests; research cap generate --check; audit/promotion if the capability flow requires it",
+      "git switch main && git merge --no-ff chore/<topic>; write CAPABILITY_COMPLETE card (research study handoff --study <study> --phase A --note CAPABILITY_COMPLETE:<topic>)",
+      "python scripts/research.py ws chore release nq_va_multitf_trade_state_geometry-missing_capability"
+    ],
+    "resume_session": [
+      "git -C <study worktree> merge --no-ff main",
+      "python scripts/research.py ws claim nq_va_multitf_trade_state_geometry --as <agent>",
+      "python scripts/research.py study compile --study studies/nq_va_multitf_trade_state_geometry"
+    ]
+  }
+}
