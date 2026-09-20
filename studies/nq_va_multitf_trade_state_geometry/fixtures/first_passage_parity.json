@@ -3,15 +3,10 @@
   "verdict": "PASS",
   "terminal_flip_check": {
     "check": "COMPOSITE_FLIP_TERMINAL_PRESERVED",
-    "verdict": "FAIL",
-    "cases_with_null_flip_ts": [
-      "order_favorable_then_adverse",
-      "order_adverse_then_favorable",
-      "milestone_past_T300",
-      "parked_side_never_fires"
-    ],
-    "cause": "research_workflow/host/outcomes.py LabelOutcomeKernel._emit: for kernel 'composite' it sets flip_ts = at if disp == POSITIVE else None, discarding the recorded p.flip_ts. With one-sided milestone arms most rows compose to CENSORED (any arm that never touches expires CENSORED under expiry: censor), so flip_ts and time_to_flip_seconds are null on virtually every row.",
-    "consequence": "Adding the milestone arms COSTS the terminal-flip timestamp that the pure flip kernel provided. Milestones and the lifecycle terminal cannot both be had from the current kernel; this is part of gap C1/T1."
+    "verdict": "PASS",
+    "cases_with_null_flip_ts": [],
+    "pre_c1_cause": "research_workflow/host/outcomes.py LabelOutcomeKernel._emit: for kernel 'composite' it sets flip_ts = at if disp == POSITIVE else None, discarding the recorded p.flip_ts. With one-sided milestone arms most rows compose to CENSORED (any arm that never touches expires CENSORED under expiry: censor), so flip_ts and time_to_flip_seconds are null on virtually every row.",
+    "repair": "C1 emits terminal_flip_ts / terminal_flip_disposition / terminal_time_to_flip_seconds / terminal_exit_* / terminal_gross_* directly from p.flip_ts, never from the composite disposition. The row-level composite columns are unchanged and still censor; that is now irrelevant to the terminal."
   },
   "kernel": "research_workflow.host.outcomes.LabelOutcomeKernel (composite)",
   "encoding": "one-sided arms, unused side parked at 99.0 ATR",
@@ -76,7 +71,13 @@
         "fp_adv_2p00": "CENSORED",
         "fp_adv_3p00": "CENSORED"
       },
-      "time_to_flip_seconds": null
+      "terminal_flip_ts": 1700000008000000000,
+      "terminal_time_to_flip_seconds": 8.0,
+      "terminal_exit_price": null,
+      "terminal_gross_pnl_atr": null,
+      "terminal_net_pnl_points": null,
+      "legacy_composite_flip_ts": null,
+      "row_level_composite_disposition": "CENSORED"
     },
     {
       "case": "order_adverse_then_favorable",
@@ -136,7 +137,13 @@
         "fp_adv_2p00": "CENSORED",
         "fp_adv_3p00": "CENSORED"
       },
-      "time_to_flip_seconds": null
+      "terminal_flip_ts": 1700000007000000000,
+      "terminal_time_to_flip_seconds": 7.0,
+      "terminal_exit_price": null,
+      "terminal_gross_pnl_atr": null,
+      "terminal_net_pnl_points": null,
+      "legacy_composite_flip_ts": null,
+      "row_level_composite_disposition": "CENSORED"
     },
     {
       "case": "milestone_past_T300",
@@ -196,7 +203,13 @@
         "fp_adv_2p00": "CENSORED",
         "fp_adv_3p00": "CENSORED"
       },
-      "time_to_flip_seconds": null
+      "terminal_flip_ts": 1700001202000000000,
+      "terminal_time_to_flip_seconds": 1202.0,
+      "terminal_exit_price": null,
+      "terminal_gross_pnl_atr": null,
+      "terminal_net_pnl_points": null,
+      "legacy_composite_flip_ts": null,
+      "row_level_composite_disposition": "CENSORED"
     },
     {
       "case": "parked_side_never_fires",
@@ -256,7 +269,145 @@
         "fp_adv_2p00": "CENSORED",
         "fp_adv_3p00": "CENSORED"
       },
-      "time_to_flip_seconds": null
+      "terminal_flip_ts": 1700000008000000000,
+      "terminal_time_to_flip_seconds": 8.0,
+      "terminal_exit_price": null,
+      "terminal_gross_pnl_atr": null,
+      "terminal_net_pnl_points": null,
+      "legacy_composite_flip_ts": null,
+      "row_level_composite_disposition": "CENSORED"
+    },
+    {
+      "case": "censored_arms_with_a_real_flip",
+      "status": "PASS",
+      "failures": [],
+      "oracle_first_passage_seconds": {
+        "fp_fav_0p25": 3.0,
+        "fp_fav_0p50": null,
+        "fp_fav_0p75": null,
+        "fp_fav_1p00": null,
+        "fp_fav_1p50": null,
+        "fp_fav_2p00": null,
+        "fp_fav_3p00": null,
+        "fp_fav_4p00": null,
+        "fp_fav_5p00": null,
+        "fp_adv_0p25": null,
+        "fp_adv_0p50": null,
+        "fp_adv_0p75": null,
+        "fp_adv_1p00": null,
+        "fp_adv_1p50": null,
+        "fp_adv_2p00": null,
+        "fp_adv_3p00": null
+      },
+      "kernel_first_passage_seconds": {
+        "fp_fav_0p25": 3.0,
+        "fp_fav_0p50": 86400.0,
+        "fp_fav_0p75": 86400.0,
+        "fp_fav_1p00": 86400.0,
+        "fp_fav_1p50": 86400.0,
+        "fp_fav_2p00": 86400.0,
+        "fp_fav_3p00": 86400.0,
+        "fp_fav_4p00": 86400.0,
+        "fp_fav_5p00": 86400.0,
+        "fp_adv_0p25": 86400.0,
+        "fp_adv_0p50": 86400.0,
+        "fp_adv_0p75": 86400.0,
+        "fp_adv_1p00": 86400.0,
+        "fp_adv_1p50": 86400.0,
+        "fp_adv_2p00": 86400.0,
+        "fp_adv_3p00": 86400.0
+      },
+      "kernel_disposition": {
+        "fp_fav_0p25": "POSITIVE",
+        "fp_fav_0p50": "CENSORED",
+        "fp_fav_0p75": "CENSORED",
+        "fp_fav_1p00": "CENSORED",
+        "fp_fav_1p50": "CENSORED",
+        "fp_fav_2p00": "CENSORED",
+        "fp_fav_3p00": "CENSORED",
+        "fp_fav_4p00": "CENSORED",
+        "fp_fav_5p00": "CENSORED",
+        "fp_adv_0p25": "CENSORED",
+        "fp_adv_0p50": "CENSORED",
+        "fp_adv_0p75": "CENSORED",
+        "fp_adv_1p00": "CENSORED",
+        "fp_adv_1p50": "CENSORED",
+        "fp_adv_2p00": "CENSORED",
+        "fp_adv_3p00": "CENSORED"
+      },
+      "terminal_flip_ts": 1700000005000000000,
+      "terminal_time_to_flip_seconds": 5.0,
+      "terminal_exit_price": 15004.8,
+      "terminal_gross_pnl_atr": 0.23999999999996363,
+      "terminal_net_pnl_points": null,
+      "legacy_composite_flip_ts": null,
+      "row_level_composite_disposition": "CENSORED"
+    },
+    {
+      "case": "terminal_flip_far_past_T300",
+      "status": "PASS",
+      "failures": [],
+      "oracle_first_passage_seconds": {
+        "fp_fav_0p25": 2.0,
+        "fp_fav_0p50": null,
+        "fp_fav_0p75": null,
+        "fp_fav_1p00": null,
+        "fp_fav_1p50": null,
+        "fp_fav_2p00": null,
+        "fp_fav_3p00": null,
+        "fp_fav_4p00": null,
+        "fp_fav_5p00": null,
+        "fp_adv_0p25": null,
+        "fp_adv_0p50": null,
+        "fp_adv_0p75": null,
+        "fp_adv_1p00": null,
+        "fp_adv_1p50": null,
+        "fp_adv_2p00": null,
+        "fp_adv_3p00": null
+      },
+      "kernel_first_passage_seconds": {
+        "fp_fav_0p25": 2.0,
+        "fp_fav_0p50": 86400.0,
+        "fp_fav_0p75": 86400.0,
+        "fp_fav_1p00": 86400.0,
+        "fp_fav_1p50": 86400.0,
+        "fp_fav_2p00": 86400.0,
+        "fp_fav_3p00": 86400.0,
+        "fp_fav_4p00": 86400.0,
+        "fp_fav_5p00": 86400.0,
+        "fp_adv_0p25": 86400.0,
+        "fp_adv_0p50": 86400.0,
+        "fp_adv_0p75": 86400.0,
+        "fp_adv_1p00": 86400.0,
+        "fp_adv_1p50": 86400.0,
+        "fp_adv_2p00": 86400.0,
+        "fp_adv_3p00": 86400.0
+      },
+      "kernel_disposition": {
+        "fp_fav_0p25": "POSITIVE",
+        "fp_fav_0p50": "CENSORED",
+        "fp_fav_0p75": "CENSORED",
+        "fp_fav_1p00": "CENSORED",
+        "fp_fav_1p50": "CENSORED",
+        "fp_fav_2p00": "CENSORED",
+        "fp_fav_3p00": "CENSORED",
+        "fp_fav_4p00": "CENSORED",
+        "fp_fav_5p00": "CENSORED",
+        "fp_adv_0p25": "CENSORED",
+        "fp_adv_0p50": "CENSORED",
+        "fp_adv_0p75": "CENSORED",
+        "fp_adv_1p00": "CENSORED",
+        "fp_adv_1p50": "CENSORED",
+        "fp_adv_2p00": "CENSORED",
+        "fp_adv_3p00": "CENSORED"
+      },
+      "terminal_flip_ts": 1700001403000000000,
+      "terminal_time_to_flip_seconds": 1403.0,
+      "terminal_exit_price": 15005.0,
+      "terminal_gross_pnl_atr": 0.25,
+      "terminal_net_pnl_points": null,
+      "legacy_composite_flip_ts": null,
+      "row_level_composite_disposition": "CENSORED"
     }
   ]
 }

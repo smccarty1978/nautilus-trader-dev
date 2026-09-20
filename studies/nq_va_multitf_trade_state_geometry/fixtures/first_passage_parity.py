@@ -54,6 +54,8 @@ def contract() -> LabelOutcomeContract:
                  "inclusive_start": True},
         "primary_arm": "fav_1p00", "composition": {"logic": "OR"},
         "direction_sign": 1, "observed_seconds": True,
+        # C1: the canonical lifecycle terminal, independent of the composite disposition.
+        "terminal_outcome": True,
     })
 
 
@@ -127,6 +129,34 @@ def run_case(name, offsets, expect, flip_at_index=None):
     for k_, v in expect.items():
         if row.get(k_) != v:
             failures.append(f"{k_}: {row.get(k_)!r} != expected {v!r}")
+
+    # --- C1 gates: the terminal must survive however the composite row resolved -------------
+    if flip_at_index is not None:
+        flip_bar = bars[flip_at_index]
+        if row.get("terminal_flip_ts") != flip_bar.ts_init:
+            failures.append(f"terminal_flip_ts {row.get('terminal_flip_ts')} != flip bar close {flip_bar.ts_init}")
+        if row.get("terminal_flip_disposition") != "LABELED_POSITIVE":
+            failures.append(f"terminal_flip_disposition = {row.get('terminal_flip_disposition')!r}")
+        want_ttf = (flip_bar.ts_init - T0) / NS
+        if row.get("terminal_time_to_flip_seconds") != want_ttf:
+            failures.append(f"terminal_time_to_flip_seconds {row.get('terminal_time_to_flip_seconds')} != {want_ttf}")
+        if flip_at_index + 1 < len(bars):
+            xb = bars[flip_at_index + 1]
+            if row.get("terminal_exit_price") != xb.open:
+                failures.append(f"terminal_exit_price {row.get('terminal_exit_price')} != next bar OPEN {xb.open}")
+            if row.get("terminal_exit_ts") != xb.ts_event:
+                failures.append(f"terminal_exit_ts {row.get('terminal_exit_ts')} != next bar open instant {xb.ts_event}")
+            if row.get("terminal_exit_price") == bars[flip_at_index].close:
+                failures.append("terminal_exit_price equals the DECISION-BAR CLOSE (forbidden convention)")
+            want_pts = 1 * (xb.open - bars[0].open)
+            got_pts = row.get("terminal_gross_pnl_points")
+            if got_pts is None or abs(got_pts - want_pts) > 1e-9:
+                failures.append(f"terminal_gross_pnl_points {got_pts} != {want_pts}")
+            got_atr = row.get("terminal_gross_pnl_atr")
+            if got_atr is None or abs(got_atr - want_pts / ATR) > 1e-12:
+                failures.append(f"terminal_gross_pnl_atr {got_atr} != {want_pts / ATR}")
+            if row.get("terminal_net_pnl_points") is not None:
+                failures.append("net PnL populated although no cost is declared (must be explicitly unavailable)")
     return name, failures, row, exp
 
 
@@ -157,6 +187,18 @@ def main() -> int:
                           [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 5.6],
                           {}, flip_at_index=6))
 
+    # 5. REGRESSION for the discovered defect, stated explicitly: arms remain censored/untouched
+    #    (nothing beyond +0.25A is ever reached) while the canonical opposite flip DOES occur.
+    cases.append(run_case("censored_arms_with_a_real_flip",
+                          [0.0, 0.20, 0.30, 0.26, 0.24],
+                          {}, flip_at_index=3))
+
+    # 6. The lifecycle clock is not tied to the fixed observation horizon: the flip itself lands
+    #    well past T300.
+    long_life = [0.0, 0.30] + [0.20] * 1400 + [0.25]
+    cases.append(run_case("terminal_flip_far_past_T300", long_life, {},
+                          flip_at_index=len(long_life) - 2))
+
     results, ok = [], True
     for name, failures, row, exp in cases:
         ok &= not failures
@@ -166,29 +208,34 @@ def main() -> int:
                         "kernel_first_passage_seconds": {
                             p: row.get(f"{p}_resolution_seconds") for p in exp},
                         "kernel_disposition": {p: row.get(f"{p}_disposition") for p in exp},
-                        "flip_ts": row.get("flip_ts"),
-                        "time_to_flip_seconds": row.get("time_to_flip_seconds")})
+                        "terminal_flip_ts": row.get("terminal_flip_ts"),
+                        "terminal_time_to_flip_seconds": row.get("terminal_time_to_flip_seconds"),
+                        "terminal_exit_price": row.get("terminal_exit_price"),
+                        "terminal_gross_pnl_atr": row.get("terminal_gross_pnl_atr"),
+                        "terminal_net_pnl_points": row.get("terminal_net_pnl_points"),
+                        "legacy_composite_flip_ts": row.get("flip_ts"),
+                        "row_level_composite_disposition": row.get("disposition")})
         print(f"[{'PASS' if not failures else 'FAIL'}] {name}")
         for f in failures:
             print("    ", f)
 
     # SEPARATE FINDING -- the flip terminal, which the arms must not cost us.
-    flip_lost = [r["case"] for r in results if r["flip_ts"] is None]
+    flip_lost = [r["case"] for r in results if r["terminal_flip_ts"] is None]
     terminal = {
         "check": "COMPOSITE_FLIP_TERMINAL_PRESERVED",
         "verdict": "FAIL" if flip_lost else "PASS",
         "cases_with_null_flip_ts": flip_lost,
-        "cause": ("research_workflow/host/outcomes.py LabelOutcomeKernel._emit: for kernel "
+        "pre_c1_cause": ("research_workflow/host/outcomes.py LabelOutcomeKernel._emit: for kernel "
                   "'composite' it sets flip_ts = at if disp == POSITIVE else None, discarding the "
                   "recorded p.flip_ts. With one-sided milestone arms most rows compose to "
                   "CENSORED (any arm that never touches expires CENSORED under expiry: censor), "
                   "so flip_ts and time_to_flip_seconds are null on virtually every row."),
-        "consequence": ("Adding the milestone arms COSTS the terminal-flip timestamp that the "
-                        "pure flip kernel provided. Milestones and the lifecycle terminal cannot "
-                        "both be had from the current kernel; this is part of gap C1/T1."),
+        "repair": ("C1 emits terminal_flip_ts / terminal_flip_disposition / "
+                   "terminal_time_to_flip_seconds / terminal_exit_* / terminal_gross_* directly "
+                   "from p.flip_ts, never from the composite disposition. The row-level composite "
+                   "columns are unchanged and still censor; that is now irrelevant to the "
+                   "terminal."),
     }
-    for r in results:
-        r.pop("flip_ts", None)
 
     card = {"proof": "FIRST_PASSAGE_INTEGRITY",
             "verdict": "PASS" if ok else "FAIL",
