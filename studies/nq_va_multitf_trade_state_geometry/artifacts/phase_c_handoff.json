@@ -1,0 +1,201 @@
+{
+  "handoff": "PHASE_C_READY -- repair + re-collection complete; next session builds the 2023 lifecycle atlas",
+  "study": "nq_va_multitf_trade_state_geometry",
+  "branch": "study/nq_va_multitf_trade_state_geometry",
+  "worktree": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_va_multitf_trade_state_geometry",
+  "repair": {
+    "branch": "chore/composite_truncate (NOT on main; based on 292c8ca4 = chore/fill_outcome_session / C1, also NOT on main)",
+    "commits": {
+      "4139ae15": "truncate implemented for barrier/composite: effective_end = min(horizon_end, session_close), arms and flip child",
+      "e341d709": "C-6 session-bounded C1 exit fill; one-tick hold at the close for a same-instant flip"
+    },
+    "study_merges": [
+      "8c3ad94d",
+      "f73559a8"
+    ]
+  },
+  "identities": {
+    "composite_seal_hash": "ba69ad0b29b0ef76fba6aa12e8ee72f5a9a41a49f74e8b0d51628738921f1ec1",
+    "plan_sha256": "11fcaf24a18e3c3f442e8a589a962f3cff6f075810fb136f14ac1b4720d1e557",
+    "execution_manifest_composite_sha256": "c9249f99ff96ab5b1dd8ae7f0876f490f6e1f9e3238fe4b7ae9cd71150748356",
+    "spent_seals": [
+      "e93c62bb7c508b1be4a8ed19c1c13327a399ae767ad210e27749a6d004a1ac0d"
+    ]
+  },
+  "audits": {
+    "causal": "pass_04 CLEAR 0/0/1 (C-7 note, unreachable here); pass_03 superseded after C-6 was fixed",
+    "contract": "contract_pass_03 CLEAR 0 critical / 1 warning (K-7, recorded in research_decision.yaml) / 0 notes"
+  },
+  "tests": {
+    "controller_seal_gate": "158 passed / 0 failed -- but lifecycle_v2.PLATFORM_TESTS is a fixed 6-file list that does not cover the outcome kernel",
+    "outcome_kernel_evidence": "artifacts/outcome_kernel_test_evidence.json: 12 suites, 208 passed / 1 failed / 0 new (pre-existing, proven at 14426fb1)",
+    "new_regression_file": "research_workflow/tests/test_composite_session_end_truncate.py, 22 cases, 10 fail against the unrepaired kernel",
+    "broad_test_delta": {
+      "scope": [
+        "research_workflow/tests",
+        "tests"
+      ],
+      "head": "e341d709",
+      "baseline_commit": "c480d8af",
+      "ran": 1128,
+      "passed": 1082,
+      "failed": 43,
+      "known_baseline": 35,
+      "new_vs_baseline": 8,
+      "new_caused_by_repair": 0,
+      "wall_seconds": 3012.5,
+      "classification": {
+        "fail identically at pre-repair base 292c8ca4 (verified)": [
+          "test_redteam_pass1_acceptance::test_acc12_canaries_green (inner failure set identical: frozen V1 ordered_barrier/target_runtime canaries)",
+          "test_runtime_bindings::test_episode_study_is_provider_host_mode_and_all_features_bind",
+          "test_docs_v2::test_generated_reference_and_registry_are_current (C1 outcome.cost_points_per_side has no MEANING entry)",
+          "tests/test_catalog_materializer::test_materialization_required_when_catalog_absent"
+        ],
+        "untracked artifacts absent from a fresh chore worktree": [
+          "test_external_model_scoring::test_external_scorer_matches_repaired_model_c_for_deterministic_parent_row",
+          "test_stage3_integration::test_stage3_model_c_long_short_routing",
+          "tests/test_pre_flip_reliability_contracts::test_long_candidates_prevailing_regime_direction",
+          "tests/test_pre_flip_reliability_contracts::test_short_candidates_prevailing_regime_direction"
+        ]
+      }
+    }
+  },
+  "collection": {
+    "timings_seconds": {
+      "2023": 2348.3,
+      "2024": 2218.2
+    },
+    "timings_vs_v3": "about 5x slower than v3 (450.7s / 430.8s). NOT profiled. Probable cause: candidates now stay pending to the flip/close instead of censoring at setup, so the pending set and the per-1s-bar arm loop are much larger.",
+    "partition_seal": {
+      "2023": "ba69ad0b29b0ef76fba6aa12e8ee72f5a9a41a49f74e8b0d51628738921f1ec1",
+      "2024": "ba69ad0b29b0ef76fba6aa12e8ee72f5a9a41a49f74e8b0d51628738921f1ec1"
+    },
+    "stale_v3_partitions_refused": "partition_reuse mode off AND REPLAY_CLOSURE_CHANGED for both years; both collected fresh",
+    "population": {
+      "2023": {
+        "observation_rows": 134664,
+        "trades_t0": 7489,
+        "regimes_in_observations": 7764,
+        "candidate_regimes": 7764,
+        "checkpoints_per_regime_mean": 17.345
+      },
+      "2024": {
+        "observation_rows": 127333,
+        "trades_t0": 7060,
+        "regimes_in_observations": 7362,
+        "candidate_regimes": 7362,
+        "checkpoints_per_regime_mean": 17.296
+      },
+      "total_trades_t0": 14549,
+      "total_regimes": 15126,
+      "trade_definition": "one row per checkpoint_index == 0 (the T0 entry checkpoint)"
+    },
+    "merged": {
+      "plan_sha256": "11fcaf24a18e3c3f442e8a589a962f3cff6f075810fb136f14ac1b4720d1e557",
+      "observations_sha256": "7bf1a8256769e08e8f8d64f180967e62446597fdddc2bcc1768b8bb123e762a0",
+      "candidates_sha256": "960de355369397f819717756bde81502aa286a3eac9552d9353b77f324b8100f",
+      "rows": 261997
+    }
+  },
+  "verification_gate": {
+    "card": "artifacts/collection_verification.json",
+    "verdict": "PASS",
+    "failed_gates": [],
+    "gates": {
+      "RESOLVED_TERMINAL_COUNT_GT_0": 14528,
+      "RESOLVED_MILESTONE_COUNT_GT_0": 3401295,
+      "ALL_TERMINALS_SESSION_END_IS_FALSE": 0.1443,
+      "ALL_MILESTONES_SESSION_END_IS_FALSE": 18.8586,
+      "PERSISTED_SCHEMA_COMPLETE": 0,
+      "BOTH_YEARS_PRESENT": [
+        2023,
+        2024
+      ],
+      "NET_ECONOMICS_EXPLICITLY_UNAVAILABLE": 0
+    },
+    "terminal_resolved_pct": 99.8557,
+    "terminal_trade_censor_reason": {
+      "<null>": 14528,
+      "SESSION_END": 21
+    },
+    "exit_unavailable_reason": {
+      "<null>": 14522,
+      "SESSION_END": 6
+    },
+    "milestone_resolved_pct": 81.1387,
+    "milestone_session_end_pct": 18.8586,
+    "milestone_resolved_pct_by_arm": {
+      "fp_fav_0p25": 96.8259,
+      "fp_fav_0p50": 93.8499,
+      "fp_fav_0p75": 90.964,
+      "fp_fav_1p00": 88.0541,
+      "fp_fav_1p50": 82.3517,
+      "fp_fav_2p00": 76.8486,
+      "fp_fav_3p00": 66.3767,
+      "fp_fav_4p00": 57.301,
+      "fp_fav_5p00": 49.199,
+      "fp_adv_0p25": 96.9267,
+      "fp_adv_0p50": 93.9663,
+      "fp_adv_0p75": 91.0106,
+      "fp_adv_1p00": 88.1132,
+      "fp_adv_1p50": 82.4219,
+      "fp_adv_2p00": 77.1421,
+      "fp_adv_3p00": 66.8672
+    },
+    "terminal_after_1515_ct_pct": 3.1319,
+    "terminal_duration_seconds": {
+      "n": 14522,
+      "mean": 812.5018592480375,
+      "p1": 45.0,
+      "p10": 165.0,
+      "p25": 285.0,
+      "p50": 585.0,
+      "p75": 1065.0,
+      "p90": 1785.0,
+      "p99": 3405.0,
+      "p100": 7365.0
+    },
+    "year_comparability": {
+      "observation_rows": {
+        "2023": 134664,
+        "2024": 127333,
+        "ratio_b_over_a": 0.9456
+      },
+      "trades_t0": {
+        "2023": 7489,
+        "2024": 7060,
+        "ratio_b_over_a": 0.9427
+      },
+      "terminal_resolved_pct": {
+        "2023": 99.8398,
+        "2024": 99.8725,
+        "ratio_b_over_a": 1.0003
+      },
+      "milestone_resolved_pct": {
+        "2023": 81.2446,
+        "2024": 81.0267,
+        "ratio_b_over_a": 0.9973
+      }
+    },
+    "gate_proven_to_fire": "same script on the invalid v3 frame -> FAIL on RESOLVED_TERMINAL_COUNT_GT_0, RESOLVED_MILESTONE_COUNT_GT_0, ALL_TERMINALS_SESSION_END_IS_FALSE"
+  },
+  "chronology": "NO 2024 OUTCOME ANALYSIS HAS OCCURRED. The verification gate printed pooled (both-year) gross-PnL quantiles and per-year RESOLUTION RATES as completeness checks only; no outcome was split by year, related to any feature, cohort or MTF state, or inspected for 2024 alone. The next session must commit the 2023 atlas specification BEFORE reading any 2024 outcome relationship.",
+  "artifacts": {
+    "merged_frame": "studies\\nq_va_multitf_trade_state_geometry\\_work\\controller\\merged",
+    "partitions": [
+      "studies\\nq_va_multitf_trade_state_geometry\\_work\\controller\\partitions\\train\\2023",
+      "studies\\nq_va_multitf_trade_state_geometry\\_work\\controller\\partitions\\train\\2024"
+    ],
+    "seal": "studies\\nq_va_multitf_trade_state_geometry\\artifacts\\preexec_audit_seal.json",
+    "verification_card": "studies\\nq_va_multitf_trade_state_geometry\\artifacts\\collection_verification.json",
+    "test_evidence": "studies\\nq_va_multitf_trade_state_geometry\\artifacts\\outcome_kernel_test_evidence.json",
+    "decision_record": "studies\\nq_va_multitf_trade_state_geometry\\research_decision.yaml -> collection_v4_repair"
+  },
+  "open_items_not_done_here": [
+    "Merge chore/fill_outcome_session (C1) and chore/composite_truncate to main -- neither is on main.",
+    "Follow-up chore: derive the seal test gate from the changed closure files instead of the fixed PLATFORM_TESTS tuple.",
+    "C-7: non-truncated composite flip branch keeps the same-timestamp hazard; binds only a future composite with a flip horizon inside its session.",
+    "test_docs_v2: add a MEANING entry for outcome.cost_points_per_side (C1 debt, not this repair).",
+    "Profile the 5x collection slowdown if collection cost matters for later studies."
+  ]
+}
