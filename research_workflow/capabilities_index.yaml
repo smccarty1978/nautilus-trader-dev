@@ -40,6 +40,16 @@ trackers:
     dependencies: [stream.completed_1s]
     update_cadence: per_1s
     required_tests: [research_workflow/tests/test_forward_outcomes.py]
+  - id: tracker.regime.prior_level_snapshot
+    version: 1
+    description: Immutable raw-price + frozen-ATR snapshot of the immediately-completed regime of one regime.dual_ema tracker (any timeframe), frozen from its own canonical regime.excursion accumulator on `changed` before the reset.
+    implementation: features.trackers.regime_prior_level_snapshot.RegimePriorLevelSnapshotBinding
+    parameters: []
+    dependencies: [tracker.regime.dual_ema, tracker.regime.excursion]
+    update_cadence: per_source_bar
+    required_tests: [features/tests/test_regime_prior_level_snapshot.py]
+    proposal: research_workflow/capabilities/proposals/tracker.regime.prior_level_snapshot.yaml
+    promotion: {parity_artifact: artifacts/parity/regime_prior_level_snapshot.json, parity_sha256: 44643bd3bf86a8cf8c2d68f59974684ea92c31ea751e4b46bcab35705cb12bd6, promoted_at_utc: '2026-09-21T19:54:55.852635+00:00'}
 
 trigger_primitives:
   - id: trigger.population.established_filter
