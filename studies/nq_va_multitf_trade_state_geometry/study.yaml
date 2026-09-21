@@ -160,7 +160,12 @@ outcome:
   horizon: 24h
   horizon_end_rule: strict
   max_gap: 300s
-  session: RTH
+  # LIFECYCLE OUTCOME POLICY. population.session stays RTH -- RTH defines who is a candidate and
+  # when the fixed-time checkpoints fire. But once a qualifying RTH flip exists, its lifecycle is
+  # allowed to run to the natural opposite 1m flip ACROSS the 15:15 CT boundary, bounded by the
+  # Globex TRADING_DAY. RTH-close censoring was measured to select against the long-runner tail,
+  # which is the cohort this study exists to describe.
+  session: TRADING_DAY
   session_end: truncate
   label_column: target_next_flip_1m
   # --- MILESTONE FIRST PASSAGE across the WHOLE flip-to-flip lifecycle -------------------
@@ -200,8 +205,15 @@ outcome:
       - {id: adv_3p00, favorable_atr: 99.0, adverse_atr: 3.00, horizon: 24h, expiry: censor, prefix: fp_adv_3p00}
 
 chronology:
-  train: [2023]          # discovery / descriptive analysis
-  dev: [2024]            # frozen validation; 2023 bucket boundaries applied unchanged
+  # Both years are TRAIN PARTITIONS because this study fits nothing (model: none) and must not
+  # manufacture a dummy model or a fake TRAIN freeze merely to open an ML-oriented OOS gate.
+  # The controller keeps partition identity per year (_work/controller/partitions/train/<year>/),
+  # so 2023 and 2024 stay separable in every downstream artifact.
+  # The DISCOVERY / FROZEN-REPLICATION split is a contract obligation, not a chronology gate --
+  # see research_decision.yaml `two_year_replication_protocol`. Nothing is fitted, so there is no
+  # parameter that 2024 could leak into.
+  train: [2023, 2024]
+  dev: []
   prohibited: [2025, 2026]
   warmup: {days_before_partition: 5, candidate_emission: false, target_generation: false}
   authorized_dates: ['2023-10-02']

@@ -500,9 +500,7 @@
     "authorized_dates": [
       "2023-10-02"
     ],
-    "dev": [
-      2024
-    ],
+    "dev": [],
     "diagnostic": [],
     "partition_reuse": {
       "mode": "off",
@@ -513,7 +511,8 @@
       2026
     ],
     "train": [
-      2023
+      2023,
+      2024
     ],
     "warmup": {
       "candidate_emission": false,
@@ -523,7 +522,7 @@
     "windows": []
   },
   "closure": {
-    "composite_sha256": "346c71526660948dbeda7549a1812a1cd700a459307d514c62656edccc45f1b8",
+    "composite_sha256": "6bcee4347b33ab0d0c82ccd0cfd904b0a2ed0d269091c84b2718c4b1ad065853",
     "file_count": 159,
     "files": {
       "backtests/nt_runtime/__init__.py": "8a091704d4e8c5dfeeb2fc16e97035e3b7e1986440e5050d9d530d1f4691614f",
@@ -640,7 +639,7 @@
       "research_workflow/governed_controller.py": "0ebe4791a068ae46a2042d01b9ca004d2501dab8512953636f0f2513496b59ae",
       "research_workflow/governed_controller_v2.py": "e878042b11555a7fe5a5f6b75d6c369e8d331bd839c4a5d1f325781eeeda9714",
       "research_workflow/grammar/__init__.py": "8346e9b1ae1cf1c7950e06d278e21d162678d0345ad5b8b2a6aa2a7eeaba5eba",
-      "research_workflow/grammar/compiler.py": "723ae32713a2562202b2cdc0b1ac400465cb9bea3286334d608e082b8fa12379",
+      "research_workflow/grammar/compiler.py": "072d6e04a8211f207338e2668e865f60b6cc0209b5478dd7b95178e35cc33a35",
       "research_workflow/grammar/deliverables.py": "f147d4f7f6fc8cf239a49440765d2410c3c6650f3f0f868b9c902e2ca9e87909",
       "research_workflow/grammar/expansion.py": "0b8124662c11dacba7a5680e229fb77433514894f10a51365287b2c8054de20d",
       "research_workflow/grammar/gaps.py": "9e3341d65135484e56e868bbe9fbb2f13637d133156ce17bdffee988c0d46b48",
@@ -650,13 +649,13 @@
       "research_workflow/host/__init__.py": "eeb674dcd8d9ce76b484669752dc2e9cb6b15934cab13257a7b010750ea1f79c",
       "research_workflow/host/interfaces.py": "daa5844a4e770bfdceb765dd677bb59466aecb4a3dd0a2e3d84ab156b8022094",
       "research_workflow/host/mux.py": "c0abfa56032dccecb465768ffb37deaf86450eafea91db95bfd2086c88db3503",
-      "research_workflow/host/outcomes.py": "a0565fc835dcd4dc197f70cb79e01ecd7535dfbbb0966c0d77fd43f443282ef3",
+      "research_workflow/host/outcomes.py": "d2ee22dcddd3f0f31a23a1df44479aadffca71c83691a371645ad8d48d1ee42e",
       "research_workflow/host/predicate_eval.py": "940b1f4ac7bc2f82d9a1596e2f5dea7e3bfdebf4eb704dbc83152f6f9222012d",
       "research_workflow/host/sink.py": "c0e353d2cd2f23f4c4142927b9e06a90b52ff70ff365a8dd188fb43ec0e0959f",
       "research_workflow/host/strategy.py": "bd1a61f80162b92d58a74ef88f177f90a52d458131a524f7c86e7c45a3c42fd5",
       "research_workflow/host/triggers.py": "f256b699e3f5cd17d8167b12d6c74ea477e4a80772aec77ba47da1bdf7fc3a83",
       "research_workflow/host_runner.py": "d1f4bbdbfe467a1cc4d9e90164b86eb9b568f31fd7422ba0a2c36a92e7d51373",
-      "research_workflow/lifecycle_v2.py": "9050add5399e12885289d498cf7a6b0063d8d59174a2dff89a9b2c5c973a73df",
+      "research_workflow/lifecycle_v2.py": "d3d8857b93e14416e79e9f535a0683ae6e296b6359568c8263fd937de81c05bd",
       "research_workflow/locks.py": "8acc08e35fb743e2cd2f84d57b7a7e08ef4963a350fefb592377651f722b2258",
       "research_workflow/model_artifacts.py": "e861172a2023b04c6bb005a8b82f20d46ec9143936d26a587b721438c784508c",
       "research_workflow/model_store.py": "5755d5e16509990e570dab3712ffc17cacc54280a563aefb9f30cf36a5fb9d80",
@@ -695,7 +694,7 @@
         ]
       },
       "collection": {
-        "composite_sha256": "c0aa6dcae55bde4b6bbaf33211f5ab7183d2de4a6bb850e2be32da7ab8baa459",
+        "composite_sha256": "b1e7aa34bc0839f1dbd30740595f2e1924480d64035a4e185b583eb213200a6b",
         "files": [
           "backtests/nt_runtime/__init__.py",
           "backtests/nt_runtime/compiled_study_loader.py",
@@ -846,7 +845,7 @@
         ]
       },
       "lifecycle": {
-        "composite_sha256": "0d1e965b11bd993b3653a8135e57a75fde2ce0b45769ea0a371aac8f2535ad68",
+        "composite_sha256": "e2496683ea6285411431ef37a0cf0fd3b9d5623e19ebf1fedd04819a63677e1d",
         "files": [
           "research_workflow/closure_hash.py",
           "research_workflow/controller_contracts.py",
@@ -883,7 +882,7 @@
         ]
       },
       "replay": {
-        "composite_sha256": "481fc90d8942bfe73d65918564138192723a85a0a2240493300e6f0ac548c72e",
+        "composite_sha256": "1562f4477a9c6d5fe764176951c033f25fd0f8d85982cefd1d9be49f29b62d38",
         "files": [
           "backtests/nt_runtime/__init__.py",
           "backtests/nt_runtime/compiled_study_loader.py",
@@ -1381,7 +1380,6 @@
       "fp_adv_3p00_disposition",
       "fp_adv_3p00_censor_reason",
       "fp_adv_3p00_resolution_seconds",
-      "observed_seconds",
       "terminal_flip_ts",
       "terminal_flip_disposition",
       "terminal_flip_censor_reason",
@@ -1396,7 +1394,8 @@
       "terminal_duration_seconds",
       "terminal_cost_points",
       "terminal_net_pnl_points",
-      "terminal_net_pnl_atr"
+      "terminal_net_pnl_atr",
+      "observed_seconds"
     ]
   },
   "deliverables": [],
@@ -2148,7 +2147,6 @@
       "fp_adv_3p00_disposition",
       "fp_adv_3p00_censor_reason",
       "fp_adv_3p00_resolution_seconds",
-      "observed_seconds",
       "terminal_flip_ts",
       "terminal_flip_disposition",
       "terminal_flip_censor_reason",
@@ -2163,7 +2161,8 @@
       "terminal_duration_seconds",
       "terminal_cost_points",
       "terminal_net_pnl_points",
-      "terminal_net_pnl_atr"
+      "terminal_net_pnl_atr",
+      "observed_seconds"
     ],
     "observed_seconds": true,
     "primary_arm": "fav_1p00",
@@ -2181,7 +2180,7 @@
     "strict_gap_rule": "max_gap must be shorter than the horizon under strict, else a horizon with zero interior observations expires instead of censoring GAP",
     "terminal_outcome": true
   },
-  "plan_sha256": "82b230f28f71c69cf5b16b827a48469ded20cb4f476ae96fd72eb66da2461821",
+  "plan_sha256": "247755a85abbf8fcabed4a36a8b79f44e00ae59ba33513cb2ae4a5b09c8d256f",
   "plan_version": 1,
   "population": {
     "anchor_identity": "regime_1m.start_ns",
@@ -2199,7 +2198,7 @@
   },
   "registry_sha256": "888bda0992e9461f6e183d24f6c2f2e303b848e1033effe4a56aa9a82a01cc6f",
   "session": {
-    "censor_session": "RTH",
+    "censor_session": "TRADING_DAY",
     "dataset": "NQ_1S_V2_GLOBEX",
     "kind": "calendar",
     "outage_gap_seconds": 7200,
@@ -2214,7 +2213,7 @@
     ],
     "session": "RTH"
   },
-  "spec_sha256": "71754d05046db119afcd771ae3fa4d29589e847319ed580aa844140178589f15",
+  "spec_sha256": "1c697259257bd7e7aa8f07c9b0fbf8cdb5086e0b76455282cbf17d1a0e90579b",
   "streams": [
     {
       "bar_type": "NQ.XCME-1-SECOND-LAST-EXTERNAL",

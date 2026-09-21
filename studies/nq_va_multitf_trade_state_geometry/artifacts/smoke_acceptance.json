@@ -1,0 +1,64 @@
+{
+  "candidates_count_total": 558,
+  "checks": {
+    "candidates_nonempty": true,
+    "no_outcome_columns_in_candidates": true,
+    "observation_per_candidate": true,
+    "pending_resolved_at_run_end": true,
+    "primary_window_respected": true,
+    "replay_imports_within_collection_closure": true
+  },
+  "date": "2023-10-02",
+  "execution_manifest_composite_sha256": "346c71526660948dbeda7549a1812a1cd700a459307d514c62656edccc45f1b8",
+  "generated_at_utc": "2026-09-21T00:17:13.219903+00:00",
+  "manifest": {
+    "candidates_sha256": "d50f91b2d2a84a55da76352a924caa53d52c99ace918b3cef65e53b3057434bb",
+    "composite_seal_hash": "48809ad8075cd921b2e260e0fd3069821cf2cd2765c623f57a75c28b7029a825",
+    "dataset": {
+      "bytes_verification": "VERIFIED",
+      "dataset_id": "NQ_1S_V2_GLOBEX",
+      "logical_digest": "9e7aecb7a2910b4402a6cb4f34cc2f6deb5df19d0e889b2c696cf4f844292c64"
+    },
+    "date": "2023-10-02",
+    "elapsed_s": 8.380063500022516,
+    "execution_manifest_sha256": "346c71526660948dbeda7549a1812a1cd700a459307d514c62656edccc45f1b8",
+    "kind": "smoke",
+    "observations_sha256": "5305de34642dedb0353099e9d7a251c981f543ff5a6b4634ec17252a442901ef",
+    "plan_sha256": "82b230f28f71c69cf5b16b827a48469ded20cb4f476ae96fd72eb66da2461821",
+    "rows": {
+      "candidates": 558,
+      "observations": 558
+    },
+    "stats": {
+      "bars": 213431,
+      "bars_by_stream": {
+        "nq_15m": 368,
+        "nq_1h": 92,
+        "nq_1m": 5520,
+        "nq_1s": 207911,
+        "nq_5m": 1104
+      },
+      "candidates": 558,
+      "dropped_outside_primary": {
+        "candidates": 1655,
+        "observations": 1655
+      },
+      "empty_windows_published": {
+        "nq_15m": 0,
+        "nq_1h": 0,
+        "nq_5m": 0
+      },
+      "epochs": 4691,
+      "observations": 558,
+      "pending_at_end": 0
+    },
+    "status": "PASS",
+    "written_at_utc": "2026-09-21T00:17:13.217198+00:00"
+  },
+  "observations_count_total": 558,
+  "run_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_va_multitf_trade_state_geometry\\studies\\nq_va_multitf_trade_state_geometry\\runs\\20260921_001701_nq_va_multitf_trade_state_geometry_smoke",
+  "sealed_composite_sha256": "48809ad8075cd921b2e260e0fd3069821cf2cd2765c623f57a75c28b7029a825",
+  "status": "ACCEPTED",
+  "study_name": "nq_va_multitf_trade_state_geometry",
+  "validator": "research_workflow.lifecycle_v2"
+}

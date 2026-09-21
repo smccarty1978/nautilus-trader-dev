@@ -6,7 +6,7 @@ research_question: >
   5m / 15m / 1h regime state, higher-timeframe regime geometry, normalized structural levels,
   and fixed-time path information? The purpose is to decide whether the data supports separate
   ensemble heads for (1) initial risk, (2) trend health / giveback, (3) runner preservation.
-status: READY_FOR_PHASE_B
+status: RESEALING_v3
 phase: A
 dataset_id: NQ_1S_V2_GLOBEX
 source_platform_commit: d83be2fd00c351fdf187bf4451d2efa123e9f664
@@ -15,8 +15,8 @@ source_platform_commit: d83be2fd00c351fdf187bf4451d2efa123e9f664
 # Chronology (spec §1). 2025 is SEALED and 2026 is PROHIBITED; neither is opened by this study.
 # --------------------------------------------------------------------------------------------
 chronology_roles:
-  train: [2023]            # discovery / descriptive analysis
-  dev: [2024]              # frozen validation; bucket boundaries defined on 2023 apply UNCHANGED
+  train: [2023, 2024]      # both collected as TRAIN partitions; see two_year_replication_protocol
+  dev: []
   prohibited: [2025, 2026]
   note: >
     2024 is a dev year and is opened only by the oos stage after the TRAIN freeze. Spec §26
@@ -261,3 +261,67 @@ technical_debt:
       fixtures/first_passage_parity.py case parked_side_never_fires proves the parked side never
       resolves, and every arm's first-passage second matches an independent oracle exactly.
     future_fix: a native one-sided first-passage outcome item; not required by this study.
+
+# --------------------------------------------------------------------------------------------
+# TWO-YEAR REPLICATION PROTOCOL (owner directive 2026-09-21). Binding on every later session.
+# --------------------------------------------------------------------------------------------
+two_year_replication_protocol:
+  why_both_years_are_train_partitions: >
+    This study fits nothing (model: none), so the `oos` stage's door -- which requires a TRAIN
+    freeze -- cannot be opened without manufacturing a dummy model and a fake freeze. The owner
+    explicitly forbade that. Collecting both years as TRAIN partitions is the least invasive
+    existing configuration that needs no platform development, and the controller preserves
+    per-year partition identity at _work/controller/partitions/train/<year>/ so the years remain
+    separable in every downstream artifact.
+  year_roles:
+    2023: DISCOVERY -- descriptive atlas construction. Every cohort definition, lifecycle class,
+          transformation, statistic, table and atlas view is specified here.
+    2024: FROZEN TEMPORAL REPLICATION -- the sealed 2023 specification applied UNCHANGED.
+  call_by_call_year_table:
+    - {call: "collection (train partition 2023)", year: 2023, role: DISCOVERY, reads: 2023}
+    - {call: "collection (train partition 2024)", year: 2024, role: REPLICATION, reads: 2024}
+    - {call: "merge", years: [2023, 2024], note: "per-year partition identity preserved in identity.json"}
+    - {call: "atlas construction", year: 2023, role: DISCOVERY, reads: 2023 ONLY}
+    - {call: "replication readout", year: 2024, role: REPLICATION, reads: 2024, precondition: "the 2023 atlas specification is frozen and committed first"}
+  binding_obligations:
+    - All cohort definitions, lifecycle classes, transformations, statistics, tables and atlas
+      views used to judge stability MUST be specified and committed BEFORE any 2024 result is
+      inspected. The commit that freezes them is the audit trail.
+    - No classifier, no entry model, no feature selection, no threshold fitting, no 2024-driven
+      redesign, at any point in this study.
+    - Any exploratory finding made after looking at 2024 is labelled EXPLORATORY and CANNOT
+      retroactively alter the sealed 2023 -> 2024 replication verdict.
+    - The years are NOT pooled until the year-by-year stability result is visible.
+  residual_risk_stated_plainly: >
+    A chronology gate is not enforcing this; a contract obligation is. The mitigation is that
+    nothing is fitted, so there is no parameter, threshold or selected feature that 2024 could
+    leak into -- the only thing at risk is the honesty of the replication claim, which the
+    freeze-before-inspect commit rule is designed to protect.
+
+lifecycle_outcome_policy_v3:
+  changed: population.session stays RTH; outcome.session RTH -> TRADING_DAY
+  why: >
+    Causal audit pass_01 WARNING C-1: RTH-close censoring truncates any lifecycle whose opposite
+    1m flip lands after 15:15 CT, which selects against exactly the long-runner cohort this study
+    exists to describe. RTH still defines who is a candidate and when the fixed-time checkpoints
+    fire; once a qualifying RTH flip exists its lifecycle now runs to the natural opposite flip
+    across the session boundary, bounded by the Globex trading day.
+  session_end: truncate (unchanged -- the trading-day close ends the window rather than voiding it)
+
+superseded_evidence:
+  collection_v2_rth_2023:
+    status: SUPERSEDED -- retained as operational evidence, NOT deleted
+    plan_sha256: 82b230f28f71c69cf5b16b827a48469ded20cb4f476ae96fd72eb66da2461821
+    seal: 48809ad8075cd921b2e260e0fd3069821cf2cd2765c623f57a75c28b7029a825
+    what_is_still_valid: >
+      Operational timing and population counts: 7m38s wall for the 2023 RTH partition,
+      12,805,413 bars, 282,196 epochs, 134,664 observations, 7,764 distinct 1m V_A regimes,
+      median 20 checkpoints per regime, smoke 2023-10-02 PASS (558 candidates, 8.4 s).
+      The 64 fp_* milestone columns were persisted correctly.
+    what_is_invalid: >
+      ALL terminal economics. The 15 terminal_* columns were declared by the compiler, emitted by
+      the kernel and DROPPED BY THE SINK, because CollectionSink buffers from the kernel's own
+      observation_columns list and that list had not been updated. Fixed in e2169543; the class of
+      defect is now caught at merge by MERGE_PERSISTED_SCHEMA_MISSING_COLUMNS (292c8ca4).
+      No terminal_flip_ts, no executable exit, no realized PnL exists in that frame.
+    disposition: do not delete; do not use for any terminal or lifecycle-duration claim.
