@@ -43,6 +43,16 @@ from research_workflow.host.interfaces import NS, BarView
 POSITIVE, NEGATIVE, CENSORED = "POSITIVE", "NEGATIVE", "CENSORED"
 LEGACY = {POSITIVE: "LABELED_POSITIVE", NEGATIVE: "LABELED_NEGATIVE", CENSORED: "CENSORED"}
 
+# C1 terminal block. The compiler and the kernel BOTH build their observation column list from
+# this tuple so the two can never drift; the sink buffers from the kernel's list.
+TERMINAL_OBSERVATION_COLUMNS = [
+    "terminal_flip_ts", "terminal_flip_disposition", "terminal_flip_censor_reason",
+    "terminal_time_to_flip_seconds", "terminal_exit_ts", "terminal_exit_price",
+    "terminal_exit_unavailable_reason", "terminal_entry_ts", "terminal_entry_price",
+    "terminal_gross_pnl_points", "terminal_gross_pnl_atr", "terminal_duration_seconds",
+    "terminal_cost_points", "terminal_net_pnl_points", "terminal_net_pnl_atr",
+]
+
 LEGACY_OBSERVATION_COLUMNS = (
     "observation_ts", "regime_start_ns", "regime_direction", "checkpoint_index", "flip_ts", "time_to_flip_seconds",
     "target_flip_within_horizon", "disposition", "censored", "censor_reason", "horizon_end_ts", "session_close_ts",
@@ -255,6 +265,12 @@ class LabelOutcomeKernel:
             for arm in self.arms:
                 self.observation_columns += [f"{arm.prefix}_label", f"{arm.prefix}_disposition",
                                              f"{arm.prefix}_censor_reason", f"{arm.prefix}_resolution_seconds"]
+        # C1. MUST mirror the compiler's observation_columns exactly, in the same order: the sink
+        # buffers from THIS list, so a column the compiler declares but the kernel omits is emitted
+        # into the row dict and then silently dropped on the way to parquet. Placed BEFORE
+        # observed_seconds so A5's invariant (observed_seconds is the last column) still holds.
+        if contract.terminal_outcome:
+            self.observation_columns += TERMINAL_OBSERVATION_COLUMNS
         if contract.observed_seconds:
             self.observation_columns.append("observed_seconds")
         self._primary_index = 0
@@ -666,5 +682,5 @@ class LabelOutcomeKernel:
 
 
 __all__ = ["LabelOutcomeContract", "TradeExecutionContract", "BarrierArm", "FlipItem", "FillModel",
-           "LabelOutcomeKernel", "compile_outcome_contract", "OutcomeContractError", "LEGACY_OBSERVATION_COLUMNS",
+           "LabelOutcomeKernel", "compile_outcome_contract", "OutcomeContractError", "LEGACY_OBSERVATION_COLUMNS", "TERMINAL_OBSERVATION_COLUMNS",
            "POSITIVE", "NEGATIVE", "CENSORED"]

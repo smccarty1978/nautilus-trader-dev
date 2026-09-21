@@ -1129,7 +1129,6 @@ def _resolve_outcome(ctx: _Ctx, population: Mapping[str, Any]) -> Dict[str, Any]
     # A5: every new compile carries observed_seconds = (resolved_at_ts - T)/1e9 (the analysis harness's own
     # terminal-minus-anchor definition). A contract field, not a legacy column: sealed plans replay unchanged.
     contract["observed_seconds"] = True
-    obs.append("observed_seconds")
     # C1: every new compile that declares a flip item also carries the CANONICAL LIFECYCLE
     # TERMINAL -- the qualifying opposite flip, its executable next_bar_open exit and the realized
     # gross economics against the executable entry. A contract field, not a legacy column, so a
@@ -1140,11 +1139,10 @@ def _resolve_outcome(ctx: _Ctx, population: Mapping[str, Any]) -> Dict[str, Any]
         contract["terminal_outcome"] = True
         if o.cost_points_per_side is not None:
             contract["cost_points_per_side"] = float(o.cost_points_per_side)
-        obs += ["terminal_flip_ts", "terminal_flip_disposition", "terminal_flip_censor_reason",
-                "terminal_time_to_flip_seconds", "terminal_exit_ts", "terminal_exit_price",
-                "terminal_exit_unavailable_reason", "terminal_entry_ts", "terminal_entry_price",
-                "terminal_gross_pnl_points", "terminal_gross_pnl_atr", "terminal_duration_seconds",
-                "terminal_cost_points", "terminal_net_pnl_points", "terminal_net_pnl_atr"]
+        from research_workflow.host.outcomes import TERMINAL_OBSERVATION_COLUMNS
+        obs += list(TERMINAL_OBSERVATION_COLUMNS)
+    # A5 invariant: observed_seconds is the LAST observation column.
+    obs.append("observed_seconds")
     contract["observation_columns"] = obs
     return contract
 
