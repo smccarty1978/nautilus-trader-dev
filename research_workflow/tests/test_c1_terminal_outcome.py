@@ -275,3 +275,56 @@ def test_merge_carries_the_persisted_schema_assertion():
     assert "MERGE_PERSISTED_SCHEMA_MISSING_COLUMNS" in src
     assert 'missing = [c for c in declared if c not in obs.columns]' in src
     assert '"declared_observation_columns": declared' in src
+
+
+# --------------------------------------------------------------------------------------------
+# v4_outcome_lineage (transplant onto main, 2026-09-21): the executable ENTRY, proven with prices
+# that cannot coincide. The fixture above opens a flat entry bar (open == close) and feeds no
+# decision bar, so it cannot tell the executable open from a close.
+# --------------------------------------------------------------------------------------------
+def _entry_run(bars, *, flip_after, direction=1):
+    arms = [_arm("fav_0p25", 0.25, 99.0, "fp_fav_0p25")]
+    k = LabelOutcomeKernel(_plan(arms=arms), _NoSessions())
+    k.open({"observation_ts": T0, "regime_start_ns": T0, "checkpoint_index": 0}, T0, direction, ATR)
+    for b in bars:
+        k.on_bar(b)
+        if b.ts_init == flip_after:
+            k.on_flip(b.ts_init, -direction, direction)
+    k.finalize(bars[-1].ts_init)
+    rows = k.drain_rows()
+    assert len(rows) == 1
+    return rows[0]
+
+
+def test_executable_entry_is_the_open_of_the_first_bar_strictly_after_the_decision():
+    decision = BarView("1s", T0 - NS, T0, 14_990.0, 15_001.0, 14_989.0, 15_000.0, 1.0)      # ts_init == T: NOT eligible
+    entry = BarView("1s", T0, T0 + NS, 15_002.0, 15_009.0, 15_001.0, 15_007.0, 1.0)         # first bar strictly after T
+    flip = BarView("1s", T0 + NS, T0 + 2 * NS, 15_007.0, 15_013.0, 15_006.0, 15_012.0, 1.0)
+    exit_ = BarView("1s", T0 + 2 * NS, T0 + 3 * NS, 15_011.0, 15_014.0, 15_010.0, 15_013.0, 1.0)
+    row = _entry_run([decision, entry, flip, exit_], flip_after=flip.ts_init)
+    assert row["terminal_entry_price"] == entry.open == 15_002.0
+    assert row["terminal_entry_price"] not in (decision.close, decision.open, entry.close, flip.close)
+    assert row["terminal_entry_ts"] == entry.ts_event == T0          # the executable bar's open instant
+    assert row["terminal_exit_price"] == exit_.open and row["terminal_exit_ts"] == exit_.ts_event
+    assert row["terminal_gross_pnl_points"] == exit_.open - entry.open
+
+
+def test_executable_entry_after_a_tape_gap_is_the_next_bar_that_exists():
+    later = BarView("1s", T0 + 4 * NS, T0 + 5 * NS, 15_020.0, 15_025.0, 15_019.0, 15_024.0, 1.0)   # 4s hole after T
+    flip = BarView("1s", T0 + 5 * NS, T0 + 6 * NS, 15_024.0, 15_030.0, 15_023.0, 15_029.0, 1.0)
+    exit_ = BarView("1s", T0 + 6 * NS, T0 + 7 * NS, 15_028.0, 15_031.0, 15_027.0, 15_030.0, 1.0)
+    row = _entry_run([later, flip, exit_], flip_after=flip.ts_init)
+    assert (row["terminal_entry_price"], row["terminal_entry_ts"]) == (later.open, later.ts_event)
+
+
+def test_entry_columns_are_published_only_with_an_executable_exit():
+    """DECLARED LIMITATION (historical C1 behaviour, transplanted unchanged): the entry pair is emitted
+    together with the realized economics, so a row whose flip has no executable exit carries a NULL
+    entry although its entry was resolved at T+1 bar. Changing that is a deliberate follow-up, not an
+    accident -- this test pins the current contract."""
+    decision = BarView("1s", T0 - NS, T0, 14_990.0, 15_001.0, 14_989.0, 15_000.0, 1.0)
+    entry = BarView("1s", T0, T0 + NS, 15_002.0, 15_009.0, 15_001.0, 15_007.0, 1.0)
+    flip = BarView("1s", T0 + NS, T0 + 2 * NS, 15_007.0, 15_013.0, 15_006.0, 15_012.0, 1.0)
+    row = _entry_run([decision, entry, flip], flip_after=flip.ts_init)                   # no bar after the flip
+    assert row["terminal_exit_unavailable_reason"] == "DATA_END"
+    assert row["terminal_entry_price"] is None and row["terminal_entry_ts"] is None
