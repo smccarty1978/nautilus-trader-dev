@@ -1,0 +1,33 @@
+{
+  "STATUS": "COMPILED",
+  "catalog_opened": false,
+  "closure_sha256": "c9249f99ff96ab5b1dd8ae7f0876f490f6e1f9e3238fe4b7ae9cd71150748356",
+  "features": 20,
+  "outcome": {
+    "contract": "label",
+    "kernel": "composite"
+  },
+  "plan_sha256": "11fcaf24a18e3c3f442e8a589a962f3cff6f075810fb136f14ac1b4720d1e557",
+  "population": "grid",
+  "streams": [
+    "nq_1s",
+    "nq_1m",
+    "nq_5m",
+    "nq_15m",
+    "nq_1h"
+  ],
+  "study_id": "nq_va_multitf_trade_state_geometry",
+  "trackers": [
+    "regime_1m",
+    "regime_5m",
+    "regime_15m",
+    "regime_1h",
+    "excursion_1m",
+    "excursion_5m",
+    "excursion_15m",
+    "excursion_1h",
+    "features"
+  ],
+  "triggers": "every_candidate",
+  "written_at_utc": "2026-09-21T03:05:19.592118+00:00"
+}

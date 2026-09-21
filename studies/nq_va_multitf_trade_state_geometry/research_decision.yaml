@@ -380,3 +380,94 @@ collection_v3_gate_failure:
       exact first-passage instant for a touch before the close and CENSORED SESSION_END only for
       one that never touches.
     then: re-audit (delta), re-seal, re-collect. The seal e93c62bb is spent.
+
+# --------------------------------------------------------------------------------------------
+# COLLECTION v4 -- the platform repair that the v3 gate failure demanded (2026-09-21).
+# --------------------------------------------------------------------------------------------
+collection_v4_repair:
+  status: repaired, re-audited, re-sealed, re-collected
+  research_contract: >
+    FROZEN and verified unchanged. `git diff 14426fb1 HEAD -- studies/.../study.yaml` is empty and
+    the recompiled compiled_plan.json differs from the sealed one in exactly 8 lines, all of them
+    closure hashes (two changed file hashes plus three composite rollups). Population, entry
+    convention, 5m/15m/1h design, MTF features, ATR normalization, T0..T300 checkpoints, the 16
+    milestone thresholds, the 99-ATR parked-side encoding, the terminal opposite-flip definition,
+    the 2023 discovery / 2024 replication chronology and model design are all untouched. This was
+    a platform semantic repair, not research.
+  spent_seal: e93c62bb7c508b1be4a8ed19c1c13327a399ae767ad210e27749a6d004a1ac0d
+  commits:
+    4139ae15: >
+      session_end_rule "truncate" implemented for the barrier/composite kernel. effective_end =
+      min(horizon_end, session_close) for every declared observation window -- each barrier arm
+      AND, independently, the composite's canonical flip child. A touch at or before the effective
+      end resolves at its own first-passage instant; only an arm that REACHES that end untouched
+      is CENSORED SESSION_END, stamped at the close. _Pending.arm_truncated records that the close
+      (not the horizon) ended the window, so _expire_arm attributes SESSION_END rather than
+      TIMEOUT, and never the `negative` expiry policy, which describes a FULL horizon elapsing.
+      A bar past the close is never touch-eligible. target_replay_oracle.replay (the independent
+      V2 oracle) gained the same rule; the frozen V1 composite path is untouched.
+    e341d709: >
+      Two findings from auditing the above. (a) WARNING C-6: the C1 terminal exit fill had no
+      session check and stayed inside the trading day only because the CME nightly maintenance
+      break exceeds max_gap_ns -- an invariant enforced by the calendar, not by the kernel. The
+      fill is now refused on the boundary itself with terminal_exit_unavailable_reason =
+      SESSION_END; the flip still resolves and economics are reported unavailable, never invented.
+      (b) A defect 4139ae15 itself introduced: _complete resolved the truncated flip child on
+      `now_ts >= session_close`, but sort_bars_causal delivers the shorter timeframe first at equal
+      ts_init, so the 1s outcome bar closing AT the close reaches on_bar BEFORE the 1m bar whose
+      tracker emits the flip at that same instant -- and the truncated window INCLUDES the close.
+      A close-instant flip was therefore censored one tick early. The close is now held one tick,
+      the rule _sweep_flip already applies for kernel: flip.
+  platform_lineage_not_on_main: >
+    REQUIRED DISCLOSURE (WORKFLOW.md M.3 step 5, and contract_pass_03 WARNING K-7). The branch
+    carrying this seal's fix, chore/composite_truncate, is NOT merged to main. It is based on
+    292c8ca4, the tip of chore/fill_outcome_session, which carries C1 and is ALSO not merged to
+    main. main is at d83be2fd and carries neither. The study branch therefore absorbs both via
+    `git merge --no-ff chore/<topic>` (merges 8c3ad94d and f73559a8), which M.3 step 5 permits
+    only when the platform change is not yet on main "and that is recorded". This is that record.
+    Anyone reproducing this frame from main alone will NOT get this kernel.
+  audits:
+    causal: >
+      pass_03 (composite 1c1b1b8a) CLEAR with WARNING C-6, which was then FIXED rather than
+      carried, making pass_03 stale. pass_04 (composite c9249f99) CLEAR -- 0 critical, 0 warning,
+      1 note. C-6 closed; the one-tick hold verified correct, sufficient and free of new
+      look-ahead; finalize termination confirmed total.
+    contract: >
+      contract_pass_03 (composite c9249f99) CLEAR -- 0 critical, 1 warning (K-7, recorded above),
+      0 notes. Terminal-label reachability re-verified: under the OLD kernel every terminal label
+      and every milestone arm was UNREACHABLE BY CONSTRUCTION; under the repaired kernel the
+      declared label space is genuinely reachable.
+  carried_notes:
+    C-7: >
+      The non-truncated composite branch still resolves NEGATIVE on `now_ts >= p.flip_end` and
+      carries the identical same-timestamp (1s-before-1m) hazard that was fixed for the truncated
+      case. Left unchanged deliberately: it is pre-existing behaviour under censor/ignore, frozen
+      studies depend on it, and it CANNOT bind this study because a 24h flip horizon always
+      exceeds the ~23h TRADING_DAY, so the truncated branch is always the one taken. Flagged
+      forward for any future kernel: composite study whose flip horizon fits inside its session.
+    K-5_K-7_disclosure_category: >
+      Swept as a category before this re-freeze, not one finding per cycle: the spent seal is
+      named, the unmerged platform lineage is named, the v3 frame is recorded unusable for
+      outcome/milestone/economic analysis, and the earlier withdrawn claim about the v2 RTH frame
+      stands withdrawn (v2 is OPERATIONAL EVIDENCE ONLY).
+  seal_test_gate_scope_gap:
+    finding: >
+      research_workflow/lifecycle_v2.py::PLATFORM_TESTS is a FIXED six-file tuple and is NOT
+      derived from the execution closure. The controller's seal-time test gate therefore executes
+      NO outcome-kernel suite except test_golden_fixture.py -- not test_session_end_truncate.py,
+      not test_c1_terminal_outcome.py, not test_first_passage_oracle_parity.py, and not the
+      regression file written for this repair. The seal's 158-test gate cannot, by itself, vouch
+      for the surface this seal exists to certify. Surfaced by contract_pass_03, which correctly
+      declined to verify coverage from aggregate counts alone.
+    handled_for_this_seal_by: >
+      artifacts/outcome_kernel_test_evidence.json -- 12 outcome-kernel suites run explicitly and
+      bound to execution composite c9249f99: 208 passed, 1 failed, 0 NEW. The single failure
+      (test_composite_target_expression::test_runtime_OR_flip_only_is_positive) is proven
+      pre-existing by running the same suites at the spent-seal commit 14426fb1 in an isolated
+      detached worktree: 186 passed / 1 failed there versus 208 passed / 1 failed here -- a delta
+      of exactly +22, the new regression file, and zero new failures.
+    not_fixed_here_because: >
+      PLATFORM_TESTS is shared by EVERY study's seal, so widening it changes seal cost and
+      behaviour repo-wide. That is a platform design decision belonging in its own chore, not a
+      unilateral edit from a study repair session. RECOMMENDED: derive the seal test gate from the
+      changed closure files instead of a fixed list.

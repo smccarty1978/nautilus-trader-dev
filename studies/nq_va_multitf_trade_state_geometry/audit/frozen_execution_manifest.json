@@ -126,7 +126,7 @@
     "research_workflow/host/__init__.py": "eeb674dcd8d9ce76b484669752dc2e9cb6b15934cab13257a7b010750ea1f79c",
     "research_workflow/host/interfaces.py": "daa5844a4e770bfdceb765dd677bb59466aecb4a3dd0a2e3d84ab156b8022094",
     "research_workflow/host/mux.py": "c0abfa56032dccecb465768ffb37deaf86450eafea91db95bfd2086c88db3503",
-    "research_workflow/host/outcomes.py": "d2ee22dcddd3f0f31a23a1df44479aadffca71c83691a371645ad8d48d1ee42e",
+    "research_workflow/host/outcomes.py": "a0b2454f30f02668e838623d66bfbd4d4009a1cca60f0ea6aaa0eb94e514d0cd",
     "research_workflow/host/predicate_eval.py": "940b1f4ac7bc2f82d9a1596e2f5dea7e3bfdebf4eb704dbc83152f6f9222012d",
     "research_workflow/host/sink.py": "c0e353d2cd2f23f4c4142927b9e06a90b52ff70ff365a8dd188fb43ec0e0959f",
     "research_workflow/host/strategy.py": "bd1a61f80162b92d58a74ef88f177f90a52d458131a524f7c86e7c45a3c42fd5",
@@ -152,7 +152,7 @@
     "research_workflow/study_closure.py": "aab002720ac1f3a39e5b0e406fd5a818eeb42fb688cff4cc06b8b78d89239928",
     "research_workflow/study_kind.py": "ce5fe11e8c1dbe930e284b7a04dc205430261ed214dc81a88149c2138c837909",
     "research_workflow/target_expression.py": "cb2980ed3b1563ce2eee981896ab04ef101179a569dffdc975bbfb5bddd40045",
-    "research_workflow/target_replay_oracle.py": "e11cabdbb923764b9a4fc54ed86272d08583bedacd714ee4120e854a7b74fe64",
+    "research_workflow/target_replay_oracle.py": "e58127d52cb6dda41bc350b9f708dabf7c32e8835e9daa51ae7fe16b7ce01a71",
     "research_workflow/target_runtime.py": "34da6cb81d122c3471422f97c88a87578dc04c0b37a290f5e7c9e67a74262e68",
     "research_workflow/test_selection.py": "f6dc5f8bcf5c3c912c4f85c1d7c7b0b5846b2fc1f90d89b4d7998e08de3e11e7",
     "research_workflow/workflow_engine.py": "dbb6a5ac3b2dcb3794740603325483fe6114cee85b2b303351fc9e2955532ba2",
@@ -162,10 +162,10 @@
     "utils/runner/data.py": "92fa0e2f9193336faa6f9e06825dd425c8f2682062cedc44ad26edbc1a121c46",
     "utils/session_boundaries.py": "15bbb046337a9fd2ed119e64fb79de5dab5d37608a0f6b9a7d1b9a73a20d5b0f"
   },
-  "frozen_execution_composite_sha256": "6bcee4347b33ab0d0c82ccd0cfd904b0a2ed0d269091c84b2718c4b1ad065853",
-  "generated_at_utc": "2026-09-21T01:08:27.580400+00:00",
+  "frozen_execution_composite_sha256": "c9249f99ff96ab5b1dd8ae7f0876f490f6e1f9e3238fe4b7ae9cd71150748356",
+  "generated_at_utc": "2026-09-21T03:05:25.291045+00:00",
   "hash_algorithm": "v2",
-  "plan_sha256": "247755a85abbf8fcabed4a36a8b79f44e00ae59ba33513cb2ae4a5b09c8d256f",
+  "plan_sha256": "11fcaf24a18e3c3f442e8a589a962f3cff6f075810fb136f14ac1b4720d1e557",
   "schema_version": 2,
   "spec_sha256": "1c697259257bd7e7aa8f07c9b0fbf8cdb5086e0b76455282cbf17d1a0e90579b",
   "stages": {
@@ -176,7 +176,7 @@
       ]
     },
     "collection": {
-      "composite_sha256": "b1e7aa34bc0839f1dbd30740595f2e1924480d64035a4e185b583eb213200a6b",
+      "composite_sha256": "e6c85c30abaf38dff34157e772266322fc0d2bac4bdbb103abdd1414df4b16d5",
       "files": [
         "backtests/nt_runtime/__init__.py",
         "backtests/nt_runtime/compiled_study_loader.py",
@@ -355,7 +355,7 @@
       ]
     },
     "outcome": {
-      "composite_sha256": "34cda7cf9c805caa2c77aa46a555cb1d13e2f5fddf84f78e00a77d72d1cc2638",
+      "composite_sha256": "d0d3fa23d7af013a102000fefa3eccaa3776e27e67dfc2641221ca74825dc126",
       "files": [
         "research_workflow/entry_references.py",
         "research_workflow/forward_outcomes/guard.py",
@@ -364,7 +364,7 @@
       ]
     },
     "replay": {
-      "composite_sha256": "1562f4477a9c6d5fe764176951c033f25fd0f8d85982cefd1d9be49f29b62d38",
+      "composite_sha256": "4c950d2010ec4e76a8afa7dd70faab7c41a61cf1a7c32afe7aad8d656ecd9f59",
       "files": [
         "backtests/nt_runtime/__init__.py",
         "backtests/nt_runtime/compiled_study_loader.py",

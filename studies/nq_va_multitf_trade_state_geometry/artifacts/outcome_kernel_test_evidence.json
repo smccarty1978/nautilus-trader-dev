@@ -1,0 +1,61 @@
+{
+  "evidence": "OUTCOME_KERNEL_TEST_COVERAGE",
+  "why": "lifecycle_v2.PLATFORM_TESTS is a FIXED 6-file tuple and is not derived from the execution closure, so the controller's seal-time test gate does not execute ANY outcome-kernel suite -- including the regression file written for this repair. The seal therefore cannot, by itself, vouch for the surface it was taken to certify. This artifact supplies that evidence explicitly, bound to the sealed composite.",
+  "gate_scope_gap": {
+    "selector": "research_workflow/lifecycle_v2.py::PLATFORM_TESTS",
+    "kind": "fixed list, not closure-derived",
+    "controller_gate_files": 6,
+    "outcome_kernel_files_in_controller_gate": [
+      "research_workflow/tests/test_golden_fixture.py"
+    ],
+    "recommendation": "separate chore: derive the seal test gate from the changed closure files"
+  },
+  "execution_composite_sha256": "c9249f99ff96ab5b1dd8ae7f0876f490f6e1f9e3238fe4b7ae9cd71150748356",
+  "files": [
+    "research_workflow/tests/test_composite_session_end_truncate.py",
+    "research_workflow/tests/test_session_end_truncate.py",
+    "research_workflow/tests/test_first_passage_oracle_parity.py",
+    "research_workflow/tests/test_c1_terminal_outcome.py",
+    "research_workflow/tests/test_composite_target_expression.py",
+    "research_workflow/tests/test_trading_day_censoring.py",
+    "research_workflow/tests/test_redteam_v2_gap_precedence.py",
+    "research_workflow/tests/test_redteam_v2_sessions.py",
+    "research_workflow/tests/test_forward_outcomes.py",
+    "research_workflow/tests/test_target_session_policy_fidelity.py",
+    "research_workflow/tests/test_bucketing_and_gate.py",
+    "research_workflow/tests/test_golden_fixture.py"
+  ],
+  "counts": {
+    "passed": 208,
+    "failed": 1
+  },
+  "failed_nodes": [
+    "research_workflow/tests/test_composite_target_expression.py::test_runtime_OR_flip_only_is_positive"
+  ],
+  "status": "PASS_WITH_KNOWN_PREEXISTING_FAILURE",
+  "generated_at_utc": "2026-09-21T03:16:09.701852+00:00",
+  "new_failures": [],
+  "classification": {
+    "known_preexisting": [
+      {
+        "node": "research_workflow/tests/test_composite_target_expression.py::test_runtime_OR_flip_only_is_positive",
+        "surface": "frozen V1 target_runtime / target_expression path, which this repair deliberately does not touch",
+        "proof": "the same node fails identically at the SPENT-SEAL commit 14426fb1, run in an isolated detached worktree: 186 passed / 1 failed there, 208 passed / 1 failed here. The delta is exactly +22 -- the new regression file -- and zero new failures.",
+        "prerepair_commit": "14426fb1",
+        "prerepair_counts": {
+          "passed": 186,
+          "failed": 1
+        },
+        "postrepair_counts": {
+          "passed": 208,
+          "failed": 1
+        }
+      }
+    ],
+    "note": "three further pre-existing failures in this family (test_redteam_pass2_target_semantics [AND]/[OR] and test_target_runtime::test_ordered_barrier_timeout_gap_ambiguous_and_exact_boundary) were verified the same way against the pristine chore base 292c8ca4; they are outside this artifact's file list. A broad test_delta over research_workflow/tests and tests classifies all of them formally against config/test_failure_baseline.json."
+  },
+  "repair_commits": [
+    "4139ae15",
+    "e341d709"
+  ]
+}
