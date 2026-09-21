@@ -1,0 +1,177 @@
+{
+ "year": 2023,
+ "frame": {
+  "plan_sha256": "11fcaf24a18e3c3f442e8a589a962f3cff6f075810fb136f14ac1b4720d1e557",
+  "composite_seal_hash": "ba69ad0b29b0ef76fba6aa12e8ee72f5a9a41a49f74e8b0d51628738921f1ec1",
+  "execution_manifest_sha256": "c9249f99ff96ab5b1dd8ae7f0876f490f6e1f9e3238fe4b7ae9cd71150748356",
+  "year": 2023,
+  "observations_sha256": "40ce405b7a92100f2e9439072e184dcd824225e8352a4dad3b7a5c961177c589",
+  "candidates_sha256": "ef03d393c6c376d50f54489bc047dcf05bbf7031dda995741522d6f09dcc58ca",
+  "rows": 134664,
+  "partition": "_work\\controller\\partitions\\train\\2023"
+ },
+ "contract_commit": null,
+ "n_trades": 7475,
+ "excluded": 14,
+ "frozen_constants": {
+  "RAPID_EDGE_s": 34.0,
+  "LONG_QUIET_duration_p75_s": 1065.0,
+  "MIN_TRADES": 5000
+ },
+ "claims": {
+  "C1": {
+   "claim": "untreated flip-to-flip gross is ~break-even",
+   "mean_A": -0.030811766346723522,
+   "se": 0.027572616584732212,
+   "verdict": "PASS"
+  },
+  "C2": {
+   "claim": "favorable ladder continues at a roughly constant per-A rate (long right tail); adverse ladder collapses past -1A (flip exit truncates the left tail)",
+   "fav_per_A": [
+    0.6258807906906313,
+    0.6264515350432593,
+    0.6511627906976745,
+    0.6808035714285714,
+    0.6729508196721311
+   ],
+   "adv_per_A": [
+    0.29838042948471005,
+    0.18630712476407288
+   ],
+   "verdict": "PASS"
+  },
+  "C3": {
+   "claim": "for trades that never reach +2A the terminal sits at the lifecycle adverse extreme",
+   "n": 4723,
+   "spearman_pnl_vs_neg_mae_rung": 0.8946286535751061,
+   "mean_pnl_plus_mae_rung_A": 0.011644092763617284,
+   "share_terminal_negative": 0.9532077069659115,
+   "verdict": "PASS"
+  },
+  "C4": {
+   "claim": "expectancy is right-tail dependent",
+   "n_top": 374,
+   "sum_top_A": 2698.2210746696014,
+   "sum_rest_A": -2928.5390281113596,
+   "mean_rest_A": -0.41241219942421625,
+   "total_A": -230.3179534417577,
+   "verdict": "PASS"
+  },
+  "C5": {
+   "claim": "T0 higher-timeframe state/geometry carries almost no information about the 1m lifecycle",
+   "max_abs_spearman_pnl": 0.021311544341559605,
+   "max_abs_auc_dev_rapid_failure": 0.02507820684091544,
+   "max_abs_auc_dev_runner3": 0.013704328071189764,
+   "n_features": 52,
+   "verdict": "PASS"
+  },
+  "C6": {
+   "claim": "entry extension from the flip-bar open scales BOTH tails (scale, not sign)",
+   "auc_severe_mae2": 0.6259751621150401,
+   "auc_runner3": 0.5466001553819663,
+   "spearman_pnl": -0.035864829600814406,
+   "verdict": "PASS"
+  },
+  "C7": {
+   "claim": "remaining gross from any observed early-path state is ~0 (post-entry state predicts spread, not drift)",
+   "30": {
+    "n": 7239,
+    "spearman_cur_pnl_vs_rem_pnl": -0.043890292770959294,
+    "mean_rem_pnl_A": -0.016253217832159165,
+    "se": 0.027440495021837173
+   },
+   "60": {
+    "n": 7182,
+    "spearman_cur_pnl_vs_rem_pnl": -0.06913198955616737,
+    "mean_rem_pnl_A": -0.00948215622251994,
+    "se": 0.027652624991949537
+   },
+   "120": {
+    "n": 6751,
+    "spearman_cur_pnl_vs_rem_pnl": -0.07638677436104763,
+    "mean_rem_pnl_A": -0.0255852991654069,
+    "se": 0.027865928962021388
+   },
+   "285": {
+    "n": 5120,
+    "spearman_cur_pnl_vs_rem_pnl": -0.05916707884097297,
+    "mean_rem_pnl_A": -0.0005618646525189834,
+    "se": 0.031974161637819465
+   },
+   "grid_cells_n_ge_min": 72,
+   "share_cells_abs_z_gt_2": 0.027777777777777776,
+   "verdict": "PASS"
+  },
+  "C8": {
+   "claim": "the -1A loser becomes identifiable only after entry and increasingly with time",
+   "t0_best_abs_auc_dev": 0.0516340496879486,
+   "path_auc_s15": 0.6029115909951793,
+   "path_auc_s120": 0.6955869702608126,
+   "verdict": "PASS"
+  },
+  "C9": {
+   "claim": "archetype prevalence: no quiet stagnation, giveback is the modal 1-3A outcome, ~1 in 9 reaches +5A",
+   "shares": {
+    "DEVELOPED_GIVEBACK": 0.33244147157190634,
+    "RUNNER_3_5": 0.12989966555183946,
+    "FAILURE_RAPID": 0.12481605351170569,
+    "FAILURE_SLOW": 0.12107023411371237,
+    "RUNNER_5PLUS": 0.10983277591973244,
+    "SHALLOW_FADE": 0.10622073578595317,
+    "SHALLOW_RECOVERED": 0.05899665551839465,
+    "DEVELOPED_HELD": 0.015785953177257527,
+    "STAGNANT_QUIET": 0.0009364548494983278
+   },
+   "failure_share": 0.24588628762541806,
+   "conditions": [
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "verdict": "PASS"
+  },
+  "C10": {
+   "claim": "path archetypes are NOT separable at T0",
+   "max_abs_auc_dev": {
+    "FAILURE_RAPID": 0.060910452231206946,
+    "RUNNER_3_5": 0.035613590559180563,
+    "RUNNER_5PLUS": 0.06130258941440625,
+    "DEVELOPED_GIVEBACK": 0.018640056773506775
+   },
+   "verdict": "PASS"
+  },
+  "C11": {
+   "claim": "SECONDARY/WEAK: 1h-opposed-with-5m+15m-aligned is below the population mean; all-aligned is above",
+   "n_1h_opp_ltf_aligned": 634,
+   "delta_1": -0.19090056023365395,
+   "se_1": 0.0841022492612633,
+   "n_all_aligned": 1586,
+   "delta_2": 0.10209820598151212,
+   "se_2": 0.06524818666722267,
+   "verdict": "PASS",
+   "primary": false
+  },
+  "C12": {
+   "claim": "runners are born in the same T0 HTF geometry as everything else",
+   "abs_delta_median_1h_loc": 0.005045021911481706,
+   "abs_delta_all_aligned_share": 0.010482336956521732,
+   "verdict": "PASS"
+  }
+ },
+ "primary_verdicts": {
+  "C1": "PASS",
+  "C2": "PASS",
+  "C3": "PASS",
+  "C4": "PASS",
+  "C5": "PASS",
+  "C6": "PASS",
+  "C7": "PASS",
+  "C8": "PASS",
+  "C9": "PASS",
+  "C10": "PASS",
+  "C12": "PASS"
+ },
+ "overall": "REPLICATED"
+}

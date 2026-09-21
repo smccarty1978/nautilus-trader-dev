@@ -6,8 +6,8 @@ research_question: >
   5m / 15m / 1h regime state, higher-timeframe regime geometry, normalized structural levels,
   and fixed-time path information? The purpose is to decide whether the data supports separate
   ensemble heads for (1) initial risk, (2) trend health / giveback, (3) runner preservation.
-status: BLOCKED_TRUNCATE_UNIMPLEMENTED_IN_COMPOSITE_KERNEL
-phase: A
+status: PHASE_C_2023_ATLAS_FROZEN_AWAITING_2024_REPLICATION
+phase: D
 dataset_id: NQ_1S_V2_GLOBEX
 source_platform_commit: d83be2fd00c351fdf187bf4451d2efa123e9f664
 
@@ -471,3 +471,34 @@ collection_v4_repair:
       behaviour repo-wide. That is a platform design decision belonging in its own chore, not a
       unilateral edit from a study repair session. RECOMMENDED: derive the seal test gate from the
       changed closure files instead of a fixed list.
+
+# --------------------------------------------------------------------------------------------
+# PHASE C -- 2023 DESCRIPTIVE ATLAS (2026-09-21). 2024 NOT OPENED at the commit that adds this.
+# --------------------------------------------------------------------------------------------
+phase_c_2023_atlas:
+  status: FROZEN
+  frame: "v4 train/2023 partition; obs 40ce405b..., cand ef03d393...; seal ba69ad0b...; plan 11fcaf24...; closure c9249f99..."
+  population: {t0_trades: 7489, resolved_terminal: 7475, excluded_unresolved: 14}
+  report: PHASE_C_2023_ATLAS_REPORT.md
+  code: [analysis/phase_c_atlas_2023.py, analysis/replication_readout.py]
+  replication_contract: artifacts/phase_c_2024_replication_contract.yaml
+  replication_selftest_2023: REPLICATED (11/11 primary + secondary C11)
+  frame_semantics_found:
+    t0_is_flip_close_plus_15s: "checkpoint_index 0 is at regime_1m.age_s = 15; E is the next 1s open"
+    excursion_1m_anchor_is_flip_bar_open: "mfe/mae/pnl_atr_1m, start_price_1m are flip-bar-OPEN anchored; E is +0.88A median from it"
+    milestone_arms_outlive_the_lifecycle: "in-lifecycle iff resolution_seconds <= time E->flip; fully observed for every resolved terminal"
+    same_instant_rows: "2051 checkpoint rows at the trade's own flip carry the NEXT terminal; excluded from post-entry analysis"
+  headline:
+    - "gross break-even: mean -0.031A (SE 0.028); tail-dependent (ex top 5% mean -0.41A)"
+    - "the terminal sits at the lifecycle adverse extreme for every trade that never reaches +2A (Spearman 0.90)"
+    - "T0 5m/15m/1h state and geometry at noise level (52 features, max |rho| 0.021)"
+    - "path state predicts spread, not drift: remaining gross ~0 from every observed state"
+    - "supported heads: post-entry loss-scale/thesis failure; runner preservation. Not supported: T0 HTF entry quality; stagnation"
+  gaps:
+    PRIOR_REGIME_LEVEL_SNAPSHOT: "prior 15m/1h regimes and prior-regime price levels at any TF are not in the frame; section 5 hypothesis UNTESTED"
+    ANALYSIS_HARNESS_GAP: >
+      registered analysis_ops cannot express lifecycle-bounded ladder races, MFE-before-first-adverse,
+      checkpoint-panel transitions vs a per-row remaining outcome, top-q tail sums, one-vs-rest AUC maps.
+      The atlas is a study-local descriptive reader (WORKFLOW F.1 conflict, flagged to the owner).
+  next: "commit; then replication_readout.py --year 2024 in a fresh session; report per-claim verbatim"
+

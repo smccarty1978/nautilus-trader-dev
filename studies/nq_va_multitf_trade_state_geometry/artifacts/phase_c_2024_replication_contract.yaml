@@ -1,0 +1,111 @@
+# FROZEN 2023 -> 2024 REPLICATION CONTRACT -- nq_va_multitf_trade_state_geometry, Phase C
+#
+# Written and committed BEFORE any 2024 outcome relationship was read. The executable form of every
+# claim is analysis/replication_readout.py; that script refuses --year 2024 unless this file, the
+# atlas script and the readout are committed and unmodified (git ls-files + git diff --quiet HEAD).
+# The commit that adds this file is the audit trail. Definitions may NOT be changed after 2024 is
+# opened; any post-2024 analysis is labelled EXPLORATORY and cannot alter the verdict below.
+contract_version: 1
+frozen_on: 2026-09-21
+study: nq_va_multitf_trade_state_geometry
+discovery_year: 2023
+replication_year: 2024
+prohibited_years: [2025, 2026]
+
+frame:
+  seal: ba69ad0b29b0ef76fba6aa12e8ee72f5a9a41a49f74e8b0d51628738921f1ec1
+  plan_sha256: 11fcaf24a18e3c3f442e8a589a962f3cff6f075810fb136f14ac1b4720d1e557
+  execution_manifest_sha256: c9249f99ff96ab5b1dd8ae7f0876f490f6e1f9e3238fe4b7ae9cd71150748356
+  partition_2023: {observations_sha256: 40ce405b7a92100f2e9439072e184dcd824225e8352a4dad3b7a5c961177c589,
+                   candidates_sha256: ef03d393c6c376d50f54489bc047dcf05bbf7031dda995741522d6f09dcc58ca}
+  partition_2024: "_work/controller/partitions/train/2024 -- hashes verified against its own manifest at readout time"
+  never_use: "the v3 collection (seal e93c62bb...), composite outcomes 100% censored at SESSION_END"
+
+definitions:   # identical in 2024; code: analysis/phase_c_atlas_2023.py
+  trade: "checkpoint_index == 0 row (T0 = confirmed 1m flip-bar close + 15 s), terminal_flip_disposition == LABELED_POSITIVE and terminal_gross_pnl_atr not null"
+  A: atr_entry_1m (1m Wilder ATR frozen at the confirmed flip; the outcome contract ATR)
+  E: executable entry fill (next 1s open after T0)
+  pnl: terminal_gross_pnl_atr (exit = open of first bar after the opposite 1m flip; gross, no costs)
+  in_lifecycle_milestone: "fp_<arm>_resolution_seconds <= (terminal_flip_ts - terminal_entry_ts)/1e9 with POSITIVE (fav) / NEGATIVE (adv) disposition"
+  ladder: {fav: [0.25, 0.5, 0.75, 1, 1.5, 2, 3, 4, 5], adv: [0.25, 0.5, 0.75, 1, 1.5, 2, 3]}
+  mfe_rung / mae_rung: highest in-lifecycle rung (a lower bound; the true excursion is in [rung, next rung))
+  relative_direction: "rel_<tf> = A if dir_<tf> * dir_1m > 0 else O, for 5m / 15m / 1h"
+  htf_location: "<tf>_loc_in_range = dir_<tf> * (E - adverse extreme) / (highest_high_<tf> - lowest_low_<tf>)"
+  entry_ext_A: "dir_1m * (E - start_price_1m) / A   (start_price_1m = OPEN of the flip bar)"
+  checkpoint_alive: "observation_ts < the T0 row's terminal_flip_ts (same-instant rows excluded)"
+  cur_pnl_A: "dir_1m * (last_close_1m at the checkpoint - E) / A"
+  rem_pnl_A: "that checkpoint row's own terminal_gross_pnl_atr (its own entry -> the same opposite flip)"
+  early_fail: "-0.50A reached within 60 s of E and before +0.50A"
+  clustered_se: "session-day (CT date of regime start) cluster-robust SE of the mean"
+
+frozen_constants:        # NOT recomputed on 2024
+  RAPID_EDGE_s: 34.0                    # 2023 median time-to--0.50A in the (MFE<0.5A, -0.5A reached) group
+  LONG_QUIET_duration_p75_s: 1065.0     # 2023 p75 lifecycle duration
+  MIN_N_cell: 100
+  MIN_N_hierarchy_cell: 150
+  near_flat_band_A: 0.25
+
+archetypes:              # precedence; mutually exclusive; code: atlas.classify
+  STAGNANT_QUIET: "MFE < 0.5A and -0.5A never reached"
+  FAILURE_RAPID: "MFE < 0.5A, -0.5A reached at s <= RAPID_EDGE_s"
+  FAILURE_SLOW: "MFE < 0.5A, -0.5A reached at s > RAPID_EDGE_s"
+  SHALLOW_FADE: "0.5A <= MFE < 1A, +0.5A first (or -0.5A never)"
+  SHALLOW_RECOVERED: "0.5A <= MFE < 1A, -0.5A before +0.5A"
+  DEVELOPED_GIVEBACK: "1A <= MFE < 3A and pnl < 0.5 x MFE rung"
+  DEVELOPED_HELD: "1A <= MFE < 3A and pnl >= 0.5 x MFE rung"
+  RUNNER_3_5: "3A <= MFE < 5A"
+  RUNNER_5PLUS: "MFE >= 5A"
+
+minimum_sample:
+  trades: 5000           # fewer resolved 2024 trades -> INSUFFICIENT_SAMPLE, no verdict
+  per_cell: 100
+
+claims:   # 2023 value | expected 2024 direction | PASS | PARTIAL (else FAIL)
+  C1: {claim: untreated flip-to-flip gross is ~break-even, stat: mean pnl, v2023: "-0.031 (SE 0.028)",
+       pass: "|mean| <= 0.15A", partial: "|mean| <= 0.30A"}
+  C2: {claim: "favorable ladder continues at a ~constant per-A rate (long right tail); adverse ladder collapses past -1A",
+       stat: "per-A continuation P(next|rung)^(1/step): fav 1->1.5,1.5->2,2->3,3->4,4->5; adv 1->1.5,1.5->2",
+       v2023: "fav 0.626 0.626 0.651 0.681 0.673; adv 0.298 0.186",
+       pass: "every fav in [0.55, 0.78] AND every adv <= 0.40", partial: "either half holds"}
+  C3: {claim: "for trades that never reach +2A the terminal sits at the lifecycle adverse extreme (the flip exit fires at the MAE)",
+       stat: "Spearman(pnl, -mae_rung) and mean(pnl + mae_rung), MFE rung < 2A", v2023: "0.895; +0.012A (n 4723)",
+       pass: "rho >= 0.80 AND |mean| <= 0.25A", partial: "rho >= 0.70", core: true}
+  C4: {claim: expectancy is right-tail dependent, stat: "mean pnl of all trades outside the top 5%", v2023: "-0.412A; top-5% sum +2698A vs total -230A",
+       pass: "mean_rest <= -0.25A AND top-5% sum > 0", partial: "mean_rest < 0"}
+  C5: {claim: "T0 5m/15m/1h state, maturity, geometry, alignment and prior-5m geometry carry ~no lifecycle information",
+       stat: "over 52 HTF features: max |Spearman(x, pnl)|, max |AUC-0.5| for FAILURE_RAPID and for MFE>=3A",
+       v2023: "0.021; 0.025; 0.014", pass: "<= 0.06; <= 0.05; <= 0.05", partial: "rho <= 0.10 and both AUC dev <= 0.08", core: true}
+  C6: {claim: "entry extension from the flip-bar open scales BOTH tails (scale, not sign)",
+       stat: "AUC(entry_ext_A, MAE>=2A), AUC(entry_ext_A, MFE>=3A), Spearman(entry_ext_A, pnl)",
+       v2023: "0.626; 0.547; -0.036", pass: ">= 0.58; >= 0.52; |rho| <= 0.08", partial: "AUC severe >= 0.55"}
+  C7: {claim: "remaining gross from any observed early-path state is ~0 (state predicts spread, not drift)",
+       stat: "mean rem_pnl_A of all alive rows at s=30/60/120/285; share of (mfe_rung_by_s x mae_rung_by_s) cells with n>=100 and |mean/SE| > 2",
+       v2023: "|mean| <= 0.026 at every s; 2 of 72 cells (2.8%)",
+       pass: "every |mean| <= 0.15A AND share <= 0.10", partial: "every |mean| <= 0.15A AND share <= 0.20", core: true}
+  C8: {claim: "the -1A loser is identifiable only after entry, increasingly with time",
+       stat: "best T0 |AUC-0.5| for lifecycle MAE>=1A; AUC(mae_rung_by_s) among rows not yet at -1A at s=15 and s=120",
+       v2023: "0.052; 0.603; 0.696", pass: "T0 <= 0.07 AND AUC120 >= 0.65 AND AUC120 > AUC15", partial: "AUC120 > AUC15"}
+  C9: {claim: "archetype prevalence", v2023: "STAGNANT 0.1%; HELD 1.6%; GIVEBACK 33.2%; RUNNER_5PLUS 11.0%; FAILURE 24.6%",
+       pass: "STAGNANT < 1%, HELD < 5%, GIVEBACK in [25,40]%, RUNNER_5PLUS in [7,15]%, FAILURE in [20,30]%", partial: ">= 4 of 5"}
+  C10: {claim: path archetypes are NOT separable at T0, stat: "max |AUC-0.5| of any T0 feature, one-vs-rest, for FAILURE_RAPID / RUNNER_3_5 / RUNNER_5PLUS / DEVELOPED_GIVEBACK",
+        v2023: "0.061 / 0.036 / 0.061 / 0.019", pass: "all <= 0.08", partial: "all <= 0.12"}
+  C11: {claim: "SECONDARY / WEAK (not in the verdict): 1h opposed with 5m+15m aligned is below the population mean; all-HTF-aligned is above",
+        v2023: "delta -0.191 (SE 0.084, n 634); +0.102 (SE 0.065, n 1586)", pass: "both signs hold", partial: "one sign holds", primary: false}
+  C12: {claim: runners (MFE>=3A) are born in the same T0 HTF geometry as the population,
+        stat: "|median 1h_loc_in_range(runners) - median(all)|; |all-aligned share(runners) - all|", v2023: "0.005; 0.010",
+        pass: "both <= 0.03", partial: "both <= 0.06"}
+
+verdict_rule:
+  primary: [C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C12]
+  core: [C3, C5, C7]
+  REPLICATED: every primary claim PASS
+  PARTIAL_REPLICATION: ">= 75% of primary claims PASS (9 of 11) and no core claim FAILS"
+  REPLICATION_FAILED: otherwise
+  self_test_2023: "analysis/replication_readout.py --year 2023 -> REPLICATED (artifacts/phase_c_2023_replication_selftest.json)"
+
+procedure:
+  - "commit this contract + analysis/*.py + the 2023 atlas (this commit)"
+  - "python studies/nq_va_multitf_trade_state_geometry/analysis/replication_readout.py --year 2024"
+  - "report artifacts/phase_c_2024_replication_readout.json verbatim, per-claim, including every FAIL"
+  - "the years are not pooled until the per-year verdict is visible"
+  - "no definition, constant or threshold in this file changes after 2024 is opened"
