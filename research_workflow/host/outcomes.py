@@ -12,8 +12,12 @@ Kernel semantics preserved exactly from the accepted target runtime
 
 * barrier arms: entry reference ``next_bar_open`` = OPEN of the first execution bar
   strictly after T, entry instant = that bar's close minus its duration, horizon from the
-  entry instant; ``SESSION_END`` when the arm's horizon end lies past the session close
-  (resolved at the close); the entry bar and every later bar are touch-eligible, the bar
+  entry instant; under ``session_end_rule: censor`` an arm whose horizon end lies past the
+  session close is ``SESSION_END`` at the close WITHOUT observing the window, and under
+  ``truncate`` the close bounds that window instead (``effective_end = min(horizon_end,
+  session_close)``): the arm keeps being evaluated and a touch at or before the effective
+  end resolves normally, only an untouched arm that REACHES the effective end is
+  ``SESSION_END``; the entry bar and every later bar are touch-eligible, the bar
   closing exactly at the horizon end included; favorable+adverse in one bar ->
   ``AMBIGUOUS_SAME_BAR_TOUCH``; a tape gap over ``max_gap`` -> ``GAP``; no touch by the
   horizon -> ``TIMEOUT`` (censor) or ``NEGATIVE`` (expiry policy); unresolved at run end
@@ -99,6 +103,10 @@ class LabelOutcomeContract:
     #               POSITIVE at its own timestamp, and only a candidate that reached the close
     #               without one is CENSORED SESSION_END, at the close. This is what "observe until
     #               the session ends" means, and a fixed horizon cannot express it.
+    #               It applies to EVERY observation window the contract declares -- the flip item
+    #               AND each barrier arm (effective_end = min(horizon_end, session_close)) -- so a
+    #               composite whose horizons are longer than a trading day is observed rather than
+    #               censored by construction.
     # "ignore"   -- no session boundary at all.
     max_gap_ns: Optional[int]
     same_bar_rule: str
@@ -204,6 +212,7 @@ def compile_outcome_contract(spec: Mapping[str, Any]):
 class _Pending:
     __slots__ = ("identity", "T", "direction", "prevailing", "atr", "session_close", "entry_resolved", "entry_price", "entry_ts",
                  "prev_ts", "arm_end", "arm_state", "arm_at", "arm_reason", "arm_good", "arm_bad", "arm_open",
+                 "arm_truncated",
                  "flip_end", "flip_state", "flip_at", "flip_reason", "flip_ts", "opened_at",
                  "exit_ts", "exit_price", "exit_reason")
 
@@ -220,6 +229,10 @@ class _Pending:
         self.entry_ts = 0
         self.prev_ts = T
         self.arm_end = [0] * n_arms
+        # `arm_end[i]` is the EFFECTIVE end: under `session_end_rule: truncate` the session close
+        # shortens it, and `arm_truncated[i]` records that it did, so expiry there is attributed
+        # SESSION_END (the window was cut short) and never TIMEOUT/NEGATIVE (a full window elapsed).
+        self.arm_truncated = [False] * n_arms
         self.arm_state = [None] * n_arms        # None (pending) | POSITIVE | NEGATIVE | CENSORED
         self.arm_at = [None] * n_arms
         self.arm_reason = [None] * n_arms
@@ -332,8 +345,20 @@ class LabelOutcomeKernel:
             target = self._target(p, role)
             if target and new_direction != target:
                 continue
-            if p.T < flip_ts <= p.flip_end:
+            if p.T < flip_ts <= self._flip_effective_end(p):
                 p.flip_ts = flip_ts
+
+    def _flip_effective_end(self, p: _Pending) -> int:
+        """The composite flip child's observation end.
+
+        Under ``truncate`` the session close bounds it exactly as it bounds a barrier arm
+        (``min(flip_end, session_close)``): a qualifying flip at or before the close resolves the
+        child at its own instant, and reaching the close without one is what SESSION_END means.
+        Under ``censor`` / ``ignore`` the declared horizon is the end, unchanged.
+        """
+        if self.c.session_end_rule == "truncate" and p.session_close is not None and p.flip_end > p.session_close:
+            return p.session_close
+        return p.flip_end
 
     def _target(self, p: _Pending, role: str) -> int:
         if role == "opposite":
@@ -359,6 +384,7 @@ class LabelOutcomeKernel:
             return
         hi, lo, op = bar.high, bar.low, bar.open
         max_gap = self.c.max_gap_ns
+        truncate = self.c.session_end_rule == "truncate"
         still: List[_Pending] = []
         for p in self.pending:
             if ts <= p.T:
@@ -382,7 +408,17 @@ class LabelOutcomeKernel:
                         p.arm_good[i] = ep + d * arm.favorable_atr * atr
                         p.arm_bad[i] = ep - d * arm.adverse_atr * atr
                         if p.session_close is not None and p.arm_end[i] > p.session_close:
-                            self._resolve_arm(p, i, CENSORED, p.session_close, "SESSION_END")
+                            if truncate:
+                                # `truncate`: the close BOUNDS the observation window instead of
+                                # voiding it. The arm keeps running to `min(horizon_end,
+                                # session_close)` and is censored only if it REACHES that end
+                                # untouched. Censoring here instead -- as `censor` must -- makes
+                                # every arm whose declared horizon is longer than a trading day
+                                # SESSION_END by construction, before a single bar is examined.
+                                p.arm_end[i] = p.session_close
+                                p.arm_truncated[i] = True
+                            else:
+                                self._resolve_arm(p, i, CENSORED, p.session_close, "SESSION_END")
             # C1: the canonical terminal exit is the OPEN of the first bar strictly after the
             # qualifying flip -- the same next_bar_open convention the entry already uses. No new
             # fill convention is invented here.
@@ -406,10 +442,16 @@ class LabelOutcomeKernel:
                         # to the horizon-expiry policy: an unobserved gap spanning the
                         # horizon end can otherwise manufacture a NEGATIVE/CENSORED-TIMEOUT
                         # label from zero price observation over the whole interval (C-B).
-                        if p.session_close is not None and ts > p.session_close:
+                        if not truncate and p.session_close is not None and ts > p.session_close:
                             self._resolve_arm(p, i, CENSORED, p.session_close, "SESSION_END")
                             continue
-                        if self.c.horizon_end_rule == "strict":
+                        # Under `truncate` the close is already baked into `end`, so reaching here
+                        # means the EFFECTIVE end elapsed; `_expire_arm` attributes SESSION_END when
+                        # that end was the close. A bar past the close is never touch-eligible under
+                        # truncate, so `first_bar_at_or_after` degrades to `strict` there rather
+                        # than reading an out-of-session bar's OHLC into an in-session arm.
+                        post_close = truncate and p.session_close is not None and ts > p.session_close
+                        if self.c.horizon_end_rule == "strict" or post_close:
                             # `strict` never inspects `ts`'s OHLC (no touch is ever evaluated
                             # post-horizon), so the only gap question that matters is whether
                             # the horizon boundary itself (`end`) was adequately observed --
@@ -442,7 +484,7 @@ class LabelOutcomeKernel:
                         else:
                             self._expire_arm(p, i)
                         continue
-                    if p.session_close is not None and ts > p.session_close:
+                    if not truncate and p.session_close is not None and ts > p.session_close:
                         self._resolve_arm(p, i, CENSORED, ts, "SESSION_END")
                         continue
                     if gap:
@@ -472,7 +514,12 @@ class LabelOutcomeKernel:
 
     def _expire_arm(self, p: _Pending, i: int) -> None:
         arm = self.arms[i]
-        if arm.expiry == "negative":
+        if p.arm_truncated[i]:
+            # The session close cut this window short: the arm never got its declared horizon, so
+            # neither TIMEOUT (a full horizon elapsed) nor the `negative` expiry policy is true of
+            # it. SESSION_END censoring is, and it is stamped exactly at the close.
+            self._resolve_arm(p, i, CENSORED, p.arm_end[i], "SESSION_END")
+        elif arm.expiry == "negative":
             self._resolve_arm(p, i, NEGATIVE, p.arm_end[i], None)
         else:
             self._resolve_arm(p, i, CENSORED, p.arm_end[i], "TIMEOUT")
@@ -488,8 +535,19 @@ class LabelOutcomeKernel:
         if self.arms and p.arm_open:
             return False
         if self.c.flip is not None and self.c.kernel == "composite":
+            truncate = self.c.session_end_rule == "truncate"
+            truncated = truncate and p.session_close is not None and p.flip_end > p.session_close
             if p.flip_ts is not None:
                 p.flip_state, p.flip_at = POSITIVE, p.flip_ts
+            elif truncated:
+                # The child is NOT decided at setup: it is observed to the close, and only a
+                # candidate that reached the close with no qualifying flip is SESSION_END there.
+                if now_ts >= p.session_close:
+                    p.flip_state, p.flip_at, p.flip_reason = CENSORED, p.session_close, "SESSION_END"
+                elif final:
+                    p.flip_state, p.flip_at, p.flip_reason = CENSORED, now_ts, "DATA_END"
+                else:
+                    return False
             elif p.session_close is not None and p.flip_end > p.session_close:
                 p.flip_state, p.flip_at, p.flip_reason = CENSORED, p.session_close, "SESSION_END"
             elif now_ts >= p.flip_end or final:

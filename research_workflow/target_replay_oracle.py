@@ -75,6 +75,11 @@ def replay(contract: Mapping, candidate: Mapping, events: Iterable[Mapping]) -> 
 
     T = int(candidate["observation_ts"])
     session_close_ts = candidate.get("session_close_ts")
+    # `session_end_rule` decides what the close DOES to an overlong window: void it (`censor`,
+    # the default and the only pre-existing behaviour) or bound it (`truncate`).
+    truncate = str((barrier or {}).get("session_end_rule",
+                   candidate.get("session_end_rule",
+                   contract.get("session_end_rule", "censor")))) == "truncate"
     atr = float(candidate["atr"])
     if not (atr > 0):
         return {"disposition": "CENSORED", "label": None, "censor_reason": "FROZEN_ATR_NONPOSITIVE"}
@@ -110,8 +115,13 @@ def replay(contract: Mapping, candidate: Mapping, events: Iterable[Mapping]) -> 
         entry_ts = T
         horizon_end_ts = int(candidate["horizon_end_ts"])
 
+    truncated = False
     if session_close_ts is not None and horizon_end_ts > int(session_close_ts):
-        return {"disposition": "CENSORED", "label": None, "censor_reason": "SESSION_END"}
+        if not truncate:
+            return {"disposition": "CENSORED", "label": None, "censor_reason": "SESSION_END"}
+        # truncate: observe to the close instead of voiding the window. A touch at or before it
+        # resolves the arm at its own first-passage bar; reaching it untouched is SESSION_END.
+        horizon_end_ts, truncated = int(session_close_ts), True
 
     good = entry_price + direction * fav * atr
     bad = entry_price - direction * adv * atr
@@ -130,9 +140,11 @@ def replay(contract: Mapping, candidate: Mapping, events: Iterable[Mapping]) -> 
             # not short-circuit straight to the horizon-expiry policy: an unobserved gap
             # spanning the horizon end can otherwise manufacture a directional label from
             # zero price observation over the whole interval (C-B).
-            if session_close_ts is not None and ts > int(session_close_ts):
+            if not truncate and session_close_ts is not None and ts > int(session_close_ts):
                 return {"disposition": "CENSORED", "label": None, "censor_reason": "SESSION_END"}
-            if end_rule != "first_bar_at_or_after":
+            # Under truncate the close is already `horizon_end_ts`; a bar past it is out of session
+            # and never touch-eligible, so `first_bar_at_or_after` degrades to `strict` there.
+            if end_rule != "first_bar_at_or_after" or truncated:
                 # `strict` never inspects this bar's OHLC (no touch is ever evaluated
                 # post-horizon), so the only gap question that matters is whether the
                 # horizon boundary itself was adequately observed -- the UNOBSERVED span
@@ -161,7 +173,7 @@ def replay(contract: Mapping, candidate: Mapping, events: Iterable[Mapping]) -> 
             break
         if ts >= horizon_end_ts:
             reached_horizon = True
-        if session_close_ts is not None and ts > int(session_close_ts):
+        if not truncate and session_close_ts is not None and ts > int(session_close_ts):
             return {"disposition": "CENSORED", "label": None, "censor_reason": "SESSION_END"}
         if e.get("gap") or (max_gap_ns is not None and ts - prev_ts > max_gap_ns):
             return {"disposition": "CENSORED", "label": None, "censor_reason": "GAP"}
@@ -189,6 +201,10 @@ def replay(contract: Mapping, candidate: Mapping, events: Iterable[Mapping]) -> 
         # W-2: the tape ran out before the horizon elapsed -- an unresolved tail must never
         # manufacture a directional/expiry label; the kernel already censors this DATA_END.
         return {"disposition": "CENSORED", "label": None, "censor_reason": "DATA_END"}
+    if truncated:
+        # The window was cut short by the close, so the horizon-expiry policy never applies: the
+        # arm did not get its declared horizon. Mirrors LabelOutcomeKernel._expire_arm.
+        return {"disposition": "CENSORED", "label": None, "censor_reason": "SESSION_END"}
     policy = str(
         barrier.get("horizon_expiry_policy", candidate.get("horizon_expiry_policy", "censor")) if barrier
         else candidate.get("horizon_expiry_policy", "censor")
