@@ -6,7 +6,7 @@ research_question: >
   5m / 15m / 1h regime state, higher-timeframe regime geometry, normalized structural levels,
   and fixed-time path information? The purpose is to decide whether the data supports separate
   ensemble heads for (1) initial risk, (2) trend health / giveback, (3) runner preservation.
-status: PHASE_C_2023_ATLAS_FROZEN_AWAITING_2024_REPLICATION
+status: PHASE_C_2024_REPLICATION_COMPLETE_PARTIAL_REPLICATION
 phase: D
 dataset_id: NQ_1S_V2_GLOBEX
 source_platform_commit: d83be2fd00c351fdf187bf4451d2efa123e9f664
@@ -502,3 +502,32 @@ phase_c_2023_atlas:
       The atlas is a study-local descriptive reader (WORKFLOW F.1 conflict, flagged to the owner).
   next: "commit; then replication_readout.py --year 2024 in a fresh session; report per-claim verbatim"
 
+
+# --------------------------------------------------------------------------------------------
+# PHASE C -- FROZEN 2024 REPLICATION (2026-09-21). Contract commit 3716a016; 2025/2026 NOT opened.
+# --------------------------------------------------------------------------------------------
+phase_c_2024_replication:
+  status: COMPLETE
+  overall_verdict: PARTIAL_REPLICATION
+  guard: "require_committed (contract + atlas + readout unmodified at HEAD 3716a016) and load_frame(2024) manifest/hash/year checks all passed; nothing bypassed"
+  frame: "v4 train/2024 partition; obs b19c9a04..., cand 2bf309b7...; seal ba69ad0b...; plan 11fcaf24...; closure c9249f99..."
+  population: {t0_trades: 7060, resolved_terminal: 7047, excluded_unresolved: 13}
+  primary_verdicts: {C1: PASS, C2: PASS, C3: PASS, C4: PASS, C5: PASS, C6: PASS, C7: PARTIAL, C8: PASS, C9: PASS, C10: PASS, C12: PASS}
+  secondary_C11: PARTIAL
+  c7_detail: "7 of 69 cells |z|>2 (0.101 vs PASS <= 0.10); whole-population remaining means +0.036..+0.057A (SE ~0.03), inside the 0.15A band; no 2023 flagged cell recurs"
+  report: PHASE_C_2024_REPLICATION_REPORT.md
+  artifacts: [artifacts/phase_c_2024_replication_readout.json, artifacts/phase_c_2024_replication_results.json]
+  supplement_code: "analysis/phase_c_2024_supplement.py -- written AFTER the verdict; frozen atlas functions on 2024, frozen RAPID_EDGE 34 s, no re-bucketing of 2023-quantile edges; not verdict-bearing"
+  special_attention:
+    runner_optionality_5A: "2024 (n 854): -0.25/-0.50/-0.75/-1.00A reached before +5A = 71.0/48.8/32.1/19.9% (2023 72.4/50.7/34.6/22.2%); adverse-first (-0.5 before +0.5) 32.6% (2023 34.5%)"
+    non_runner_loss_realization: "MFE<2A: Spearman(pnl,-MAE rung) 0.905, mean(pnl+MAE rung) +0.017A, 95.7% negative"
+    static_mtf: "52 HTF features max |rho| 0.030, |AUC-.5| 0.037 rapid-failure / 0.012 runner; 2023 1h-opp/LTF-aligned cell -0.22 -> +0.07"
+    post_entry: "AUC(-1A) 0.60 (s15) -> 0.685 (s120); remaining mean ~ year mean from every state"
+    archetypes: "STAGNANT 0.06%; time-to--0.5A unimodal; adverse-first 32-33% in every developed/runner class; T0 separability <= 0.057"
+  ensemble_hypothesis: SUPPORTED   # A no, B yes (magnitude not drift), C yes, D yes
+  next_research_target_conceptual: "DYNAMIC TRADE-STATE / THESIS-FAILURE MANAGEMENT with runner preservation as a hard constraint; treated-path study with matched length-blind placebo; not another static-HTF entry-filter study"
+  observations_for_future_study_not_investigated:
+    - "C7 cell test is against 0 not the year mean; flagged cells do not recur across years (future contract design question)"
+    - "all-HTF-aligned above population both years (+0.10/+0.14A, ~1.6-2 SE); weak, not a filter candidate from this study"
+  deferred: [PRIOR_REGIME_LEVEL_SNAPSHOT, ANALYSIS_HARNESS_GAP, ENTRY_TIMING_15s, COSTS_gross_only]
+  next: "STOP. No next study started. 2025 remains sealed."
