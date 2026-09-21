@@ -248,6 +248,89 @@ def test_flip_after_the_close_is_session_end_not_a_cross_session_terminal():
     assert row["terminal_exit_price"] is None
 
 
+def test_a_flip_at_the_close_instant_still_lands_although_the_bar_arrives_first():
+    """`sort_bars_causal` delivers the shorter timeframe first at equal ts_init, so the 1s
+    outcome bar closing AT the session close reaches `on_bar` before the 1m bar whose tracker
+    emits the flip at that same instant. The close must be held one tick, or the kernel censors
+    SESSION_END a moment before the flip it was waiting for arrives."""
+    offsets = _quiet(SESSION_SECONDS + 10)
+    at_close = SESSION_SECONDS - 1
+    bars = bars_from(offsets)
+    assert bars[at_close].ts_init == CLOSE
+    k = LabelOutcomeKernel(contract("truncate"), sessions())
+    k.open({"observation_ts": T0, "regime_start_ns": T0, "checkpoint_index": 0}, T0, 1, ATR)
+    for i, b in enumerate(bars):
+        k.on_bar(b)                      # the 1s bar at the close is seen FIRST
+        if i == at_close:
+            assert not k.drain_rows(), "the row must not be emitted before the flip can land"
+            k.on_flip(b.ts_init, -1, 1)  # ... and only then the same-instant 1m flip
+    k.finalize(bars[-1].ts_init)
+    row = k.drain_rows()[0]
+    assert row["terminal_flip_ts"] == CLOSE
+    assert row["terminal_flip_disposition"] == "LABELED_POSITIVE"
+    assert row["terminal_flip_censor_reason"] is None
+
+
+def test_the_exit_fill_never_comes_from_a_bar_past_the_session_close():
+    """C-6. A qualifying flip on the LAST in-session bar resolves the terminal, but the only
+    bar that could fill it lies past the close.
+
+    The fill must be refused on the session boundary itself, not left to `max_gap_ns`. Relying
+    on the gap makes the guarantee depend on the calendar's break being longer than max_gap --
+    true of the CME nightly break today, not a property the kernel may assume. Here the next bar
+    is 1s away, far inside max_gap, so the gap rule would have filled it from the next session.
+    """
+    offsets = _quiet(SESSION_SECONDS + 10)
+    flip_i = SESSION_SECONDS - 1                  # this bar closes exactly at the session close
+    row, bars, _ = run(offsets, flip_at_index=flip_i, pad=False)
+    assert bars[flip_i].ts_init == CLOSE
+    assert bars[flip_i + 1].ts_init == CLOSE + NS         # the would-be fill bar, 1s later
+    # the flip itself is real and at or before the close, so the terminal RESOLVES
+    assert row["terminal_flip_ts"] == CLOSE
+    assert row["terminal_flip_disposition"] == "LABELED_POSITIVE"
+    # but there is no executable exit inside the session, and that is reported, not invented
+    assert row["terminal_exit_unavailable_reason"] == "SESSION_END"
+    assert row["terminal_exit_ts"] is None
+    assert row["terminal_exit_price"] is None
+    assert row["terminal_gross_pnl_atr"] is None
+    assert row["terminal_net_pnl_atr"] is None
+
+
+def test_the_exit_fill_session_bound_does_not_depend_on_max_gap():
+    """The same case with max_gap_ns wide enough to wave the next session's bar through."""
+    from research_workflow.host.outcomes import LabelOutcomeContract, LabelOutcomeKernel as K
+    offsets = _quiet(SESSION_SECONDS + 10)
+    flip_i = SESSION_SECONDS - 1
+    spec = dict(contract("truncate").__dict__)
+    c = contract("truncate")
+    wide = LabelOutcomeContract.from_plan({
+        "contract": "label", "kernel": "composite", "direction": "regime_1m.dir",
+        "atr": "excursion_1m.frozen_atr", "entry_reference": "next_bar_open",
+        "session_end_censoring": True, "session_end_rule": "truncate",
+        "horizon_end_rule": "strict", "max_gap_ns": 86400 * NS,      # no gap can ever trigger
+        "same_bar_rule": "ambiguous_censor",
+        "arms": [{"id": a.id, "favorable_atr": a.favorable_atr, "adverse_atr": a.adverse_atr,
+                  "horizon_ns": a.horizon_ns, "expiry": a.expiry, "prefix": a.prefix}
+                 for a in c.arms],
+        "flip": {"horizon_ns": HORIZON_NS, "source": "regime_1m", "role": "opposite",
+                 "inclusive_start": True},
+        "primary_arm": "fav_1p00", "composition": {"logic": "OR"},
+        "direction_sign": 1, "observed_seconds": True, "terminal_outcome": True})
+    k = K(wide, sessions())
+    bars = bars_from(offsets)
+    k.open({"observation_ts": T0, "regime_start_ns": T0, "checkpoint_index": 0}, T0, 1, ATR)
+    for i, b in enumerate(bars):
+        k.on_bar(b)
+        if i == flip_i:
+            k.on_flip(b.ts_init, -1, 1)
+    k.finalize(bars[-1].ts_init)
+    row = k.drain_rows()[0]
+    assert row["terminal_flip_ts"] == CLOSE
+    assert row["terminal_exit_unavailable_reason"] == "SESSION_END"
+    assert row["terminal_exit_price"] is None
+    assert spec["session_end_rule"] == "truncate"      # guards the fixture, not the kernel
+
+
 # --------------------------------------------------------------------------------------- #
 # 6. first-passage ORDER stays exact against an independent scan
 # --------------------------------------------------------------------------------------- #
