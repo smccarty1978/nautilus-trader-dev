@@ -248,3 +248,16 @@ c1_completion:
     test_ordered_barrier_entry_reference.py 3 failures, an IDENTICAL set on clean main.
   next: Phase B -- readiness, preflight, tests, causal audit, contract audit, seal. Collection is
         a separate decision after Phase B clears independently.
+
+# --------------------------------------------------------------------------------------------
+# Accepted technical debt (owner decision 2026-09-20): does not block research.
+# --------------------------------------------------------------------------------------------
+technical_debt:
+  one_sided_barrier_encoding:
+    what: >
+      BarrierArm requires both a favorable and an adverse level and there is no native one-sided
+      first-passage item, so each of the 16 milestone arms parks its unused side at 99.0 ATR.
+    accepted_because: >
+      fixtures/first_passage_parity.py case parked_side_never_fires proves the parked side never
+      resolves, and every arm's first-passage second matches an independent oracle exactly.
+    future_fix: a native one-sided first-passage outcome item; not required by this study.
