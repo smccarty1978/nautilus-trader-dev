@@ -190,3 +190,21 @@ bars, so its first regime can start later.
   does, and it inherits that tracker's stream visibility.
 - There is no `seconds_since_update` or `age_s` epoch field. Snapshot age is `T − frozen_at_ns`, as same-row
   arithmetic.
+
+## Pre-merge gate (WORKFLOW §N.3, run once)
+
+One `scripts/test_delta.py` run on `e2c90e50`. Scope: `features/tests` plus every test that reads the
+capabilities index or registry (`test_capability_modularity`, `test_docs_v2`, `scripts/tests/test_capabilities`,
+`test_session_efficiency`, `test_supervisor_blackbox`) plus `test_host_core`, `test_grammar_v2` and
+`test_golden_fixture`.
+
+Result: 212 ran, 209 passed, 3 failed, wall 3,900 s.
+
+The committed baseline is stale (`BASELINE_COMMIT_MISMATCH`), so the card calls the 3 failures NEW. All 3 fail
+identically on clean `main` `d83be2fd`, so they are pre-existing and none touches this chore's code:
+
+- `features/tests/test_candidate_authority.py::test_real_candidate_requires_explicit_resolver_authority_and_active_does_not_use_it` (145 != 129)
+- `features/tests/test_feature_system_v2.py::test_explicit_instances_and_collection_universe_share_canonical_status`
+- `scripts/tests/test_session_efficiency.py::test_test_delta_classifies_against_committed_baseline`
+
+The baseline was not re-recorded; that is outside this chore.
