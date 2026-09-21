@@ -213,8 +213,47 @@ def test_milestone_arms_keep_running_after_the_flip():
 # --------------------------------------------------------------------------------------------
 def test_compiler_declares_terminal_columns_for_a_flip_outcome():
     from research_workflow.grammar import compiler as C
+    from research_workflow.host.outcomes import TERMINAL_OBSERVATION_COLUMNS
     src = (C.__file__ and open(C.__file__, encoding="utf-8").read()) or ""
     assert 'contract["terminal_outcome"] = True' in src
+    # the compiler builds its list from the kernel's single source of truth
+    assert "TERMINAL_OBSERVATION_COLUMNS" in src
     for col in ("terminal_flip_ts", "terminal_exit_price", "terminal_gross_pnl_atr",
                 "terminal_net_pnl_points"):
-        assert col in src, col
+        assert col in TERMINAL_OBSERVATION_COLUMNS, col
+
+
+# --------------------------------------------------------------------------------------------
+# THE SINK CONTRACT. The sink buffers from kernel.observation_columns, NOT from the compiled
+# plan's list. A column the compiler declares but the kernel omits is emitted into the row dict
+# and then silently dropped on the way to parquet -- which is exactly what happened on the first
+# C1 collection: all 15 terminal columns were declared, emitted, and absent from the frame.
+# --------------------------------------------------------------------------------------------
+def test_kernel_observation_columns_carry_the_terminal_block():
+    from research_workflow.host.outcomes import TERMINAL_OBSERVATION_COLUMNS
+    arms = [_arm("fav_0p25", 0.25, 99.0, "fp_fav_0p25"), _arm("fav_1p00", 1.0, 99.0, "fp_fav_1p00")]
+    k = LabelOutcomeKernel(_plan(arms=arms), _NoSessions())
+    for col in TERMINAL_OBSERVATION_COLUMNS:
+        assert col in k.observation_columns, f"{col} would be dropped by the sink"
+    # contiguous, in order, and immediately before observed_seconds (the A5 invariant keeps
+    # observed_seconds last, so the terminal block is the slice just before it)
+    assert k.observation_columns[-1] == "observed_seconds"
+    assert k.observation_columns[-1 - len(TERMINAL_OBSERVATION_COLUMNS):-1] == list(TERMINAL_OBSERVATION_COLUMNS)
+
+
+def test_kernel_columns_omit_the_terminal_block_for_a_pre_c1_contract():
+    from research_workflow.host.outcomes import TERMINAL_OBSERVATION_COLUMNS
+    arms = [_arm("fav_0p25", 0.25, 99.0, "fp_fav_0p25"), _arm("fav_1p00", 1.0, 99.0, "fp_fav_1p00")]
+    k = LabelOutcomeKernel(_plan(arms=arms, terminal=False), _NoSessions())
+    assert not set(TERMINAL_OBSERVATION_COLUMNS) & set(k.observation_columns)
+
+
+def test_every_emitted_terminal_key_is_a_declared_column():
+    """No terminal key may be emitted that the sink has no column for, and vice versa."""
+    from research_workflow.host.outcomes import TERMINAL_OBSERVATION_COLUMNS
+    arms = [_arm("fav_0p25", 0.25, 99.0, "fp_fav_0p25"), _arm("fav_1p00", 1.0, 99.0, "fp_fav_1p00")]
+    row, _ = _run([0.0, 0.30, 0.50, 0.40], arms=arms, flip_at=2)
+    emitted = {k for k in row if k.startswith("terminal_")}
+    assert emitted == set(TERMINAL_OBSERVATION_COLUMNS), (
+        f"emitted-only={emitted - set(TERMINAL_OBSERVATION_COLUMNS)} "
+        f"declared-only={set(TERMINAL_OBSERVATION_COLUMNS) - emitted}")
