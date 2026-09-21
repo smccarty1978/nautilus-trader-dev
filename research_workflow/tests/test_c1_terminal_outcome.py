@@ -257,3 +257,21 @@ def test_every_emitted_terminal_key_is_a_declared_column():
     assert emitted == set(TERMINAL_OBSERVATION_COLUMNS), (
         f"emitted-only={emitted - set(TERMINAL_OBSERVATION_COLUMNS)} "
         f"declared-only={set(TERMINAL_OBSERVATION_COLUMNS) - emitted}")
+
+
+def test_merge_carries_the_persisted_schema_assertion():
+    """Source-level guard check.
+
+    A true behavioural test of merge() needs a controller, authorized years and partition
+    parquet on disk, which is an integration fixture this file does not own. What is asserted
+    here is that the guard exists and compares the PLAN's declared observation columns against
+    the MERGED FRAME's columns. The behavioural protection against the root cause -- kernel and
+    plan column lists drifting apart -- is covered by
+    test_kernel_observation_columns_carry_the_terminal_block and
+    test_every_emitted_terminal_key_is_a_declared_column above.
+    """
+    import research_workflow.lifecycle_v2 as L
+    src = open(L.__file__, encoding="utf-8").read()
+    assert "MERGE_PERSISTED_SCHEMA_MISSING_COLUMNS" in src
+    assert 'missing = [c for c in declared if c not in obs.columns]' in src
+    assert '"declared_observation_columns": declared' in src
