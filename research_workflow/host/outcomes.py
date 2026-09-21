@@ -423,7 +423,13 @@ class LabelOutcomeKernel:
             # qualifying flip -- the same next_bar_open convention the entry already uses. No new
             # fill convention is invented here.
             if (c1 := self.c).terminal_outcome and p.flip_ts is not None and p.exit_ts is None and ts > p.flip_ts:
-                if c1.max_gap_ns is not None and (ts - p.flip_ts) > c1.max_gap_ns:
+                if p.session_close is not None and ts > p.session_close:
+                    # The exit fill must come from the session that BOUNDED the lifecycle. Leaving
+                    # this to `max_gap_ns` makes the guarantee depend on the calendar's break being
+                    # longer than max_gap -- true of the CME nightly break today, not a property
+                    # the kernel may assume (C-6). SESSION_END outranks GAP, as declared.
+                    p.exit_reason = "SESSION_END"
+                elif c1.max_gap_ns is not None and (ts - p.flip_ts) > c1.max_gap_ns:
                     p.exit_reason = "GAP"
                 else:
                     p.exit_price = op
@@ -542,7 +548,14 @@ class LabelOutcomeKernel:
             elif truncated:
                 # The child is NOT decided at setup: it is observed to the close, and only a
                 # candidate that reached the close with no qualifying flip is SESSION_END there.
-                if now_ts >= p.session_close:
+                #
+                # The close itself is HELD ONE TICK. `sort_bars_causal` delivers the shorter
+                # timeframe first at equal ts_init, so the 1s outcome bar closing at the session
+                # close reaches `on_bar` BEFORE the 1m bar whose tracker emits the flip at that
+                # same instant. Resolving on `now_ts >= session_close` would censor a flip that
+                # is about to land at a timestamp the window includes. `_sweep_flip` applies
+                # exactly this rule for `kernel: flip`; the composite child now matches it.
+                if p.session_close < now_ts or (p.session_close == now_ts and final):
                     p.flip_state, p.flip_at, p.flip_reason = CENSORED, p.session_close, "SESSION_END"
                 elif final:
                     p.flip_state, p.flip_at, p.flip_reason = CENSORED, now_ts, "DATA_END"
