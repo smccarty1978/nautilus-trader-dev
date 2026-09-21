@@ -6,7 +6,7 @@ research_question: >
   5m / 15m / 1h regime state, higher-timeframe regime geometry, normalized structural levels,
   and fixed-time path information? The purpose is to decide whether the data supports separate
   ensemble heads for (1) initial risk, (2) trend health / giveback, (3) runner preservation.
-status: RESEALING_v3
+status: BLOCKED_TRUNCATE_UNIMPLEMENTED_IN_COMPOSITE_KERNEL
 phase: A
 dataset_id: NQ_1S_V2_GLOBEX
 source_platform_commit: d83be2fd00c351fdf187bf4451d2efa123e9f664
@@ -325,3 +325,58 @@ superseded_evidence:
       defect is now caught at merge by MERGE_PERSISTED_SCHEMA_MISSING_COLUMNS (292c8ca4).
       No terminal_flip_ts, no executable exit, no realized PnL exists in that frame.
     disposition: do not delete; do not use for any terminal or lifecycle-duration claim.
+
+# --------------------------------------------------------------------------------------------
+# GATE FAILURE at post-collection verification (2026-09-21). Collection v3 is INVALID.
+# --------------------------------------------------------------------------------------------
+collection_v3_gate_failure:
+  status: BLOCKED -- do not analyse this frame
+  what_passed:
+    persisted_schema: PASS -- declared 93 == persisted 93, missing []; 15/15 terminal_*, 64/64 fp_*
+    collection: both years final, 2023 450.7s / 2024 430.8s, merge PASS
+    counts: {2023: {rows: 134664, regimes: 7764, trades: 7489}, 2024: {rows: 127333, regimes: 7362, trades: 7060}}
+  what_failed: >
+    100.0% of all 14,549 trades are CENSORED / SESSION_END -- on the terminal AND on every
+    milestone arm. terminal_flip_ts, flip_ts, terminal_exit_price, terminal_gross_pnl_atr and
+    target_flip_within_horizon are non-null on ZERO rows. fp_fav_0p25_disposition is CENSORED on
+    all 14,549. The frame contains no resolved outcome of any kind.
+  root_cause:
+    finding: >
+      session_end_rule "truncate" is NOT IMPLEMENTED in the barrier/composite path of
+      LabelOutcomeKernel. All three truncate sites (on_flip legacy branch, _sweep_flip, finalize)
+      are inside `kernel == "flip"` branches. The barrier/composite path applies pure CENSOR
+      semantics regardless of what the contract declares:
+        * arm setup in on_bar:  `if p.arm_end[i] > p.session_close: resolve CENSORED SESSION_END`
+          -- fires at ENTRY for every arm whose horizon exceeds the remaining session.
+        * _complete composite branch: `elif p.flip_end > p.session_close: CENSORED SESSION_END`
+          -- same, for the terminal.
+      With 24h arm/flip horizons and a ~23h trading day, both conditions are ALWAYS true, so every
+      arm and every terminal is censored the instant the entry resolves.
+    precedent_missed: >
+      nq_mtf_regime_atlas_pilot2023 OWNER AMENDMENT 02 (2026-09-14) documents exactly this:
+      "`censor` censored every row because a 24h window always reaches past a ~23h trading-day
+      close (smoke 1380/1380)". That study fixed it by declaring truncate -- which works for its
+      `kernel: flip`. This study is `kernel: composite`, where truncate is inert.
+  corrects_an_earlier_claim_of_mine: >
+    I previously reported the superseded v2 (RTH) frame as "valid for milestone analysis". That was
+    wrong. I inferred it from column PRESENCE without checking dispositions. Under RTH the same
+    arm-setup condition holds even more strongly (6.75h session vs 24h horizons), so v2's fp_*
+    columns are almost certainly 100% CENSORED as well. v2 is valid for OPERATIONAL evidence only
+    (timing, bar/epoch/candidate counts); no milestone or terminal claim may be made from it.
+  required_fix:
+    surface: research_workflow/host/outcomes.py (barrier/composite path only)
+    semantics: >
+      Under session_end_rule == "truncate", the session close must BOUND the observation window
+      rather than void it, matching the documented meaning and the flip-kernel behaviour:
+        * effective arm end = min(entry_ts + arm.horizon_ns, session_close);
+        * do NOT censor at setup; run the arm to that effective end; a touch at or before it
+          resolves POSITIVE/NEGATIVE at its own instant; reaching the effective end untouched is
+          CENSORED SESSION_END (or the declared expiry policy if the true horizon came first);
+        * _complete's composite flip branch: use session_close as the effective flip end under
+          truncate instead of censoring because flip_end > session_close.
+    regression_test_required: >
+      composite kernel + truncate + arm horizon longer than the remaining session must produce
+      real resolutions. A test asserting "not 100% censored" is the minimum; better, assert the
+      exact first-passage instant for a touch before the close and CENSORED SESSION_END only for
+      one that never touches.
+    then: re-audit (delta), re-seal, re-collect. The seal e93c62bb is spent.
