@@ -1,0 +1,90 @@
+kind: tracker
+name: tracker.regime.prior_level_snapshot
+semantics: 'Immutable snapshot of the IMMEDIATELY-COMPLETED regime of one regime.dual_ema
+  tracker (any timeframe it supports). The binding owns a canonical regime.excursion
+  accumulator (the same class, same bars/regime inputs); on the regime''s `changed`
+  event it freezes that accumulator''s state BEFORE forwarding the reset, and publishes
+  it as the prior regime: direction, start_ns/end_ns, start/end price, frozen ATR,
+  bars, duration, raw MFE/MAE prices, MFE/MAE/terminal displacement in the completed
+  regime''s frozen ATR. The snapshot is replaced whole at the next `changed`; nothing
+  else writes it.
+
+  '
+availability_rule: 'The snapshot of a regime terminated by the `<tf>` bar closing
+  at H becomes readable at H (frozen_at_ns = H = end_ns), the instant the terminating
+  bar is published by the mux, and never earlier. An epoch at T < H reads the previous
+  snapshot (or null).
+
+  '
+parameters: {}
+inputs:
+  bars: stream
+  regime: tracker
+fields:
+- dir
+- start_ns
+- end_ns
+- start_price
+- end_price
+- end_price_ts
+- transition_close
+- frozen_atr
+- duration_s
+- bars
+- mfe_price
+- mae_price
+- mfe_atr
+- mae_atr
+- terminal_displacement_atr
+- regime_seq
+- frozen_at_ns
+- rotation_seq
+events: []
+update_cadence: per_source_bar
+dependencies:
+- tracker.regime.dual_ema
+- tracker.regime.excursion
+serves_studies:
+- nq_mtf_regime_structural_geometry_atlas
+- nq_va_multitf_trade_state_geometry
+- nq_mtf_regime_atlas_pilot2023
+closest_existing:
+  id: tracker.regime.excursion
+  why_not: 'regime.excursion holds exactly the completed regime''s extremes, start
+    price and frozen ATR, but resets them on `changed` and keeps nothing; GenericCompletedRegimeGeometryProvider
+    keeps a `_prior` but only as ATR ratios through the regime FEATURE family (5s/1m/5m
+    only, gap G3), without MAE and with a different end-close rule.
+
+    '
+composition_attempted:
+  spec_fragment: 'prior_1h: {tracker: regime.prior_level_snapshot, bars: 1m, regime:
+    regime_1h}'
+  compiler_gap: MISSING_CAPABILITY tracker.regime.prior_level_snapshot (studies/nq_mtf_regime_structural_geometry_atlas/CAPABILITY_GAP_HANDOFF.json)
+reset_policy: 'Rotates exactly and only on the input regime tracker''s `changed` event.
+  regime.dual_ema has no session, day or gap reset (the regime is sticky once non-zero),
+  so neither does the snapshot: it persists across session boundaries, halts, weekends
+  and data gaps until that tracker''s next `changed`. The first `changed` (0 -> +/-1)
+  completes no regime and rotates nothing.
+
+  '
+null_policy: 'Every snapshot field is null before the first completed regime (rotation_seq
+  = 0). ATR-denominated fields (frozen_atr, mfe_atr, mae_atr, terminal_displacement_atr)
+  are null when the completed regime''s frozen ATR was not positive (regime established
+  before ATR warmup); raw prices stay populated. Never 0 as a stand-in.
+
+  '
+gap_policy: 'No gap handling of its own. Source bars and regime bars arrive as the
+  plan''s streams deliver them, including the closed_window zero-volume in-trading-day
+  fill; a zero-volume regime bar can terminate a regime like any other. end_price
+  is the close of the last source bar the completed regime''s accumulator observed,
+  so after a source gap end_price_ts may lie more than one source bar before end_ns
+  (declared, not repaired).
+
+  '
+proposal_sha256: 983130778d09d690eee5837d6fb66beab1c61f415b108eeda24913a6eed3a399
+status: promoted
+proposed_at_utc: '2026-09-21T19:44:07.250359+00:00'
+scaffold:
+  module: features/trackers/regime_prior_level_snapshot.py
+  test: features/tests/test_regime_prior_level_snapshot.py
+  class: RegimePriorLevelSnapshotBinding

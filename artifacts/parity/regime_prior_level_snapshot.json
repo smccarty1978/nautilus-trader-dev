@@ -1,0 +1,67 @@
+{
+  "capability": "tracker.regime.prior_level_snapshot",
+  "fixture": "synthetic 2-day 1s/1m tape (features/tests/test_regime_prior_level_snapshot.py::_tape)",
+  "oracle": "test-only raw-1m-tape rebuild (_oracle): own window aggregation + zero-volume fill; dual-EMA engine for direction only",
+  "passed": true,
+  "runtime_path": "compile_study -> HostCore -> StreamMux(closed_window, zero_volume_in_trading_day)",
+  "scenarios": {
+    "gaps": {
+      "15m": {
+        "completed_regimes": 15,
+        "instants_checked": 13565,
+        "mismatches": 0,
+        "null_atr": 3,
+        "null_end_price": 0
+      },
+      "1h": {
+        "completed_regimes": 8,
+        "instants_checked": 13565,
+        "mismatches": 0,
+        "null_atr": 2,
+        "null_end_price": 0
+      },
+      "5m": {
+        "completed_regimes": 52,
+        "instants_checked": 13565,
+        "mismatches": 0,
+        "null_atr": 1,
+        "null_end_price": 0
+      },
+      "empty_windows_published": {
+        "syn_a_15m": 3,
+        "syn_a_1h": 0,
+        "syn_a_5m": 9
+      },
+      "replay_sha256": "cb94255078c3e2af88b14cded50bb69261934b12819c0d8bf5728b69068912c3"
+    },
+    "no_gaps": {
+      "15m": {
+        "completed_regimes": 15,
+        "instants_checked": 14400,
+        "mismatches": 0,
+        "null_atr": 3,
+        "null_end_price": 0
+      },
+      "1h": {
+        "completed_regimes": 8,
+        "instants_checked": 14400,
+        "mismatches": 0,
+        "null_atr": 2,
+        "null_end_price": 0
+      },
+      "5m": {
+        "completed_regimes": 58,
+        "instants_checked": 14400,
+        "mismatches": 0,
+        "null_atr": 1,
+        "null_end_price": 0
+      },
+      "empty_windows_published": {
+        "syn_a_15m": 0,
+        "syn_a_1h": 0,
+        "syn_a_5m": 0
+      },
+      "replay_sha256": "7ea3676b85a478bf639f5b5b09bc2cb19e3ed8351dd03e846dd6515c0b147d31"
+    }
+  }
+}
