@@ -1108,6 +1108,17 @@ def _resolve_outcome(ctx: _Ctx, population: Mapping[str, Any]) -> Dict[str, Any]
             contract["cost_points_per_side"] = float(o.cost_points_per_side)
         from research_workflow.host.outcomes import TERMINAL_OBSERVATION_COLUMNS
         obs += list(TERMINAL_OBSERVATION_COLUMNS)
+    # Causal executable-entry observation: opt-in, so a plan that does not ask for it compiles (and
+    # a sealed plan replays) exactly as before. Only the barrier/composite kernels read the
+    # execution stream, so only they can observe an entry.
+    if o.entry_observation:
+        if not arms:
+            ctx.gap(GapKind.INVALID_PARAMETERIZATION, "outcome.entry_observation",
+                    "entry_observation needs a barrier outcome (barrier or composite kernel): the flip kernel resolves no executable entry")
+        else:
+            contract["entry_observation"] = True
+            from research_workflow.host.outcomes import ENTRY_OBSERVATION_COLUMNS
+            obs += list(ENTRY_OBSERVATION_COLUMNS)
     # A5 invariant: observed_seconds is the LAST observation column.
     obs.append("observed_seconds")
     contract["observation_columns"] = obs
@@ -1420,8 +1431,56 @@ def _check_condition_ops(gap: Any, where: str, params: Any) -> None:
     walk(params, where)
 
 
+def _analysis_column_proof(gap: Any, where: str, step: Any, rows_columns: Optional[List[str]]) -> Optional[List[str]]:
+    """Compile-time column provenance for the ops whose column contract is statically knowable.
+
+    ``rows_columns`` is the proven column list of the step's ``rows`` (None = not provable). Returns
+    the step's output columns, or None when they are not provable. ``analysis.derive.columns`` is
+    STRICT: every expression must parse and reference only columns the plan provides (or columns
+    derived earlier); a derive over rows whose columns cannot be proven is refused, never trusted.
+    ``analysis.contrast.nominate`` (compute mode) must name existing columns. ``classify.precedence``
+    only propagates (input + its output column) -- no new check on an existing op.
+    """
+    params = dict(step.params or {})
+    if step.op == "analysis.derive.columns":
+        if rows_columns is None:
+            gap(GapKind.UNSUPPORTED_COMPOSITION, f"{where}.rows",
+                f"analysis.derive.columns needs rows whose columns are provable at compile time; {step.rows!r} "
+                "is produced by an op with no static column contract")
+            return None
+        from research.analysis.expressions import static_check
+        errors, out = static_check(params, rows_columns)
+        for err in errors:
+            gap(GapKind.INVALID_PARAMETERIZATION, f"{where}.params", err)
+        return out
+    if step.op == "analysis.classify.precedence":
+        return None if rows_columns is None else list(rows_columns) + [str(params.get("output_column", "label"))]
+    # Summary ops: their OUTPUT schema is fixed by their params (propagation only, no new check), so
+    # a derive over a summary (e.g. a Wilson interval from mean and n) is provable.
+    if step.op == "analysis.describe.grouped":
+        qs = sorted({float(q) for q in (params.get("quantiles") or (0.25, 0.5, 0.75))})
+        return list(params.get("group_by") or []) + ["column", "n_rows", "n_clusters", "n_censored", "n_null", "n",
+                                                     "n_clusters_observed", "mean", "median", "std", "min", "max"] + [f"q{q:g}" for q in qs]
+    if step.op == "analysis.uncertainty.clustered_mean":
+        return list(params.get("group_by") or []) + ["column", "n_rows", "n_censored", "n_null", "n_clusters", "mean", "se",
+                                                     "df", "ci_low", "ci_high"]
+    if step.op == "analysis.contrast.nominate" and rows_columns is not None and params.get("mode", "compute") == "compute":
+        named = list(params.get("parent_by") or []) + list(params.get("dimensions") or [])
+        for block in params.get("contrasts") or []:
+            if isinstance(block, Mapping):
+                named += list(block.get("parent_by") or []) + list(block.get("dimensions") or [])
+        named += [str(m["column"]) if isinstance(m, Mapping) else str(m) for m in (params.get("metrics") or [])]
+        named += [params[k] for k in ("cluster_column", "cluster_ts_column", "censored_column") if params.get(k)]
+        missing = sorted({str(c) for c in named} - set(rows_columns))
+        if missing:
+            gap(GapKind.INVALID_PARAMETERIZATION, f"{where}.params",
+                f"analysis.contrast.nominate names columns the rows do not carry: {missing}")
+    return None
+
+
 def _check_analysis_pipeline(gap: Any, steps_spec: Sequence[Any], artifacts_spec: Sequence[Any], *, registered: Set[str],
-                             builtin: Set[str], unbound: Any) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+                             builtin: Set[str], unbound: Any,
+                             frame_columns: Optional[Mapping[str, List[str]]] = None) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
     """Prove a declared analysis pipeline at COMPILE time and return its compiled steps and artifacts.
 
     Shared by ``_resolve_analysis`` (a study's own ``analysis:``) and ``research_workflow.explore``
@@ -1429,10 +1488,13 @@ def _check_analysis_pipeline(gap: Any, steps_spec: Sequence[Any], artifacts_spec
     and every extra input resolve to a built-in frame or an EARLIER step (a DAG in declaration
     order), and every artifact names a declared step. ``gap(kind, where, message, **detail)`` is the
     caller's gap sink; ``unbound(ref)`` renders the message for a reference that binds to nothing.
+    ``frame_columns`` (built-in frame -> its columns, when known) enables the column proof of
+    ``_analysis_column_proof``; without it no column is ever proven.
     """
     from research.analysis.ops import op_inputs
     steps: List[Dict[str, Any]] = []
     seen: List[str] = []
+    proven: Dict[str, Optional[List[str]]] = {k: list(v) for k, v in (frame_columns or {}).items()}
     for i, step in enumerate(steps_spec):
         where = f"analysis.steps[{i}]"
         if step.id in seen:
@@ -1455,6 +1517,7 @@ def _check_analysis_pipeline(gap: Any, steps_spec: Sequence[Any], artifacts_spec
         for name in sorted(required - set((step.inputs or {}))):
             gap(GapKind.INVALID_PARAMETERIZATION, f"{where}.inputs", f"{step.op} needs input {name!r}")
         _check_condition_ops(gap, f"{where}.params", step.params or {})
+        proven[step.id] = _analysis_column_proof(gap, where, step, proven.get(step.rows))
         seen.append(step.id)
         steps.append({"id": step.id, "op": step.op, "rows": step.rows, "inputs": dict(step.inputs or {}),
                       "params": dict(step.params or {})})
@@ -1477,7 +1540,7 @@ def _check_analysis_pipeline(gap: Any, steps_spec: Sequence[Any], artifacts_spec
     return steps, artifacts
 
 
-def _resolve_analysis(ctx: _Ctx, chronology: Mapping[str, Any]) -> Optional[Dict[str, Any]]:
+def _resolve_analysis(ctx: _Ctx, chronology: Mapping[str, Any], columns: Mapping[str, Any]) -> Optional[Dict[str, Any]]:
     """Compile the declarative ``analysis:`` pipeline: registered ops, bound inputs, named artifacts.
 
     Every step is proven at COMPILE time: the op is a registered ``analysis_ops`` capability, its
@@ -1512,7 +1575,15 @@ def _resolve_analysis(ctx: _Ctx, chronology: Mapping[str, Any]) -> Optional[Dict
             return "'train_frame' exists only under analysis.source: oos; under source: train it is the same rows as 'frame'"
         return f"{ref!r} is neither {' / '.join(repr(b) for b in sorted(builtin))} nor an earlier step"
 
-    steps, artifacts = _check_analysis_pipeline(ctx.gap, spec.steps, spec.artifacts, registered=registered, builtin=builtin, unbound=_unbound)
+    # The analysis frame is candidates joined with every observation column plus `_year`
+    # (lifecycle_v2._train_frame_all_labels) -- exactly the plan's declared columns. Own model scores
+    # add runtime-named `score__*` columns, which no expression can be proven against.
+    cols = list(columns.get("identity") or []) + [m["column"] for m in columns.get("metadata") or []]
+    cols += list(columns.get("features") or []) + list(columns.get("derived") or []) + list(columns.get("observation") or [])
+    cols = list(dict.fromkeys(cols + ["_year"]))
+    frame_columns = None if spec.model_scores else {b: cols for b in builtin}
+    steps, artifacts = _check_analysis_pipeline(ctx.gap, spec.steps, spec.artifacts, registered=registered, builtin=builtin, unbound=_unbound,
+                                                frame_columns=frame_columns)
     # The analysis ops are resolved from the capability index, so the closure's import walk cannot
     # see them: seed the modules that actually implement the declared steps, plus the boundary that
     # binds an id to one of them. Editing either stales the freeze, exactly as before.
@@ -1838,7 +1909,7 @@ def compile_study(spec_data: Any, *, repo_root: Path = REPO_ROOT, registry: Opti
     if not ctx.gaps.ok:
         return CompileOutcome(None, ctx.gaps)
     warmup, availability = _resolve_warmup_and_availability(ctx)
-    analysis = _resolve_analysis(ctx, chronology)
+    analysis = _resolve_analysis(ctx, chronology, columns)
     _resolve_collect_stage(ctx, population, triggers, chronology, model, analysis)
     deliverables = _resolve_deliverables(ctx, model, analysis)
     if not ctx.gaps.ok:

@@ -28,7 +28,8 @@ from research.analysis.tests.golden_analysis_ops import GOLDEN_PATH, build
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 BOUNDARY = "research/analysis/ops.py"
-IMPLEMENTATION_MODULES = {"research/analysis/diagnostic_ops.py"}
+IMPLEMENTATION_MODULES = {"research/analysis/diagnostic_ops.py", "research/analysis/derive_ops.py",
+                          "research/analysis/contrast_ops.py"}
 CONSUMERS = ("research_workflow/grammar/compiler.py", "research_workflow/lifecycle_v2.py")
 
 

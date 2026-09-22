@@ -113,3 +113,30 @@ analysis_ops:
     parameters: [value_columns, group_by, cluster_column, cluster_ts_column, censored_column, confidence, differences]
     update_cadence: offline_only
     required_tests: [research/analysis/tests/test_summary_ops.py]
+  - id: analysis.derive.columns
+    version: 1
+    description: Declared row-wise column derivation in a bounded, parsed (never eval-ed) expression grammar -- arithmetic, comparisons, three-valued logic and a closed function whitelist (abs, sign, sqrt, min, max, is_null, not_null, where, coalesce, concat, cut); explicit NULL propagation and divide-by-zero policy; optional row filter; no aggregation, no cross-row access; the compiler refuses any column the plan does not provide.
+    implementation: research.analysis.derive_ops.derive_columns
+    inputs: []
+    needs_context: false
+    parameters: [columns, keep, div_zero]
+    update_cadence: offline_only
+    required_tests: [research/analysis/tests/test_derive_ops.py]
+  - id: analysis.contrast.nominate
+    version: 1
+    description: Frozen nomination rules over parent/child contrasts -- child minus rest-of-parent with session-day-clustered CR1 intervals (the clustered_mean difference estimator), declared support gates, Benjamini-Hochberg over the whole tested family, declared absolute/relative/CI/q materiality gates; emits every contrast in key order (never ranked) and a claim file freezing the specification, gates, replication rules and claims.
+    implementation: research.analysis.contrast_ops.contrast_nominate
+    inputs: []
+    needs_context: false
+    parameters: [mode, parent_by, dimensions, metrics, cluster_column, cluster_ts_column, censored_column, exclude_child_values, n_basis, confidence, gates, materiality, bh_null_policy, key_columns, replication, contrasts]
+    update_cadence: offline_only
+    required_tests: [research/analysis/tests/test_contrast_ops.py]
+  - id: analysis.replication.scorecard
+    version: 1
+    description: Re-measures every claim of a hash-pinned contrast.nominate claim file on the replication rows with the file's own contrast specification and classifies each by the file's own ordered rules; refuses a changed file, never drops, adds or re-thresholds a claim.
+    implementation: research.analysis.contrast_ops.replication_scorecard
+    inputs: []
+    needs_context: true
+    parameters: [claims_path, claims_sha256]
+    update_cadence: offline_only
+    required_tests: [research/analysis/tests/test_contrast_ops.py]

@@ -1,0 +1,167 @@
+# Capability proof (chore entry_observation_and_atlas_ops, 2026-09-22): the frozen atlas_design of
+# studies/nq_mtf_regime_structural_geometry_atlas/research_decision.yaml expressed ONLY through registered
+# analysis ops. Used by atlas_compile_proof.py against the study's own study.yaml (overlay below). It is a
+# PROOF OF EXPRESSIBILITY, not the study's analysis: the study session owns its analysis block and must
+# re-derive/confirm every choice marked DECISION below before sealing. No outcome was read to write it.
+outcome_overlay:
+  entry_observation: true            # binds atlas_design.reference_price to executable_entry_price
+
+analysis_discovery:                  # phase 1 (2023): atlas frame, census, lifecycle tables, nomination
+  source: train
+  steps:
+    - id: atlas
+      op: analysis.derive.columns
+      params:
+        keep: "checkpoint_index == 0"          # unit: the T0 row of each confirmed flip
+        columns:
+          # ---- levels (atlas_design.levels) ---------------------------------------------------------------
+          - {name: "lvl_cur_start_{tf}", expr: "start_price_{tf}", each: {tf: [5m, 15m, 1h]}}
+          - {name: "lvl_cur_mfe_{tf}", expr: "where(dir_{tf} == 1, highest_high_{tf}, where(dir_{tf} == -1, lowest_low_{tf}, null))", each: {tf: [5m, 15m, 1h]}}
+          - {name: "lvl_cur_mae_{tf}", expr: "where(dir_{tf} == 1, lowest_low_{tf}, where(dir_{tf} == -1, highest_high_{tf}, null))", each: {tf: [5m, 15m, 1h]}}
+          - {name: "no_prior_{tf}", expr: "is_null(prior_rotation_seq_{tf}) or prior_rotation_seq_{tf} == 0", each: {tf: [5m, 15m, 1h]}}
+          - {name: "lvl_pri_{lv}_{tf}", expr: "where(no_prior_{tf}, null, prior_{lv}_price_{tf})", each: {tf: [5m, 15m, 1h], lv: [start, mfe, mae, end]}}
+          # ---- distances: 3 tf x 7 levels x 2 denominators x 2 forms = 84 -------------------------------------
+          # A = the regime's OWN frozen ATR (current -> frozen_atr_<tf>; prior -> prior_frozen_atr_<tf>); B = atr_entry_1m.
+          # A zero/null denominator is NULL by the op's div_zero rule (null_rules.no_atr).
+          - {name: "sd_cur_{lv}_{tf}_A", expr: "dir_1m * (executable_entry_price - lvl_cur_{lv}_{tf}) / frozen_atr_{tf}", each: {tf: [5m, 15m, 1h], lv: [start, mfe, mae]}}
+          - {name: "sd_pri_{lv}_{tf}_A", expr: "dir_1m * (executable_entry_price - lvl_pri_{lv}_{tf}) / prior_frozen_atr_{tf}", each: {tf: [5m, 15m, 1h], lv: [start, mfe, mae, end]}}
+          - {name: "sd_{lvl}_{tf}_B", expr: "dir_1m * (executable_entry_price - lvl_{lvl}_{tf}) / atr_entry_1m", each: {tf: [5m, 15m, 1h], lvl: [cur_start, cur_mfe, cur_mae, pri_start, pri_mfe, pri_mae, pri_end]}}
+          - {name: "ad_cur_{lv}_{tf}_A", expr: "abs(executable_entry_price - lvl_cur_{lv}_{tf}) / frozen_atr_{tf}", each: {tf: [5m, 15m, 1h], lv: [start, mfe, mae]}}
+          - {name: "ad_pri_{lv}_{tf}_A", expr: "abs(executable_entry_price - lvl_pri_{lv}_{tf}) / prior_frozen_atr_{tf}", each: {tf: [5m, 15m, 1h], lv: [start, mfe, mae, end]}}
+          - {name: "ad_{lvl}_{tf}_B", expr: "abs(executable_entry_price - lvl_{lvl}_{tf}) / atr_entry_1m", each: {tf: [5m, 15m, 1h], lvl: [cur_start, cur_mfe, cur_mae, pri_start, pri_mfe, pri_mae, pri_end]}}
+          # ---- position / span (atlas_design.position); ZERO_SPAN -> NULL by div_zero ------------------------------
+          - {name: "cur_pos_{tf}", expr: "(executable_entry_price - lvl_cur_mae_{tf}) / (lvl_cur_mfe_{tf} - lvl_cur_mae_{tf})", each: {tf: [5m, 15m, 1h]}}
+          - {name: "cur_span_{tf}_A", expr: "(highest_high_{tf} - lowest_low_{tf}) / frozen_atr_{tf}", each: {tf: [5m, 15m, 1h]}}
+          - {name: "cur_span_{tf}_B", expr: "(highest_high_{tf} - lowest_low_{tf}) / atr_entry_1m", each: {tf: [5m, 15m, 1h]}}
+          # ---- taxonomy ----------------------------------------------------------------------------------------------
+          - {name: "s_{tf}", expr: "where(dir_{tf} == 1, 'L', where(dir_{tf} == -1, 'S', null))", each: {tf: [1m, 5m, 15m, 1h]}}
+          - {name: mtf_state, expr: "coalesce(concat(s_1m, '|', s_5m, '|', s_15m, '|', s_1h), 'UNDEFINED')"}
+          - {name: "rel_{tf}", expr: "where(is_null(s_{tf}) or is_null(s_1m), null, where(dir_{tf} == dir_1m, 'A', 'O'))", each: {tf: [5m, 15m, 1h]}}
+          - {name: rel_code, expr: "coalesce(concat(rel_5m, rel_15m, rel_1h), 'UNDEFINED')"}
+          - {name: side, expr: "where(dir_1m == 1, 'LONG', 'SHORT')"}
+          # ---- exclusions (null_rules), counted, never outcome-selected --------------------------------------------------
+          - {name: geometry_excluded, expr: "is_null(executable_entry_price) or is_null(atr_entry_1m) or atr_entry_1m <= 0"}
+          - {name: state_excluded, expr: "geometry_excluded or mtf_state == 'UNDEFINED'"}
+          # ---- fixed-edge buckets (atlas_design.buckets); null categories are their own rows --------------------------------
+          - {name: "b_sd_cur_{lv}_{tf}_{X}", each: {tf: [5m, 15m, 1h], lv: [start, mfe, mae], X: [A, B]},
+             expr: "where(is_null(sd_cur_{lv}_{tf}_{X}), 'NO_ATR', cut(sd_cur_{lv}_{tf}_{X}, [-2, -1, -0.5, 0, 0.5, 1, 2], ['<-2', '[-2,-1)', '[-1,-0.5)', '[-0.5,0)', '[0,0.5)', '[0.5,1)', '[1,2)', '>=2']))"}
+          - {name: "b_sd_pri_{lv}_{tf}_{X}", each: {tf: [5m, 15m, 1h], lv: [start, mfe, mae, end], X: [A, B]},
+             expr: "where(no_prior_{tf}, 'NO_PRIOR', where(is_null(sd_pri_{lv}_{tf}_{X}), 'NO_ATR', cut(sd_pri_{lv}_{tf}_{X}, [-2, -1, -0.5, 0, 0.5, 1, 2], ['<-2', '[-2,-1)', '[-1,-0.5)', '[-0.5,0)', '[0,0.5)', '[0.5,1)', '[1,2)', '>=2'])))"}
+          - {name: "b_pos_{tf}", each: {tf: [5m, 15m, 1h]},
+             expr: "where(lvl_cur_mfe_{tf} == lvl_cur_mae_{tf}, 'ZERO_SPAN', where(cur_pos_{tf} > 1, '>1', cut(cur_pos_{tf}, [0, 0.2, 0.4, 0.6, 0.8], ['<0', '[0,0.20)', '[0.20,0.40)', '[0.40,0.60)', '[0.60,0.80)', '[0.80,1.00]'])))"}
+          - {name: "b_ad_{lvl}_{tf}_B", each: {tf: [5m, 15m, 1h], lvl: [cur_start, cur_mfe, cur_mae, pri_start, pri_mfe, pri_mae, pri_end]},
+             expr: "cut(ad_{lvl}_{tf}_B, [0.5, 1, 2], ['[0,0.5)', '[0.5,1)', '[1,2)', '>=2'])"}
+          # ---- terminal lifecycle (atlas_design.lifecycle.terminal) ------------------------------------------------------------
+          - {name: terminal_class, expr: "where(is_null(terminal_gross_pnl_points), 'TRUNCATED', where(terminal_gross_pnl_points > 0, 'WIN', where(terminal_gross_pnl_points < 0, 'LOSS', 'FLAT')))"}
+          - {name: is_win, expr: "where(terminal_class == 'TRUNCATED', null, where(terminal_class == 'WIN', 1, 0))"}
+          - {name: is_loss, expr: "where(terminal_class == 'TRUNCATED', null, where(terminal_class == 'LOSS', 1, 0))"}
+          - {name: is_flat, expr: "where(terminal_class == 'TRUNCATED', null, where(terminal_class == 'FLAT', 1, 0))"}
+          - {name: is_truncated, expr: "where(terminal_class == 'TRUNCATED', 1, 0)"}
+          - {name: g_pos, expr: "where(terminal_gross_pnl_atr > 0, terminal_gross_pnl_atr, 0)"}
+          - {name: g_neg_abs, expr: "where(terminal_gross_pnl_atr < 0, -terminal_gross_pnl_atr, 0)"}
+          # ---- before-flip reach: touch STRICTLY before the terminal flip (or the truncated close) -----------------------
+          # DECISION (study): a DATA_END terminal has no bound -> NULL for a touched arm; untouched -> 0.
+          - {name: bound_ts, expr: "where(terminal_flip_disposition == 'LABELED_POSITIVE', terminal_flip_ts, where(terminal_flip_censor_reason == 'SESSION_END', session_close_ts, null))"}
+          - {name: "reach_fav_{k}", each: {k: [0p25, 0p50, 0p75, 1p00, 1p50, 2p00, 3p00, 4p00, 5p00]},
+             expr: "where(fp_fav_{k}_disposition == 'POSITIVE' and (bound_ts - executable_entry_ts) / 1000000000 > fp_fav_{k}_resolution_seconds, 1, 0)"}
+          - {name: "reach_adv_{k}", each: {k: [0p25, 0p50, 0p75, 1p00, 1p50, 2p00, 3p00]},
+             expr: "where(fp_adv_{k}_disposition == 'NEGATIVE' and (bound_ts - executable_entry_ts) / 1000000000 > fp_adv_{k}_resolution_seconds, 1, 0)"}
+          # ---- ordering P(+a before -b), TIE excluded from both numerators, NEITHER reported -------------------------------
+          - {name: "tie_{a}_{b}", each: {a: [0p50, 1p00, 2p00, 3p00, 5p00], b: [0p50, 1p00]},
+             expr: "where(reach_fav_{a} == 1 and reach_adv_{b} == 1 and fp_fav_{a}_resolution_seconds == fp_adv_{b}_resolution_seconds, 1, 0)"}
+          - {name: "fav_first_{a}_{b}", each: {a: [0p50, 1p00, 2p00, 3p00, 5p00], b: [0p50, 1p00]},
+             expr: "where(reach_fav_{a} == 1 and (reach_adv_{b} == 0 or fp_fav_{a}_resolution_seconds < fp_adv_{b}_resolution_seconds), 1, 0)"}
+          - {name: "adv_first_{a}_{b}", each: {a: [0p50, 1p00, 2p00, 3p00, 5p00], b: [0p50, 1p00]},
+             expr: "where(reach_adv_{b} == 1 and (reach_fav_{a} == 0 or fp_adv_{b}_resolution_seconds < fp_fav_{a}_resolution_seconds), 1, 0)"}
+          - {name: "neither_{a}_{b}", each: {a: [0p50, 1p00, 2p00, 3p00, 5p00], b: [0p50, 1p00]},
+             expr: "where(reach_fav_{a} == 0 and reach_adv_{b} == 0, 1, 0)"}
+          # ---- runner preservation: among runner_X, adverse Y reached strictly before t(+X) ---------------------------------
+          - {name: "pres_{x}_{y}", each: {x: [2p00, 3p00, 5p00], y: [0p25, 0p50, 0p75, 1p00, 1p50]},
+             expr: "where(reach_fav_{x} == 1, where(reach_adv_{y} == 1 and fp_adv_{y}_resolution_seconds < fp_fav_{x}_resolution_seconds, 1, 0), null)"}
+          # ---- rung ladder + shapes (precedence RUNNER > TWO_SIDED > SLOW_FAILURE > SMALL_WIN_GIVEBACK > QUICK_FAILURE > OTHER) ----
+          - {name: max_fav_rung, expr: "where(reach_fav_5p00 == 1, 5.0, where(reach_fav_4p00 == 1, 4.0, where(reach_fav_3p00 == 1, 3.0, where(reach_fav_2p00 == 1, 2.0, where(reach_fav_1p50 == 1, 1.5, where(reach_fav_1p00 == 1, 1.0, where(reach_fav_0p75 == 1, 0.75, where(reach_fav_0p50 == 1, 0.5, where(reach_fav_0p25 == 1, 0.25, 0.0)))))))))"}
+          - {name: max_adv_rung, expr: "where(reach_adv_3p00 == 1, 3.0, where(reach_adv_2p00 == 1, 2.0, where(reach_adv_1p50 == 1, 1.5, where(reach_adv_1p00 == 1, 1.0, where(reach_adv_0p75 == 1, 0.75, where(reach_adv_0p50 == 1, 0.5, where(reach_adv_0p25 == 1, 0.25, 0.0)))))))"}
+          - {name: shape, expr: "where(reach_fav_2p00 == 1, 'RUNNER', where(max_fav_rung >= 1.0 and max_adv_rung >= 1.0, 'TWO_SIDED', where(max_fav_rung >= 1.0 and terminal_gross_pnl_atr < 0, 'SLOW_FAILURE', where(max_fav_rung >= 1.0 and terminal_gross_pnl_atr >= 0 and terminal_gross_pnl_atr < 0.5 * max_fav_rung, 'SMALL_WIN_GIVEBACK', where(reach_adv_0p50 == 1 and fp_adv_0p50_resolution_seconds <= 300 and max_fav_rung < 0.5 and terminal_gross_pnl_atr < 0, 'QUICK_FAILURE', 'OTHER')))))"}
+    # ---- A/B/C: pooled baseline, exact-state census and lifecycle tables (session-day clustered) --------------------
+    - id: lifecycle_by_state
+      op: analysis.describe.grouped
+      rows: atlas
+      params:
+        value_columns: [is_win, is_loss, is_flat, is_truncated, terminal_gross_pnl_atr, g_pos, g_neg_abs, terminal_duration_seconds,
+                        reach_fav_0p25, reach_fav_0p50, reach_fav_0p75, reach_fav_1p00, reach_fav_1p50, reach_fav_2p00, reach_fav_3p00,
+                        reach_fav_4p00, reach_fav_5p00, reach_adv_0p25, reach_adv_0p50, reach_adv_0p75, reach_adv_1p00, reach_adv_1p50,
+                        reach_adv_2p00, reach_adv_3p00, fav_first_1p00_0p50, fav_first_2p00_1p00, pres_2p00_0p50, pres_3p00_1p00]
+        group_by: [mtf_state]
+        quantiles: [0.1, 0.25, 0.5, 0.75, 0.9]
+        censored_column: state_excluded
+        cluster_ts_column: observation_ts
+    - id: lifecycle_wilson           # Wilson 95 % for single proportions, row-wise over the summary
+      op: analysis.derive.columns
+      rows: lifecycle_by_state
+      params:
+        columns:
+          - {name: z, expr: "1.959963984540054"}
+          - {name: wilson_center, expr: "(mean + z * z / (2 * n)) / (1 + z * z / n)"}
+          - {name: wilson_half, expr: "z * sqrt(mean * (1 - mean) / n + z * z / (4 * n * n)) / (1 + z * z / n)"}
+          - {name: wilson_low, expr: "wilson_center - wilson_half"}
+          - {name: wilson_high, expr: "wilson_center + wilson_half"}
+          - {name: printable, expr: "n >= 50"}          # support.n_print
+    - id: clustered_by_state
+      op: analysis.uncertainty.clustered_mean
+      rows: atlas
+      params:
+        value_columns: [is_win, reach_fav_2p00, reach_adv_1p00, fav_first_1p00_0p50, fav_first_2p00_1p00, reach_fav_3p00]
+        group_by: [mtf_state]
+        censored_column: state_excluded
+        cluster_ts_column: observation_ts
+    # ---- D/E: one structural dimension within eligible states, vs parent; ONE BH family with L1 ------------------
+    - id: nomination
+      op: analysis.contrast.nominate
+      rows: atlas
+      params:
+        contrasts:
+          - {parent_by: [], dimensions: [mtf_state, rel_code]}                          # L1 vs pooled baseline
+          - parent_by: [mtf_state]                                                      # L2: 45 dimensions
+            dimensions: [b_sd_cur_start_5m_A, b_sd_cur_mfe_5m_A, b_sd_cur_mae_5m_A, b_sd_pri_start_5m_A, b_sd_pri_mfe_5m_A, b_sd_pri_mae_5m_A, b_sd_pri_end_5m_A,
+                         b_sd_cur_start_5m_B, b_sd_cur_mfe_5m_B, b_sd_cur_mae_5m_B, b_sd_pri_start_5m_B, b_sd_pri_mfe_5m_B, b_sd_pri_mae_5m_B, b_sd_pri_end_5m_B,
+                         b_sd_cur_start_15m_A, b_sd_cur_mfe_15m_A, b_sd_cur_mae_15m_A, b_sd_pri_start_15m_A, b_sd_pri_mfe_15m_A, b_sd_pri_mae_15m_A, b_sd_pri_end_15m_A,
+                         b_sd_cur_start_15m_B, b_sd_cur_mfe_15m_B, b_sd_cur_mae_15m_B, b_sd_pri_start_15m_B, b_sd_pri_mfe_15m_B, b_sd_pri_mae_15m_B, b_sd_pri_end_15m_B,
+                         b_sd_cur_start_1h_A, b_sd_cur_mfe_1h_A, b_sd_cur_mae_1h_A, b_sd_pri_start_1h_A, b_sd_pri_mfe_1h_A, b_sd_pri_mae_1h_A, b_sd_pri_end_1h_A,
+                         b_sd_cur_start_1h_B, b_sd_cur_mfe_1h_B, b_sd_cur_mae_1h_B, b_sd_pri_start_1h_B, b_sd_pri_mfe_1h_B, b_sd_pri_mae_1h_B, b_sd_pri_end_1h_B,
+                         b_pos_5m, b_pos_15m, b_pos_1h]
+        metrics: [is_win, reach_fav_2p00, reach_adv_1p00, fav_first_1p00_0p50, fav_first_2p00_1p00, reach_fav_3p00]   # support.primary_metrics
+        cluster_ts_column: observation_ts
+        censored_column: state_excluded
+        n_basis: rows                      # DECISION (study): "child trades" -> non-excluded rows
+        confidence: 0.95
+        gates: {min_child_n: 150, min_parent_n: 300, min_nominate_n: 300}       # support.n_compare / parent / n_nominate
+        materiality: {min_abs_difference: 0.05, min_relative_difference: 0.25, require_ci_excludes_zero: true, max_bh_q: 0.10}
+        bh_null_policy: count_as_one
+        replication:                       # support.replication_2024, frozen INTO the claim file
+          min_ratio: 0.5
+          min_child_n: 150
+          rules:                           # DECISION (study): the frozen text overlaps; this ORDER resolves it (first match)
+            - {class: UNDERPOWERED, requires: [underpowered]}
+            - {class: REPLICATED, requires: [same_sign, ratio_ge_min, ci_excludes_zero]}
+            - {class: CONTRADICTED, requires: [opposite_sign, ci_excludes_zero]}
+            - {class: DIRECTIONALLY_CONSISTENT, requires: [same_sign, ci_includes_zero]}
+            - {class: NOT_REPLICATED, requires: [ratio_lt_min]}
+            - {class: NOT_REPLICATED, requires: [opposite_sign, ci_includes_zero]}
+  artifacts:
+    - {name: atlas_frame.parquet, source: atlas, kind: frame}
+    - {name: atlas_columns.json, source: atlas, kind: json}
+    - {name: lifecycle_by_state.parquet, source: lifecycle_wilson, kind: frame}
+    - {name: clustered_by_state.json, source: clustered_by_state, kind: json}
+    - {name: nomination_tests.parquet, source: nomination, kind: frame}
+    - {name: replication_claims.json, source: nomination, kind: json}
+
+analysis_replication:                # phase 2 (2024): the SAME derive step, then the pinned scorecard
+  steps_from_discovery: [atlas]
+  scorecard:
+    id: scorecard
+    op: analysis.replication.scorecard
+    rows: atlas
+    params: {claims_path: artifacts/replication_claims.json, claims_sha256: "<sha256 of the committed 2023 claim file>"}
+  artifacts:
+    - {name: replication_scorecard.json, source: scorecard, kind: json}
+    - {name: replication_scorecard.parquet, source: scorecard, kind: frame}
