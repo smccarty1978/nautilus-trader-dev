@@ -1,0 +1,48 @@
+{
+  "broad_test_delta": {
+    "command": "python scripts/test_delta.py research_workflow/tests research/analysis/tests scripts/tests --baseline-reference c480d8af (baseline recorded at c480d8af, an ancestor of pre-chore main 677687f2)",
+    "counts": {
+      "BASELINE_FAILURE_NOW_FIXED": 1,
+      "ENVIRONMENTAL_MISSING_ARTIFACT": 0,
+      "KNOWN_BASELINE_FAILURE": 53,
+      "NEW_FAILURE": 9,
+      "NEW_FAILURE_OUTSIDE_BASELINE_SCOPE": 0
+    },
+    "failed": 62,
+    "head": "1d471247",
+    "passed": 2405,
+    "ran": 2494,
+    "wall_seconds": 15571
+  },
+  "new_failure_classification": {
+    "ATTRIBUTABLE_TO_CHORE": [],
+    "ENVIRONMENTAL_GITIGNORED_STUDY_ARTIFACTS": {
+      "evidence": "fail only in the fresh worktree: FileNotFoundError on git-ignored studies/*/artifacts/train_fitted_models.joblib etc.; with those 49 ignored files copied from the main checkout all 3 pass on the chore head; copies removed afterwards",
+      "ids": [
+        "research_workflow/tests/test_external_model_scoring.py::test_external_scorer_matches_repaired_model_c_for_deterministic_parent_row",
+        "research_workflow/tests/test_runtime_bindings.py::test_episode_study_is_provider_host_mode_and_all_features_bind",
+        "research_workflow/tests/test_stage3_integration.py::test_stage3_model_c_long_short_routing"
+      ]
+    },
+    "PRE_EXISTING_ON_677687f2": {
+      "evidence": "each fails identically on the clean main worktree at 677687f2; the contract-audit offender list is identical on both trees (all offenders pre-date the chore, e.g. compiler.py:1020 blame cd407353 2026-09-02)",
+      "ids": [
+        "research_workflow/tests/test_redteam_pass1_acceptance.py::test_acc12_canaries_green",
+        "research_workflow/tests/test_redteam_v2_model_store_concurrency.py::test_concurrent_add_export_yields_exactly_one_joblib_record",
+        "scripts/tests/test_direction_qualified_freeze_binding.py::test_aggregate_freeze_opens_the_real_oos_gate",
+        "scripts/tests/test_generic_contract_audit.py::test_no_hardcoded_feature_count_in_generic_workflow",
+        "scripts/tests/test_rt_final_blockers.py::test_rt2b2_editing_a_governance_authority_moves_the_composite[scripts/check_feature_promotion.py]",
+        "scripts/tests/test_rt_final_blockers.py::test_rt2b2_editing_a_governance_authority_moves_the_composite[scripts/select_required_tests.py]"
+      ]
+    }
+  },
+  "targeted": {
+    "c1/truncate/oracle suites": "46 passed",
+    "research/analysis/tests": "139 passed",
+    "targeted platform suites (16 files)": "304 passed + 3 boundary tests fixed in 538ad7ec",
+    "test_analysis_derive_contrast_compile.py": 7,
+    "test_contrast_ops.py": 31,
+    "test_derive_ops.py": 32,
+    "test_entry_observation.py": 32
+  }
+}
