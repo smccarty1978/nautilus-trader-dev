@@ -12,8 +12,12 @@ Kernel semantics preserved exactly from the accepted target runtime
 
 * barrier arms: entry reference ``next_bar_open`` = OPEN of the first execution bar
   strictly after T, entry instant = that bar's close minus its duration, horizon from the
-  entry instant; ``SESSION_END`` when the arm's horizon end lies past the session close
-  (resolved at the close); the entry bar and every later bar are touch-eligible, the bar
+  entry instant; under ``session_end_rule: censor`` an arm whose horizon end lies past the
+  session close is ``SESSION_END`` at the close WITHOUT observing the window, and under
+  ``truncate`` the close bounds that window instead (``effective_end = min(horizon_end,
+  session_close)``): the arm keeps being evaluated and a touch at or before the effective
+  end resolves normally, only an untouched arm that REACHES the effective end is
+  ``SESSION_END``; the entry bar and every later bar are touch-eligible, the bar
   closing exactly at the horizon end included; favorable+adverse in one bar ->
   ``AMBIGUOUS_SAME_BAR_TOUCH``; a tape gap over ``max_gap`` -> ``GAP``; no touch by the
   horizon -> ``TIMEOUT`` (censor) or ``NEGATIVE`` (expiry policy); unresolved at run end
@@ -42,6 +46,16 @@ from research_workflow.host.interfaces import NS, BarView
 
 POSITIVE, NEGATIVE, CENSORED = "POSITIVE", "NEGATIVE", "CENSORED"
 LEGACY = {POSITIVE: "LABELED_POSITIVE", NEGATIVE: "LABELED_NEGATIVE", CENSORED: "CENSORED"}
+
+# C1 terminal block. The compiler and the kernel BOTH build their observation column list from
+# this tuple so the two can never drift; the sink buffers from the kernel's list.
+TERMINAL_OBSERVATION_COLUMNS = [
+    "terminal_flip_ts", "terminal_flip_disposition", "terminal_flip_censor_reason",
+    "terminal_time_to_flip_seconds", "terminal_exit_ts", "terminal_exit_price",
+    "terminal_exit_unavailable_reason", "terminal_entry_ts", "terminal_entry_price",
+    "terminal_gross_pnl_points", "terminal_gross_pnl_atr", "terminal_duration_seconds",
+    "terminal_cost_points", "terminal_net_pnl_points", "terminal_net_pnl_atr",
+]
 
 LEGACY_OBSERVATION_COLUMNS = (
     "observation_ts", "regime_start_ns", "regime_direction", "checkpoint_index", "flip_ts", "time_to_flip_seconds",
@@ -89,6 +103,10 @@ class LabelOutcomeContract:
     #               POSITIVE at its own timestamp, and only a candidate that reached the close
     #               without one is CENSORED SESSION_END, at the close. This is what "observe until
     #               the session ends" means, and a fixed horizon cannot express it.
+    #               It applies to EVERY observation window the contract declares -- the flip item
+    #               AND each barrier arm (effective_end = min(horizon_end, session_close)) -- so a
+    #               composite whose horizons are longer than a trading day is observed rather than
+    #               censored by construction.
     # "ignore"   -- no session boundary at all.
     max_gap_ns: Optional[int]
     same_bar_rule: str
@@ -105,6 +123,17 @@ class LabelOutcomeContract:
     # `observed_seconds = (resolved_at_ts - T) / 1e9` on every row, whatever the disposition. Emitted only when the
     # compiled contract asks for it (every new compile does); a sealed plan compiled before it replays unchanged.
     observed_seconds: bool = False
+    # C1. The CANONICAL TERMINAL of the lifecycle: the qualifying opposite flip, its executable
+    # exit fill and the realized gross economics between the executable entry and that exit.
+    # Emitted only when the compiled contract asks for it (every new compile does); a sealed plan
+    # compiled before C1 replays byte-identically. These columns are INDEPENDENT of the composite
+    # disposition by construction -- three clocks (fixed-time features, milestone arms, lifecycle
+    # terminal) are preserved separately and never collapsed into one aggregate status.
+    terminal_outcome: bool = False
+    # Per-side friction in POINTS. None means the research contract supplies no cost assumption,
+    # in which case gross economics are canonical and net economics are explicitly unavailable --
+    # never guessed.
+    cost_points_per_side: Optional[float] = None
 
     @classmethod
     def from_plan(cls, spec: Mapping[str, Any]) -> "LabelOutcomeContract":
@@ -125,6 +154,9 @@ class LabelOutcomeContract:
                    primary_arm=spec.get("primary_arm"), composition=spec.get("composition"),
                    direction_sign=int(spec.get("direction_sign", 1)),
                    observed_seconds=bool(spec.get("observed_seconds", False)),
+                   terminal_outcome=bool(spec.get("terminal_outcome", False)),
+                   cost_points_per_side=(float(spec["cost_points_per_side"])
+                                         if spec.get("cost_points_per_side") is not None else None),
                    data_end_lookahead_ns=(int(spec["data_end_lookahead_ns"]) if spec.get("data_end_lookahead_ns") is not None else None))
 
 
@@ -180,7 +212,9 @@ def compile_outcome_contract(spec: Mapping[str, Any]):
 class _Pending:
     __slots__ = ("identity", "T", "direction", "prevailing", "atr", "session_close", "entry_resolved", "entry_price", "entry_ts",
                  "prev_ts", "arm_end", "arm_state", "arm_at", "arm_reason", "arm_good", "arm_bad", "arm_open",
-                 "flip_end", "flip_state", "flip_at", "flip_reason", "flip_ts", "opened_at")
+                 "arm_truncated",
+                 "flip_end", "flip_state", "flip_at", "flip_reason", "flip_ts", "opened_at",
+                 "exit_ts", "exit_price", "exit_reason")
 
     def __init__(self, identity: Dict[str, Any], T: int, direction: int, atr: float, session_close: Optional[int],
                  n_arms: int, flip_end: Optional[int], prevailing: int) -> None:
@@ -195,6 +229,10 @@ class _Pending:
         self.entry_ts = 0
         self.prev_ts = T
         self.arm_end = [0] * n_arms
+        # `arm_end[i]` is the EFFECTIVE end: under `session_end_rule: truncate` the session close
+        # shortens it, and `arm_truncated[i]` records that it did, so expiry there is attributed
+        # SESSION_END (the window was cut short) and never TIMEOUT/NEGATIVE (a full window elapsed).
+        self.arm_truncated = [False] * n_arms
         self.arm_state = [None] * n_arms        # None (pending) | POSITIVE | NEGATIVE | CENSORED
         self.arm_at = [None] * n_arms
         self.arm_reason = [None] * n_arms
@@ -207,6 +245,10 @@ class _Pending:
         self.flip_reason = None
         self.flip_ts = None
         self.opened_at = T
+        # C1: executable terminal exit (first bar OPEN strictly after the flip instant).
+        self.exit_ts: Optional[int] = None
+        self.exit_price: Optional[float] = None
+        self.exit_reason: Optional[str] = None
 
 
 # --------------------------------------------------------------------------- #
@@ -236,6 +278,12 @@ class LabelOutcomeKernel:
             for arm in self.arms:
                 self.observation_columns += [f"{arm.prefix}_label", f"{arm.prefix}_disposition",
                                              f"{arm.prefix}_censor_reason", f"{arm.prefix}_resolution_seconds"]
+        # C1. MUST mirror the compiler's observation_columns exactly, in the same order: the sink
+        # buffers from THIS list, so a column the compiler declares but the kernel omits is emitted
+        # into the row dict and then silently dropped on the way to parquet. Placed BEFORE
+        # observed_seconds so A5's invariant (observed_seconds is the last column) still holds.
+        if contract.terminal_outcome:
+            self.observation_columns += TERMINAL_OBSERVATION_COLUMNS
         if contract.observed_seconds:
             self.observation_columns.append("observed_seconds")
         self._primary_index = 0
@@ -297,8 +345,20 @@ class LabelOutcomeKernel:
             target = self._target(p, role)
             if target and new_direction != target:
                 continue
-            if p.T < flip_ts <= p.flip_end:
+            if p.T < flip_ts <= self._flip_effective_end(p):
                 p.flip_ts = flip_ts
+
+    def _flip_effective_end(self, p: _Pending) -> int:
+        """The composite flip child's observation end.
+
+        Under ``truncate`` the session close bounds it exactly as it bounds a barrier arm
+        (``min(flip_end, session_close)``): a qualifying flip at or before the close resolves the
+        child at its own instant, and reaching the close without one is what SESSION_END means.
+        Under ``censor`` / ``ignore`` the declared horizon is the end, unchanged.
+        """
+        if self.c.session_end_rule == "truncate" and p.session_close is not None and p.flip_end > p.session_close:
+            return p.session_close
+        return p.flip_end
 
     def _target(self, p: _Pending, role: str) -> int:
         if role == "opposite":
@@ -324,6 +384,7 @@ class LabelOutcomeKernel:
             return
         hi, lo, op = bar.high, bar.low, bar.open
         max_gap = self.c.max_gap_ns
+        truncate = self.c.session_end_rule == "truncate"
         still: List[_Pending] = []
         for p in self.pending:
             if ts <= p.T:
@@ -347,7 +408,32 @@ class LabelOutcomeKernel:
                         p.arm_good[i] = ep + d * arm.favorable_atr * atr
                         p.arm_bad[i] = ep - d * arm.adverse_atr * atr
                         if p.session_close is not None and p.arm_end[i] > p.session_close:
-                            self._resolve_arm(p, i, CENSORED, p.session_close, "SESSION_END")
+                            if truncate:
+                                # `truncate`: the close BOUNDS the observation window instead of
+                                # voiding it. The arm keeps running to `min(horizon_end,
+                                # session_close)` and is censored only if it REACHES that end
+                                # untouched. Censoring here instead -- as `censor` must -- makes
+                                # every arm whose declared horizon is longer than a trading day
+                                # SESSION_END by construction, before a single bar is examined.
+                                p.arm_end[i] = p.session_close
+                                p.arm_truncated[i] = True
+                            else:
+                                self._resolve_arm(p, i, CENSORED, p.session_close, "SESSION_END")
+            # C1: the canonical terminal exit is the OPEN of the first bar strictly after the
+            # qualifying flip -- the same next_bar_open convention the entry already uses. No new
+            # fill convention is invented here.
+            if (c1 := self.c).terminal_outcome and p.flip_ts is not None and p.exit_ts is None and ts > p.flip_ts:
+                if p.session_close is not None and ts > p.session_close:
+                    # The exit fill must come from the session that BOUNDED the lifecycle. Leaving
+                    # this to `max_gap_ns` makes the guarantee depend on the calendar's break being
+                    # longer than max_gap -- true of the CME nightly break today, not a property
+                    # the kernel may assume (C-6). SESSION_END outranks GAP, as declared.
+                    p.exit_reason = "SESSION_END"
+                elif c1.max_gap_ns is not None and (ts - p.flip_ts) > c1.max_gap_ns:
+                    p.exit_reason = "GAP"
+                else:
+                    p.exit_price = op
+                    p.exit_ts = ts - (bar.ts_init - bar.ts_event)
             if p.arm_open:
                 gap = bool(max_gap is not None and ts - p.prev_ts > max_gap)
                 for i in range(self.n_arms):
@@ -362,10 +448,16 @@ class LabelOutcomeKernel:
                         # to the horizon-expiry policy: an unobserved gap spanning the
                         # horizon end can otherwise manufacture a NEGATIVE/CENSORED-TIMEOUT
                         # label from zero price observation over the whole interval (C-B).
-                        if p.session_close is not None and ts > p.session_close:
+                        if not truncate and p.session_close is not None and ts > p.session_close:
                             self._resolve_arm(p, i, CENSORED, p.session_close, "SESSION_END")
                             continue
-                        if self.c.horizon_end_rule == "strict":
+                        # Under `truncate` the close is already baked into `end`, so reaching here
+                        # means the EFFECTIVE end elapsed; `_expire_arm` attributes SESSION_END when
+                        # that end was the close. A bar past the close is never touch-eligible under
+                        # truncate, so `first_bar_at_or_after` degrades to `strict` there rather
+                        # than reading an out-of-session bar's OHLC into an in-session arm.
+                        post_close = truncate and p.session_close is not None and ts > p.session_close
+                        if self.c.horizon_end_rule == "strict" or post_close:
                             # `strict` never inspects `ts`'s OHLC (no touch is ever evaluated
                             # post-horizon), so the only gap question that matters is whether
                             # the horizon boundary itself (`end`) was adequately observed --
@@ -398,7 +490,7 @@ class LabelOutcomeKernel:
                         else:
                             self._expire_arm(p, i)
                         continue
-                    if p.session_close is not None and ts > p.session_close:
+                    if not truncate and p.session_close is not None and ts > p.session_close:
                         self._resolve_arm(p, i, CENSORED, ts, "SESSION_END")
                         continue
                     if gap:
@@ -428,7 +520,12 @@ class LabelOutcomeKernel:
 
     def _expire_arm(self, p: _Pending, i: int) -> None:
         arm = self.arms[i]
-        if arm.expiry == "negative":
+        if p.arm_truncated[i]:
+            # The session close cut this window short: the arm never got its declared horizon, so
+            # neither TIMEOUT (a full horizon elapsed) nor the `negative` expiry policy is true of
+            # it. SESSION_END censoring is, and it is stamped exactly at the close.
+            self._resolve_arm(p, i, CENSORED, p.arm_end[i], "SESSION_END")
+        elif arm.expiry == "negative":
             self._resolve_arm(p, i, NEGATIVE, p.arm_end[i], None)
         else:
             self._resolve_arm(p, i, CENSORED, p.arm_end[i], "TIMEOUT")
@@ -444,8 +541,26 @@ class LabelOutcomeKernel:
         if self.arms and p.arm_open:
             return False
         if self.c.flip is not None and self.c.kernel == "composite":
+            truncate = self.c.session_end_rule == "truncate"
+            truncated = truncate and p.session_close is not None and p.flip_end > p.session_close
             if p.flip_ts is not None:
                 p.flip_state, p.flip_at = POSITIVE, p.flip_ts
+            elif truncated:
+                # The child is NOT decided at setup: it is observed to the close, and only a
+                # candidate that reached the close with no qualifying flip is SESSION_END there.
+                #
+                # The close itself is HELD ONE TICK. `sort_bars_causal` delivers the shorter
+                # timeframe first at equal ts_init, so the 1s outcome bar closing at the session
+                # close reaches `on_bar` BEFORE the 1m bar whose tracker emits the flip at that
+                # same instant. Resolving on `now_ts >= session_close` would censor a flip that
+                # is about to land at a timestamp the window includes. `_sweep_flip` applies
+                # exactly this rule for `kernel: flip`; the composite child now matches it.
+                if p.session_close < now_ts or (p.session_close == now_ts and final):
+                    p.flip_state, p.flip_at, p.flip_reason = CENSORED, p.session_close, "SESSION_END"
+                elif final:
+                    p.flip_state, p.flip_at, p.flip_reason = CENSORED, now_ts, "DATA_END"
+                else:
+                    return False
             elif p.session_close is not None and p.flip_end > p.session_close:
                 p.flip_state, p.flip_at, p.flip_reason = CENSORED, p.session_close, "SESSION_END"
             elif now_ts >= p.flip_end or final:
@@ -455,6 +570,13 @@ class LabelOutcomeKernel:
                     p.flip_state, p.flip_at, p.flip_reason = CENSORED, now_ts, "DATA_END"
             else:
                 return False
+        # C1: if the flip has happened but its executable exit bar has not arrived yet, hold the
+        # row one more bar. Without this a candidate whose arms all resolved before the flip would
+        # emit with no terminal fill. On `final` there is no next bar, so record why.
+        if self.c.terminal_outcome and p.flip_ts is not None and p.exit_ts is None and p.exit_reason is None:
+            if not final:
+                return False
+            p.exit_reason = "DATA_END"
         return True
 
     def _sweep_flip(self, now_ts: int, *, final: bool) -> None:
@@ -542,6 +664,54 @@ class LabelOutcomeKernel:
         })
         if c.observed_seconds:
             row["observed_seconds"] = ((at - p.T) / NS) if at is not None else None
+
+        # ------------------------------------------------------------------ C1 terminal block --
+        # THE CANONICAL LIFECYCLE TERMINAL, independent of `disp`. The composite disposition
+        # summarises the barrier arms and is CENSORED whenever any arm never touched; deriving the
+        # terminal from it (the pre-C1 behaviour) discarded a flip the kernel had already recorded.
+        # These columns read p.flip_ts directly and are never conditioned on the aggregate.
+        if c.terminal_outcome:
+            has_flip = p.flip_ts is not None
+            if has_flip:
+                term_disp, term_reason = POSITIVE, None
+            elif p.flip_reason is not None:
+                term_disp, term_reason = CENSORED, p.flip_reason
+            elif p.flip_state is not None:
+                term_disp, term_reason = p.flip_state, None
+            else:
+                term_disp, term_reason = CENSORED, "UNRESOLVED"
+            row["terminal_flip_ts"] = p.flip_ts
+            row["terminal_flip_disposition"] = LEGACY[term_disp]
+            row["terminal_flip_censor_reason"] = term_reason
+            row["terminal_time_to_flip_seconds"] = ((p.flip_ts - p.T) / NS) if has_flip else None
+            row["terminal_exit_ts"] = p.exit_ts
+            row["terminal_exit_price"] = p.exit_price
+            row["terminal_exit_unavailable_reason"] = p.exit_reason
+            # Realized gross economics between the EXECUTABLE entry fill and the EXECUTABLE exit
+            # fill. Both are next_bar_open marks; neither is a decision-bar close.
+            if p.entry_resolved and p.exit_ts is not None and p.exit_price is not None:
+                gross_pts = p.direction * (p.exit_price - p.entry_price)
+                row["terminal_entry_ts"] = p.entry_ts
+                row["terminal_entry_price"] = p.entry_price
+                row["terminal_gross_pnl_points"] = gross_pts
+                row["terminal_gross_pnl_atr"] = (gross_pts / p.atr) if p.atr else None
+                row["terminal_duration_seconds"] = (p.exit_ts - p.entry_ts) / NS
+                if c.cost_points_per_side is not None:
+                    net_pts = gross_pts - 2.0 * c.cost_points_per_side
+                    row["terminal_cost_points"] = 2.0 * c.cost_points_per_side
+                    row["terminal_net_pnl_points"] = net_pts
+                    row["terminal_net_pnl_atr"] = (net_pts / p.atr) if p.atr else None
+                else:
+                    # The research contract supplies no cost assumption: gross is canonical and
+                    # net is EXPLICITLY unavailable rather than invented.
+                    row["terminal_cost_points"] = None
+                    row["terminal_net_pnl_points"] = None
+                    row["terminal_net_pnl_atr"] = None
+            else:
+                for k_ in ("terminal_entry_ts", "terminal_entry_price", "terminal_gross_pnl_points",
+                           "terminal_gross_pnl_atr", "terminal_duration_seconds", "terminal_cost_points",
+                           "terminal_net_pnl_points", "terminal_net_pnl_atr"):
+                    row[k_] = None
         if self._arm_columns:
             for i, arm in enumerate(self.arms):
                 st, rat, rr = p.arm_state[i], p.arm_at[i], p.arm_reason[i]
@@ -583,5 +753,5 @@ class LabelOutcomeKernel:
 
 
 __all__ = ["LabelOutcomeContract", "TradeExecutionContract", "BarrierArm", "FlipItem", "FillModel",
-           "LabelOutcomeKernel", "compile_outcome_contract", "OutcomeContractError", "LEGACY_OBSERVATION_COLUMNS",
+           "LabelOutcomeKernel", "compile_outcome_contract", "OutcomeContractError", "LEGACY_OBSERVATION_COLUMNS", "TERMINAL_OBSERVATION_COLUMNS",
            "POSITIVE", "NEGATIVE", "CENSORED"]

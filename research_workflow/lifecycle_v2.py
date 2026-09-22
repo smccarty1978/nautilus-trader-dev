@@ -1005,7 +1005,19 @@ class V2Lifecycle:
         obs = obs.sort_values(list(KEY), kind="mergesort").reset_index(drop=True)
         out = self.work / "merged"; out.mkdir(parents=True, exist_ok=True)
         cands.to_parquet(out / "candidates.parquet", index=False); obs.to_parquet(out / "observations.parquet", index=False)
+        # PERSISTED-SCHEMA ASSERTION. The sink buffers from the kernel's own column list, so a
+        # column the plan declares can be emitted into the row dict and then silently dropped on
+        # the way to parquet -- that is exactly how a whole C1 terminal block went missing from a
+        # completed collection with every stage reporting PASS. Fail the merge instead.
+        declared = list((plan.get("outcome") or {}).get("observation_columns") or [])
+        missing = [c for c in declared if c not in obs.columns]
+        if missing:
+            raise LifecycleV2Error(
+                "MERGE_PERSISTED_SCHEMA_MISSING_COLUMNS: the plan declares observation columns that "
+                f"are absent from the merged frame: {missing}. The kernel's observation_columns and "
+                "the compiled plan's observation_columns must agree; the sink buffers from the former.")
         ident = _write(out / "identity.json", {"candidates_identity": frame_content_identity(cands), "observations_identity": frame_content_identity(obs),
+                                                "declared_observation_columns": declared, "persisted_observation_columns": list(obs.columns),
                                                 "rows": int(len(cands)), "years": list(years), "authority": "plan.chronology.train", "plan_sha256": plan["plan_sha256"],
                                                 "candidates_sha256": _sha(out / "candidates.parquet"), "observations_sha256": _sha(out / "observations.parquet"), "generated_at_utc": _now()})
         return {"status": "PASS", "outputs": [str(out / "candidates.parquet"), str(out / "observations.parquet"), str(ident)]}
