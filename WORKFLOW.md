@@ -311,9 +311,13 @@ analysis:
     - {name: anchors.parquet,           source: anchors,   kind: frame}
 ```
 
-Six operations today (`research cap list analysis_ops`): `anchor.first_threshold_crossing`,
-`incidence.cumulative`, `decomposition.buckets`, `control.cell_matched`, `path.anchored_offsets`,
-`classify.precedence`. They are study-agnostic -- the science is in the declared parameters -- and
+Registered operations (`research cap list analysis_ops`; `docs/RESEARCH_WORKFLOW.md` has the table):
+`anchor.first_threshold_crossing`, `incidence.cumulative`, `decomposition.buckets`, `control.cell_matched`,
+`path.anchored_offsets`, `classify.precedence`, `metric.tail_lift`, `describe.grouped`,
+`uncertainty.clustered_mean`, `derive.columns` (row-wise arithmetic/conditions/buckets in a bounded,
+parsed grammar; the compiler refuses a column the plan lacks), `contrast.nominate` (support gates +
+BH + materiality -> a frozen claim file) and `replication.scorecard` (classifies every claim of a
+hash-pinned claim file), plus the two STOP gates. They are study-agnostic -- the science is in the declared parameters -- and
 the compiler proves, before execution, that every op is registered, that the pipeline is a DAG in
 declaration order, and that every declared artifact names a declared step. Steps run after
 collection and may read outcome columns; they are never a feature surface.
