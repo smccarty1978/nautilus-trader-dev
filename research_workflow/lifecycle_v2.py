@@ -1049,8 +1049,15 @@ class V2Lifecycle:
         from research_workflow.forward_outcomes.guard import assert_causal_feature_surface
         from research_workflow.model_store import GOLDEN_MIN_ROWS, ModelLineage, store_model
         frame, label = self._train_frame(plan)
-        features = list(plan["columns"]["features"]) + list(plan["columns"].get("derived") or [])
+        # The MODEL INPUT SURFACE. `model.feature_columns`, when the plan declares it, is the explicit
+        # surface the compiler validated column by column (identity, observation/outcome and guard-refused
+        # names are already rejected there); otherwise it is the declared feature surface, unchanged.
+        features = [str(c) for c in (model.get("feature_columns") or [])] or (
+            list(plan["columns"]["features"]) + list(plan["columns"].get("derived") or []))
         assert_causal_feature_surface(features, context="v2 fit feature surface")
+        unbound = [c for c in features if c not in frame.columns]
+        if unbound:
+            raise LifecycleV2Error(f"MODEL_FEATURE_COLUMNS_UNBOUND: the collected frame has no column(s) {unbound}")
         binary = frame[frame[label].isin([0, 1, 0.0, 1.0])].copy()
         family = str(model["family"]).split(".", 1)[-1]
         params = dict(model.get("params") or {})

@@ -1,0 +1,49 @@
+{
+  "broad_test_delta": {
+    "command": "scripts/test_delta.py research_workflow/tests research/analysis/tests scripts/tests --baseline-reference c480d8af",
+    "head": "ececdbfd",
+    "ran": 2521,
+    "passed": 2432,
+    "failed": 62,
+    "wall_seconds": 13219,
+    "counts": {
+      "NEW_FAILURE": 9,
+      "NEW_FAILURE_OUTSIDE_BASELINE_SCOPE": 0,
+      "KNOWN_BASELINE_FAILURE": 53,
+      "BASELINE_FAILURE_NOW_FIXED": 1,
+      "ENVIRONMENTAL_MISSING_ARTIFACT": 0
+    },
+    "placement": "P-core affinity 0xFFF (3.7 h vs 4.3 h on E-cores)"
+  },
+  "new_failure_classification": {
+    "PRE_EXISTING_ON_137a7e91": {
+      "ids": [
+        "research_workflow/tests/test_redteam_pass1_acceptance.py::test_acc12_canaries_green",
+        "scripts/tests/test_direction_qualified_freeze_binding.py::test_aggregate_freeze_opens_the_real_oos_gate",
+        "scripts/tests/test_generic_contract_audit.py::test_no_hardcoded_feature_count_in_generic_workflow",
+        "scripts/tests/test_rt_final_blockers.py::test_rt2b2_editing_a_governance_authority_moves_the_composite[scripts/check_feature_promotion.py]",
+        "scripts/tests/test_rt_final_blockers.py::test_rt2b2_editing_a_governance_authority_moves_the_composite[scripts/select_required_tests.py]"
+      ],
+      "evidence": "all 5 fail identically on the clean main worktree at 137a7e91"
+    },
+    "ENVIRONMENTAL_GITIGNORED_STUDY_ARTIFACTS": {
+      "ids": [
+        "research_workflow/tests/test_external_model_scoring.py::test_external_scorer_matches_repaired_model_c_for_deterministic_parent_row",
+        "research_workflow/tests/test_runtime_bindings.py::test_episode_study_is_provider_host_mode_and_all_features_bind",
+        "research_workflow/tests/test_stage3_integration.py::test_stage3_model_c_long_short_routing"
+      ],
+      "evidence": "fail only in a fresh worktree; all 3 pass on the chore head with the 49 git-ignored studies/*/artifacts files present (copied, verified, removed)"
+    },
+    "CAUSED_BY_THIS_CHORE_AND_FIXED": {
+      "ids": [
+        "research_workflow/tests/test_docs_v2.py::test_generated_reference_and_registry_are_current"
+      ],
+      "evidence": "MEANING table was missing model.feature_columns; entry added and docs/RESEARCH_YAML_REFERENCE.md regenerated; gen_yaml_reference.py --check now RESEARCH_YAML_REFERENCE_CURRENT and test_docs_v2 9 passed"
+    }
+  },
+  "targeted": {
+    "test_model_feature_columns.py": 27,
+    "test_multi_arm_modeling+grammar_v2+declarative_analysis": 69,
+    "test_docs_v2.py": 9
+  }
+}
