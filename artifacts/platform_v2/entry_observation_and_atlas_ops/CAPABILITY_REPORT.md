@@ -151,6 +151,16 @@ Results:
    - null categories are tested as their own children.
 4. **Two-phase chronology.** The scorecard needs the committed 2023 claim file's sha256 pinned in `study.yaml`. The replication configuration is therefore a post-2023 plan change, which means a reseal. It cannot run in the same analyze pass as discovery.
 
-## E. Tests
+## E. Tests (`test_gate.json`)
 
-Test results are in `test_gate.json` and in the merge commit message.
+- Targeted: entry observation 32, derive 32, contrast/BH/scorecard 31, compiler+pipeline integration 7;
+  `research/analysis/tests` 139 passed; C1/truncate/oracle suites 46 passed; 16 targeted platform files 304 passed
+  (the 3 boundary-architecture failures were fixed in `538ad7ec`: golden regenerated additively, new implementation
+  modules enumerated, `frame_common` instead of an impl->impl import).
+- ONE broad `test_delta` (`research_workflow/tests research/analysis/tests scripts/tests`, baseline reference
+  `c480d8af`): 2,494 ran, 2,405 passed, 53 KNOWN_BASELINE, 1 BASELINE_FAILURE_NOW_FIXED, **9 NEW**, 4.3 h.
+  Every NEW failure was classified against the actual pre-chore main `677687f2`:
+  6 fail identically on clean `677687f2` (the contract-audit offender list is identical on both trees);
+  3 are environmental (git-ignored `studies/*/artifacts/*.joblib` absent from a fresh worktree -- all 3 pass on
+  the chore head once those ignored files are present; copies removed). **0 attributable to this chore.**
+  The baseline was not re-recorded here.
