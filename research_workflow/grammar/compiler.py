@@ -1243,6 +1243,56 @@ def _resolve_partition_windows(ctx: _Ctx, ch, train: set, dev: set, prohibited: 
     return resolved
 
 
+# Identity/provenance columns of the V2 candidate table. They key a row; they are never model inputs.
+MODEL_INELIGIBLE_IDENTITY_COLUMNS: Tuple[str, ...] = ("observation_ts", "regime_start_ns", "checkpoint_index")
+
+
+def _resolve_model_feature_columns(ctx: _Ctx, requested: Sequence[str], cols: Mapping[str, Any],
+                                   outcome: Mapping[str, Any]) -> List[str]:
+    """Validate `model.feature_columns` against THIS study's own declared columns, per column.
+
+    Eligible: a feature alias, a derived input, or a declared `features.metadata` column -- all of which
+    are read at the decision epoch and carried by the availability table the causal audit reviews.
+    Refused, fail-closed: a column the study does not emit; an identity/provenance column; any column of
+    the outcome contract (its observation columns, its label column, the per-arm label columns) -- those
+    resolve AFTER the entry; and anything the forward-outcome guard rejects by name. Declaration order is
+    preserved exactly, so the fitted model's ordered inputs are the declared order.
+    """
+    from research_workflow.forward_outcomes.guard import find_outcome_columns
+    features = set(cols.get("features") or ctx.feature_aliases)
+    derived = set(cols.get("derived") or [])
+    metadata = {m["column"] if isinstance(m, Mapping) else m for m in (cols.get("metadata") or [])}
+    eligible = features | derived | metadata
+    observation = set(cols.get("observation") or []) | set(outcome.get("observation_columns") or [])
+    observation |= {outcome.get("label_column")} | {f"{a.get('prefix')}_label" for a in (outcome.get("arms") or [])}
+    observation.discard(None)
+    identity = set(cols.get("identity") or MODEL_INELIGIBLE_IDENTITY_COLUMNS) | set(MODEL_INELIGIBLE_IDENTITY_COLUMNS)
+    resolved: List[str] = []
+    for i, name in enumerate(requested):
+        where = f"model.feature_columns[{i}]"
+        if name in identity:
+            ctx.gap(GapKind.INVALID_PARAMETERIZATION, where,
+                    f"{name!r} is an identity/provenance column of the candidate table, never a model input")
+            continue
+        if name in observation:
+            ctx.gap(GapKind.INVALID_PARAMETERIZATION, where,
+                    f"{name!r} is an observation/outcome column of this study's outcome contract; it resolves after the "
+                    "entry it describes and can never be a model input")
+            continue
+        if find_outcome_columns([name]):
+            ctx.gap(GapKind.INVALID_PARAMETERIZATION, where,
+                    f"{name!r} is refused by the forward-outcome guard (post-event outcome naming grammar)")
+            continue
+        if name not in eligible:
+            ctx.gap(GapKind.INVALID_PARAMETERIZATION, where,
+                    f"{name!r} is not a column this study emits; model.feature_columns selects from the declared "
+                    "feature aliases, derived inputs and features.metadata columns",
+                    closest=_closest(name, sorted(eligible)))
+            continue
+        resolved.append(name)
+    return resolved
+
+
 def _resolve_chronology_and_model(ctx: _Ctx, outcome_resolved: Optional[Dict[str, Any]] = None,
                                   columns: Optional[Mapping[str, Any]] = None) -> Tuple[Dict[str, Any], Optional[Dict[str, Any]]]:
     ch = ctx.spec.chronology
@@ -1259,6 +1309,7 @@ def _resolve_chronology_and_model(ctx: _Ctx, outcome_resolved: Optional[Dict[str
     if model_spec == "none":
         return chronology, None
     kinds = ctx.registry.get("kinds", {})
+    feature_columns: Optional[List[str]] = None
     families = {e["id"] for e in kinds.get("model_drivers", [])}
     fam_id = f"model.{model_spec.family}" if model_spec.family else None
     if model_spec.mode == "train" and fam_id not in families:
@@ -1286,6 +1337,12 @@ def _resolve_chronology_and_model(ctx: _Ctx, outcome_resolved: Optional[Dict[str
 
         cols = columns or {}
         declared_columns = set(cols.get("features") or ctx.feature_aliases) | set(cols.get("derived") or [])
+        # model.feature_columns: the EXPLICIT model input surface over columns this study already emits.
+        # Validated per column (never a blanket metadata exemption) and, when declared, it becomes the
+        # surface arms subset. It changes no observation column, so the partition-reuse key is untouched.
+        if model_spec.feature_columns:
+            feature_columns = _resolve_model_feature_columns(ctx, model_spec.feature_columns, cols, outcome_resolved or {})
+            declared_columns |= set(feature_columns)
         bare = [a for a in model_spec.arms if not isinstance(a, _ArmSpec)]
         if bare:
             # The trap this refusal exists to close: `arms: [A, B, C]` was accepted, consumed
@@ -1392,10 +1449,15 @@ def _resolve_chronology_and_model(ctx: _Ctx, outcome_resolved: Optional[Dict[str
                 search_space[name] = {"low": dom["low"], "high": dom["high"], "log": bool(dom.get("log", False)), "int": bool(dom.get("int", False))}
             else:
                 ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"model.search_space.{name}", "domain must be a non-empty list of choices or {low, high, log?, int?}")
-    return chronology, {"mode": model_spec.mode, "family": fam_id, "params": dict(model_spec.params),
-                        "arms": arms if arms else [a for a in model_spec.arms if isinstance(a, str)],
-                        "cells": cells, "reference_models": references,
-                        "validation": validation, "models": scored, "search_space": search_space}
+    out = {"mode": model_spec.mode, "family": fam_id, "params": dict(model_spec.params),
+           "arms": arms if arms else [a for a in model_spec.arms if isinstance(a, str)],
+           "cells": cells, "reference_models": references,
+           "validation": validation, "models": scored, "search_space": search_space}
+    if feature_columns is not None:
+        # Only present when declared, so a plan that never asked for it keeps the identical compiled
+        # shape (and plan_sha256) it had before this key existed.
+        out["feature_columns"] = feature_columns
+    return chronology, out
 
 
 _SAFE_ARTIFACT_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,120}\.(json|parquet|md)$")
