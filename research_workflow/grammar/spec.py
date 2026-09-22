@@ -198,6 +198,10 @@ class OutcomeSpec(_Strict):
     # research contract supplies no cost assumption -- gross economics stay canonical and net
     # economics are emitted as explicitly unavailable (null) rather than guessed.
     cost_points_per_side: Optional[float] = None
+    # Opt-in causal executable-entry observation: executable_entry_ts / executable_entry_price /
+    # executable_entry_unavailable_reason, published whenever the entry is known, independent of any
+    # exit, flip or terminal state. Needs barrier arms (the kernel that reads the execution stream).
+    entry_observation: bool = False
 
 
 class WarmupSpec(_Strict):

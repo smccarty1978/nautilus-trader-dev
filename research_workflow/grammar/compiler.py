@@ -1108,6 +1108,17 @@ def _resolve_outcome(ctx: _Ctx, population: Mapping[str, Any]) -> Dict[str, Any]
             contract["cost_points_per_side"] = float(o.cost_points_per_side)
         from research_workflow.host.outcomes import TERMINAL_OBSERVATION_COLUMNS
         obs += list(TERMINAL_OBSERVATION_COLUMNS)
+    # Causal executable-entry observation: opt-in, so a plan that does not ask for it compiles (and
+    # a sealed plan replays) exactly as before. Only the barrier/composite kernels read the
+    # execution stream, so only they can observe an entry.
+    if o.entry_observation:
+        if not arms:
+            ctx.gap(GapKind.INVALID_PARAMETERIZATION, "outcome.entry_observation",
+                    "entry_observation needs a barrier outcome (barrier or composite kernel): the flip kernel resolves no executable entry")
+        else:
+            contract["entry_observation"] = True
+            from research_workflow.host.outcomes import ENTRY_OBSERVATION_COLUMNS
+            obs += list(ENTRY_OBSERVATION_COLUMNS)
     # A5 invariant: observed_seconds is the LAST observation column.
     obs.append("observed_seconds")
     contract["observation_columns"] = obs

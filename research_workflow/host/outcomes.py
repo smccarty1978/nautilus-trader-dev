@@ -57,6 +57,15 @@ TERMINAL_OBSERVATION_COLUMNS = [
     "terminal_cost_points", "terminal_net_pnl_points", "terminal_net_pnl_atr",
 ]
 
+# Causal executable-entry observation. Published as soon as the entry is known -- one bar after
+# T -- and NEVER conditioned on anything after the entry bar (no exit, no flip, no arm, no terminal
+# state). `terminal_entry_*` keeps its historical C1 contract (entry published only beside an
+# executable exit); this block is the unconditional surface. Compiler and kernel both build from
+# this list, placed after the terminal block and before observed_seconds (A5).
+ENTRY_OBSERVATION_COLUMNS = [
+    "executable_entry_ts", "executable_entry_price", "executable_entry_unavailable_reason",
+]
+
 LEGACY_OBSERVATION_COLUMNS = (
     "observation_ts", "regime_start_ns", "regime_direction", "checkpoint_index", "flip_ts", "time_to_flip_seconds",
     "target_flip_within_horizon", "disposition", "censored", "censor_reason", "horizon_end_ts", "session_close_ts",
@@ -134,6 +143,9 @@ class LabelOutcomeContract:
     # in which case gross economics are canonical and net economics are explicitly unavailable --
     # never guessed.
     cost_points_per_side: Optional[float] = None
+    # Unconditional causal executable-entry observation (ENTRY_OBSERVATION_COLUMNS). Opt-in per
+    # study (`outcome.entry_observation: true`); plans that do not request it replay unchanged.
+    entry_observation: bool = False
 
     @classmethod
     def from_plan(cls, spec: Mapping[str, Any]) -> "LabelOutcomeContract":
@@ -155,6 +167,7 @@ class LabelOutcomeContract:
                    direction_sign=int(spec.get("direction_sign", 1)),
                    observed_seconds=bool(spec.get("observed_seconds", False)),
                    terminal_outcome=bool(spec.get("terminal_outcome", False)),
+                   entry_observation=bool(spec.get("entry_observation", False)),
                    cost_points_per_side=(float(spec["cost_points_per_side"])
                                          if spec.get("cost_points_per_side") is not None else None),
                    data_end_lookahead_ns=(int(spec["data_end_lookahead_ns"]) if spec.get("data_end_lookahead_ns") is not None else None))
@@ -210,7 +223,7 @@ def compile_outcome_contract(spec: Mapping[str, Any]):
 # pending state (scalar; one record per candidate)
 # --------------------------------------------------------------------------- #
 class _Pending:
-    __slots__ = ("identity", "T", "direction", "prevailing", "atr", "session_close", "entry_resolved", "entry_price", "entry_ts",
+    __slots__ = ("identity", "T", "direction", "prevailing", "atr", "session_close", "entry_resolved", "entry_price", "entry_ts", "entry_bar_close",
                  "prev_ts", "arm_end", "arm_state", "arm_at", "arm_reason", "arm_good", "arm_bad", "arm_open",
                  "arm_truncated",
                  "flip_end", "flip_state", "flip_at", "flip_reason", "flip_ts", "opened_at",
@@ -227,6 +240,7 @@ class _Pending:
         self.entry_resolved = False
         self.entry_price = 0.0
         self.entry_ts = 0
+        self.entry_bar_close = 0
         self.prev_ts = T
         self.arm_end = [0] * n_arms
         # `arm_end[i]` is the EFFECTIVE end: under `session_end_rule: truncate` the session close
@@ -272,6 +286,10 @@ class LabelOutcomeKernel:
             raise OutcomeContractError("COMPOSITE_KERNEL_NEEDS_ARMS_AND_FLIP")
         if contract.entry_reference != "next_bar_open" and self.arms:
             raise OutcomeContractError(f"ENTRY_REFERENCE_UNSUPPORTED: {contract.entry_reference!r}")
+        if contract.entry_observation and contract.kernel not in ("barrier", "composite"):
+            # The flip kernel never reads the execution stream, so it has no entry bar to observe.
+            raise OutcomeContractError("ENTRY_OBSERVATION_REQUIRES_EXECUTION_BARS: kernel "
+                                       f"{contract.kernel!r} resolves no executable entry")
         self.observation_columns: List[str] = list(LEGACY_OBSERVATION_COLUMNS)
         self._arm_columns = self.n_arms > 1 or (self.n_arms == 1 and contract.primary_arm is None and self.arms[0].prefix != self.arms[0].id)
         if self._arm_columns:
@@ -284,6 +302,8 @@ class LabelOutcomeKernel:
         # observed_seconds so A5's invariant (observed_seconds is the last column) still holds.
         if contract.terminal_outcome:
             self.observation_columns += TERMINAL_OBSERVATION_COLUMNS
+        if contract.entry_observation:
+            self.observation_columns += ENTRY_OBSERVATION_COLUMNS
         if contract.observed_seconds:
             self.observation_columns.append("observed_seconds")
         self._primary_index = 0
@@ -394,6 +414,7 @@ class LabelOutcomeKernel:
                 p.entry_resolved = True
                 p.entry_price = op
                 p.entry_ts = ts - (bar.ts_init - bar.ts_event)
+                p.entry_bar_close = ts
                 p.prev_ts = p.entry_ts
                 # N-3: the entry observation is subject to the same gap rule as any other
                 # observation -- an execution reference (next_bar_open) more than max_gap
@@ -712,6 +733,11 @@ class LabelOutcomeKernel:
                            "terminal_gross_pnl_atr", "terminal_duration_seconds", "terminal_cost_points",
                            "terminal_net_pnl_points", "terminal_net_pnl_atr"):
                     row[k_] = None
+        if c.entry_observation:
+            ets, epx, ereason = self._entry_observation(p)
+            row["executable_entry_ts"] = ets
+            row["executable_entry_price"] = epx
+            row["executable_entry_unavailable_reason"] = ereason
         if self._arm_columns:
             for i, arm in enumerate(self.arms):
                 st, rat, rr = p.arm_state[i], p.arm_at[i], p.arm_reason[i]
@@ -727,6 +753,26 @@ class LabelOutcomeKernel:
                 row[f"{arm.prefix}_censor_reason"] = rr
                 row[f"{arm.prefix}_resolution_seconds"] = res_s
         self.rows.append(row)
+
+    def _entry_observation(self, p: _Pending) -> Tuple[Optional[int], Optional[float], Optional[str]]:
+        """The executable entry, as known one bar after T.
+
+        A function of T, the first execution bar strictly after T, the session close of T and
+        ``max_gap`` ONLY -- never of the exit, the flip, an arm, or the row's emission time -- so
+        two candidates sharing their history through the entry bar publish bit-identical values
+        whatever their futures. Unavailable, with a reason and no fabricated value, when:
+        ``SESSION_END`` -- the first bar after T closes past T's session close (the same bound
+        and the same SESSION_END > GAP precedence as the C1 exit fill); ``GAP`` -- that bar opens
+        more than ``max_gap`` after T (a stale execution reference, N-3); ``DATA_END`` -- the run
+        ended with no bar after T.
+        """
+        if not p.entry_resolved:
+            return None, None, "DATA_END"
+        if p.session_close is not None and p.entry_bar_close > p.session_close:
+            return None, None, "SESSION_END"
+        if self.c.max_gap_ns is not None and (p.entry_ts - p.T) > self.c.max_gap_ns:
+            return None, None, "GAP"
+        return p.entry_ts, p.entry_price, None
 
     def _compose(self, p: _Pending) -> Tuple[str, Optional[int], Optional[str], Optional[int]]:
         from research_workflow.target_expression import TargetResult, worst_censor_reason
@@ -754,4 +800,5 @@ class LabelOutcomeKernel:
 
 __all__ = ["LabelOutcomeContract", "TradeExecutionContract", "BarrierArm", "FlipItem", "FillModel",
            "LabelOutcomeKernel", "compile_outcome_contract", "OutcomeContractError", "LEGACY_OBSERVATION_COLUMNS", "TERMINAL_OBSERVATION_COLUMNS",
+           "ENTRY_OBSERVATION_COLUMNS",
            "POSITIVE", "NEGATIVE", "CENSORED"]
