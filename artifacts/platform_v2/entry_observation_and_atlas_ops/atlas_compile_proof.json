@@ -1,0 +1,170 @@
+{
+  "chore_root": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-entry_observation_and_atlas_ops",
+  "collected": false,
+  "discovery_compile": {
+    "analysis_ops": [
+      "analysis.contrast.nominate",
+      "analysis.derive.columns",
+      "analysis.describe.grouped",
+      "analysis.uncertainty.clustered_mean"
+    ],
+    "closure_has_new_modules": [
+      "research/analysis/contrast_ops.py",
+      "research/analysis/derive_ops.py",
+      "research/analysis/expressions.py"
+    ],
+    "closure_sha256": null,
+    "derived_atlas_columns": 277,
+    "distance_columns": 84,
+    "distance_columns_by_denominator": {
+      "A": 42,
+      "B": 42
+    },
+    "entry_columns": [
+      "executable_entry_ts",
+      "executable_entry_price",
+      "executable_entry_unavailable_reason"
+    ],
+    "entry_observation": true,
+    "l2_dimensions": 45,
+    "n_steps": 5,
+    "observation_columns_last": "observed_seconds",
+    "ok": true,
+    "plan_sha256": "65171f14d98523b4a54f6ec836cc2d2e38335e023185a65ca7531d2a9e945093",
+    "terminal_outcome": true
+  },
+  "discovery_execution": {
+    "artifacts": [
+      {
+        "kind": "frame",
+        "name": "atlas_frame.parquet",
+        "source": "atlas"
+      },
+      {
+        "kind": "json",
+        "name": "atlas_columns.json",
+        "source": "atlas"
+      },
+      {
+        "kind": "frame",
+        "name": "lifecycle_by_state.parquet",
+        "source": "lifecycle_wilson"
+      },
+      {
+        "kind": "json",
+        "name": "clustered_by_state.json",
+        "source": "clustered_by_state"
+      },
+      {
+        "kind": "frame",
+        "name": "nomination_tests.parquet",
+        "source": "nomination"
+      },
+      {
+        "kind": "json",
+        "name": "replication_claims.json",
+        "source": "nomination"
+      }
+    ],
+    "atlas_rows": 48122,
+    "mtf_states": 16,
+    "n_claims": 1,
+    "nomination_summary": {
+      "family_size": 26850,
+      "n_cells": 5544,
+      "n_claims": 1,
+      "n_contrasts": 33264,
+      "n_material": 2,
+      "n_material_cells": 2,
+      "n_not_tested": 6414,
+      "n_parents": 17,
+      "n_tested": 26850,
+      "not_tested_reasons": {
+        "CHILD_N_BELOW_MIN": 6414
+      }
+    },
+    "null_categories_seen": [
+      "NO_ATR",
+      "NO_PRIOR",
+      "ZERO_SPAN"
+    ],
+    "steps": [
+      {
+        "id": "atlas",
+        "op": "analysis.derive.columns",
+        "rows_in": 60000,
+        "rows_out": 48122
+      },
+      {
+        "id": "lifecycle_by_state",
+        "op": "analysis.describe.grouped",
+        "rows_in": 48122,
+        "rows_out": 448
+      },
+      {
+        "id": "lifecycle_wilson",
+        "op": "analysis.derive.columns",
+        "rows_in": 448,
+        "rows_out": 448
+      },
+      {
+        "id": "clustered_by_state",
+        "op": "analysis.uncertainty.clustered_mean",
+        "rows_in": 48122,
+        "rows_out": 96
+      },
+      {
+        "id": "nomination",
+        "op": "analysis.contrast.nominate",
+        "rows_in": 48122,
+        "rows_out": 33264
+      }
+    ]
+  },
+  "outcomes_read": false,
+  "refusals": {
+    "tampered_claim_file": "ANALYSIS_REPLICATION_CLAIMS_HASH_MISMATCH",
+    "unknown_column_compile_ok": false,
+    "unknown_column_gap": [
+      "DERIVE_COLUMN_UNKNOWN: leak references ['no_such_plan_column'], which are neither plan columns nor earlier derived columns"
+    ]
+  },
+  "replication_compile": {
+    "analysis_ops": [
+      "analysis.derive.columns",
+      "analysis.replication.scorecard"
+    ],
+    "ok": true,
+    "plan_sha256": "3e4dabc22c52711275ffa896e62eb034ded5afba3d9aee75929a5e5761d9d495"
+  },
+  "replication_execution": {
+    "claims_sha256": "e70dd0ed28a6aa264020ec8db4b87b2737cce8afcd5dfedadbae283b37296350",
+    "counts": {
+      "CONTRADICTED": 0,
+      "DIRECTIONALLY_CONSISTENT": 0,
+      "NOT_REPLICATED": 0,
+      "REPLICATED": 1,
+      "UNCLASSIFIED": 0,
+      "UNDERPOWERED": 0
+    },
+    "every_claim_retained": true,
+    "n_claims": 1,
+    "rows": 1,
+    "steps": [
+      {
+        "id": "atlas",
+        "op": "analysis.derive.columns",
+        "rows_in": 60000,
+        "rows_out": 48085
+      },
+      {
+        "id": "scorecard",
+        "op": "analysis.replication.scorecard",
+        "rows_in": 48085,
+        "rows_out": 1
+      }
+    ]
+  },
+  "study": "nq_mtf_regime_structural_geometry_atlas",
+  "study_yaml_sha256": "3639cf1aff6fe399b737be93dfae73c472abb3ee7ecb9ce7c52aa868c69d7b03"
+}
