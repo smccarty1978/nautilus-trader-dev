@@ -1,0 +1,49 @@
+{
+ "atlas_plan_sha256": "c408c4d9fe81a36136d614e6e47f71f002e6c5377915fbca846b2abee7824679",
+ "atlas_replay_plan_sha256": "d917443a59fdd79ea37a9dc3269d0c780f5d37583943c0d24452dc04b90b4578",
+ "atlas_feature_columns": [
+  "regime_alignment",
+  "current_5m_regime_direction"
+ ],
+ "atlas_metadata_columns": 112,
+ "arm_naming_metadata": {
+  "ok": false,
+  "card": {
+   "STATUS": "CAPABILITY_GAP",
+   "study_id": "probe_arm_metadata",
+   "kinds": [
+    "INVALID_PARAMETERIZATION"
+   ],
+   "count": 1,
+   "gaps": [
+    {
+     "kind": "INVALID_PARAMETERIZATION",
+     "where": "model.arms[0].features",
+     "message": "arm 'geometry' names features that are not in the study's declared surface: ['dir_5m', 'dir_15m', 'age_s_5m', 'mfe_atr_5m']",
+     "detail": {},
+     "closest": null
+    }
+   ]
+  }
+ },
+ "model_only_no_arms": {
+  "ok": true,
+  "card": null,
+  "replay_plan_sha256": "d917443a59fdd79ea37a9dc3269d0c780f5d37583943c0d24452dc04b90b4578",
+  "reuse_key_unchanged": true,
+  "model_feature_surface": [
+   "regime_alignment",
+   "current_5m_regime_direction"
+  ]
+ },
+ "metadata_to_features_columns": {
+  "ok": true,
+  "card": null,
+  "replay_plan_sha256": "b0b3c160f1cd5b42484807cfa43cf4faee32ed345a27bd087b073b6152fb9391",
+  "reuse_key_unchanged": false,
+  "model_feature_surface": [
+   "regime_alignment",
+   "current_5m_regime_direction"
+  ]
+ }
+}

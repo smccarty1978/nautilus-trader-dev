@@ -1,0 +1,71 @@
+# Authoritative decision contract (research_decision.yaml > SPEC.md > study.yaml > compiled_study.json > code)
+study_id: nq_mtf_structural_predictive_ranking
+research_question: "# NQ MTF + Structural Geometry Predictive Ranking (lean modeling follow-up)\n\nPRIMARY QUESTION. Can the JOINT continuous entry-time information in 1m/5m/15m/1h regime orientation,\ncurrent 5m/15m/1h regime geometry, immediately prior 5m/15m/1h regime geometry, ATR-normalized distances to\ncurrent/prior structural levels, and regime age/progress/excursion state RANK 1m V_A flips into economically\ndifferent lifecycle populations OUT OF SAMPLE?\n\nThe completed atlas (studies/nq_mtf_regime_structural_geometry_atlas, verdict D_NOT_FOUND) tested HUMAN-DEFINED\nrectangular segmentation only. JOINT PREDICTIVE INFORMATION IN THE CONTINUOUS SURFACE IS UNTESTED and is what\nthis study tests.\n\nKEY EXPERIMENT. TRAIN = 2023 only. Freeze model, feature order, preprocessing, hyperparameters, score definition\nand the 2023 score-bucket boundaries. Score untouched 2024 ONCE. Decide whether the frozen score creates\neconomically ordered 2024 populations, against direction-only and exact-MTF controls.\n\nNOT: another NT collection, another bucket search, exit/stop/target optimization, post-entry management, ML zoo.\nOne primary nonlinear tabular model (LightGBM) plus one simple baseline; fixed modest configuration; no sweeps.\n\nTARGETS (predeclared): A terminal_gross_pnl_atr > 0 (+ continuous g for economics); B reach +2A before the\nopposite 1m flip; C reach +3A; D (diagnostic) +5A; E reach -2A.\n\nSTOP CONDITION. Stop after the frozen 2024 evaluation, diagnostics and descriptive top-50/30/20/10 retention\nsurfaces. 2025 and 2026 remain untouched. Verdict is one of NO_INFORMATION / WEAK_RANKING /\nTARGET_SPECIFIC_INFORMATION / REPRODUCIBLE_ECONOMIC_RANKING.\n\nREUSE CONSTRAINT (owner). Do not recollect the already-audited 2023/2024 atlas frame. If the workflow forces a\nrecollection of identical bars, STOP and resolve reuse."
+status: BLOCKED_ON_CAPABILITY_GAP   # model surface cannot include the audited metadata geometry without recollecting identical bars (2026-09-22, session a2b50fd4)
+dataset_id: NQ_1S_V2_GLOBEX
+terminal_decisions: {}
+# Predeclared fork policy (WORKFLOW.md §N.4). Agents follow these instead of asking again; a genuine
+# semantic choice with no policy here is still a SEMANTIC_DECISION_REQUIRED question.
+autonomy_decisions:
+  on_capability_gap: stop_and_handoff                # write CAPABILITY_GAP_HANDOFF, end the session; never build it here
+  platform_change_required: chore_branch_and_fresh_session
+  deterministic_defect: auto_fix                     # fix, add a targeted test, re-run the bounded check
+  calendar_reference_parity: common_interval_exact   # exact on the common calendar interval; Globex-only rows enumerated, descriptive
+  frozen_parent_model: rescore_if_authenticated      # never retrain a frozen parent
+  protected_period: never_expand_authority
+
+# ---------------------------------------------------------------------------------------------
+# Phase A (2026-09-22, session a2b50fd4). Contract declared BEFORE any modeling; then the capability gap below.
+source_frame:
+  study: nq_mtf_regime_structural_geometry_atlas   # STUDY_CLOSED 53316cff, verdict D_NOT_FOUND
+  partitions: {train_2023: plan 4e7538b4, train_2024: plan c408c4d9}
+  rows: {collected_2023: 134664, collected_2024: 127333, t0_trades_2023: 7489, t0_trades_2024: 7060}
+  merged_identity: _work/controller/merged/identity.json of the atlas worktree
+  reuse_rule: "NEVER recollect; the bars are identical and already audited (causal pass_01 CLEAR, contract pass_01 CLEAR)"
+
+model_contract:   # predeclared, frozen before any fit
+  split: {train: 2023, frozen_evaluation: 2024, never_open: [2025, 2026]}
+  mechanism: >-
+    model.validation.tuning_years = [2023] and final_train_validation_years = [2024] with BOTH years as TRAIN
+    partitions -- lifecycle_v2.fit fits final_rows = rows whose _year is in tuning_years and evaluates on
+    final_train_validation_years, so 2023-only fitting with a single 2024 scoring pass is expressible WITHOUT
+    changing chronology roles (proved: a model-only plan change leaves the partition-reuse key unchanged,
+    artifacts/capability_probe_model_surface.json).
+  primary_model: {family: lightgbm, params: fixed modest configuration, search_space: none, tuning: none}
+  baseline_model: logistic regression on the identical surface (one, for reference only)
+  targets:
+    A_terminal_winner: "terminal_gross_pnl_atr > 0 (continuous terminal_gross_pnl_atr retained for economics)"
+    B_runner_2A: "fp_fav_2p00 reached strictly before the terminal opposite 1m flip (atlas reach_fav_2p00)"
+    C_runner_3A: reach_fav_3p00
+    D_runner_5A: reach_fav_5p00 (diagnostic; only if support permits)
+    E_severe_adverse: reach_adv_2p00
+  controls: [direction_only (dir_1m), exact_MTF_state_only (16-cell categorical), geometry_without_direction]
+  freeze: [feature list and order, preprocessing, categorical treatment, missing-value behaviour, hyperparameters,
+           model artifact + sha256, score definition, 2023 score-bucket boundaries]
+  evaluation: >-
+    frozen 2023 decile boundaries applied to 2024 (never re-quantiled on 2024); per-bucket lifecycle tables,
+    monotonicity/rank correlation, top-vs-bottom with uncertainty, capture shares of runners / severe losers /
+    positive and negative gross PnL; descriptive top 50/30/20/10 retention surfaces (NOT optimised).
+  prohibited: [threshold optimisation, stop/target/trail rules, position sizing, post-entry modelling,
+               hyperparameter sweeps, AutoML, ensembles, neural nets, opening 2025 or 2026]
+
+capability_gap:
+  status: BLOCKING
+  id: MODEL_SURFACE_EXCLUDES_AUDITED_METADATA_COLUMNS
+  request: CAPABILITY_REQUEST_model_surface_metadata_columns.md
+  evidence: artifacts/capability_probe_model_surface.json
+  summary: >-
+    The V2 modeling layer can only fit on columns.features (registered feature-definition instances) plus
+    columns.derived: lifecycle_v2.fit builds `features = plan.columns.features + derived`, and the compiler
+    refuses an arm naming anything else (probe: arm naming dir_5m/dir_15m/age_s_5m/mfe_atr_5m ->
+    INVALID_PARAMETERIZATION "not in the study's declared surface"). The atlas's ENTIRE audited MTF/structural
+    geometry surface (112 columns: dir_*, age_s_*, start_price_*, frozen_atr_*, mfe/mae_atr_*, retained_*,
+    highest_high/lowest_low_*, and the 39 prior_* snapshot fields) is columns.metadata, which is model-ineligible.
+  why_no_workaround: >-
+    Moving those refs to features.columns changes the compiled plan outside the replay-key exclusion set, so the
+    partition-reuse key changes (d917443a -> b0b3c160) and BOTH years would be re-replayed (~2 h of identical
+    bars) -- and under host: provider_host it does not even add them to columns.features, so the model surface
+    would still be the 2 feature instances. Declaring new feature-definition instances for the same tracker state
+    is feature development (WORKFLOW E) plus a full recollection. EXPLORE over a registered frame runs analysis
+    ops only and trains nothing, and frame registration requires a `stage: collect` study.
+  owner_instruction: "STOP and resolve reuse rather than spending another 1-2 hours replaying identical bars"

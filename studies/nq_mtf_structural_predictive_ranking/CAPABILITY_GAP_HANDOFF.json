@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "study_id": "nq_mtf_structural_predictive_ranking",
+  "phase": "A",
+  "state": "BLOCKED_ON_CAPABILITY_GAP",
+  "capability_gap": {
+    "id": "MODEL_SURFACE_EXCLUDES_AUDITED_METADATA_COLUMNS",
+    "blocking": true,
+    "request": "CAPABILITY_REQUEST_model_surface_metadata_columns.md",
+    "evidence": "artifacts/capability_probe_model_surface.json",
+    "summary": "lifecycle_v2.fit builds the model surface from columns.features + columns.derived only; the compiler refuses an arm naming any other column. The atlas's entire audited MTF/structural geometry is columns.metadata (112 columns incl. 39 prior_* snapshot fields), so the study cannot fit on it.",
+    "evidence_facts": {
+      "arm_naming_metadata_compile": "INVALID_PARAMETERIZATION: arm 'geometry' names features that are not in the study's declared surface: ['dir_5m','dir_15m','age_s_5m','mfe_atr_5m']",
+      "model_only_change_reuse_key_unchanged": true,
+      "model_only_replay_plan_sha256": "d917443a59fdd79ea37a9dc3269d0c780f5d37583943c0d24452dc04b90b4578",
+      "metadata_to_features_columns_reuse_key_unchanged": false,
+      "metadata_to_features_columns_replay_plan_sha256": "b0b3c160f1cd5b42484807cfa43cf4faee32ed345a27bd087b073b6152fb9391",
+      "model_surface_after_reclassification": [
+        "regime_alignment",
+        "current_5m_regime_direction"
+      ]
+    },
+    "cost_if_ignored": "re-replaying two identical audited years (~2 h) merely to reclassify columns"
+  },
+  "no_work_performed": [
+    "no collection",
+    "no fit",
+    "no scoring",
+    "no 2024 inspection",
+    "no 2025/2026 access"
+  ],
+  "ready_when_capability_lands": {
+    "mechanism": "model.validation.tuning_years=[2023], final_train_validation_years=[2024] with both years as TRAIN partitions (fit uses tuning_years only); partitions copied/served from the closed atlas under replay-closure reuse",
+    "contract": "research_decision.yaml model_contract (targets A-E, controls, freeze list, frozen 2023 decile boundaries, descriptive retention surfaces)"
+  },
+  "next_session": "platform chore (fresh session): implement the model-surface declaration + tests, merge to main; then a fresh study session compiles this study, serves both audited partitions by replay-closure reuse, fits 2023, scores 2024 once"
+}

@@ -1,0 +1,42 @@
+# Platform-v2 study: a composition of registered primitives (see `research cap list`).
+# Sections: study, streams, population, context, triggers, features, outcome, chronology, model.
+# Compile with `research study compile --study studies/nq_mtf_structural_predictive_ranking`; a typed CapabilityGap names what is missing.
+study:
+  id: nq_mtf_structural_predictive_ranking
+  tier: 2
+  question: "# NQ MTF + Structural Geometry Predictive Ranking (lean modeling follow-up)\n\nPRIMARY QUESTION. Can the JOINT continuous entry-time information in 1m/5m/15m/1h regime orientation,\ncurrent 5m/15m/1h regime geometry, immediately prior 5m/15m/1h regime geometry, ATR-normalized distances to\ncurrent/prior structural levels, and regime age/progress/excursion state RANK 1m V_A flips into economically\ndifferent lifecycle populations OUT OF SAMPLE?\n\nThe completed atlas (studies/nq_mtf_regime_structural_geometry_atlas, verdict D_NOT_FOUND) tested HUMAN-DEFINED\nrectangular segmentation only. JOINT PREDICTIVE INFORMATION IN THE CONTINUOUS SURFACE IS UNTESTED and is what\nthis study tests.\n\nKEY EXPERIMENT. TRAIN = 2023 only. Freeze model, feature order, preprocessing, hyperparameters, score definition\nand the 2023 score-bucket boundaries. Score untouched 2024 ONCE. Decide whether the frozen score creates\neconomically ordered 2024 populations, against direction-only and exact-MTF controls.\n\nNOT: another NT collection, another bucket search, exit/stop/target optimization, post-entry management, ML zoo.\nOne primary nonlinear tabular model (LightGBM) plus one simple baseline; fixed modest configuration; no sweeps.\n\nTARGETS (predeclared): A terminal_gross_pnl_atr > 0 (+ continuous g for economics); B reach +2A before the\nopposite 1m flip; C reach +3A; D (diagnostic) +5A; E reach -2A.\n\nSTOP CONDITION. Stop after the frozen 2024 evaluation, diagnostics and descriptive top-50/30/20/10 retention\nsurfaces. 2025 and 2026 remain untouched. Verdict is one of NO_INFORMATION / WEAK_RANKING /\nTARGET_SPECIFIC_INFORMATION / REPRODUCIBLE_ECONOMIC_RANKING.\n\nREUSE CONSTRAINT (owner). Do not recollect the already-audited 2023/2024 atlas frame. If the workflow forces a\nrecollection of identical bars, STOP and resolve reuse."
+streams:
+  - {dataset: NQ_1S_V2_GLOBEX, timeframes: [1s, 1m]}
+context:
+  regime_1m:     {tracker: regime.dual_ema, timeframe: 1m}
+  excursion:     {tracker: regime.excursion, bars: 1s, regime: regime_1m}
+  regime_bar_5m: {tracker: regime_bar.calendar_bucket, bucket: 5m, bars: 1m, regime: regime_1m}
+population:
+  session: RTH
+  cadence: {every: 5s, anchor: regime_1m.start_ns, max_age: 1800s}
+  qualify: "excursion.frozen_atr > 0 and regime_1m.age_s >= 120s and excursion.mfe_atr >= 1.0 and features.structural_snapshot_ready"
+  direction: regime_1m.dir
+  anchor_identity: regime_1m.start_ns
+triggers: every_candidate
+features:
+  instances:
+    - {feature: regime_efficiency, over: {timeframe: [1m, 5m]}, context: prior}
+    - {feature: rolling_giveback_atr, window: 300s, update_every: 1s}
+  metadata:
+    regime_age_seconds: regime_1m.age_s
+    triggering_1s_ts_init: epoch.T
+  bindings:
+    completed_5m: {tracker: regime_bar_5m, ready_gate: false}
+    snapshot: {atr: regime_1m.atr, family_a_atr: excursion.frozen_atr, episode_state: {prevailing_direction: regime_1m.dir}}
+outcome:
+  kind: label
+  event: regime_1m.flipped
+  horizon: 300s
+  direction: regime_1m.dir
+  session_end: censor
+chronology:
+  train: [2021, 2022, 2023]
+  dev: [2024]
+  prohibited: [2025, 2026]
+  authorized_dates: []        # smoke day(s), e.g. ['2023-10-02']
+model: none
