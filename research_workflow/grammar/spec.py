@@ -341,6 +341,14 @@ class ModelSpec(_Strict):
     # absent the sampler falls back to model.params.random_state|seed. The estimator fit on
     # each fold always uses model.params.random_state|seed, never random_seed.
     search_space: Dict[str, Any] = Field(default_factory=dict)
+    # THE MODEL INPUT SURFACE, when it is not the declared feature surface. Each entry names a column
+    # this study ALREADY EMITS -- a feature alias, a derived input, or a declared `features.metadata`
+    # column (tracker state read at the decision epoch). It selects model inputs; it never changes what
+    # collection emits, so a partition collected without it stays valid (the reuse key excludes `model`).
+    # Eligibility is per column and explicit: the compiler refuses an unknown column, an identity column,
+    # any observation/outcome column of this study's own outcome contract, and anything the forward-outcome
+    # guard rejects. There is no blanket "metadata is safe" rule. Declaration order IS the feature order.
+    feature_columns: List[str] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def _mode(self) -> "ModelSpec":
@@ -350,6 +358,11 @@ class ModelSpec(_Strict):
             raise ValueError("model.models must list at least one frozen model for mode: score")
         if self.mode == "score" and (self.arms or self.cells or self.reference_models):
             raise ValueError("model.arms/cells/reference_models are train-mode declarations; mode: score trains nothing")
+        if self.mode == "score" and self.feature_columns:
+            raise ValueError("model.feature_columns is a train-mode declaration; mode: score uses each frozen model's own ordered_inputs")
+        dupes = sorted({c for c in self.feature_columns if self.feature_columns.count(c) > 1})
+        if dupes:
+            raise ValueError(f"model.feature_columns has duplicates {dupes}; declaration order is the feature order")
         specs = [a for a in self.arms if isinstance(a, ArmSpec)]
         if specs and len(specs) != len(self.arms):
             raise ValueError("model.arms must be either all names or all arm declarations, not a mix")

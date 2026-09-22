@@ -1,0 +1,66 @@
+{
+ "requested_surface_size": 75,
+ "atlas_reuse_key_from_probe": "d917443a59fdd79ea37a9dc3269d0c780f5d37583943c0d24452dc04b90b4578",
+ "no_model": {
+  "ok": true,
+  "replay_plan_sha256": "d917443a59fdd79ea37a9dc3269d0c780f5d37583943c0d24452dc04b90b4578"
+ },
+ "with_model_feature_columns": {
+  "ok": true,
+  "card": null,
+  "replay_plan_sha256": "d917443a59fdd79ea37a9dc3269d0c780f5d37583943c0d24452dc04b90b4578",
+  "reuse_key_matches_atlas": true,
+  "reuse_key_matches_no_model": true,
+  "plan_sha_differs_from_no_model": true,
+  "model_surface_size": 75,
+  "surface_is_all_metadata": true,
+  "observation_sections_identical": true,
+  "collection_closure_identical": false,
+  "validation": {
+   "protocol": "validation.model_selection.random",
+   "tuning_years": [
+    2023
+   ],
+   "final_train_validation_years": [
+    2024
+   ],
+   "max_trials": null,
+   "random_seed": null,
+   "primary_metric": null,
+   "year_role_table": [
+    {
+     "year": 2023,
+     "role": "tuning"
+    },
+    {
+     "year": 2024,
+     "role": "final_validation"
+    },
+    {
+     "year": 2025,
+     "role": "prohibited"
+    },
+    {
+     "year": 2026,
+     "role": "prohibited"
+    }
+   ]
+  },
+  "first_10_inputs": [
+   "dir_1m",
+   "atr_entry_1m",
+   "checkpoint_seconds_since_flip",
+   "dir_5m",
+   "dir_15m",
+   "dir_1h",
+   "age_s_5m",
+   "bars_5m",
+   "start_price_5m",
+   "atr_5m"
+  ]
+ },
+ "outcome_column_refused": {
+  "ok": false,
+  "message": "'terminal_gross_pnl_atr' is an observation/outcome column of this study's outcome contract; it resolves after the entry it describes and can never be a model input"
+ }
+}
