@@ -1,0 +1,86 @@
+{
+  "PASS": true,
+  "checks": {
+    "N": {
+      "forensic": 7475,
+      "match": true,
+      "observed": 7475
+    },
+    "duplicate_key_rows": {
+      "forensic": 0,
+      "match": true,
+      "observed": 0
+    },
+    "fit_receipt_final_fit_rows": {
+      "forensic": 7475,
+      "match": true,
+      "observed": 7475
+    },
+    "frozen_full_model_2023_auc": {
+      "forensic": 0.9782538989898989,
+      "match": true,
+      "observed": 0.9782538989898989
+    },
+    "frozen_full_model_2023_score_digest16": {
+      "forensic": "8fa2031cd01d9a7a",
+      "match": true,
+      "observed": "8fa2031cd01d9a7a"
+    },
+    "negatives": {
+      "forensic": 5000,
+      "match": true,
+      "observed": 5000
+    },
+    "original_feature_order_sha256": {
+      "forensic": "36777a8755e32abc7b120f1715948b6f5f5beef2e8dc8cfc739c97e2fd653ef0",
+      "match": true,
+      "observed": "36777a8755e32abc7b120f1715948b6f5f5beef2e8dc8cfc739c97e2fd653ef0"
+    },
+    "positives": {
+      "forensic": 2475,
+      "match": true,
+      "observed": 2475
+    },
+    "session_days": {
+      "forensic": 257,
+      "match": true,
+      "observed": 257
+    },
+    "source_parquet_sha256_match": true,
+    "t0_rows_in_year": {
+      "forensic": 7489,
+      "match": true,
+      "observed": 7489
+    },
+    "target_nulls": {
+      "forensic": 14,
+      "match": true,
+      "observed": 14
+    },
+    "unique_key_tuples": {
+      "forensic": 7475,
+      "match": true,
+      "observed": 7475
+    },
+    "unique_regime_start_ns": {
+      "forensic": 7475,
+      "match": true,
+      "observed": 7475
+    }
+  },
+  "kind": "phase0_reuse_proof",
+  "lineage": {
+    "merge_rule": "lifecycle_v2._train_frame_all_labels: inner join on (observation_ts, regime_start_ns, checkpoint_index) after dropping duplicated observation columns",
+    "population_rule": "_year == 2023 AND checkpoint_index == 0 AND (terminal_gross_pnl_atr > 0) in {0,1}",
+    "prior_study": "nq_mtf_structural_predictive_ranking",
+    "prior_study_commit": "577c5fc5 (forensic audit)",
+    "replayed": false,
+    "source_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_mtf_structural_predictive_ranking\\studies\\nq_mtf_structural_predictive_ranking\\_work\\controller\\merged",
+    "source_sha256": {
+      "candidates.parquet": "475209b46caf48b674d66833f56005c8fc6c6436f34c8aa50626da7d07300842",
+      "observations.parquet": "98e03dc4a2cf01b44d05c45d84b81af5768848142216945cfd133e13d66303b6"
+    }
+  },
+  "population_row_digest": "ad0b933e5e455dc18505340b39869c2345c56f8c2847f7d7e501486cbbd225df",
+  "year": 2023
+}

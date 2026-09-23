@@ -1,0 +1,191 @@
+{
+  "bagging_active_proof": "every configuration is also refit with subsample_freq=0; predictions must differ, else CONTRACT FAILURE",
+  "bound_to": {
+    "PHASE0_REUSE_PROOF.json": "3e0d6e2b2578ddd242b042ada558e5fbf2c3bbf201ab8442c57abb10b4cbac50",
+    "STATIONARY_FEATURE_SURFACE.json": "9efd053808b7904a856c3036ff59f3611f55d58100804ed1baa7a934bd889287",
+    "TEMPORAL_SPLIT_2023.json": "0d92473dcbea102eb318ec8a91040d815192a35dea524fb36e7f8be67898ebfa"
+  },
+  "configurations": [
+    {
+      "capacity_rank": 1,
+      "colsample_bytree": 0.7,
+      "deterministic": true,
+      "force_row_wise": true,
+      "id": "L1_stumps",
+      "learning_rate": 0.05,
+      "max_depth": 1,
+      "max_total_leaves": 200,
+      "min_child_samples": 200,
+      "n_estimators": 100,
+      "n_jobs": 4,
+      "num_leaves": 2,
+      "objective": "binary",
+      "random_state": 42,
+      "reg_alpha": 0.0,
+      "reg_lambda": 10.0,
+      "subsample": 0.7,
+      "subsample_freq": 1,
+      "verbosity": -1
+    },
+    {
+      "capacity_rank": 2,
+      "colsample_bytree": 0.7,
+      "deterministic": true,
+      "force_row_wise": true,
+      "id": "L2_depth2",
+      "learning_rate": 0.05,
+      "max_depth": 2,
+      "max_total_leaves": 400,
+      "min_child_samples": 200,
+      "n_estimators": 100,
+      "n_jobs": 4,
+      "num_leaves": 4,
+      "objective": "binary",
+      "random_state": 42,
+      "reg_alpha": 0.0,
+      "reg_lambda": 10.0,
+      "subsample": 0.7,
+      "subsample_freq": 1,
+      "verbosity": -1
+    },
+    {
+      "capacity_rank": 3,
+      "colsample_bytree": 0.7,
+      "deterministic": true,
+      "force_row_wise": true,
+      "id": "L3_depth3",
+      "learning_rate": 0.05,
+      "max_depth": 3,
+      "max_total_leaves": 800,
+      "min_child_samples": 200,
+      "n_estimators": 100,
+      "n_jobs": 4,
+      "num_leaves": 8,
+      "objective": "binary",
+      "random_state": 42,
+      "reg_alpha": 0.0,
+      "reg_lambda": 10.0,
+      "subsample": 0.7,
+      "subsample_freq": 1,
+      "verbosity": -1
+    }
+  ],
+  "controls": {
+    "direction_only": [
+      "dir_1m"
+    ],
+    "estimator": "exact-cell empirical Target-A rate fitted on the training block, smoothed toward the training prevalence with m=20; an unseen cell scores the prevalence",
+    "mtf_state_only": [
+      "dir_1m",
+      "dir_5m",
+      "dir_15m",
+      "dir_1h"
+    ],
+    "why": "the strongest use of 'knowing direction / the exact 1m/5m/15m/1h state' -- no capacity limit handicaps it"
+  },
+  "development_gate": {
+    "none_eligible": "NO_DEVELOPMENT_SIGNAL -- stop, final 20% stays dark",
+    "per_config_eligible_if": [
+      "random-label train AUC <= 0.70",
+      "validation AUC day-blocked 95% CI lower bound > 0.50"
+    ],
+    "selection": "among eligible configs take the LOWEST capacity_rank whose validation AUC >= best eligible validation AUC - 0.01"
+  },
+  "diagnostics_not_targets": {
+    "adv1_before_terminal": "fp_adv_1p00_label == 0 (adverse barrier hit) AND fp_adv_1p00_resolution_seconds <= terminal_time_to_flip_seconds",
+    "fav2_before_terminal": "fp_fav_2p00_label == 1 AND fp_fav_2p00_resolution_seconds <= terminal_time_to_flip_seconds"
+  },
+  "early_stopping": "none -- fixed n_estimators, the validation block is never passed to fit",
+  "final": {
+    "arms": [
+      "stationary_full",
+      "stationary_geometry_no_direction",
+      "direction_only",
+      "mtf_state_only"
+    ],
+    "bin_boundaries": "quantiles of the frozen final model's scores on the first-80% rows (development data), never the holdout",
+    "refit_rows": "development_train + development_validation (first 80% of sessions)",
+    "score": "final_holdout once",
+    "surfaces": [
+      "quintiles Q1..Q5",
+      "deciles D1..D10 (monotonicity only)",
+      "top50",
+      "top30",
+      "top20",
+      "top10"
+    ],
+    "uncertainty": "session-blocked bootstrap, 2000 reps, seed 20260924; paired deltas use the same resamples"
+  },
+  "frozen_before_any_fit": true,
+  "gates": {
+    "beats_control": "paired delta AUC 95% CI lower > 0 AND point delta >= 0.02",
+    "holdout_skill": "stationary_full holdout AUC 95% CI lower > 0.50",
+    "monotonic_quality": "Spearman(quintile, Target-A rate) >= 0.9",
+    "variance_signature": "Spearman(quintile, +2A reach) >= 0.9 AND Spearman(quintile, -1A reach) >= 0.9, in validation AND final holdout"
+  },
+  "kind": "capacity_ladder_and_evaluation_contract",
+  "old_configuration": {
+    "defects": [
+      "subsample 0.8 inert (subsample_freq unset)",
+      "no early stopping",
+      "12,400 leaves for 7,475 rows",
+      "22 absolute price inputs"
+    ],
+    "family": "lightgbm.LGBMClassifier 4.6.0",
+    "forensic_capacity": {
+      "early_stopping": "none (no validation set passed to fit)",
+      "lightgbm_version": "4.6.0",
+      "subsample_declared": 0.8,
+      "subsample_effective": false,
+      "subsample_note": "LightGBM bags only when subsample_freq > 0; it is unset, so the declared row subsampling never applied",
+      "total_leaves": 12400,
+      "training_rows": 7475,
+      "training_rows_per_leaf": 0.6028225806451613,
+      "trees": 400
+    },
+    "params": {
+      "colsample_bytree": 0.8,
+      "learning_rate": 0.05,
+      "min_child_samples": 100,
+      "n_estimators": 400,
+      "num_leaves": 31,
+      "subsample": 0.8,
+      "verbosity": -1
+    }
+  },
+  "random_label_canary": {
+    "arm": "stationary_full",
+    "pass_if_random_label_train_auc_le": 0.7,
+    "rows": "development_train only",
+    "scored_elsewhere": false,
+    "seed": 20260923,
+    "shuffles": 1
+  },
+  "shared_params": {
+    "colsample_bytree": 0.7,
+    "deterministic": true,
+    "force_row_wise": true,
+    "learning_rate": 0.05,
+    "min_child_samples": 200,
+    "n_estimators": 100,
+    "n_jobs": 4,
+    "objective": "binary",
+    "random_state": 42,
+    "reg_alpha": 0.0,
+    "reg_lambda": 10.0,
+    "subsample": 0.7,
+    "subsample_freq": 1,
+    "verbosity": -1
+  },
+  "target": {
+    "expr": "terminal_gross_pnl_atr > 0",
+    "id": "A_win"
+  },
+  "verdict_order": [
+    "PIPELINE_OR_CONTRACT_FAILURE if any contract check fails",
+    "NO_DEVELOPMENT_SIGNAL if no configuration passes the development gate",
+    "CAPACITY_FIXED_SIGNAL_FOUND if holdout_skill AND beats mtf_state_only AND beats direction_only AND monotonic_quality AND NOT variance_signature",
+    "VARIANCE_NOT_QUALITY if variance_signature (reproduced in validation and holdout)",
+    "CAPACITY_FIXED_NO_INCREMENTAL_SIGNAL otherwise"
+  ]
+}
