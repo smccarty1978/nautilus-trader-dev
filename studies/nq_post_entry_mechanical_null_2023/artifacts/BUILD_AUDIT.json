@@ -1,0 +1,86 @@
+{
+  "PASS": true,
+  "engine_replay": {
+    "parity": {
+      "t0_flip_reproduced": 6024,
+      "terminal_flip_reproduced": 6024,
+      "trades": 6024
+    },
+    "tracker": "features/trackers/regime_dual_ema.py DualEmaRegimeTracker(3, 9, 14) on NQ.XCME-1-MINUTE-LAST-EXTERNAL",
+    "window": [
+      "2022-12-20",
+      "2023-10-17 22:00"
+    ]
+  },
+  "engine_state_matches_trade_dir_at_anchor": 1.0,
+  "events": 25333,
+  "events_by_anchor": {
+    "0.25": 5162,
+    "0.5": 4519,
+    "0.75": 3977,
+    "1.0": 3528,
+    "1.25": 3136,
+    "1.5": 2791,
+    "2.0": 2220
+  },
+  "final_20pct_loaded": false,
+  "first_touch_parity_vs_kernel_arms": {
+    "0p25": {
+      "compared": 6024,
+      "mismatch": 0
+    },
+    "0p50": {
+      "compared": 6024,
+      "mismatch": 0
+    },
+    "0p75": {
+      "compared": 6024,
+      "mismatch": 0
+    },
+    "1p00": {
+      "compared": 6024,
+      "mismatch": 0
+    },
+    "1p50": {
+      "compared": 6024,
+      "mismatch": 0
+    },
+    "2p00": {
+      "compared": 6024,
+      "mismatch": 0
+    }
+  },
+  "flip_trigger_definition": "long: min(EMA3_low, EMA9_low); short: max(EMA3_high, EMA9_high); engine state after the last COMPLETED 1m bar at or before the instant. A flip needs a completed 1m close beyond BOTH EMAs after they absorb that bar's own low/high, so this level is the loosest close that could flip; intrabar prices never flip.",
+  "kind": "mechanical_null_build_audit",
+  "newly_computed_from_1s": [
+    "anchor first touches incl. +0.25/+0.75/+1.25",
+    "all anchor features",
+    "fixed-race outcome",
+    "N2/N3 nulls"
+  ],
+  "not_kernel_verified": [
+    "+1.25A (no kernel arm)"
+  ],
+  "null_sim": {
+    "K": 64,
+    "block_s": 30,
+    "cap_s": 7200,
+    "pool": "the preceding 3600 s of real 1s bars (causal), sign-symmetrised per block",
+    "seed": 20260926
+  },
+  "reused": {
+    "TRADE_EVENT_TIMELINE.parquet": "7728f007078a67f326eec9baab8b5657f2e004b5987f42998f1665a4cfcd2a94",
+    "fields_reused": [
+      "t0_ns",
+      "entry_price",
+      "entry_ts",
+      "atr",
+      "terminal_ts",
+      "win",
+      "reach_fav_2p0",
+      "dir",
+      "session"
+    ]
+  },
+  "trades": 6024
+}

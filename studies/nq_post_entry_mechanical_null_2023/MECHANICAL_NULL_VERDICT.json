@@ -1,0 +1,54 @@
+{
+  "development_sessions_only": true,
+  "evidence": {
+    "ANALYSIS_RESULTS.json": "fc3a0203c17564dfcc34481fe013bb1b5a714cdab67d7da19d5230ec287520b8",
+    "BUILD_AUDIT.json": "7cfd8eeedcc8a726a6389acc2c337c85933f1c19be6e7f839c3e23e824d5a879",
+    "DESIGN.json": "9f45cf121b3de971759e7cf7c3695cccb6c632665688fcd4518d23d37dcf991d"
+  },
+  "final_20pct_loaded": false,
+  "flip_trigger": {
+    "engine": "features/trackers/regime_dual_ema.py (3/9 EMA of completed 1m high/low, sticky)",
+    "parity": "6,024/6,024 T0 and terminal flips reproduced",
+    "primitive": "long min(EMA3_low,EMA9_low); short max(EMA3_high,EMA9_high)"
+  },
+  "kind": "mechanical_null_verdict",
+  "level_residual_pass": {
+    "A_vs_N1": {
+      "PASS": false,
+      "runs": []
+    },
+    "A_vs_N1c": {
+      "PASS": false,
+      "runs": []
+    },
+    "A_vs_N2": {
+      "PASS": false,
+      "runs": []
+    },
+    "B_vs_N3": {
+      "PASS": false,
+      "runs": []
+    },
+    "G_vs_N3": {
+      "PASS": false,
+      "runs": []
+    }
+  },
+  "ml_justified": false,
+  "models_trained": 0,
+  "primary_path_pass": [],
+  "schema_version": 1,
+  "study_id": "nq_post_entry_mechanical_null_2023",
+  "substantive_reading": "fixed race = (x+1)/3 within +/-1.5pp (pooled CI +/-1.7pp); terminal race = driftless dual-EMA engine null within ~2pp (uniformly ~2pp below); raw speed/giveback effects mostly explained by the trailing flip trigger; one unreplicated candidate: ret30 at +1.5A/+2A raises giveback beyond the engine null (disc +9.1/+10.7pp, rep +2.8/+4.8pp)",
+  "triggering_clause": "replication-block MDE > 0.10 at every anchor (0.113-0.140 fixed race); no level residual passed and no primary path variable passed",
+  "verdict": "INCONCLUSIVE_MECHANICAL_BASELINE",
+  "verdict_source": "frozen decision rule artifacts/DESIGN.json (commit 2e8ca01e)",
+  "years_not_touched": [
+    2024,
+    2025,
+    2026
+  ],
+  "years_used": [
+    2023
+  ]
+}
