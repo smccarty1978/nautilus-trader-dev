@@ -177,7 +177,68 @@ def _sha(path: Path) -> Optional[str]:
     return h.hexdigest()
 
 
-def verify_reusable(manifest: Mapping[str, Any], out_dir: Path, expected: Mapping[str, Any]) -> Tuple[bool, str]:
+ATTESTATION_FILE = "partition_reattestation.json"
+ATTESTATION_SCHEMA_VERSION = 1
+# The ONLY key component a closure attestation may excuse. Everything else (the replay plan, the dataset,
+# the partition interval, the authorization, the replay-time data files) must still match exactly.
+ATTESTABLE_COMPONENTS = ("replay_closure_composite_sha256", "authorization_sha256")
+ATTESTABLE_COMPONENT = "replay_closure_composite_sha256"
+# `authorization_sha256` hashes the study id and path together with the year roles, so a partition produced by
+# ANOTHER study can never match it even when the authorised years are identical. It is attestable ONLY when the
+# authorisation CONTENT is proven identical (same train / oos / prohibited years) and the sole differences are
+# the study identifiers -- the year roles are what authorise a replay; which study ran it is provenance.
+AUTHORIZATION_IDENTITY_FIELDS = ("study_id", "study_path")
+
+
+def attestation_permits(partition_id: str, recorded: Mapping[str, Any], expected: Mapping[str, Any],
+                        attestation: Optional[Mapping[str, Any]]) -> Tuple[bool, str]:
+    """May this partition be served although the replay-stage CLOSURE COMPOSITE moved?
+
+    Only when a recorded attestation proves, for THIS partition, that the closure delta cannot have changed a
+    persisted row: the closure MEMBERSHIP is identical, every other key component matches exactly, and a bounded
+    replay executed under the CURRENT closure reproduced a reference replay executed under the RECORDED closure
+    BYTE FOR BYTE. Anything else is refused -- an attestation never excuses a plan, dataset, interval or
+    authorization difference, and never replaces the artifact-bytes check.
+    """
+    if not attestation:
+        return False, "NO_CLOSURE_ATTESTATION"
+    if int(attestation.get("schema_version") or 0) != ATTESTATION_SCHEMA_VERSION:
+        return False, "ATTESTATION_SCHEMA_UNKNOWN"
+    entry = next((e for e in (attestation.get("entries") or []) if str(e.get("partition_id")) == str(partition_id)), None)
+    if entry is None:
+        return False, f"ATTESTATION_MISSING_PARTITION:{partition_id}"
+    differing = sorted(k for k in set(recorded) | set(expected) if recorded.get(k) != expected.get(k))
+    if not differing or set(differing) - set(ATTESTABLE_COMPONENTS):
+        return False, "ATTESTATION_SCOPE:" + ",".join(differing)
+    if "authorization_sha256" in differing:
+        auth = entry.get("authorization_equivalence") or {}
+        if not auth.get("year_roles_identical") or sorted(auth.get("differing_fields") or []) != sorted(AUTHORIZATION_IDENTITY_FIELDS):
+            return False, "ATTESTATION_AUTHORIZATION_NOT_EQUIVALENT"
+        if auth.get("recorded", {}).get("authorization_sha256") != recorded.get("authorization_sha256") or                 auth.get("current", {}).get("authorization_sha256") != expected.get("authorization_sha256"):
+            return False, "ATTESTATION_AUTHORIZATION_MISMATCH"
+    if ATTESTABLE_COMPONENT not in differing:
+        return True, "REUSABLE_BY_AUTHORIZATION_ATTESTATION"
+    if (entry.get("recorded", {}).get(ATTESTABLE_COMPONENT) != recorded.get(ATTESTABLE_COMPONENT)
+            or entry.get("current", {}).get(ATTESTABLE_COMPONENT) != expected.get(ATTESTABLE_COMPONENT)):
+        return False, "ATTESTATION_COMPOSITE_MISMATCH"
+    delta = entry.get("closure_delta") or {}
+    if not delta.get("membership_identical"):
+        return False, "ATTESTATION_CLOSURE_MEMBERSHIP_CHANGED"
+    proof = entry.get("equivalence_proof") or {}
+    if proof.get("kind") != "bounded_replay_byte_equality" or not proof.get("identical"):
+        return False, "ATTESTATION_NO_BYTE_EQUALITY_PROOF"
+    ref, now = proof.get("reference") or {}, proof.get("current") or {}
+    if (ref.get("replay_closure_composite_sha256") != recorded.get(ATTESTABLE_COMPONENT)
+            or now.get("replay_closure_composite_sha256") != expected.get(ATTESTABLE_COMPONENT)):
+        return False, "ATTESTATION_PROOF_CLOSURE_MISMATCH"
+    for name in ("candidates_sha256", "observations_sha256"):
+        if not ref.get(name) or ref.get(name) != now.get(name):
+            return False, f"ATTESTATION_PROOF_BYTES_DIFFER:{name}"
+    return True, "REUSABLE_BY_CLOSURE_ATTESTATION"
+
+
+def verify_reusable(manifest: Mapping[str, Any], out_dir: Path, expected: Mapping[str, Any],
+                    attestation: Optional[Mapping[str, Any]] = None, partition_id: Optional[str] = None) -> Tuple[bool, str]:
     """Deterministic reuse proof for one existing partition directory.
 
     Order: manifest PASS -> manifest carries a binding -> recorded components re-hash to the recorded
@@ -193,7 +254,12 @@ def verify_reusable(manifest: Mapping[str, Any], out_dir: Path, expected: Mappin
         return False, "RECORDED_BINDING_INCONSISTENT"
     if rc["replay_closure_sha256"] != expected["replay_closure_sha256"]:
         diff = [k for k in expected["components"] if expected["components"].get(k) != rc["components"].get(k)]
-        return False, "REPLAY_CLOSURE_CHANGED:" + ",".join(diff)
+        ok, reason = attestation_permits(partition_id or "", rc["components"], expected["components"], attestation)
+        if not ok:
+            return False, "REPLAY_CLOSURE_CHANGED:" + ",".join(diff) + ("|" + reason if reason else "")
+        if _sha(out_dir / "candidates.parquet") != manifest.get("candidates_sha256") or _sha(out_dir / "observations.parquet") != manifest.get("observations_sha256"):
+            return False, "ARTIFACT_BYTES_MISMATCH"
+        return True, reason
     if _sha(out_dir / "candidates.parquet") != manifest.get("candidates_sha256") or _sha(out_dir / "observations.parquet") != manifest.get("observations_sha256"):
         return False, "ARTIFACT_BYTES_MISMATCH"
     return True, "REUSABLE"
@@ -263,7 +329,7 @@ def assert_within_closure(traced_files: Iterable[str], closure_files: Iterable[s
     return escapes
 
 
-__all__ = ["REPLAY_PLAN_EXCLUDED_KEYS", "REPLAY_CHRONOLOGY_EXCLUDED_KEYS", "REUSE_MODE_OFF", "REUSE_MODE_REPLAY_CLOSURE",
+__all__ = ["attestation_permits", "ATTESTATION_FILE", "ATTESTATION_SCHEMA_VERSION", "ATTESTABLE_COMPONENTS","REPLAY_PLAN_EXCLUDED_KEYS", "REPLAY_CHRONOLOGY_EXCLUDED_KEYS", "REUSE_MODE_OFF", "REUSE_MODE_REPLAY_CLOSURE",
            "SHADOW_EVERY_RUN", "SHADOW_SAMPLED", "SHADOW_SAMPLED_ONE_IN", "SHADOW_BAKE_IN_CLEAN_STUDIES",
            "ReplayClosureError", "ReplayClosureEscape", "collection_closure", "replay_plan_subset", "replay_plan_sha256",
            "binding_sha256", "replay_closure_binding", "reuse_policy", "verify_reusable", "select_shadow",

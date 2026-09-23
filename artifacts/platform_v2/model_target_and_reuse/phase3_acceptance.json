@@ -1,0 +1,224 @@
+{
+  "collector_executed": false,
+  "steps": [],
+  "2_replay_plan": {
+    "study": "d917443a59fdd79ea37a9dc3269d0c780f5d37583943c0d24452dc04b90b4578",
+    "atlas": "d917443a59fdd79ea37a9dc3269d0c780f5d37583943c0d24452dc04b90b4578",
+    "identical": true,
+    "study_plan_sha256": "928abd582cbd9c9139ce64596ab0de4d39e32ee2d7fd615ef0955d4ee7f01ab6",
+    "closure": {
+      "study": "060ee6d99bb6958d71ba8356547fb96d48830c50d8f7f0944b63ac8c5a5a8aac",
+      "atlas": "16aa903966e539810e188023eeead17cfcb73b37e0195423c6aa0d430327f580"
+    }
+  },
+  "3a_install": {
+    "STATUS": "OK",
+    "placed": [
+      {
+        "partition_id": "train-2023",
+        "source": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_mtf_regime_structural_geometry_atlas\\studies\\nq_mtf_regime_structural_geometry_atlas\\_work\\controller\\partitions\\train\\2023",
+        "target": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-model_target_and_reuse\\studies\\nq_mtf_structural_predictive_ranking\\_work\\controller\\partitions\\train\\2023",
+        "candidates_sha256": "bf176578acf65cfa400017d0a77bc85dc90beec698b0f3f633f6e38271139f64",
+        "observations_sha256": "0dba125d961f5a8d7ae41e57c44533f96477cf9164311086d0c02107454eff42",
+        "rows": {
+          "candidates": 134664,
+          "observations": 134664
+        },
+        "original_plan_sha256": "4e7538b459db82aef27bda64ae4a800c563d022156b09945227ab5d5bd580372"
+      },
+      {
+        "partition_id": "train-2024",
+        "source": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_mtf_regime_structural_geometry_atlas\\studies\\nq_mtf_regime_structural_geometry_atlas\\_work\\controller\\partitions\\train\\2024",
+        "target": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-model_target_and_reuse\\studies\\nq_mtf_structural_predictive_ranking\\_work\\controller\\partitions\\train\\2024",
+        "candidates_sha256": "b8896d9950720cffd237b99c68d54aaaaf07d29975879d43a31530e3b0484c28",
+        "observations_sha256": "c31f07ddd92ae6c67705942c48f93388ae935afe47b0e8d5dabde70d2765d0f6",
+        "rows": {
+          "candidates": 127333,
+          "observations": 127333
+        },
+        "original_plan_sha256": "c408c4d9fe81a36136d614e6e47f71f002e6c5377915fbca846b2abee7824679"
+      }
+    ]
+  },
+  "3b_reattest": {
+    "STATUS": "OK",
+    "attestation": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-model_target_and_reuse\\studies\\nq_mtf_structural_predictive_ranking\\artifacts\\partition_reattestation.json",
+    "entries": [
+      "train-2023",
+      "train-2024"
+    ],
+    "byte_equality_date": "2023-10-02",
+    "recorded_closure": "16aa903966e539810e188023eeead17cfcb73b37e0195423c6aa0d430327f580",
+    "current_closure": "060ee6d99bb6958d71ba8356547fb96d48830c50d8f7f0944b63ac8c5a5a8aac",
+    "seconds": 79.1
+  },
+  "3c_smoke": {
+    "status": "PASS",
+    "seconds": 78.4,
+    "note": "the study's OWN bounded smoke day: required to seed the reuse key, NOT a year replay"
+  },
+  "3d_reuse_preview": {
+    "declared": {
+      "mode": "replay_closure",
+      "shadow": "sampled"
+    },
+    "period": "train",
+    "effective": "replay_closure",
+    "partitions": [
+      {
+        "id": "train-2023",
+        "year": 2023,
+        "reusable": true,
+        "reason": "REUSABLE_BY_CLOSURE_ATTESTATION",
+        "expected_replay_closure_sha256": "0fb5003513c5f12f747935f3084965d5e4b3973e390a7be7f9f67c6e8f35cf41",
+        "recorded_replay_closure_sha256": "7794dd71970ff3af0af1c6192f4289fb7cdf2db5e48b596cdcc6aa22a23e2b65",
+        "manifest_plan_sha256": "4e7538b459db82aef27bda64ae4a800c563d022156b09945227ab5d5bd580372",
+        "manifest_seal": "519bc80e0eead4de2ef5e3d13d87590379ed88b20fd43657e0594eb8b17d761b",
+        "candidates_sha256": "bf176578acf65cfa400017d0a77bc85dc90beec698b0f3f633f6e38271139f64",
+        "observations_sha256": "0dba125d961f5a8d7ae41e57c44533f96477cf9164311086d0c02107454eff42"
+      },
+      {
+        "id": "train-2024",
+        "year": 2024,
+        "reusable": true,
+        "reason": "REUSABLE_BY_CLOSURE_ATTESTATION",
+        "expected_replay_closure_sha256": "48c6ba94a0d0b46d186753ff553ed45087a51b2fc3c2aa7ab8f695f626d75b5b",
+        "recorded_replay_closure_sha256": "70ad0ab80c7737212ba5225118013eb217751d9eb5ee657ef3ae60758571ed19",
+        "manifest_plan_sha256": "c408c4d9fe81a36136d614e6e47f71f002e6c5377915fbca846b2abee7824679",
+        "manifest_seal": "d9fd44dee28bb149e4c71fc26300823d42d9c9b9d8ebcdb15272d8cb218ef597",
+        "candidates_sha256": "b8896d9950720cffd237b99c68d54aaaaf07d29975879d43a31530e3b0484c28",
+        "observations_sha256": "c31f07ddd92ae6c67705942c48f93388ae935afe47b0e8d5dabde70d2765d0f6"
+      }
+    ],
+    "would_reuse": [
+      "train-2023",
+      "train-2024"
+    ]
+  },
+  "4_partitions_untouched": {
+    "2023": {
+      "plan_sha256": "4e7538b459db82aef27bda64ae4a800c563d022156b09945227ab5d5bd580372",
+      "written_at_utc": "2026-09-22T14:50:31.432336+00:00",
+      "candidates_sha256": "bf176578acf65cfa400017d0a77bc85dc90beec698b0f3f633f6e38271139f64",
+      "observations_sha256": "0dba125d961f5a8d7ae41e57c44533f96477cf9164311086d0c02107454eff42",
+      "identical_to_atlas_manifest": true,
+      "rows": {
+        "candidates": 134664,
+        "observations": 134664
+      },
+      "elapsed_s_original": 6690.532777399989
+    },
+    "2024": {
+      "plan_sha256": "c408c4d9fe81a36136d614e6e47f71f002e6c5377915fbca846b2abee7824679",
+      "written_at_utc": "2026-09-22T17:42:29.251916+00:00",
+      "candidates_sha256": "b8896d9950720cffd237b99c68d54aaaaf07d29975879d43a31530e3b0484c28",
+      "observations_sha256": "c31f07ddd92ae6c67705942c48f93388ae935afe47b0e8d5dabde70d2765d0f6",
+      "identical_to_atlas_manifest": true,
+      "rows": {
+        "candidates": 127333,
+        "observations": 127333
+      },
+      "elapsed_s_original": 3441.407406900078
+    }
+  },
+  "5_merge": {
+    "status": "PASS",
+    "seconds": 11.4,
+    "rows": 261997,
+    "years": [
+      2023,
+      2024
+    ]
+  },
+  "6_target": {
+    "eligible_n": 261552,
+    "expr": "terminal_gross_pnl_atr > 0",
+    "expression_sha256": "edb73ed2b2d0a79ad955d595a8b6cb00307b16974e19956adf0b39d82e7986f1",
+    "id": "A_terminal_winner",
+    "negative_n": 176094,
+    "null_n": 445,
+    "positive_n": 85458
+  },
+  "7_fit": {
+    "seconds": 7.6,
+    "tuning_years": [
+      2023
+    ],
+    "final_train_validation_years": [
+      2024
+    ],
+    "models": [
+      {
+        "arm": "full",
+        "cell": "t0",
+        "n_features": 78,
+        "final_fit_rows": 7475,
+        "model_id": "df7c86bdcd4e03c6",
+        "train_years": [
+          2023
+        ],
+        "final_validation_n": 7047
+      },
+      {
+        "arm": "direction_only",
+        "cell": "t0",
+        "n_features": 4,
+        "final_fit_rows": 7475,
+        "model_id": "03e0632d83aafe24",
+        "train_years": [
+          2023
+        ],
+        "final_validation_n": 7047
+      },
+      {
+        "arm": "mtf_state_only",
+        "cell": "t0",
+        "n_features": 4,
+        "final_fit_rows": 7475,
+        "model_id": "935f1e4732feb9c0",
+        "train_years": [
+          2023
+        ],
+        "final_validation_n": 7047
+      },
+      {
+        "arm": "geometry_no_direction",
+        "cell": "t0",
+        "n_features": 71,
+        "final_fit_rows": 7475,
+        "model_id": "88585ded2e06a857",
+        "train_years": [
+          2023
+        ],
+        "final_validation_n": 7047
+      }
+    ]
+  },
+  "9_max_training_year": 2023,
+  "9_2024_in_fit": false,
+  "10_freeze": {
+    "seconds": 0.0,
+    "freeze_sha256_present": true,
+    "models": 4
+  },
+  "11_oos_score_proof": {
+    "model_id": "df7c86bdcd4e03c6",
+    "authenticated": true,
+    "rows_scored": 500,
+    "year": 2024,
+    "scored_after_freeze": true,
+    "score_min": 0.08496702784951915,
+    "score_max": 0.7885573964499315,
+    "note": "infrastructure proof only; no model quality is interpreted"
+  },
+  "12_lineage": {
+    "ordered_inputs_n": 78,
+    "train_years": [
+      2023
+    ],
+    "validation_years": [
+      2024
+    ],
+    "label": "__target_A_terminal_winner"
+  }
+}

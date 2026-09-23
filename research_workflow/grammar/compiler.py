@@ -1293,6 +1293,38 @@ def _resolve_model_feature_columns(ctx: _Ctx, requested: Sequence[str], cols: Ma
     return resolved
 
 
+def _resolve_model_target(ctx: _Ctx, target: Mapping[str, Any], cols: Mapping[str, Any],
+                          outcome: Mapping[str, Any]) -> Optional[Dict[str, Any]]:
+    """Compile `model.target`: a bounded expression over columns the collected frame already carries.
+
+    A TARGET may read outcome/observation columns -- that is what a label is -- but never a column the study
+    does not emit, and never an identity column. The expression is parsed (never eval-ed), its referenced
+    columns are proven against the plan, and its canonical AST hash goes into the modeling contract.
+    """
+    from research.analysis.expressions import ExpressionError, definition_sha256, parse, referenced_columns
+    where = "model.target"
+    emitted = ({m["column"] if isinstance(m, Mapping) else m for m in (cols.get("metadata") or [])}
+               | set(cols.get("features") or ctx.feature_aliases) | set(cols.get("derived") or [])
+               | set(cols.get("observation") or []) | set(outcome.get("observation_columns") or []))
+    emitted |= {outcome.get("label_column")} | {f"{a.get('prefix')}_label" for a in (outcome.get("arms") or [])}
+    emitted.discard(None)
+    identity = set(cols.get("identity") or MODEL_INELIGIBLE_IDENTITY_COLUMNS)
+    try:
+        ast = parse(str(target["expr"]))
+    except ExpressionError as exc:
+        ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"{where}.expr", str(exc))
+        return None
+    used = sorted(referenced_columns(ast))
+    unknown = [c for c in used if c not in emitted and c not in identity]
+    if unknown:
+        ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"{where}.expr",
+                f"target references columns this study does not emit: {unknown}",
+                closest=_closest(unknown[0], sorted(emitted)))
+        return None
+    return {"id": str(target["id"]), "expr": str(target["expr"]), "expression_sha256": definition_sha256(ast),
+            "columns": used}
+
+
 def _resolve_chronology_and_model(ctx: _Ctx, outcome_resolved: Optional[Dict[str, Any]] = None,
                                   columns: Optional[Mapping[str, Any]] = None) -> Tuple[Dict[str, Any], Optional[Dict[str, Any]]]:
     ch = ctx.spec.chronology
@@ -1310,6 +1342,7 @@ def _resolve_chronology_and_model(ctx: _Ctx, outcome_resolved: Optional[Dict[str
         return chronology, None
     kinds = ctx.registry.get("kinds", {})
     feature_columns: Optional[List[str]] = None
+    model_target: Optional[Dict[str, Any]] = None
     families = {e["id"] for e in kinds.get("model_drivers", [])}
     fam_id = f"model.{model_spec.family}" if model_spec.family else None
     if model_spec.mode == "train" and fam_id not in families:
@@ -1343,6 +1376,8 @@ def _resolve_chronology_and_model(ctx: _Ctx, outcome_resolved: Optional[Dict[str
         if model_spec.feature_columns:
             feature_columns = _resolve_model_feature_columns(ctx, model_spec.feature_columns, cols, outcome_resolved or {})
             declared_columns |= set(feature_columns)
+        if model_spec.target is not None:
+            model_target = _resolve_model_target(ctx, model_spec.target, cols, outcome_resolved or {})
         bare = [a for a in model_spec.arms if not isinstance(a, _ArmSpec)]
         if bare:
             # The trap this refusal exists to close: `arms: [A, B, C]` was accepted, consumed
@@ -1453,6 +1488,8 @@ def _resolve_chronology_and_model(ctx: _Ctx, outcome_resolved: Optional[Dict[str
            "arms": arms if arms else [a for a in model_spec.arms if isinstance(a, str)],
            "cells": cells, "reference_models": references,
            "validation": validation, "models": scored, "search_space": search_space}
+    if model_target is not None:
+        out["target"] = model_target
     if feature_columns is not None:
         # Only present when declared, so a plan that never asked for it keeps the identical compiled
         # shape (and plan_sha256) it had before this key existed.
