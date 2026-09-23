@@ -1,0 +1,120 @@
+{
+  "capacity_ladder": {
+    "L1_stumps": {
+      "canary_pass": true,
+      "eligible": false,
+      "random_label_train_auc": 0.5839948113492477,
+      "total_leaves": 200,
+      "train_auc": 0.5920528062496611,
+      "validation_auc": 0.5116268393360426,
+      "validation_auc_ci95": [
+        0.47653269722595165,
+        0.5470971965633549
+      ]
+    },
+    "L2_depth2": {
+      "canary_pass": true,
+      "eligible": false,
+      "random_label_train_auc": 0.6373014959698451,
+      "total_leaves": 371,
+      "train_auc": 0.6400031833836193,
+      "validation_auc": 0.5178404618000942,
+      "validation_auc_ci95": [
+        0.48591226460385667,
+        0.5500488604803749
+      ]
+    },
+    "L3_depth3": {
+      "canary_pass": true,
+      "eligible": false,
+      "random_label_train_auc": 0.6806231804118734,
+      "total_leaves": 591,
+      "train_auc": 0.6834358673860584,
+      "validation_auc": 0.5215909907464331,
+      "validation_auc_ci95": [
+        0.4910755681303332,
+        0.5518553534797552
+      ]
+    }
+  },
+  "contract_commit": "8efcc675",
+  "controls_validation": {
+    "direction_only": {
+      "train_auc": 0.532395447673242,
+      "validation_auc": 0.5275251698616357,
+      "validation_auc_ci": [
+        0.4959220735033391,
+        0.559114224309944
+      ]
+    },
+    "mtf_state_only": {
+      "train_auc": 0.552630436057419,
+      "validation_auc": 0.5064701115378166,
+      "validation_auc_ci": [
+        0.4689121493734063,
+        0.5434003615867821
+      ]
+    }
+  },
+  "evidence": {
+    "CAPACITY_LADDER.json": "4b56525e165ef908ec4342a31e875979a80d5cb3418903ec28d317821ef00a07",
+    "CONTRACT_FREEZE.json": "c5f1e8b3abf0c1dd972eec8778e7db685b939c9e3d7d7aafd6fd5898af78d685",
+    "DEVELOPMENT_GATE.json": "ab04386c22831a2d6a3276b85b5c747bc9eae7ee46680a98a782001a0589ffbb",
+    "DEVELOPMENT_RESULTS.csv": "0bb0f46a5a6a1026020e70bebf0954fb0f761ecc275c0b90228181e3f559807c",
+    "DEVELOPMENT_VALIDATION_BINS.csv": "c435d29d173692758ce4a22d34c4b6e14459e463a7f666531ebf5d64a1fcb59d",
+    "PHASE0_REUSE_PROOF.json": "3e0d6e2b2578ddd242b042ada558e5fbf2c3bbf201ab8442c57abb10b4cbac50",
+    "RANDOM_LABEL_CAPACITY.csv": "e8ad263e52550ccb1b4291ec402950f13c21fb3c4332b1f2b81b98cc88f0e8ed",
+    "STATIONARY_FEATURE_SURFACE.json": "9efd053808b7904a856c3036ff59f3611f55d58100804ed1baa7a934bd889287",
+    "TEMPORAL_SPLIT_2023.json": "0d92473dcbea102eb318ec8a91040d815192a35dea524fb36e7f8be67898ebfa"
+  },
+  "final_holdout_opened": false,
+  "final_holdout_sessions": "2023-10-18..2023-12-29 (52 sessions, 1,451 rows) -- dark; labels never read",
+  "kind": "target_a_constrained_model_verdict",
+  "old_model": {
+    "random_label_train_auc": 0.9711100606060606,
+    "total_leaves": 12400
+  },
+  "questions": {
+    "q10_justify_untouched_year": "NO",
+    "q1_nonstationarity_reduced": "YES for the 22 price levels (forensic 2024 out-of-range 94.8-96.0% -> kept max 3.6%); RESIDUAL: prior_rotation_seq_{5m,15m,1h} are within-year monotone counters, 100% outside the train range in validation",
+    "q2_memorises_shuffled_labels": "NO: 0.584 / 0.637 / 0.681 vs 0.971 -- but real-label train AUC exceeds random by only 0.003-0.008, so the in-sample fit is still capacity",
+    "q3_generalises_early_to_middle": "NO: validation 0.512 / 0.518 / 0.522, every 95% CI contains 0.50",
+    "q4_gate_opened_final": "NO",
+    "q5_final_retains_skill": "NOT EVALUATED (dark)",
+    "q6_beats_direction_only": "NOT EVALUATED on final; on validation every config is BELOW direction_only (0.528)",
+    "q7_beats_mtf_state_only": "NOT EVALUATED on final; on validation +0.005..+0.015 over 0.506, inside noise",
+    "q8_monotonic": "NO on validation (Spearman quintile vs Target-A 0.6 / 0.8 / 0.5; vs mean gross ATR -0.7 / -0.7 / -0.3)",
+    "q9_quality_or_variance": "NEITHER on validation: +2A and -1A reach flat across quintiles (no variance signature)"
+  },
+  "reuse": {
+    "N": 7475,
+    "PASS": true,
+    "duplicates": 0,
+    "frozen_full_model_score_digest_reproduced": "8fa2031cd01d9a7a",
+    "negatives": 5000,
+    "nulls": 14,
+    "positives": 2475,
+    "unique_trade_keys": 7475
+  },
+  "schema_version": 1,
+  "split": {
+    "development_train": "2023-01-03..2023-08-07 (154 s, 4,521)",
+    "development_validation": "2023-08-08..2023-10-17 (51 s, 1,503)"
+  },
+  "study_id": "nq_target_a_constrained_stationary_2023",
+  "surface": {
+    "excluded_absolute_price": 22,
+    "original": 78,
+    "stationary_full": 56,
+    "stationary_geometry_no_direction": 49
+  },
+  "verdict": "NO_DEVELOPMENT_SIGNAL",
+  "years_not_touched": [
+    2024,
+    2025,
+    2026
+  ],
+  "years_used": [
+    2023
+  ]
+}

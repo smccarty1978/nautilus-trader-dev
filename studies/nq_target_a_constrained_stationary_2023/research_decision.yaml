@@ -2,7 +2,7 @@
 study_id: nq_target_a_constrained_stationary_2023
 research_question: "Can a deliberately low-capacity LightGBM over only the stationary/relative T0 MTF + structural geometry of the audited Target-A surface (22 absolute-price columns removed) show genuine chronological Target-A information inside 2023 -- resisting shuffled labels, generalising 60%->20%, concentrating monotonically, and beating the exact MTF-state control? 2023 only; 2024/2025/2026 untouched."
 method_note: "Methodology study over the REUSED audited 2023 T0 frame of nq_mtf_structural_predictive_ranking (merged controller output, sha-pinned; no replay). Bounded analysis script constrained_model.py; contract = artifacts/CAPACITY_LADDER.json + STATIONARY_FEATURE_SURFACE.json + TEMPORAL_SPLIT_2023.json, frozen by CONTRACT_FREEZE.json and committed before any fit."
-status: DRAFT
+status: CLOSED_NO_DEVELOPMENT_SIGNAL
 dataset_id: NQ_1S_V2_GLOBEX
 terminal_decisions: {}
 # Predeclared fork policy (WORKFLOW.md §N.4). Agents follow these instead of asking again; a genuine
