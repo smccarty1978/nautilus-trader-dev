@@ -1,0 +1,85 @@
+{
+  "anchors": {
+    "+3A": "reported only where N >= 300 per block, else descriptive",
+    "capture_only": [
+      "T0 = entry bar (first 1s bar after the T0 observation)"
+    ],
+    "primary": [
+      0.5,
+      1.0,
+      1.5,
+      2.0,
+      3.0
+    ]
+  },
+  "capture": "T0 events: real vs null final_mfe, final_pnl, capture = final_pnl/final_mfe (final_mfe > 0; also ratio of means), giveback; residual capture; also for the top final-MFE quintile (outcome-defined, descriptive only)",
+  "decision_rule": {
+    "EXCESS_CONTINUATION_RESIDUAL": "excess_continuation state(s) and no excess_giveback state",
+    "EXCESS_GIVEBACK_RESIDUAL": "excess_giveback state(s) and no excess_continuation state",
+    "INCONCLUSIVE": "only if the DISCOVERY-block MDE for final_pnl tercile residuals exceeds 0.10 A at every primary anchor (the economic question cannot be bounded); power alone never triggers it otherwise",
+    "MIXED_RESIDUAL": "both",
+    "TRIGGER_LAG_IS_TRADEOFF - MECHANICALLY_NEUTRAL": "no excess_giveback and no excess_continuation state, and no anchor has a meaningful overall final_pnl residual that replication does not contradict",
+    "mandatory": "if residual giveback and add_mfe curves by lag match the engine null within the development MDE -> MECHANICALLY_NEUTRAL; no exit-policy experiment on expectancy grounds; stop",
+    "overall_pnl_residual_note": "a meaningful overall (not lag-specific) final_pnl residual that is not lag-specific is reported as UNIFORM_RESIDUAL alongside the verdict"
+  },
+  "execution": {
+    "decision_price": "close of the flip 1m bar (= last 1s close at the flip timestamp)",
+    "decomposition": "MFE-to-exit giveback = (final MFE - decision location) [boundary component] + (decision location - exit location) [fill gap]",
+    "exit": "audited: OPEN of the first 1s bar after the flip (terminal_exit_price)",
+    "parity": "real exit price == first-1s-open after the flip; terminal_gross_pnl_atr == (exit-entry)*dir/atr_entry_1m"
+  },
+  "frozen_before_build_and_any_residual_comparison": true,
+  "kind": "engine_null_residual_capture_contract",
+  "lag_measures_at_anchor": {
+    "catchup1": "trig_pos now - trig_pos one completed minute earlier",
+    "catchup2": "two completed minutes earlier (secondary)",
+    "mfe_to_trig": "MFE through anchor - trig_pos",
+    "price_to_trig": "cur - trig_pos",
+    "trig_pos": "pre-bar bound relative to entry (A, + = protected)"
+  },
+  "meaningful": {
+    "binary": "|residual| >= 5 pp with CI excluding 0",
+    "continuous": "|mean residual| >= 0.10 A with CI excluding 0 (0.10 A ~ 0.9 NQ pt at the 2023 median 1m ATR ~ 8.6 pt, the order of round-trip friction; the frame carries no cost column)"
+  },
+  "no_model": true,
+  "no_policy_simulation": true,
+  "outcomes_per_event": {
+    "add_mfe": "final_mfe - MFE through the anchor bar",
+    "exit_below_entry": "final_pnl <= 0",
+    "fill_gap": "(exit - flip-bar close)*dir/atr",
+    "final_mfe": "max favourable excursion from entry through the flip bar (A)",
+    "final_pnl": "terminal gross P&L in A (real: audited)",
+    "frac_surrendered": "giveback / final_mfe (final_mfe > 0)",
+    "giveback": "final_mfe - final_pnl",
+    "giveback_ge_1A": "giveback >= 1",
+    "null": "per event: mean over the K=64 engine-null paths that flip before the session close / 2 h cap (unflipped share reported; the real population is conditioned on a flip)"
+  },
+  "population": "the 6,024 audited 2023 development trades; discovery = first 154 sessions, replication = next 51; final 20% dark; 2024-2026 untouched",
+  "power": "MDE (80%, two-sided 5%) per block, anchor and outcome from the session-cluster SE of the REAL outcome (no residual means read); used ONLY to label replication as NOT_SHOWN_AT_AVAILABLE_POWER, never to decide the verdict",
+  "question": "Does the existing opposite-1m-regime exit behave differently on real NQ post-entry paths than the same exit behaves on driftless paths?",
+  "replication_labels": {
+    "CONTRADICTED": "opposite sign (or same sign but replication MDE <= |discovery effect| and CI includes 0)",
+    "DIRECTIONAL": "same sign, CI crosses 0, replication MDE > |discovery effect|  -> NOT_SHOWN_AT_AVAILABLE_POWER",
+    "REPRODUCED": "same sign and CI excludes 0"
+  },
+  "residual": "per event real - null; aggregated by lag tercile (cutpoints fixed on DISCOVERY at each anchor) and overall",
+  "reuse": [
+    "../artifacts/EVENT_LEVEL.parquet (anchors <= +2A, causal state)",
+    "mechanical_null.py replay_engine / simulate / build_session, EXTENDED in place behind an opt-in econ flag",
+    "frozen split"
+  ],
+  "robustness": "long/short, initial MTF states >= 150 events, RTH segments -- for claimed effects only",
+  "simulator_extension_parity": "re-running the extended build must reproduce every existing null_p_* column of EVENT_LEVEL bit-for-bit (same RNG stream, same draws); new anchors (T0, +3A) and previously 'decided' events use a SEPARATE rng stream",
+  "speed": "time_to_anchor terciles (discovery cutpoints), RTH-segment stratified [08:30-10:30),[10:30-13:30),[13:30-close) CT; raw vs residual; sensitivity excluding anchors < 3600 s before the close",
+  "states": {
+    "excess_continuation": "a lag tercile where residual add_mfe >= +0.10 A AND residual final_pnl >= +0.10 A (both meaningful) at >= 2 adjacent primary anchors in discovery, replication not CONTRADICTED",
+    "excess_giveback": "a lag tercile where residual giveback >= +0.10 A AND residual final_pnl <= -0.10 A (both meaningful) at >= 2 adjacent primary anchors in discovery, replication not CONTRADICTED"
+  },
+  "statistics": "session-cluster bootstrap 95% CI (1000 reps, seed 20260928); Spearman(lag, residual) reported alongside terciles",
+  "trigger_semantics": {
+    "long_flip_on_completed_1m_bar": "c < a3*l + (1-a3)*E3_low_prev AND c < a9*l + (1-a9)*E9_low_prev (strict), a3=1/2, a9=1/5; short mirrored with highs and >",
+    "parity": "(close beyond realized threshold) must equal the engine's flipped flag on every in-trade minute; exact",
+    "pre_bar_bound": "long min(E3_low, E9_low), short max(E3_high, E9_high) of the engine state after the last COMPLETED minute -- the only trigger quantity used as an anchor-time explanatory variable",
+    "realized_threshold": "long min_k(a_k*l + (1-a_k)*E_k_prev) using that bar's own low -- OUTCOME-side, timeline only"
+  }
+}
