@@ -1,0 +1,34 @@
+{
+  "contract_sha256": "8e2cb1fc462d001c43d130f865771834169e089a5e1dca60bf46f16f7a1df484",
+  "evidence": {
+    "ECON_BUILD_AUDIT.json": "41ae168352506006ec3f5923bccf133bfda560d2c0049047b9ea6faf443f82fd",
+    "RESIDUAL_RESULTS.json": "d72910a695c3b7402c2246d2ffb376eb799111c0c2a28eddd53a2ef4021ceaa4"
+  },
+  "exit_policy_experiment_recommended": false,
+  "final_20pct_loaded": false,
+  "kind": "residual_capture_verdict",
+  "models_trained": 0,
+  "q10_exit_change_could_improve_expectancy": false,
+  "resolved": [
+    "overall expectancy of the existing exit = anchor location at every anchor, matched by the engine null (pooled residual within ~+/-0.1A)",
+    "raw lag->giveback is mechanical (engine-null rank correlation stronger than real)",
+    "real-vs-null departures by lag are paired: excess giveback and excess additional MFE move together (variance, not expectancy); pattern replicates directionally",
+    "fill gap flip-close -> next-1s-open ~ +0.005A (negligible)",
+    "MFE capture ~0 is fully mechanical (real -1.3% vs null -0.4%; residual final P&L -0.02A [-0.08,+0.04])"
+  ],
+  "schema_version": 1,
+  "stop": true,
+  "study": "nq_post_entry_mechanical_null_2023/residual_capture",
+  "triggering_clause": "no lag state qualified AND discovery final_pnl tercile MDE (0.20-0.42A) > 0.10A at every primary anchor",
+  "unresolved": "lag-tercile expectancy residuals of +/-0.1-0.3A (per-tercile precision insufficient); sign flips between blocks",
+  "verdict": "INCONCLUSIVE",
+  "verdict_source": "frozen CONTRACT.json (commit d15fb461)",
+  "years_not_touched": [
+    2024,
+    2025,
+    2026
+  ],
+  "years_used": [
+    2023
+  ]
+}

@@ -102,6 +102,7 @@ def load_events():
     for c in CONT + BIN:
         ev[f"null_{c}"] = ev[f"null_econ_{'p_' if c in BIN else ''}{c}"]
         ev[f"res_{c}"] = ev[f"real_{c}"] - ev[f"null_{c}"]
+    ev["null_final_mfe"] = ev["null_econ_final_mfe"]
     ev["seg"] = pd.cut(ev["tod_min"], SEG_EDGES, right=False, labels=False)
     return ev
 
