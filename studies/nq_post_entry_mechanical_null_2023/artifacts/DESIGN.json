@@ -1,0 +1,96 @@
+{
+  "anchors": {
+    "definition": "first 1s bar whose high/low reaches entry +/- x*atr_entry_1m, strictly before the terminal flip; features through that bar inclusive",
+    "giveback_only": [
+      2.0
+    ],
+    "not_kernel_verified": [
+      1.25
+    ],
+    "primary": [
+      0.25,
+      0.5,
+      0.75,
+      1.0,
+      1.25,
+      1.5
+    ]
+  },
+  "blocks": {
+    "discovery": "first 154 development sessions (2023-01-03..2023-08-07)",
+    "replication": "next 51 sessions (2023-08-08..2023-10-17)"
+  },
+  "decision_rule": {
+    "INCONCLUSIVE_MECHANICAL_BASELINE": "a level residual passes with no primary variable explaining it, OR replication MDE > 0.10 at every anchor for the primary tests, OR the engine null cannot be built",
+    "LOCATION_ONLY": "no primary variable passes on any residual outcome AND the A level residual vs N1c does not pass AND the B level residual vs N3 does not pass (raw speed separation may remain)",
+    "PATH_INFORMATION_PRESENT": "any PRIMARY variable passes discovery+replication on A residual-vs-N2, B residual-vs-N3, or giveback residual-vs-N3",
+    "critical": "if A shows no meaningful residual from (x+1)/3 and the B residual disappears against N3 (the causal flip-trigger mechanics), the verdict is LOCATION_ONLY even if raw speed separation remains"
+  },
+  "flip_trigger": {
+    "definition": "long: min(EMA3_low, EMA9_low); short: max(EMA3_high, EMA9_high) of completed 1m bars, engine state after the last completed minute; loosest completed-close that could flip (a flip also needs the bar's own low/high absorbed); intrabar never flips",
+    "features": [
+      "trig_rel_entry (A, + = above entry in trade direction)",
+      "dist_to_trig = cur - trig_rel_entry",
+      "trig_move60"
+    ]
+  },
+  "frozen_before_build_and_any_comparison": true,
+  "kind": "mechanical_null_design",
+  "no_model_of_any_kind": true,
+  "nulls": {
+    "N1_analytic": "driftless continuous path between fixed barriers: P = (x+1)/3 at the nominal anchor x; N1c uses the anchor bar close location (overshoot-aware): (cur+1)/3",
+    "N2_bootstrap_fixed": "per event, 64 driftless paths: 30 s blocks of the preceding 3600 s of real 1s bars (relative OHLC), sign-symmetrised per block, started from the anchor bar close, same OHLC touch semantics; quantifies discrete-bar/tick/overshoot/local-volatility corrections to N1",
+    "N3_engine_terminal": "the same simulated paths aggregated into real-clock 1m bars (the partial current minute included) and fed through features/trackers/regime_dual_ema.py semantics initialised with the replayed real engine state at the anchor; gives P(+2A before flip), P(giveback | +2A), P(win)",
+    "no_diffusion_baseline": "a fitted drift/vol diffusion is not built: N2 already preserves local volatility causally and a fitted drift would reintroduce the effect under test",
+    "role": "N1 is THE fixed-race null (N2 reports corrections); N3 is THE terminal-race null (moving endogenous boundary); never substituted for each other"
+  },
+  "outcomes": {
+    "A_fixed_race": "from the anchor bar onward: +2A (from entry) touched before -1A; eligible only if -1A not touched at/before the anchor bar; same-bar both = ambiguous (excluded); unresolved by session close = censored (excluded)",
+    "B_terminal_race": "+2A touched strictly before the opposite 1m flip (audited reach_fav_2p0)",
+    "giveback": "among B == 1: terminal loss (win == 0)",
+    "three_class_at_1p0_1p5": [
+      "fail_before_plus2",
+      "plus2_then_giveback",
+      "plus2_then_win"
+    ]
+  },
+  "population": "the 6,024 audited 2023 development trades of nq_post_entry_path_mechanism_2023; final 20% dark; 2024-2026 untouched",
+  "reuse_lineage": {
+    "TRADE_EVENT_TIMELINE.parquet": "7728f007078a67f326eec9baab8b5657f2e004b5987f42998f1665a4cfcd2a94"
+  },
+  "robustness": "for primary effects that pass (else the largest |delta| primary per outcome, descriptively): long/short, initial MTF states with >= 150 events, RTH segments",
+  "script_sha256": "4e33625dfd33e6c7e0d40038f0dda7ff3a2d25e797c5b15f08cfbf9de7fce3d2",
+  "statistics": {
+    "level_residual": "per anchor: mean(y) - mean(null) (A vs N1, N1c, N2; B vs N3); session-cluster bootstrap 95% CI, 1000 reps, seed 20260927",
+    "path_effect": "per anchor x primary variable: tercile cutpoints fixed on the DISCOVERY block at that anchor; delta = mean(y - null_event) in top tercile - bottom tercile; A uses N2 per event, B uses N3 per event, giveback uses N3 P(giveback|+2A) (anchor 2.0: 1 - N3 P(win)); raw (y-only) deltas also reported to show what the nulls absorb",
+    "power": "MDE (80% power, two-sided 5%) for a top-vs-bottom tercile difference: 2.80 * sqrt(p(1-p)*(3/N + 3/N)) * sqrt(1.3 design effect), p = block outcome rate; reported per anchor/block/outcome BEFORE effects are read",
+    "speed_controls": "time_to_anchor delta = N-weighted mean of within-segment deltas over RTH segments [08:30-10:30), [10:30-13:30), [13:30-close) CT; sensitivity: exclude anchors < 3600 s before session close",
+    "trigger_conditioning": "B raw speed delta vs B residual-vs-N3 speed delta, and within trig_rel_entry terciles"
+  },
+  "thresholds": {
+    "discovery_pass": "meaningful at >= 2 ADJACENT anchors for the same variable and outcome",
+    "level_residual_pass": "meaningful at >= 2 adjacent anchors in discovery AND same sign with >= half magnitude in replication",
+    "meaningful": "|delta| >= 0.05 with 95% CI excluding 0",
+    "replication_pass": "at those anchors, replication deltas have the same sign and mean |delta_rep| >= 0.5 * mean |delta_disc|, with replication MDE <= 0.10 at those anchors"
+  },
+  "variables": {
+    "primary": [
+      "time_to_anchor_s",
+      "pullback_from_mfe",
+      "mae_before",
+      "ret30"
+    ],
+    "secondary": [
+      "ret15",
+      "ret60",
+      "path_eff",
+      "n_cross",
+      "rv60",
+      "accel",
+      "fav_share",
+      "dir",
+      "tod_min"
+    ],
+    "secondary_rule": "secondary variables are reported and can never determine PATH_INFORMATION_PRESENT"
+  }
+}
