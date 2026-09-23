@@ -1,0 +1,44 @@
+{
+  "broad_test_delta": {
+    "head": "b5bc1a2f",
+    "ran": 2545,
+    "passed": 2457,
+    "failed": 61,
+    "wall_seconds": 12044,
+    "counts": {
+      "NEW_FAILURE": 8,
+      "NEW_FAILURE_OUTSIDE_BASELINE_SCOPE": 0,
+      "KNOWN_BASELINE_FAILURE": 53,
+      "BASELINE_FAILURE_NOW_FIXED": 1,
+      "ENVIRONMENTAL_MISSING_ARTIFACT": 0
+    },
+    "placement": "P-core affinity 0xFFF"
+  },
+  "new_failure_classification": {
+    "PRE_EXISTING_ON_ff47868d": {
+      "ids": [
+        "research_workflow/tests/test_redteam_pass1_acceptance.py::test_acc12_canaries_green",
+        "scripts/tests/test_direction_qualified_freeze_binding.py::test_aggregate_freeze_opens_the_real_oos_gate",
+        "scripts/tests/test_generic_contract_audit.py::test_no_hardcoded_feature_count_in_generic_workflow",
+        "scripts/tests/test_rt_final_blockers.py::test_rt2b2_editing_a_governance_authority_moves_the_composite[scripts/check_feature_promotion.py]",
+        "scripts/tests/test_rt_final_blockers.py::test_rt2b2_editing_a_governance_authority_moves_the_composite[scripts/select_required_tests.py]"
+      ],
+      "evidence": "all 5 fail identically on the clean main worktree at ff47868d (verified this session)"
+    },
+    "ENVIRONMENTAL_GITIGNORED_STUDY_ARTIFACTS": {
+      "ids": [
+        "research_workflow/tests/test_external_model_scoring.py::test_external_scorer_matches_repaired_model_c_for_deterministic_parent_row",
+        "research_workflow/tests/test_runtime_bindings.py::test_episode_study_is_provider_host_mode_and_all_features_bind",
+        "research_workflow/tests/test_stage3_integration.py::test_stage3_model_c_long_short_routing"
+      ],
+      "evidence": "pass on the chore head once the 49 git-ignored studies/*/artifacts files are present (copied, verified, removed)"
+    },
+    "CAUSED_BY_THIS_CHORE": []
+  },
+  "targeted": {
+    "test_model_target_and_reattest.py": 24,
+    "targeted suite (5 files)": 124,
+    "test_docs_v2.py": 9
+  },
+  "acceptance": "artifacts/platform_v2/model_target_and_reuse/phase3_acceptance.json"
+}
