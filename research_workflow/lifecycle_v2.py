@@ -679,7 +679,9 @@ class V2Lifecycle:
         from research_workflow.replay_closure import verify_reusable
         m = _read(out_dir / "manifest.json")
         expected = self._replay_binding(plan, self._expected_partition(plan, year, period))
-        ok, reason = verify_reusable(m, out_dir, expected) if m else (False, "NO_MANIFEST")
+        pid = f"{period}-{year}"
+        ok, reason = verify_reusable(m, out_dir, expected, attestation=self._closure_attestation(),
+                                     partition_id=pid) if m else (False, "NO_MANIFEST")
         declared_digest = self._plan_dataset(plan).get("logical_digest")
         seen_digest = ((m.get("dataset") or {}).get("logical_digest") if m else None)
         if ok and declared_digest and seen_digest and declared_digest != seen_digest:
@@ -691,11 +693,16 @@ class V2Lifecycle:
             smokes = [r for r in (trace.get("runs") or []) if r.get("kind") == "smoke" and r.get("plan_sha256") == plan["plan_sha256"]]
             if not smokes or smokes[-1].get("verdict") != "WITHIN_CLOSURE":
                 ok, reason = False, "NO_CLEAN_SMOKE_TRACE_FOR_PLAN"
-        return {"id": f"{period}-{year}", "year": int(year), "reusable": bool(ok), "reason": reason,
+        return {"id": pid, "year": int(year), "reusable": bool(ok), "reason": reason,
                 "expected_replay_closure_sha256": expected["replay_closure_sha256"],
                 "recorded_replay_closure_sha256": ((m.get("replay_closure") or {}).get("replay_closure_sha256") if m else None),
                 "manifest_plan_sha256": (m.get("plan_sha256") if m else None), "manifest_seal": (m.get("composite_seal_hash") if m else None),
                 "candidates_sha256": (m.get("candidates_sha256") if m else None), "observations_sha256": (m.get("observations_sha256") if m else None)}
+
+    def _closure_attestation(self) -> Optional[Dict[str, Any]]:
+        """The study's committed partition re-attestation receipt, if any (never machine-local state)."""
+        from research_workflow.replay_closure import ATTESTATION_FILE
+        return _read(self.artifacts / ATTESTATION_FILE) or None
 
     def partition_reuse_preview(self, period: str = "train") -> Dict[str, Any]:
         """What `collection` WOULD reuse under the current plan and seal (read-only; audit surface)."""
@@ -1048,13 +1055,50 @@ class V2Lifecycle:
         from research.analysis.modeling import _build_estimator, frame_content_identity
         from research_workflow.forward_outcomes.guard import assert_causal_feature_surface
         from research_workflow.model_store import GOLDEN_MIN_ROWS, ModelLineage, store_model
-        frame, label = self._train_frame(plan)
+        if model.get("target"):
+            # A declared target is derived from OUTCOME columns, so the fit frame must carry every observation
+            # column (the default fit frame carries only the label and the disposition).
+            frame = self._train_frame_all_labels(plan)
+            label = plan["outcome"].get("label_column") or "target_flip_within_horizon"
+        else:
+            frame, label = self._train_frame(plan)
+        # MODEL TARGET. When the plan declares `model.target`, the label is DERIVED here, after collection,
+        # from columns the frame already carries -- the persisted partition is never touched. Outcome columns
+        # are legitimate target inputs (a label resolves after its entry); the feature surface is guarded
+        # separately below and still refuses them.
+        target_record = None
+        if model.get("target"):
+            from research.analysis.expressions import Evaluator, ExpressionError, parse
+            spec_t = model["target"]
+            try:
+                ev = Evaluator(frame)
+                value = ev.eval(parse(str(spec_t["expr"])))
+            except ExpressionError as exc:
+                raise LifecycleV2Error(f"MODEL_TARGET_UNRESOLVED: {spec_t['id']}: {exc}") from exc
+            if value.kind not in ("bool", "null"):
+                raise LifecycleV2Error(
+                    f"MODEL_TARGET_NOT_BINARY: {spec_t['id']} evaluates to {value.kind}; a model target must be a "
+                    "boolean expression resolving to {0, 1, null}")
+            import pandas as _pd
+            series = ev.materialize(value)
+            label = f"__target_{spec_t['id']}"
+            frame[label] = _pd.array([None if _pd.isna(v) else int(bool(v)) for v in series], dtype="Int64")
+            target_record = {**{k: spec_t[k] for k in ("id", "expr", "expression_sha256")},
+                             "eligible_n": int(frame[label].notna().sum()), "positive_n": int((frame[label] == 1).sum()),
+                             "negative_n": int((frame[label] == 0).sum()), "null_n": int(frame[label].isna().sum())}
+            if target_record["positive_n"] == 0 or target_record["negative_n"] == 0:
+                raise LifecycleV2Error(
+                    f"MODEL_TARGET_SINGLE_CLASS: {spec_t['id']} resolves to one class only "
+                    f"({target_record['positive_n']} positive / {target_record['negative_n']} negative / "
+                    f"{target_record['null_n']} null of {len(frame)} rows); a fit on it would be vacuous")
         # The MODEL INPUT SURFACE. `model.feature_columns`, when the plan declares it, is the explicit
         # surface the compiler validated column by column (identity, observation/outcome and guard-refused
         # names are already rejected there); otherwise it is the declared feature surface, unchanged.
         features = [str(c) for c in (model.get("feature_columns") or [])] or (
             list(plan["columns"]["features"]) + list(plan["columns"].get("derived") or []))
         assert_causal_feature_surface(features, context="v2 fit feature surface")
+        if model.get("target") and label in features:
+            raise LifecycleV2Error(f"MODEL_TARGET_IN_FEATURE_SURFACE: {label} is the derived target")
         unbound = [c for c in features if c not in frame.columns]
         if unbound:
             raise LifecycleV2Error(f"MODEL_FEATURE_COLUMNS_UNBOUND: the collected frame has no column(s) {unbound}")
@@ -1211,6 +1255,19 @@ class V2Lifecycle:
                                 "final_fit_unique_regimes": int(final_rows["regime_start_ns"].nunique()) if "regime_start_ns" in final_rows.columns else None,
                                 "model_store_tier": manifest.get("tier"), "metrics": cell_metrics})
 
+        # B: a fit that trained nothing is a FAILURE, not a PASS. Before this, an empty `trained` wrote a
+        # receipt with zero models and the controller reported PASS -- a vacuous fit that looks like a result.
+        if not trained:
+            raise LifecycleV2Error(
+                "MODEL_FIT_PRODUCED_NO_MODELS: every requested arm x cell was skipped (no eligible rows, or a "
+                f"single target class) for label {label!r} over {len(binary)} binary rows of {len(frame)}; "
+                "nothing was fitted, so there is nothing to freeze or score")
+        expected = len(arms) * len(cells)
+        if len(trained) != expected:
+            missing = sorted({(a["id"], c["id"]) for a in arms for c in cells}
+                             - {(t["arm"], t["cell"]) for t in trained})
+            raise LifecycleV2Error(f"MODEL_FIT_INCOMPLETE: {len(trained)} of {expected} requested arm x cell "
+                                   f"models were fitted; missing {missing}")
         paired = self._paired_arm_deltas(trained)
         references = self._score_models(self._train_frame_all_labels(plan), model.get("reference_models") or []) if model.get("reference_models") else []
         for r in references:
@@ -1218,6 +1275,7 @@ class V2Lifecycle:
         single = trained[0] if len(trained) == 1 else None
         body = {"schema_version": 3, "plan_sha256": plan["plan_sha256"], "family": family, "label_column": label,
                 "rows": {"total": int(len(frame)), "binary": int(len(binary))},
+                "target": target_record,
                 "tuning_years": sorted(tuning), "final_train_validation_years": final_years,
                 "fold_protocol": ("walk_forward_months" if month_folds else "expanding_years"),
                 "month_folds": month_folds, "models": trained, "paired_deltas_vs_baseline_arm": paired,

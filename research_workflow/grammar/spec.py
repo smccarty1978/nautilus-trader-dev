@@ -349,6 +349,12 @@ class ModelSpec(_Strict):
     # any observation/outcome column of this study's own outcome contract, and anything the forward-outcome
     # guard rejects. There is no blanket "metadata is safe" rule. Declaration order IS the feature order.
     feature_columns: List[str] = Field(default_factory=list)
+    # THE MODEL TARGET, derived at modeling time from columns the collected frame ALREADY carries.
+    # `{id, expr}` in the bounded expression grammar of research/analysis/expressions.py (parsed, never
+    # eval-ed). Forward-outcome columns ARE allowed here -- a label resolves after the entry by definition --
+    # and remain forbidden as model FEATURES. The expression derives a label; it never alters a persisted
+    # partition, and it is hashed into the modeling contract. Absent: the fit keeps using outcome.label_column.
+    target: Optional[Dict[str, Any]] = None
 
     @model_validator(mode="after")
     def _mode(self) -> "ModelSpec":
@@ -360,6 +366,12 @@ class ModelSpec(_Strict):
             raise ValueError("model.arms/cells/reference_models are train-mode declarations; mode: score trains nothing")
         if self.mode == "score" and self.feature_columns:
             raise ValueError("model.feature_columns is a train-mode declaration; mode: score uses each frozen model's own ordered_inputs")
+        if self.target is not None:
+            if self.mode != "train":
+                raise ValueError("model.target is a train-mode declaration; mode: score uses each frozen model's own label")
+            unknown = set(self.target) - {"id", "expr"}
+            if unknown or not self.target.get("id") or not self.target.get("expr"):
+                raise ValueError("model.target is {id, expr}")
         dupes = sorted({c for c in self.feature_columns if self.feature_columns.count(c) > 1})
         if dupes:
             raise ValueError(f"model.feature_columns has duplicates {dupes}; declaration order is the feature order")
