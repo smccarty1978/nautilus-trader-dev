@@ -1,0 +1,55 @@
+{
+  "PASS": true,
+  "econ_parity": {
+    "exactly_one_flip_per_trade_at_terminal": {
+      "mismatch": 0,
+      "trades": 6024
+    },
+    "exit_price": {
+      "compared": 6024,
+      "mismatch": 0
+    },
+    "flip_close_vs_1m": {
+      "compared": 6024,
+      "mismatch": 0
+    },
+    "pnl": {
+      "compared": 6024,
+      "mismatch": 0
+    },
+    "threshold_vs_engine": {
+      "compared": 80353,
+      "mismatch": 0
+    }
+  },
+  "events": 32797,
+  "events_by_anchor": {
+    "0.0": 6024,
+    "0.25": 5162,
+    "0.5": 4519,
+    "0.75": 3977,
+    "1.0": 3528,
+    "1.25": 3136,
+    "1.5": 2791,
+    "2.0": 2220,
+    "3.0": 1440
+  },
+  "final_20pct_loaded": false,
+  "kind": "residual_capture_build_audit",
+  "original_null_reproduced_bit_for_bit": {
+    "cur": 0,
+    "fixed_outcome": 0,
+    "mfe_through": 0,
+    "null_fixed_resolved": 0,
+    "null_p_fixed": 0,
+    "null_p_giveback_given_reach2": 0,
+    "null_p_term_reach2": 0,
+    "null_p_term_win": 0,
+    "null_sim_unflipped": 0,
+    "rows_compared": 25333,
+    "rows_missing_in_new": 0,
+    "trig_rel_entry": 0
+  },
+  "sim_flipped_share_mean": 0.9990290651583986,
+  "timeline_rows": 80353
+}

@@ -63,12 +63,13 @@ def replay_engine():
     rows = []
     for b in bars:
         u = tr.observe(b.high.as_double(), b.low.as_double(), b.close.as_double())
-        rows.append((b.ts_init, u.regime, u.flipped, u.ema_short_low, u.ema_long_low, u.ema_short_high, u.ema_long_high))
-    return pd.DataFrame(rows, columns=["ts", "regime", "flipped", "e3l", "e9l", "e3h", "e9h"])
+        rows.append((b.ts_init, u.regime, u.flipped, u.ema_short_low, u.ema_long_low, u.ema_short_high, u.ema_long_high,
+                     b.high.as_double(), b.low.as_double(), b.close.as_double()))
+    return pd.DataFrame(rows, columns=["ts", "regime", "flipped", "e3l", "e9l", "e3h", "e9h", "bh", "bl", "bc"])
 
 
 # ----------------------------------------------------------------------------- simulation (vectorised over K paths)
-def simulate(pool, rng, start_close, ep, d, atr, t0, close_ns, minute_end0, part, eng, lev2, levm1):
+def simulate(pool, rng, start_close, ep, d, atr, t0, close_ns, minute_end0, part, eng, lev2, levm1, mfe0=None):
     """pool: (n,4) rel O/H/L/C vs previous close. part: partial current minute (o,h,l,c or None).
     eng: (e3l,e9l,e3h,e9h). Returns per-path fixed outcome (1/0/nan) and terminal (reach2 before flip, giveback)."""
     K = K_SIM
@@ -91,6 +92,11 @@ def simulate(pool, rng, start_close, ep, d, atr, t0, close_ns, minute_end0, part
         mo = mh = ml = None
     else:
         mo, mh, ml = np.full(K, part[0]), np.full(K, part[1]), np.full(K, part[2])
+    econ = mfe0 is not None                                    # residual-capture extension: consumes NO extra random draws
+    if econ:
+        mfe = np.full(K, float(mfe0))
+        flip_close = np.full(K, np.nan)
+        flip_t = np.full(K, np.nan)
     t = t0
     for s in range(S):
         t += NS
@@ -115,6 +121,9 @@ def simulate(pool, rng, start_close, ep, d, atr, t0, close_ns, minute_end0, part
             mh, ml = np.maximum(mh, H), np.minimum(ml, L)
         minute_close = (t >= minute_end0) and ((t - minute_end0) % (60 * NS) == 0)
         live = ~flipped
+        if econ:                                               # MFE runs through the flip bar inclusive
+            fav_now = (H - ep) / atr if d > 0 else (ep - L) / atr
+            mfe = np.where(live, np.maximum(mfe, fav_now), mfe)
         if minute_close:
             e3h = np.where(live, A3 * mh + (1 - A3) * e3h, e3h)
             e9h = np.where(live, A9 * mh + (1 - A9) * e9h, e9h)
@@ -124,6 +133,9 @@ def simulate(pool, rng, start_close, ep, d, atr, t0, close_ns, minute_end0, part
             reach2 |= live & hit2 & ~flip_now                  # a touch at the flip close itself is not "before" the flip
             flipped |= flip_now
             need_exit |= flip_now
+            if econ:
+                flip_close[flip_now] = C[flip_now]
+                flip_t[flip_now] = (t - t0) / NS
             mo = mh = ml = None
         else:
             reach2 |= live & hit2
@@ -134,15 +146,35 @@ def simulate(pool, rng, start_close, ep, d, atr, t0, close_ns, minute_end0, part
     no_flip = ~flipped
     exit_px[no_flip] = c[no_flip]                              # truncated at the sim horizon / session close
     win = ((exit_px - ep) * d > 0)
-    return {"p_fixed": float(np.nanmean(fixed)) if (~np.isnan(fixed)).any() else np.nan,
-            "fixed_resolved": int((~np.isnan(fixed)).sum()),
-            "p_term_reach2": float(reach2.mean()),
-            "p_giveback_given_reach2": float((reach2 & ~win).sum() / reach2.sum()) if reach2.any() else np.nan,
-            "p_term_win": float(win.mean()), "sim_unflipped": int(no_flip.sum())}
+    out = {"p_fixed": float(np.nanmean(fixed)) if (~np.isnan(fixed)).any() else np.nan,
+           "fixed_resolved": int((~np.isnan(fixed)).sum()),
+           "p_term_reach2": float(reach2.mean()),
+           "p_giveback_given_reach2": float((reach2 & ~win).sum() / reach2.sum()) if reach2.any() else np.nan,
+           "p_term_win": float(win.mean()), "sim_unflipped": int(no_flip.sum())}
+    if econ:
+        ok = flipped & ~np.isnan(exit_px) & ~need_exit          # paths that flipped AND filled at the next open
+        pnl = (exit_px - ep) * d / atr
+        gb = mfe - pnl
+        dec = (flip_close - ep) * d / atr
+        with np.errstate(invalid="ignore", divide="ignore"):
+            frac = np.where(mfe > 0, gb / mfe, np.nan)
+        m = ok
+        out.update({"econ_n_flipped": int(m.sum()),
+                    "econ_final_pnl": float(pnl[m].mean()) if m.any() else np.nan,
+                    "econ_final_mfe": float(mfe[m].mean()) if m.any() else np.nan,
+                    "econ_add_mfe": float((mfe[m] - mfe0).mean()) if m.any() else np.nan,
+                    "econ_giveback": float(gb[m].mean()) if m.any() else np.nan,
+                    "econ_frac_surrendered": float(np.nanmean(frac[m])) if m.any() and np.isfinite(frac[m]).any() else np.nan,
+                    "econ_p_exit_below_entry": float((pnl[m] <= 0).mean()) if m.any() else np.nan,
+                    "econ_p_giveback_ge_1A": float((gb[m] >= 1.0).mean()) if m.any() else np.nan,
+                    "econ_boundary_component": float((mfe[m] - dec[m]).mean()) if m.any() else np.nan,
+                    "econ_fill_gap": float((pnl[m] - dec[m]).mean()) if m.any() else np.nan,
+                    "econ_term_s": float(flip_t[m].mean()) if m.any() else np.nan})
+    return out
 
 
 # ----------------------------------------------------------------------------- per-session build
-def build_session(sess, part_df, eng_sess, seed):
+def build_session(sess, part_df, eng_sess, seed, econ=False):
     from utils.runner.data import CausalDataLoader
     loader = CausalDataLoader(CATALOG)
     start = pd.Timestamp(int(part_df["t0_ns"].min()), tz="UTC") - pd.Timedelta(seconds=POOL_S + 60)
@@ -158,7 +190,10 @@ def build_session(sess, part_df, eng_sess, seed):
     rel = np.column_stack([op - prev_c, hi - prev_c, lo - prev_c, cl - prev_c])
     ets_eng = eng_sess["ts"].to_numpy()
     rng = np.random.default_rng(seed)
+    rng2 = np.random.default_rng(seed + 1_000_000)             # econ-only stream: never touches the original draws
     out, par = [], {lbl(x): [0, 0] for x in ARM}
+    timeline, epar = [], {"exit_price": [0, 0], "pnl": [0, 0], "flip_close_vs_1m": [0, 0], "threshold_vs_engine": [0, 0]}
+    ets_idx = {int(v): k for k, v in enumerate(ets_eng)}
     for r in part_df.itertuples():
         T0, T, d, atr, ep = int(r.t0_ns), int(r.terminal_ts), int(r.dir), float(r.atr), float(r.entry_price)
         close_ns = int(r.session_close_ts)
@@ -174,7 +209,48 @@ def build_session(sess, part_df, eng_sess, seed):
         hit2 = (sh >= lev2) if d > 0 else (sl <= lev2)
         hitm1 = (sl <= levm1) if d > 0 else (sh >= levm1)
         curA = (sc - ep) * d / atr
-        for x in sorted(set(ANCHORS) | set(GIVEBACK_ANCHORS)):
+        if econ:
+            kT = int(np.searchsorted(sti, T, side="right")) - 1           # the flip bar's last 1s bar
+            final_mfe = float(fav[: kT + 1].max())
+            dec_loc = float(curA[kT])
+            exit_px = float(op[i0 + kT + 1])
+            epar["exit_price"][0] += 1
+            epar["exit_price"][1] += int(exit_px != float(r.terminal_exit_price))
+            epar["pnl"][0] += 1
+            epar["pnl"][1] += int(abs((exit_px - ep) * d / atr - float(r.terminal_gross_atr)) > 1e-9)
+            eT = eng_sess.iloc[ets_idx[T]]
+            epar["flip_close_vs_1m"][0] += 1
+            epar["flip_close_vs_1m"][1] += int(float(sc[kT]) != float(eT.bc))
+            # trigger timeline over completed minutes inside the trade (pre-bar bound vs realized threshold)
+            k_first = int(np.searchsorted(ets_eng, int(sti[0]), side="left"))
+            for km in range(max(k_first, 2), ets_idx[T] + 1):
+                prv, cur_r, pp = eng_sess.iloc[km - 1], eng_sess.iloc[km], eng_sess.iloc[km - 2]
+                if d > 0:
+                    pre = min(prv.e3l, prv.e9l)
+                    thr = min(A3 * cur_r.bl + (1 - A3) * prv.e3l, A9 * cur_r.bl + (1 - A9) * prv.e9l)
+                    by_thr = bool(cur_r.bc < thr)
+                    pre_prev = min(pp.e3l, pp.e9l)
+                else:
+                    pre = max(prv.e3h, prv.e9h)
+                    thr = max(A3 * cur_r.bh + (1 - A3) * prv.e3h, A9 * cur_r.bh + (1 - A9) * prv.e9h)
+                    by_thr = bool(cur_r.bc > thr)
+                    pre_prev = max(pp.e3h, pp.e9h)
+                eng_flip = bool(cur_r.flipped) and int(cur_r.regime) == -d
+                epar["threshold_vs_engine"][0] += 1
+                epar["threshold_vs_engine"][1] += int(by_thr != eng_flip)
+                kk = int(np.searchsorted(sti, int(cur_r.ts), side="right"))
+                mfe_m = float(fav[:kk].max()) if kk else 0.0
+                pre_rel = (pre - ep) * d / atr
+                timeline.append({"regime_start_ns": r.regime_start_ns, "ts": int(cur_r.ts), "dir": d, "atr": atr,
+                                 "close_A": (cur_r.bc - ep) * d / atr, "mfe_A": mfe_m,
+                                 "ema3_boundary_A": ((prv.e3l if d > 0 else prv.e3h) - ep) * d / atr,
+                                 "ema9_boundary_A": ((prv.e9l if d > 0 else prv.e9h) - ep) * d / atr,
+                                 "pre_bar_bound_A": pre_rel, "realized_threshold_A": (thr - ep) * d / atr,
+                                 "price_to_trigger_A": (cur_r.bc - pre) * d / atr, "mfe_to_trigger_A": mfe_m - pre_rel,
+                                 "trigger_move_1bar_A": pre_rel - (pre_prev - ep) * d / atr,
+                                 "gross_pnl_A": (cur_r.bc - ep) * d / atr, "flip_by_threshold": by_thr, "engine_flip": eng_flip})
+        anchor_list = sorted(set(ANCHORS) | set(GIVEBACK_ANCHORS)) + ([0.0, 3.0] if econ else [])
+        for x in anchor_list:
             lev = ep + d * x * atr
             touch = (sh >= lev) if d > 0 else (sl <= lev)
             idx = np.flatnonzero(touch[:first_gap])
@@ -187,6 +263,8 @@ def build_session(sess, part_df, eng_sess, seed):
                     par[lbl(x)][1] += int(t_hit is None or (t_hit - int(te[i0])) / NS != getattr(r, f"{arm}_resolution_seconds"))
                 else:
                     par[lbl(x)][1] += int(t_hit is not None)
+            if x == 0.0:                                        # econ-only T0 anchor: the entry bar itself
+                t_hit, idx = int(sti[0]), np.array([0])
             if t_hit is None or t_hit >= T:
                 continue
             j = int(idx[0])
@@ -255,15 +333,46 @@ def build_session(sess, part_df, eng_sess, seed):
             ib = int(np.searchsorted(ti, int(ets_eng[m]), side="right"))
             ie = i0 + j + 1
             part = (op[ib], hi[ib:ie].max(), lo[ib:ie].min()) if ie > ib else None
-            sim = None if decided else simulate(pool, rng, float(sc[j]), ep, d, atr, t_hit, close_ns, minute_end0, part,
-                                                (e.e3l, e.e9l, e.e3h, e.e9h), lev2, levm1)
+            original = x in ANCHORS or x in GIVEBACK_ANCHORS
+            mfe0 = ev["mfe_through"] if econ else None
+            sim = None if (decided or not original) else simulate(pool, rng, float(sc[j]), ep, d, atr, t_hit, close_ns, minute_end0, part,
+                                                                  (e.e3l, e.e9l, e.e3h, e.e9h), lev2, levm1, mfe0)
             if decided:
                 sim = {"p_fixed": 1.0 if not hitm1[j] else np.nan, "fixed_resolved": K_SIM, "p_term_reach2": 1.0,
                        "p_giveback_given_reach2": np.nan, "p_term_win": np.nan, "sim_unflipped": 0}
+            if econ and (decided or not original):
+                s2 = simulate(pool, rng2, float(sc[j]), ep, d, atr, t_hit, close_ns, minute_end0, part,
+                              (e.e3l, e.e9l, e.e3h, e.e9h), lev2, levm1, mfe0)
+                if s2 is not None:
+                    keep = {k: v for k, v in s2.items() if k.startswith("econ_")}
+                    if not original:
+                        keep.update({k: v for k, v in s2.items() if not k.startswith("econ_")})
+                    sim = {**({} if sim is None else sim), **keep}
+            if econ:
+                ev["real_final_pnl"] = float(r.terminal_gross_atr)
+                ev["real_final_mfe"] = final_mfe
+                ev["real_add_mfe"] = final_mfe - ev["mfe_through"]
+                ev["real_giveback"] = final_mfe - ev["real_final_pnl"]
+                ev["real_frac_surrendered"] = ev["real_giveback"] / final_mfe if final_mfe > 0 else np.nan
+                ev["real_exit_below_entry"] = int(ev["real_final_pnl"] <= 0)
+                ev["real_giveback_ge_1A"] = int(ev["real_giveback"] >= 1.0)
+                ev["real_boundary_component"] = final_mfe - dec_loc
+                ev["real_fill_gap"] = ev["real_final_pnl"] - dec_loc
+                ev["real_term_s"] = (T - t_hit) / NS
+                ev["mfe_to_trig"] = ev["mfe_through"] - ev["trig_rel_entry"]
+                for back in (1, 2):
+                    if m - back >= 0:
+                        eb = eng_sess.iloc[m - back]
+                        tb = min(eb.e3l, eb.e9l) if d > 0 else max(eb.e3h, eb.e9h)
+                        ev[f"catchup{back}"] = ev["trig_rel_entry"] - (tb - ep) * d / atr
+                    else:
+                        ev[f"catchup{back}"] = np.nan
             for k2, v2 in (sim or {}).items():
                 ev[f"null_{k2}"] = v2
             ev["null_decided_by_touch_bar"] = int(decided)
             out.append(ev)
+    if econ:
+        return out, par, timeline, epar
     return out, par
 
 
