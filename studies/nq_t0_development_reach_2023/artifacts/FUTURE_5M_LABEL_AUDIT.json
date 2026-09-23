@@ -1,0 +1,28 @@
+{
+  "definition": "1 iff a 5m regime whose dir == the trade's 1m direction STARTED strictly after the T0 observation and strictly before the terminal opposite 1m flip",
+  "exact_n": 7248,
+  "flips_in_window": {
+    "0.0": 5934,
+    "1.0": 1314
+  },
+  "impl1_vs_impl2_mismatch_on_exact": 0,
+  "kind": "future_5m_alignment_label_audit",
+  "obs_lag_s_after_terminal": {
+    "25%": 0.0,
+    "50%": 15.0,
+    "75%": 15.0,
+    "count": 7248.0,
+    "max": 270.0,
+    "mean": 11.163079470198676,
+    "min": 0.0,
+    "std": 8.610079421870688
+  },
+  "prevalence_exact": 0.18101545253863136,
+  "regime_map_conflicts": 0,
+  "role": "FUTURE LABEL -- never a feature; no model is trained on it in this study",
+  "status_counts": {
+    "CHAIN_BROKEN": 4,
+    "EXACT": 7248,
+    "NO_OBSERVATION_AFTER_TERMINAL_IN_SESSION": 223
+  }
+}

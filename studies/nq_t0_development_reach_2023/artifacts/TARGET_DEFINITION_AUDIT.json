@@ -1,0 +1,115 @@
+{
+  "PASS": true,
+  "diagnostics": {
+    "adv0p5": {
+      "expression": "where(fp_adv_0p50_disposition == 'NEGATIVE' and (bound_ts - executable_entry_ts) / 1000000000 > fp_adv_0p50_resolution_seconds, 1, 0)",
+      "prevalence": 0.8005351170568562
+    },
+    "adv1": {
+      "expression": "where(fp_adv_1p00_disposition == 'NEGATIVE' and (bound_ts - executable_entry_ts) / 1000000000 > fp_adv_1p00_resolution_seconds, 1, 0)",
+      "prevalence": 0.5665551839464883
+    }
+  },
+  "historical_baseline_check": {
+    "atlas_2023_all_T0_fav2": 0.369,
+    "this_frame_all_T0_fav2": 0.3689411136333289
+  },
+  "independent_recomputations": {
+    "path1_platform_expression_grammar_vs_path2_pandas": {
+      "adv0p5": 0,
+      "adv1": 0,
+      "bound_ts_mismatch": 0,
+      "fav2": 0,
+      "fav3": 0,
+      "rows": 7489
+    },
+    "path3_atlas_study_frame_parity": {
+      "adv0p5": 0,
+      "adv1": 0,
+      "atlas_frame_sha256": "40a528489bbea6bd724f441cd7bbdc71f4d13bbf4c9bd64dbdda612cde80d507",
+      "bound_expr_identical": true,
+      "column_atr_entry_1m": 0,
+      "column_dir_1m": 0,
+      "column_executable_entry_price": 0,
+      "column_observation_ts": 0,
+      "expr_text_identical": {
+        "adv0p5": true,
+        "adv1": true,
+        "fav2": true,
+        "fav3": true
+      },
+      "fav2": 0,
+      "fav3": 0,
+      "join_both": 7489,
+      "join_left_only": 0,
+      "join_right_only": 0
+    },
+    "path4_raw_1s_catalog_recompute_with_atr_entry_1m": {
+      "adv0p5": 0,
+      "adv0p5_resolution_seconds": 0,
+      "adv1": 0,
+      "adv1_resolution_seconds": 0,
+      "bar_type": "NQ.XCME-1-SECOND-LAST-EXTERNAL",
+      "catalog": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\catalog\\NQ_1S_V2_GLOBEX",
+      "entry_price": 0,
+      "entry_ts": 0,
+      "fav2": 0,
+      "fav2_resolution_seconds": 0,
+      "fav3": 0,
+      "fav3_resolution_seconds": 0,
+      "rows": 7475
+    }
+  },
+  "kind": "target_definition_audit",
+  "mismatch_count_total": 0,
+  "primary": {
+    "atr_denominator": "atr_entry_1m (= excursion_1m.frozen_atr at T0, the outcome ATR) -- proven by the raw 1s path recompute",
+    "bound_ts": "where(terminal_flip_disposition == 'LABELED_POSITIVE', terminal_flip_ts, where(terminal_flip_censor_reason == 'SESSION_END', session_close_ts, null))",
+    "censored_barrier_rows_counted_zero": 1739,
+    "denominator": 7475,
+    "expression": "where(fp_fav_2p00_disposition == 'POSITIVE' and (bound_ts - executable_entry_ts) / 1000000000 > fp_fav_2p00_resolution_seconds, 1, 0)",
+    "id": "reach_fav_2p00_before_terminal",
+    "nulls": 0,
+    "numerator": 2752,
+    "prevalence": 0.3681605351170569,
+    "prevalence_all_7489_T0": 0.3689411136333289,
+    "source_columns": [
+      "fp_fav_2p00_disposition",
+      "fp_fav_2p00_resolution_seconds",
+      "executable_entry_ts",
+      "terminal_flip_disposition",
+      "terminal_flip_ts",
+      "terminal_flip_censor_reason",
+      "session_close_ts"
+    ]
+  },
+  "reuse": {
+    "N": 7475,
+    "digest_match": true,
+    "duplicate_keys": 0,
+    "nulls_A": 14,
+    "population_row_digest": "ad0b933e5e455dc18505340b39869c2345c56f8c2847f7d7e501486cbbd225df",
+    "positives_A": 2475,
+    "prior_population_row_digest": "ad0b933e5e455dc18505340b39869c2345c56f8c2847f7d7e501486cbbd225df",
+    "prior_reuse_proof_sha256": "3e0d6e2b2578ddd242b042ada558e5fbf2c3bbf201ab8442c57abb10b4cbac50",
+    "sessions": 257,
+    "source_sha256": {
+      "merged/candidates.parquet": "475209b46caf48b674d66833f56005c8fc6c6436f34c8aa50626da7d07300842",
+      "merged/observations.parquet": "98e03dc4a2cf01b44d05c45d84b81af5768848142216945cfd133e13d66303b6"
+    },
+    "t0_feature_parity": "frozen FULL model score digest 8fa2031cd01d9a7a reproduced on this exact frame in the constrained study (PHASE0_REUSE_PROOF.json)",
+    "unique_trade_keys": 7475
+  },
+  "secondary_diagnostic": {
+    "denominator": 7475,
+    "expression": "where(fp_fav_3p00_disposition == 'POSITIVE' and (bound_ts - executable_entry_ts) / 1000000000 > fp_fav_3p00_resolution_seconds, 1, 0)",
+    "id": "reach_fav_3p00_before_terminal",
+    "numerator": 1792,
+    "prevalence": 0.2397324414715719
+  },
+  "wrong_definition_recorded": {
+    "raw_fp_fav_2p00_label_rate_all_T0": 0.767392175190279,
+    "why_wrong": "fp_fav_2p00_label ignores the terminal flip: it reports any +2A touch within 24h / the session, after the trade has already exited"
+  },
+  "year": 2023
+}
