@@ -1,0 +1,61 @@
+{
+  "answers": {
+    "q1_first_observable": "+30 s (cur AUC 0.603 [0.589,0.617] in EARLY); >=4 variables meaningful at +60 s (cur 0.632)",
+    "q2_excursion_by_then": "+30 s: runners median MFE 0.35A (34% >= +0.5A, 9% >= +1A); +60 s: 0.57A (55% / 22%)",
+    "q3_5m_leads_or_follows": "FOLLOWS: 5m into-alignment before +0.5A in 2.8% of turns, after +1A in 91%, after +2A in 64%; MTF alignment AUC 0.48-0.52 everywhere",
+    "q4_sustained_vs_giveback_before_plus2": "NO (speed builds 0.53->0.59 but is meaningful only at the +2A touch, AUC 0.632; late-mover MAE at +285 s AUC 0.388)",
+    "q5_information_type": "early price path (location); not T0 structure, not MTF transition",
+    "q6_post_entry_ml_justified": "not yet; only as 'does anything beat location', after a matched driftless-path placebo",
+    "q7_minimal_surface": [
+      "cur",
+      "mfe",
+      "mae",
+      "alive (implicit)",
+      "checkpoint +60 s"
+    ]
+  },
+  "development_sessions_only": true,
+  "evidence": {
+    "ANALYSIS_PLAN.json": "89a03b7926bf367d8352a1f0135d4b979ddcdfcef99003b94a18611845ccea2b",
+    "ANALYSIS_RESULTS.json": "4e9898d900b0cd373e71186c209a5ae9635e4c16517df158bb8fa59ed10f99d2",
+    "TRADE_PATH_TIMELINE_AUDIT.json": "623df5be006f5d90310fe5ebfcb8610006a0d624b425b3b9a4cee7a9c8814b2b"
+  },
+  "final_20pct_loaded": false,
+  "kind": "path_mechanism_verdict",
+  "models_trained": 0,
+  "qualification": "The early information is price location only (current P&L / MFE / MAE from the original entry); conditional on the level touched, no other observable (timing, MAE, MTF alignment) separates continuation (AUC 0.46-0.51). Consistent with distance-to-barrier; a matched driftless placebo is the required next test before any post-entry ML.",
+  "rule_evidence": {
+    "A_T0": false,
+    "B_early_hits": [
+      {
+        "elapsed_s": 30,
+        "plus2_already_1p0_pct": 9.27927927927928,
+        "variables": [
+          "cur"
+        ]
+      },
+      {
+        "elapsed_s": 60,
+        "plus2_already_1p0_pct": 22.387387387387385,
+        "variables": [
+          "mfe",
+          "cur",
+          "fav_share",
+          "mfe_rate"
+        ]
+      }
+    ]
+  },
+  "schema_version": 1,
+  "study_id": "nq_post_entry_path_mechanism_2023",
+  "verdict": "EARLY_POST_ENTRY_INFORMATION",
+  "verdict_source": "frozen decision rule in artifacts/ANALYSIS_PLAN.json (commit 91c3d2e3)",
+  "years_not_touched": [
+    2024,
+    2025,
+    2026
+  ],
+  "years_used": [
+    2023
+  ]
+}
