@@ -1,0 +1,34 @@
+{
+  "contract_sha256": "92e4295f9d9f51f022116a137fe6c8cab7bcd050f7cd803abf9362dada4fac35",
+  "final_holdout_opened": false,
+  "gate_passed": false,
+  "gates": {
+    "L1_stumps": {
+      "G1_canary": true,
+      "G2_validation_auc": false,
+      "G3_controls": false,
+      "G4_monotonic": false,
+      "G5_support": true,
+      "G6_not_variance": false
+    },
+    "L2_depth2": {
+      "G1_canary": true,
+      "G2_validation_auc": false,
+      "G3_controls": false,
+      "G4_monotonic": false,
+      "G5_support": true,
+      "G6_not_variance": false
+    },
+    "L3_depth3": {
+      "G1_canary": true,
+      "G2_validation_auc": false,
+      "G3_controls": false,
+      "G4_monotonic": false,
+      "G5_support": true,
+      "G6_not_variance": false
+    }
+  },
+  "kind": "development_gate",
+  "selected": null,
+  "verdict_if_stop": "NO_T0_DEVELOPMENT_SIGNAL"
+}

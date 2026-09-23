@@ -1,0 +1,124 @@
+{
+  "answer": "No. At T0 the stationary structural/MTF surface does not rank +2A-before-terminal development: validation AUC 0.505-0.513, all blocked CIs contain 0.50, no gain over direction_only (0.512) or mtf_state_only (0.502).",
+  "bucket_reconciliation": {
+    "buckets": 15,
+    "score_ordered": false
+  },
+  "configs": {
+    "L1_stumps": {
+      "delta_vs_direction_only": 0.0006841817186645782,
+      "delta_vs_mtf_state_only": 0.010645484783415982,
+      "gates": {
+        "G1_canary": true,
+        "G2_validation_auc": false,
+        "G3_controls": false,
+        "G4_monotonic": false,
+        "G5_support": true,
+        "G6_not_variance": false
+      },
+      "real_train_auc": 0.5806299489831674,
+      "shuffled_train_auc": 0.5771123390065797,
+      "validation_auc": 0.5128501766432801,
+      "validation_ci": [
+        0.47814979268291913,
+        0.544665841559122
+      ]
+    },
+    "L2_depth2": {
+      "delta_vs_direction_only": -0.006823636133980959,
+      "delta_vs_mtf_state_only": 0.003137666930770444,
+      "gates": {
+        "G1_canary": true,
+        "G2_validation_auc": false,
+        "G3_controls": false,
+        "G4_monotonic": false,
+        "G5_support": true,
+        "G6_not_variance": false
+      },
+      "real_train_auc": 0.6298334745455088,
+      "shuffled_train_auc": 0.6356570604618917,
+      "validation_auc": 0.5053423587906346,
+      "validation_ci": [
+        0.47414547945576185,
+        0.5370976997860176
+      ]
+    },
+    "L3_depth3": {
+      "delta_vs_direction_only": -0.0001751122440777353,
+      "delta_vs_mtf_state_only": 0.009786190820673668,
+      "gates": {
+        "G1_canary": true,
+        "G2_validation_auc": false,
+        "G3_controls": false,
+        "G4_monotonic": false,
+        "G5_support": true,
+        "G6_not_variance": false
+      },
+      "real_train_auc": 0.6766795121486535,
+      "shuffled_train_auc": 0.6761385834887086,
+      "validation_auc": 0.5119908826805378,
+      "validation_ci": [
+        0.4815892714350412,
+        0.5418383883738842
+      ]
+    }
+  },
+  "contract_commit": "fe1f4756",
+  "controls_validation_auc": {
+    "direction_only": 0.5121659949246156,
+    "mtf_state_only": 0.5022046918598642
+  },
+  "deciding_evidence": [
+    "G2 fails for every config (AUC CI lower < 0.50)",
+    "G3 fails (deltas vs both controls ~0, CIs span 0)",
+    "G4 fails (+2A not monotone / Q5 not >= pooled+5pp)",
+    "G6 fails (Q5-Q1 -1A rise > +2A rise)",
+    "real-label train AUC == shuffled-label train AUC (+-0.006)"
+  ],
+  "evidence": {
+    "BUCKET_RECONCILIATION.csv": "98869bceee4f1251cf2ce09444ae1c69dbee14d53fe4d2dba2ae6c2ba456b0c6",
+    "CONTRACT_FREEZE.json": "f9bf470c32761cdacc3e847dc49421dcbbe6a2b1ea85a3fd99341b15d6c60d08",
+    "DEVELOPMENT_CONTRACT.json": "92e4295f9d9f51f022116a137fe6c8cab7bcd050f7cd803abf9362dada4fac35",
+    "DEVELOPMENT_GATE.json": "cb6fb8ac0d5820ad22ab1082d6116e870839ee11797c2783fc4690435b9d66e6",
+    "DEVELOPMENT_MODEL_RESULTS.csv": "80c7b04dbe501f44b0660b6d592b81ffba450158e348fc6c03a427f102d835b3",
+    "FUTURE_5M_BY_STATE.csv": "fd3e5cadfcbfc2c7f929803b1fbed37a7b07866f5b5165cf2bc7197357fc1c7e",
+    "FUTURE_5M_DIAGNOSTIC.json": "f2c3f8daf2e2b12bbf17a1e8efda89a7ad3b657ecb682c929e8c9c1115b3d7b0",
+    "FUTURE_5M_LABEL_AUDIT.json": "ebb8347da6c20c25ad0cb5cb54e3359c6d96aaa2b1e2f28762af8cb807b8c120",
+    "SCORE_BINS_VALIDATION.csv": "97600909a4219a9c0ad9c37d2051674f4bc5f942e0421bebd9ad6edd017c2fb5",
+    "STATIONARITY_AUDIT.csv": "53fa5712b6bd274eb42ab67e84d423185ffe919f082bf282cd03489b89835a16",
+    "TARGET_A_VS_FAV2_CROSSTAB_DEV.csv": "0e48dd42769861986f078b1826d5e3cc0aa4aeec2fb0eeb2f84623232537f7a5",
+    "TARGET_DEFINITION_AUDIT.json": "7df4ed50f9165fd080d6f5159602e822f9be92100e966fdf7e98f2c065fef842",
+    "TARGET_OVERLAP.csv": "b2d940408eef6c0481e1b9b0e553ef1f811e7b831c58d1c17e50e1b8721dec30"
+  },
+  "final_holdout_opened": false,
+  "future_5m_alignment": {
+    "exact": 7248,
+    "impl_mismatch": 0,
+    "model_trained": false,
+    "null": 227,
+    "prevalence_exact": 0.181
+  },
+  "kind": "development_model_verdict",
+  "label_overlap_dev": {
+    "fav2_then_lose": 373,
+    "fav2_vs_targetA_agreement": 0.9124,
+    "n": 6024,
+    "phi": 0.821
+  },
+  "schema_version": 1,
+  "study_id": "nq_t0_development_reach_2023",
+  "target": {
+    "id": "fav2",
+    "mismatch_count_total": 0,
+    "prevalence": 0.3681605351170569
+  },
+  "verdict": "NO_T0_DEVELOPMENT_SIGNAL",
+  "years_not_touched": [
+    2024,
+    2025,
+    2026
+  ],
+  "years_used": [
+    2023
+  ]
+}

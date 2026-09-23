@@ -650,7 +650,7 @@ def stage_develop() -> None:
     write_table("DEVELOPMENT_MODEL_RESULTS", dev)
     write_table("SCORE_BINS_VALIDATION", pd.concat(tables, ignore_index=True))
 
-    cand = dev[dev["capacity_rank"].notna() & dev["all_gates"].fillna(False).astype(bool)]
+    cand = dev[dev["capacity_rank"].notna() & dev["all_gates"].eq(True)]
     selected = None
     if len(cand):
         best = cand["validation_auc"].max()
@@ -666,11 +666,11 @@ def stage_develop() -> None:
     for cfg in contract["capacity_ladder"]["configurations"]:
         m = lgbm(cfg).fit(tr[feats], ytr)
         va_s = va.assign(score=m.predict_proba(va[feats])[:, 1])
-        va_s = va_s.merge(atlas[["regime_start_ns", "mtf_state"] + sorted({b["dimension"] for b in contract["bucket_reconciliation"]["buckets"]})],
-                          on="regime_start_ns", how="left", validate="1:1")
+        dims = sorted({"mtf_state"} | {b["dimension"] for b in contract["bucket_reconciliation"]["buckets"]})
+        va_s = va_s.merge(atlas[["regime_start_ns"] + dims], on="regime_start_ns", how="left", validate="1:1")
         for b in contract["bucket_reconciliation"]["buckets"]:
-            part = va_s[(va_s["mtf_state"] == b["parent.mtf_state"]) & (va_s[b["dimension"]].astype(str) == str(b["child_value"]))]
-            parent = va_s[va_s["mtf_state"] == b["parent.mtf_state"]]
+            parent = va_s if b["parent.mtf_state"] is None else va_s[va_s["mtf_state"] == b["parent.mtf_state"]]
+            part = parent[parent[b["dimension"]].astype(str) == str(b["child_value"])]
             ex = part[part["f5_status"] == "EXACT"]
             rec_rows.append({"config": cfg["id"], "bucket_id": b["bucket_id"], "parent": b["parent.mtf_state"], "dimension": b["dimension"],
                              "child_value": b["child_value"], "atlas_metric": b["metric"], "atlas_2023_estimate": b["estimate"],
