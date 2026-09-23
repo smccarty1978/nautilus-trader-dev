@@ -1,0 +1,15 @@
+# Authoritative decision contract (research_decision.yaml > SPEC.md > study.yaml > compiled_study.json > code)
+study_id: nq_post_entry_path_mechanism_2023
+research_question: "When, after the original T0 entry, does information about a sustained favourable move (+2A before the terminal flip) first become observable -- T0, early path, MTF transition, or late confirmation? Descriptive mechanism discovery; no model; entry never redefined; 2023 development sessions only."
+status: DRAFT
+dataset_id: NQ_1S_V2_GLOBEX
+terminal_decisions: {}
+# Predeclared fork policy (WORKFLOW.md §N.4). Agents follow these instead of asking again; a genuine
+# semantic choice with no policy here is still a SEMANTIC_DECISION_REQUIRED question.
+autonomy_decisions:
+  on_capability_gap: stop_and_handoff                # write CAPABILITY_GAP_HANDOFF, end the session; never build it here
+  platform_change_required: chore_branch_and_fresh_session
+  deterministic_defect: auto_fix                     # fix, add a targeted test, re-run the bounded check
+  calendar_reference_parity: common_interval_exact   # exact on the common calendar interval; Globex-only rows enumerated, descriptive
+  frozen_parent_model: rescore_if_authenticated      # never retrain a frozen parent
+  protected_period: never_expand_authority

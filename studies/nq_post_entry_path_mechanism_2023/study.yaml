@@ -1,0 +1,42 @@
+# Platform-v2 study: a composition of registered primitives (see `research cap list`).
+# Sections: study, streams, population, context, triggers, features, outcome, chronology, model.
+# Compile with `research study compile --study studies/nq_post_entry_path_mechanism_2023`; a typed CapabilityGap names what is missing.
+study:
+  id: nq_post_entry_path_mechanism_2023
+  tier: 2
+  question: "Research question for nq_post_entry_path_mechanism_2023 (edit research_decision.yaml)"
+streams:
+  - {dataset: NQ_1S_V2_GLOBEX, timeframes: [1s, 1m]}
+context:
+  regime_1m:     {tracker: regime.dual_ema, timeframe: 1m}
+  excursion:     {tracker: regime.excursion, bars: 1s, regime: regime_1m}
+  regime_bar_5m: {tracker: regime_bar.calendar_bucket, bucket: 5m, bars: 1m, regime: regime_1m}
+population:
+  session: RTH
+  cadence: {every: 5s, anchor: regime_1m.start_ns, max_age: 1800s}
+  qualify: "excursion.frozen_atr > 0 and regime_1m.age_s >= 120s and excursion.mfe_atr >= 1.0 and features.structural_snapshot_ready"
+  direction: regime_1m.dir
+  anchor_identity: regime_1m.start_ns
+triggers: every_candidate
+features:
+  instances:
+    - {feature: regime_efficiency, over: {timeframe: [1m, 5m]}, context: prior}
+    - {feature: rolling_giveback_atr, window: 300s, update_every: 1s}
+  metadata:
+    regime_age_seconds: regime_1m.age_s
+    triggering_1s_ts_init: epoch.T
+  bindings:
+    completed_5m: {tracker: regime_bar_5m, ready_gate: false}
+    snapshot: {atr: regime_1m.atr, family_a_atr: excursion.frozen_atr, episode_state: {prevailing_direction: regime_1m.dir}}
+outcome:
+  kind: label
+  event: regime_1m.flipped
+  horizon: 300s
+  direction: regime_1m.dir
+  session_end: censor
+chronology:
+  train: [2021, 2022, 2023]
+  dev: [2024]
+  prohibited: [2025, 2026]
+  authorized_dates: []        # smoke day(s), e.g. ['2023-10-02']
+model: none

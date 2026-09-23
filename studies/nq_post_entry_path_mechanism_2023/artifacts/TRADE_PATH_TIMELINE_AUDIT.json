@@ -1,0 +1,105 @@
+{
+  "PASS": true,
+  "atr": "atr_entry_1m (audited outcome ATR)",
+  "chain_status": {
+    "15m": {
+      "CHAIN_BROKEN": 1,
+      "EXACT": 5845,
+      "NO_OBSERVATION_AFTER_TERMINAL_IN_SESSION": 178
+    },
+    "1h": {
+      "EXACT": 5846,
+      "NO_OBSERVATION_AFTER_TERMINAL_IN_SESSION": 178
+    },
+    "5m": {
+      "CHAIN_BROKEN": 4,
+      "EXACT": 5842,
+      "NO_OBSERVATION_AFTER_TERMINAL_IN_SESSION": 178
+    }
+  },
+  "entry_definition": "original T0 executable entry: OPEN of the first 1s bar with ts_init > T0 observation; entry instant = that bar's ts_event; unchanged",
+  "event_semantics": {
+    "before_terminal": "touch time strictly before the terminal opposite 1m flip (atlas convention)",
+    "checkpoint_state": "at c = T0 + e: bars with ts_init <= c, regimes with start <= c; e in [0, 30, 60, 120, 180, 285] s (canonical collector checkpoints k=0,2,4,8,12,19)",
+    "event_anchored_state": "at a first-touch bar: bars through that bar (inclusive), regimes with start <= touch time",
+    "htf_transition": "a regime's start_ns = its detection bar close; known at that instant; first transition = first regime starting strictly inside (T0 observation, terminal flip); INTO if its dir == trade dir",
+    "price_touch": "first 1s bar (entry bar included) whose HIGH/LOW reaches entry +/- k*ATR (kernel arithmetic); time = that bar's close (ts_init); a >300 s bar gap before the touch censors",
+    "ties": "a 5m/15m/1h detection close and a 1s touch bar close at the same second are 'at or before' each other; counted separately"
+  },
+  "final_20pct_loaded": false,
+  "kind": "trade_path_timeline_audit",
+  "mismatch_total": 0,
+  "missing_primitives": [
+    "collector checkpoint rows are gappy (32% of trades miss some k); structural state after T0 is therefore not used -- path state is rebuilt from 1s bars, MTF state from exact regime chains",
+    "checkpoints stop at 285 s after T0 (collector max_age 300 s)"
+  ],
+  "n_trades": 6024,
+  "parity": {
+    "labels_vs_prior_audited_labels": {
+      "adv_0p5": 0,
+      "adv_1p0": 0,
+      "f5_into_vs_prior_label_on_exact": 0,
+      "fav_2p0": 0,
+      "fav_3p0": 0,
+      "win_vs_target_A": 0
+    },
+    "mtf_chain_vs_candidate_rows": {
+      "15m": {
+        "compared": 103257,
+        "mismatch": 0
+      },
+      "1h": {
+        "compared": 103277,
+        "mismatch": 0
+      },
+      "5m": {
+        "compared": 103200,
+        "mismatch": 0
+      }
+    },
+    "price_first_touch_vs_kernel_resolution_seconds": {
+      "adv_0p5": {
+        "compared": 6024,
+        "mismatch": 0
+      },
+      "adv_1p0": {
+        "compared": 6024,
+        "mismatch": 0
+      },
+      "entry_price": {
+        "compared": 6024,
+        "mismatch": 0
+      },
+      "fav_0p5": {
+        "compared": 6024,
+        "mismatch": 0
+      },
+      "fav_1p0": {
+        "compared": 6024,
+        "mismatch": 0
+      },
+      "fav_1p5": {
+        "compared": 6024,
+        "mismatch": 0
+      },
+      "fav_2p0": {
+        "compared": 6024,
+        "mismatch": 0
+      },
+      "fav_3p0": {
+        "compared": 6024,
+        "mismatch": 0
+      }
+    },
+    "regime_link_conflicts": {
+      "15m": 0,
+      "1h": 0,
+      "5m": 0
+    }
+  },
+  "population": "2023 development sessions (first 80%, 205 sessions), audited Target-A-eligible T0 trades",
+  "sessions": 205,
+  "years_touched": [
+    2023
+  ]
+}

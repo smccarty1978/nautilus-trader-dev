@@ -1,0 +1,101 @@
+{
+  "bound_to": {
+    "CHECKPOINT_STATE.csv": "ffd3886971be61e1717168ecb477d937c0578e398d460f34938f8c57eeaa1805",
+    "EVENT_ANCHORED_STATE.csv": "05c50e99123763a3c614d107353cce7799b2df863f81b93ea3259ca6dc7d5396",
+    "TRADE_EVENT_TIMELINE.csv": "2f033f7aac31201f687c5b764007d75f311185d1821375a2be9e7ddc25b739df",
+    "TRADE_PATH_TIMELINE_AUDIT.json": "623df5be006f5d90310fe5ebfcb8610006a0d624b425b3b9a4cee7a9c8814b2b"
+  },
+  "checkpoints_s": [
+    0,
+    30,
+    60,
+    120,
+    180,
+    285
+  ],
+  "contrasts": {
+    "C1": "future +2A (G2+G3) vs G1",
+    "C2": "G2 sustained vs G3 giveback",
+    "C3": "future +3A vs not (descriptive)"
+  },
+  "decision_rule": {
+    "A_T0_INFORMATION": "any variable meaningful for C1 at e=0 (ALIVE)",
+    "B_EARLY_POST_ENTRY_INFORMATION": "at some e <= 120 s, some variable meaningful for C1 in EARLY, AND < 25% of eventual +2A trades alive at e already have MFE >= 1A",
+    "C2_reported_separately": "answers whether givebacks are distinguishable before +2A (meaningful C2 in PRE2 at a checkpoint or at +0.5/+1/+1.5 first touch)",
+    "C_LATE_CONFIRMATION_ONLY": "meaningful C1 separation exists (any checkpoint/subset or event-anchored at +1A/+1.5A) but B's conditions are not met",
+    "D_NO_USEFUL_PATH_SEPARATION": "no meaningful C1 separation anywhere"
+  },
+  "effect_sizes": "AUC as probability of superiority (positive group > negative, ties 1/2) with session-block bootstrap 95% CI (1000 reps, seed 20260925); Cohen's d; per-group median and IQR",
+  "event_anchored": {
+    "events": [
+      "fav_0p5",
+      "fav_1p0",
+      "fav_1p5",
+      "fav_2p0"
+    ],
+    "outcomes": {
+      "fav_0p5/1p0/1p5": [
+        "reach +2A",
+        "reach +3A",
+        "win"
+      ],
+      "fav_2p0": [
+        "win (sustained vs giveback)",
+        "reach +3A"
+      ]
+    }
+  },
+  "frozen_before_any_group_comparison": true,
+  "groups": {
+    "G1_failed": "reach_fav_2p0 == 0",
+    "G2_sustained": "reach_fav_2p0 == 1 AND win == 1",
+    "G3_giveback": "reach_fav_2p0 == 1 AND win == 0",
+    "G4_plus3": "reach_fav_3p0 == 1 (complement: == 0)"
+  },
+  "initial_states": "exact 16-state mtf (dir_1m/5m/15m/1h at T0); min support 150 development trades; long vs short compared",
+  "kind": "analysis_plan",
+  "meaningful_separation": "AUC >= 0.60 with CI lower >= 0.55 (or AUC <= 0.40 with CI upper <= 0.45)",
+  "mtf_timing": "first INTO-alignment 5m transition vs first-touch times of +0.5/+1/+1.5/+2/+3A (touch before terminal); categories by the highest level touched at or before the transition; 15m/1h repeated",
+  "no_model_of_any_kind": true,
+  "old_buckets": "not used for any choice; not shown",
+  "population": "2023 development sessions only (6,024 audited T0 trades); final 20% and 2024-2026 never loaded",
+  "subsets": {
+    "ALIVE": "terminal flip after the checkpoint",
+    "EARLY": "ALIVE and running MFE < 1A (before substantial excursion)",
+    "PRE2": "ALIVE and running MFE < 2A"
+  },
+  "substantial_excursion": "+1A",
+  "variables": {
+    "event_anchored": [
+      "t_since_t0_s",
+      "s_from_prev_level",
+      "mae_through_touch",
+      "adv0p5_before",
+      "adv1_before",
+      "aligned_5m",
+      "aligned_15m",
+      "aligned_1h",
+      "trans_5m"
+    ],
+    "mtf": [
+      "aligned_5m",
+      "aligned_15m",
+      "aligned_1h",
+      "trans_5m",
+      "n_htf_aligned"
+    ],
+    "path": [
+      "mfe",
+      "mae",
+      "cur",
+      "fav_share",
+      "mfe_rate",
+      "mae_rate",
+      "d_mfe",
+      "d_mae",
+      "fav_expand_adv_stall",
+      "adv_expand_fav_stall"
+    ]
+  },
+  "zero_denominator": "fav_share = MFE/(MFE+MAE), 0.5 when both are 0; rates are per minute, 0 at e=0"
+}
