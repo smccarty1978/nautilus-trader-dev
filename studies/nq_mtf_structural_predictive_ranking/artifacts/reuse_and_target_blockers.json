@@ -1,0 +1,67 @@
+{
+  "session": "resume nq_mtf_structural_predictive_ranking on main ff47868d (study 678ab367)",
+  "study_plan_sha256": "75709c91306db839984712b54f4123c87de7cf211f1c6048c69401d85282b0d0",
+  "reuse_check": {
+    "replay_plan_sha256": {
+      "study": "d917443a59fdd79ea37a9dc3269d0c780f5d37583943c0d24452dc04b90b4578",
+      "atlas": "d917443a59fdd79ea37a9dc3269d0c780f5d37583943c0d24452dc04b90b4578",
+      "equal": true,
+      "verdict": "PASS - model.feature_columns + arms + cells are replay-neutral exactly as the capability proved (d917443a)"
+    },
+    "replay_closure_composite": {
+      "study": "2e30c4f75c08cf25da0ff10ad09261f937c54b2b96139ee0330df87d6a1809a6",
+      "atlas": "16aa903966e539810e188023eeead17cfcb73b37e0195423c6aa0d430327f580",
+      "equal": false,
+      "verdict": "FAIL - both partitions would be RE-REPLAYED"
+    },
+    "partitions": {
+      "2023": {
+        "recorded_key": "7794dd71970ff3af0af1c6192f4289fb7cdf2db5e48b596cdcc6aa22a23e2b65",
+        "recorded_replay_plan_sha256": "d917443a59fdd79ea37a9dc3269d0c780f5d37583943c0d24452dc04b90b4578",
+        "recorded_replay_closure_composite": "16aa903966e539810e188023eeead17cfcb73b37e0195423c6aa0d430327f580",
+        "rows": {
+          "candidates": 134664,
+          "observations": 134664
+        }
+      },
+      "2024": {
+        "recorded_key": "70ad0ab80c7737212ba5225118013eb217751d9eb5ee657ef3ae60758571ed19",
+        "recorded_replay_plan_sha256": "d917443a59fdd79ea37a9dc3269d0c780f5d37583943c0d24452dc04b90b4578",
+        "recorded_replay_closure_composite": "16aa903966e539810e188023eeead17cfcb73b37e0195423c6aa0d430327f580",
+        "rows": {
+          "candidates": 127333,
+          "observations": 127333
+        }
+      }
+    },
+    "root_cause": {
+      "file": "research_workflow/grammar/spec.py",
+      "in_replay_closure": true,
+      "why_on_the_replay_path": "features/trackers/host_bindings.py imports duration_seconds from research_workflow.grammar.spec (lines 172, 269); the closure is FILE-level so the whole module is bound",
+      "what_changed_it": "the model_feature_columns capability added ModelSpec.feature_columns to that file (main ff47868d)",
+      "other_capability_files": {
+        "research_workflow/lifecycle_v2.py": "NOT in the replay closure",
+        "research_workflow/grammar/compiler.py": "NOT in the replay closure"
+      },
+      "consequence": "a partition collected at replay closure 16aa9039 can only be served to a plan whose replay closure is byte-identical; the capability that makes these columns modelable lives in a file the key binds"
+    }
+  },
+  "second_blocker_independent_of_reuse": {
+    "id": "NO_TRAINABLE_BINARY_LABEL_IN_THE_AUDITED_FRAME",
+    "fit_label_source": "lifecycle_v2.fit uses plan.outcome.label_column, which is inside the replay key and cannot change without re-collection",
+    "label_distribution_target_flip_within_horizon": {
+      "nan": 196707,
+      "1.0": 65290
+    },
+    "arm_labels": "one-sided milestone arms are degenerate: fp_fav_2p00_label 201284 ones vs 57 zeros; fp_adv_1p00_label 230816 zeros vs 38 ones",
+    "frozen_targets_are_derived": "A terminal_gross_pnl_atr > 0; B/C/D reach_fav_{2,3,5}A BEFORE the terminal flip; E reach_adv_2A -- all derived from outcome columns (the atlas derived them with analysis.derive.columns)",
+    "failure_mode_if_run": "fit keeps rows with label in {0,1} (65,290 rows, ALL class 1) then skips every cell on nunique()<2, writing experiment_models.json with zero models: a silent vacuous fit, not an error"
+  },
+  "nothing_launched": [
+    "no collection",
+    "no smoke",
+    "no fit",
+    "no scoring",
+    "2025/2026 untouched"
+  ]
+}

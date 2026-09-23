@@ -1,7 +1,7 @@
 # Authoritative decision contract (research_decision.yaml > SPEC.md > study.yaml > compiled_study.json > code)
 study_id: nq_mtf_structural_predictive_ranking
 research_question: "# NQ MTF + Structural Geometry Predictive Ranking (lean modeling follow-up)\n\nPRIMARY QUESTION. Can the JOINT continuous entry-time information in 1m/5m/15m/1h regime orientation,\ncurrent 5m/15m/1h regime geometry, immediately prior 5m/15m/1h regime geometry, ATR-normalized distances to\ncurrent/prior structural levels, and regime age/progress/excursion state RANK 1m V_A flips into economically\ndifferent lifecycle populations OUT OF SAMPLE?\n\nThe completed atlas (studies/nq_mtf_regime_structural_geometry_atlas, verdict D_NOT_FOUND) tested HUMAN-DEFINED\nrectangular segmentation only. JOINT PREDICTIVE INFORMATION IN THE CONTINUOUS SURFACE IS UNTESTED and is what\nthis study tests.\n\nKEY EXPERIMENT. TRAIN = 2023 only. Freeze model, feature order, preprocessing, hyperparameters, score definition\nand the 2023 score-bucket boundaries. Score untouched 2024 ONCE. Decide whether the frozen score creates\neconomically ordered 2024 populations, against direction-only and exact-MTF controls.\n\nNOT: another NT collection, another bucket search, exit/stop/target optimization, post-entry management, ML zoo.\nOne primary nonlinear tabular model (LightGBM) plus one simple baseline; fixed modest configuration; no sweeps.\n\nTARGETS (predeclared): A terminal_gross_pnl_atr > 0 (+ continuous g for economics); B reach +2A before the\nopposite 1m flip; C reach +3A; D (diagnostic) +5A; E reach -2A.\n\nSTOP CONDITION. Stop after the frozen 2024 evaluation, diagnostics and descriptive top-50/30/20/10 retention\nsurfaces. 2025 and 2026 remain untouched. Verdict is one of NO_INFORMATION / WEAK_RANKING /\nTARGET_SPECIFIC_INFORMATION / REPRODUCIBLE_ECONOMIC_RANKING.\n\nREUSE CONSTRAINT (owner). Do not recollect the already-audited 2023/2024 atlas frame. If the workflow forces a\nrecollection of identical bars, STOP and resolve reuse."
-status: BLOCKED_ON_CAPABILITY_GAP   # model surface cannot include the audited metadata geometry without recollecting identical bars (2026-09-22, session a2b50fd4)
+status: BLOCKED_REUSE_AND_TARGET   # gap 1 resolved (ff47868d); two NEW blockers found pre-fit (2026-09-22, session a2b50fd4)
 dataset_id: NQ_1S_V2_GLOBEX
 terminal_decisions: {}
 # Predeclared fork policy (WORKFLOW.md §N.4). Agents follow these instead of asking again; a genuine
@@ -69,3 +69,48 @@ capability_gap:
     is feature development (WORKFLOW E) plus a full recollection. EXPLORE over a registered frame runs analysis
     ops only and trains nothing, and frame registration requires a `stage: collect` study.
   owner_instruction: "STOP and resolve reuse rather than spending another 1-2 hours replaying identical bars"
+
+# ---------------------------------------------------------------------------------------------
+# Phase A resume (2026-09-22, session a2b50fd4). main ff47868d merged -> 678ab367. study.yaml now carries the atlas
+# collection contract VERBATIM + partition_reuse: replay_closure + the frozen model block (78-column surface, 4 arms,
+# cell t0, tuning_years [2023] / final_train_validation_years [2024]). Compiled: plan 75709c91. NOTHING was launched.
+capability_gap_model_feature_columns:
+  status: RESOLVED   # main ff47868d; the declaration is replay-neutral as proved
+blockers_found_pre_fit:
+  evidence: artifacts/reuse_and_target_blockers.json
+  B1_replay_closure_moved:
+    finding: >-
+      replay_plan_sha256 of this study == the atlas's d917443a (PASS: model.feature_columns, arms and cells are
+      replay-neutral), but the replay-stage CLOSURE COMPOSITE differs (2e30c4f7 vs the partitions' 16aa9039), so
+      both audited partitions would be RE-REPLAYED. Collection was NOT launched (owner hard stop).
+    root_cause: >-
+      research_workflow/grammar/spec.py is INSIDE the replay-stage closure because
+      features/trackers/host_bindings.py imports duration_seconds from it (lines 172, 269), and the closure is
+      file-level. The model_feature_columns capability added ModelSpec.feature_columns to that same file, so
+      merging the capability moved the composite. lifecycle_v2.py and grammar/compiler.py are NOT in the closure.
+    honest_note: >-
+      the capability's acceptance proof compared compiles at ONE code version; it never checked that MERGING the
+      capability preserves the recorded partitions' closure composite. That check was missing.
+    options:
+      A_recollect_once: "~2 h P-core (2023 57 min + 2024 57 min) under the new closure; governance intact; owner forbade recollection"
+      B_platform_chore: >-
+        move the replay-time helpers (duration_seconds) out of spec.py into a schema-free module so a grammar edit
+        never touches the replay path. NOTE: this ALSO changes the closure file list, so it does not by itself make
+        the EXISTING partitions reusable -- it only prevents the next occurrence.
+      C_closure_migration: "a governed re-attestation of an existing partition under a new closure (does not exist today)"
+    owner_decision_required: true
+  B2_no_trainable_binary_label:
+    finding: >-
+      the audited frame has no trainable binary label. target_flip_within_horizon is single-class (65,290 ones,
+      196,707 censored NaN, ZERO zeros) and the 16 one-sided milestone arm labels are degenerate
+      (fp_fav_2p00_label 201,284 ones vs 57 zeros). lifecycle_v2.fit takes its label from plan.outcome.label_column,
+      which is inside the replay key and cannot change without re-collection.
+    consequence: >-
+      every frozen target (A terminal g > 0; B/C/D reach +2/+3/+5A before the terminal flip; E reach -2A) is DERIVED
+      from outcome columns, and the fit stage cannot derive a label. Run as-is, fit would keep 65,290 all-positive
+      rows, skip every cell on nunique()<2 and write ZERO models silently -- a vacuous fit, not an error.
+    smallest_fix: >-
+      declare the model target as a bounded expression over already-collected outcome columns, reusing the registered
+      analysis.derive.columns grammar (research/analysis/expressions.py), e.g. model.targets: [{id, expr}]; plus make
+      a zero-model fit a hard error instead of a silent PASS.
+    independent_of_B1: true
