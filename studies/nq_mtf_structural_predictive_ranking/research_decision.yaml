@@ -1,7 +1,7 @@
 # Authoritative decision contract (research_decision.yaml > SPEC.md > study.yaml > compiled_study.json > code)
 study_id: nq_mtf_structural_predictive_ranking
 research_question: "# NQ MTF + Structural Geometry Predictive Ranking (lean modeling follow-up)\n\nPRIMARY QUESTION. Can the JOINT continuous entry-time information in 1m/5m/15m/1h regime orientation,\ncurrent 5m/15m/1h regime geometry, immediately prior 5m/15m/1h regime geometry, ATR-normalized distances to\ncurrent/prior structural levels, and regime age/progress/excursion state RANK 1m V_A flips into economically\ndifferent lifecycle populations OUT OF SAMPLE?\n\nThe completed atlas (studies/nq_mtf_regime_structural_geometry_atlas, verdict D_NOT_FOUND) tested HUMAN-DEFINED\nrectangular segmentation only. JOINT PREDICTIVE INFORMATION IN THE CONTINUOUS SURFACE IS UNTESTED and is what\nthis study tests.\n\nKEY EXPERIMENT. TRAIN = 2023 only. Freeze model, feature order, preprocessing, hyperparameters, score definition\nand the 2023 score-bucket boundaries. Score untouched 2024 ONCE. Decide whether the frozen score creates\neconomically ordered 2024 populations, against direction-only and exact-MTF controls.\n\nNOT: another NT collection, another bucket search, exit/stop/target optimization, post-entry management, ML zoo.\nOne primary nonlinear tabular model (LightGBM) plus one simple baseline; fixed modest configuration; no sweeps.\n\nTARGETS (predeclared): A terminal_gross_pnl_atr > 0 (+ continuous g for economics); B reach +2A before the\nopposite 1m flip; C reach +3A; D (diagnostic) +5A; E reach -2A.\n\nSTOP CONDITION. Stop after the frozen 2024 evaluation, diagnostics and descriptive top-50/30/20/10 retention\nsurfaces. 2025 and 2026 remain untouched. Verdict is one of NO_INFORMATION / WEAK_RANKING /\nTARGET_SPECIFIC_INFORMATION / REPRODUCIBLE_ECONOMIC_RANKING.\n\nREUSE CONSTRAINT (owner). Do not recollect the already-audited 2023/2024 atlas frame. If the workflow forces a\nrecollection of identical bars, STOP and resolve reuse."
-status: BLOCKED_REUSE_AND_TARGET   # gap 1 resolved (ff47868d); two NEW blockers found pre-fit (2026-09-22, session a2b50fd4)
+status: TARGET_A_COMPLETE_NO_INFORMATION   # 2023 fit -> freeze 357302cb -> 2024 scored once; verdict NO_INFORMATION (2026-09-23)
 dataset_id: NQ_1S_V2_GLOBEX
 terminal_decisions: {}
 # Predeclared fork policy (WORKFLOW.md §N.4). Agents follow these instead of asking again; a genuine
@@ -26,7 +26,9 @@ source_frame:
 model_contract:   # predeclared, frozen before any fit
   split: {train: 2023, frozen_evaluation: 2024, never_open: [2025, 2026]}
   mechanism: >-
-    model.validation.tuning_years = [2023] and final_train_validation_years = [2024] with BOTH years as TRAIN
+    model.validation.tuning_years = [2023]; final_train_validation_years = [] (SUPERSEDED 2026-09-23 by
+    session_decisions: it was [2024], which made fit score 2024 before the freeze; 2024 is now scored ONCE
+    after the freeze instead) with BOTH years as TRAIN
     partitions -- lifecycle_v2.fit fits final_rows = rows whose _year is in tuning_years and evaluates on
     final_train_validation_years, so 2023-only fitting with a single 2024 scoring pass is expressible WITHOUT
     changing chronology roles (proved: a model-only plan change leaves the partition-reuse key unchanged,
@@ -114,3 +116,72 @@ blockers_found_pre_fit:
       analysis.derive.columns grammar (research/analysis/expressions.py), e.g. model.targets: [{id, expr}]; plus make
       a zero-model fit a hard error instead of a silent PASS.
     independent_of_B1: true
+
+# ---------------------------------------------------------------------------------------------
+# Phase B execution (2026-09-23, session a2b50fd4). main bbfeb550 merged. BOTH pre-fit blockers RESOLVED:
+blockers_resolved:
+  B1_replay_closure_moved: >-
+    RESOLVED by partition re-attestation (main bbfeb550). artifacts/partition_reattestation.json carries, per
+    partition, the original identity (atlas plan 4e7538b4 / c408c4d9, seal, parquet sha256, rows) and the
+    byte-equality proof (bounded replay 2023-10-02 identical under recorded closure 16aa9039 and current). Both
+    partitions serve REUSABLE_BY_CLOSURE_ATTESTATION; replay plan stays d917443a. Neither year was replayed.
+  B2_no_trainable_binary_label: >-
+    RESOLVED by model.target (main bbfeb550): target A_win = `terminal_gross_pnl_atr > 0`, derived at modeling
+    time from an already-collected outcome column. The raw label target_flip_within_horizon stays single-class
+    and is NOT used.
+session_decisions:
+  final_train_validation_years: []   # owner instruction: 2024 stays completely dark until after the freeze
+  targets_this_session: [A_win]      # B-E remain frozen future experiments; NOT declared or run here
+  controls: >-
+    direction_only = [dir_1m] (the TRADE direction alone); mtf_state_only = [dir_1m, dir_5m, dir_15m, dir_1h]
+    (the exact joint state, which the tree encodes as the 16 cells); geometry_no_direction = the 71 non-direction
+    geometry columns; full = all 78. CORRECTED after contract pass 01 found direction_only and mtf_state_only
+    declared the identical 4-column list, which would have made their comparison structurally dead.
+
+# ---------------------------------------------------------------------------------------------
+# Phase B RESULT (2026-09-23, session a2b50fd4). Target A only. Report: REPORT_TARGET_A.md
+verdict:
+  code: NO_INFORMATION
+  target: "A_win = terminal_gross_pnl_atr > 0"
+  answer: >-
+    NO. The 78-variable T0 MTF + structural-geometry model, trained on 2023 only and applied once to 2024 under
+    boundaries frozen beforehand, scored ROC AUC 0.5137 (day-blocked bootstrap 95% CI [0.4996, 0.5284] -- contains
+    chance) and produced no monotonic economic concentration (Spearman decile vs mean terminal gross ATR = -0.33).
+    It beat none of the three controls; every paired AUC delta straddles zero. The same model scores 0.9783 on the
+    rows it was fitted on: the surface memorises a year and transfers nothing.
+  evidence:
+    oos_2024_auc: {full: 0.5137, geometry_no_direction: 0.5112, direction_only: 0.5168, mtf_state_only: 0.5208}
+    dev_2023_auc_in_sample: {full: 0.9783, geometry_no_direction: 0.9728, direction_only: 0.5263, mtf_state_only: 0.5376}
+    full_vs_controls_auc_delta_ci95:
+      direction_only_minus_full: [-0.0152, 0.0206]
+      geometry_no_direction_minus_full: [-0.0121, 0.0073]
+      mtf_state_only_minus_full: [-0.0124, 0.0261]
+    pooled_2024: {eligible_n: 7047, win_pct: 33.74, mean_gross_atr: 0.042, median_gross_atr: -0.703, session_days: 258}
+    full_top10_2024: {n: 81, coverage_pct: 1.1, win_pct: 33.3, lift_pp: -0.4, lift_ci95: [-10.8, 11.3]}
+  only_nominal_positive: >-
+    direction_only top-k win lift +1.5pp [+0.3, +2.7] -- the ONE-BIT CONTROL, one of twenty nominal comparisons,
+    survives no multiplicity adjustment, and is not the hypothesis. Not evidence.
+  consistent_prior_finding: >-
+    The single consistent gradient is +2A REACH (full D10 43.2% vs 38.3% pooled; geometry D10 45.2%), which does not
+    convert into mean gross ATR, and both EXTREME deciles show elevated mean ATR. Extreme scores mark higher VARIANCE,
+    not better trades -- the atlas's "predicts spread, not drift", now reproduced out of sample.
+  method_limitations:
+    - "2023 development AUCs are IN-SAMPLE (one tuning year, no within-2023 holdout). They measure memorisation and
+       selected nothing. Any future run on this surface must carve a within-2023 holdout."
+    - "2024 was protected by the FREEZE RECEIPT, not the chronology gate: both years are reused train:-role partitions
+       (chronology.oos is empty), so the governed analyze stage cannot run (ExperimentAuthorizationError: chronology
+       must declare non-empty train and OOS years) and the study halts at READY_TO_ANALYZE. Declaring 2024 as oos:
+       would change authorised year roles, break re-attestation and force a replay of both years. Not done."
+    - "All figures gross; no costs applied."
+  targets_b_to_e: >-
+    DO NOT launch as a batch. Same rows, same surface, high prior of null, and four more targets against an
+    already-opened evaluation year compounds the multiplicity problem. If one probe is judged worthwhile, a single
+    pre-registered reach-based target (+2A before terminal flip) with a within-2023 holdout is the defensible choice.
+  models_verified:
+    full: 3cf8c5493fef66a7c1b5c04468b0e717eef8247626bfa7dc3ff65109f28ed973
+    geometry_no_direction: 410e6146680484b6e1b5a1bc039ee670b7bf07c2ae5da68cb80a895dc37bd6e3
+    mtf_state_only: 48e72fc1509d6547437d4026267319fc6adb9a1dcd7c6348460f9768a7e172ab
+    direction_only: 042c613e66214a549fd951910242eeb6903d647e70e17fcab8ee3051d9c67976
+    check: "all four authenticate; golden max_abs_diff 0.0; canonical bytes match; train_years [2023]; feature-order SHAs match the freeze"
+  freeze_sha256: 357302cbc632f504dbf4acafa4877c88bb65aafef4f7be878d9ab955eedd28cd
+  untouched: [2025, 2026]

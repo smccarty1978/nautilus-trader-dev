@@ -2,10 +2,10 @@
   "schema_version": 1,
   "study_id": "nq_mtf_structural_predictive_ranking",
   "phase": "A",
-  "state": "BLOCKED_ON_CAPABILITY_GAP",
+  "state": "RESOLVED_EXECUTING",
   "capability_gap": {
     "id": "MODEL_SURFACE_EXCLUDES_AUDITED_METADATA_COLUMNS",
-    "blocking": true,
+    "blocking": false,
     "request": "CAPABILITY_REQUEST_model_surface_metadata_columns.md",
     "evidence": "artifacts/capability_probe_model_surface.json",
     "summary": "lifecycle_v2.fit builds the model surface from columns.features + columns.derived only; the compiler refuses an arm naming any other column. The atlas's entire audited MTF/structural geometry is columns.metadata (112 columns incl. 39 prior_* snapshot fields), so the study cannot fit on it.",
@@ -22,16 +22,11 @@
     },
     "cost_if_ignored": "re-replaying two identical audited years (~2 h) merely to reclassify columns"
   },
-  "no_work_performed": [
-    "no collection",
-    "no fit",
-    "no scoring",
-    "no 2024 inspection",
-    "no 2025/2026 access"
-  ],
-  "ready_when_capability_lands": {
-    "mechanism": "model.validation.tuning_years=[2023], final_train_validation_years=[2024] with both years as TRAIN partitions (fit uses tuning_years only); partitions copied/served from the closed atlas under replay-closure reuse",
-    "contract": "research_decision.yaml model_contract (targets A-E, controls, freeze list, frozen 2023 decile boundaries, descriptive retention surfaces)"
+  "resolved_by": {
+    "model_feature_columns": "ff47868d",
+    "model_target_and_reuse": "bbfeb550"
   },
-  "next_session": "platform chore (fresh session): implement the model-surface declaration + tests, merge to main; then a fresh study session compiles this study, serves both audited partitions by replay-closure reuse, fits 2023, scores 2024 once"
+  "resolved_at_utc": "2026-09-23",
+  "note": "both capability gaps closed; the study is executing Target A on re-attested partitions (no recollection)",
+  "superseded": "Phase-A gap text removed; both gaps closed (see resolved_by). Execution state lives in research_decision.yaml."
 }

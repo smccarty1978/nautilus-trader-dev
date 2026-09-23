@@ -471,8 +471,7 @@ model:
     protocol: validation.model_selection.random
     tuning_years:
     - 2023
-    final_train_validation_years:
-    - 2024
+    final_train_validation_years: []
   cells:
   - id: t0
     subset:
@@ -484,9 +483,6 @@ model:
   - id: direction_only
     features:
     - dir_1m
-    - dir_5m
-    - dir_15m
-    - dir_1h
   - id: mtf_state_only
     features:
     - dir_1m
@@ -566,3 +562,6 @@ model:
     - prior_mae_atr_1h
     - prior_terminal_displacement_atr_1h
     - prior_rotation_seq_1h
+  target:
+    id: A_win
+    expr: terminal_gross_pnl_atr > 0

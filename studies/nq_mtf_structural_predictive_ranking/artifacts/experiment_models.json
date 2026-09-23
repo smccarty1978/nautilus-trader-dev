@@ -1,0 +1,336 @@
+{
+  "family": "lightgbm",
+  "final_train_validation_years": [],
+  "fold_protocol": "expanding_years",
+  "generated_at_utc": "2026-09-23T05:40:48.455233+00:00",
+  "label_column": "__target_A_win",
+  "models": [
+    {
+      "arm": "full",
+      "baseline_arm": true,
+      "cell": "t0",
+      "direction": "both",
+      "features": [
+        "dir_1m",
+        "atr_entry_1m",
+        "checkpoint_seconds_since_flip",
+        "bars_1m",
+        "atr_1m",
+        "start_price_1m",
+        "dir_5m",
+        "dir_15m",
+        "dir_1h",
+        "age_s_5m",
+        "bars_5m",
+        "start_price_5m",
+        "atr_5m",
+        "frozen_atr_5m",
+        "mfe_atr_5m",
+        "mae_atr_5m",
+        "pnl_atr_5m",
+        "retained_5m",
+        "highest_high_5m",
+        "lowest_low_5m",
+        "age_s_15m",
+        "bars_15m",
+        "start_price_15m",
+        "atr_15m",
+        "frozen_atr_15m",
+        "mfe_atr_15m",
+        "mae_atr_15m",
+        "pnl_atr_15m",
+        "retained_15m",
+        "highest_high_15m",
+        "lowest_low_15m",
+        "age_s_1h",
+        "bars_1h",
+        "start_price_1h",
+        "atr_1h",
+        "frozen_atr_1h",
+        "mfe_atr_1h",
+        "mae_atr_1h",
+        "pnl_atr_1h",
+        "retained_1h",
+        "highest_high_1h",
+        "lowest_low_1h",
+        "prior_dir_5m",
+        "prior_start_price_5m",
+        "prior_end_price_5m",
+        "prior_frozen_atr_5m",
+        "prior_duration_s_5m",
+        "prior_bars_5m",
+        "prior_mfe_price_5m",
+        "prior_mae_price_5m",
+        "prior_mfe_atr_5m",
+        "prior_mae_atr_5m",
+        "prior_terminal_displacement_atr_5m",
+        "prior_rotation_seq_5m",
+        "prior_dir_15m",
+        "prior_start_price_15m",
+        "prior_end_price_15m",
+        "prior_frozen_atr_15m",
+        "prior_duration_s_15m",
+        "prior_bars_15m",
+        "prior_mfe_price_15m",
+        "prior_mae_price_15m",
+        "prior_mfe_atr_15m",
+        "prior_mae_atr_15m",
+        "prior_terminal_displacement_atr_15m",
+        "prior_rotation_seq_15m",
+        "prior_dir_1h",
+        "prior_start_price_1h",
+        "prior_end_price_1h",
+        "prior_frozen_atr_1h",
+        "prior_duration_s_1h",
+        "prior_bars_1h",
+        "prior_mfe_price_1h",
+        "prior_mae_price_1h",
+        "prior_mfe_atr_1h",
+        "prior_mae_atr_1h",
+        "prior_terminal_displacement_atr_1h",
+        "prior_rotation_seq_1h"
+      ],
+      "final_fit_rows": 7475,
+      "final_fit_unique_regimes": 7475,
+      "hyperparameters": {
+        "colsample_bytree": 0.8,
+        "learning_rate": 0.05,
+        "min_child_samples": 100,
+        "n_estimators": 400,
+        "num_leaves": 31,
+        "subsample": 0.8,
+        "verbosity": -1
+      },
+      "metrics": {
+        "final_validation": null,
+        "folds": [],
+        "tuning": null
+      },
+      "model_id": "3cf8c5493fef66a7c1b5c04468b0e717eef8247626bfa7dc3ff65109f28ed973",
+      "model_store_tier": "registry",
+      "n_features": 78,
+      "subset": {
+        "checkpoint_index": 0
+      }
+    },
+    {
+      "arm": "direction_only",
+      "baseline_arm": false,
+      "cell": "t0",
+      "direction": "both",
+      "features": [
+        "dir_1m"
+      ],
+      "final_fit_rows": 7475,
+      "final_fit_unique_regimes": 7475,
+      "hyperparameters": {
+        "colsample_bytree": 0.8,
+        "learning_rate": 0.05,
+        "min_child_samples": 100,
+        "n_estimators": 400,
+        "num_leaves": 31,
+        "subsample": 0.8,
+        "verbosity": -1
+      },
+      "metrics": {
+        "final_validation": null,
+        "folds": [],
+        "tuning": null
+      },
+      "model_id": "042c613e66214a549fd951910242eeb6903d647e70e17fcab8ee3051d9c67976",
+      "model_store_tier": "registry",
+      "n_features": 1,
+      "subset": {
+        "checkpoint_index": 0
+      }
+    },
+    {
+      "arm": "mtf_state_only",
+      "baseline_arm": false,
+      "cell": "t0",
+      "direction": "both",
+      "features": [
+        "dir_1m",
+        "dir_5m",
+        "dir_15m",
+        "dir_1h"
+      ],
+      "final_fit_rows": 7475,
+      "final_fit_unique_regimes": 7475,
+      "hyperparameters": {
+        "colsample_bytree": 0.8,
+        "learning_rate": 0.05,
+        "min_child_samples": 100,
+        "n_estimators": 400,
+        "num_leaves": 31,
+        "subsample": 0.8,
+        "verbosity": -1
+      },
+      "metrics": {
+        "final_validation": null,
+        "folds": [],
+        "tuning": null
+      },
+      "model_id": "48e72fc1509d6547437d4026267319fc6adb9a1dcd7c6348460f9768a7e172ab",
+      "model_store_tier": "registry",
+      "n_features": 4,
+      "subset": {
+        "checkpoint_index": 0
+      }
+    },
+    {
+      "arm": "geometry_no_direction",
+      "baseline_arm": false,
+      "cell": "t0",
+      "direction": "both",
+      "features": [
+        "atr_entry_1m",
+        "checkpoint_seconds_since_flip",
+        "bars_1m",
+        "atr_1m",
+        "start_price_1m",
+        "age_s_5m",
+        "bars_5m",
+        "start_price_5m",
+        "atr_5m",
+        "frozen_atr_5m",
+        "mfe_atr_5m",
+        "mae_atr_5m",
+        "pnl_atr_5m",
+        "retained_5m",
+        "highest_high_5m",
+        "lowest_low_5m",
+        "age_s_15m",
+        "bars_15m",
+        "start_price_15m",
+        "atr_15m",
+        "frozen_atr_15m",
+        "mfe_atr_15m",
+        "mae_atr_15m",
+        "pnl_atr_15m",
+        "retained_15m",
+        "highest_high_15m",
+        "lowest_low_15m",
+        "age_s_1h",
+        "bars_1h",
+        "start_price_1h",
+        "atr_1h",
+        "frozen_atr_1h",
+        "mfe_atr_1h",
+        "mae_atr_1h",
+        "pnl_atr_1h",
+        "retained_1h",
+        "highest_high_1h",
+        "lowest_low_1h",
+        "prior_start_price_5m",
+        "prior_end_price_5m",
+        "prior_frozen_atr_5m",
+        "prior_duration_s_5m",
+        "prior_bars_5m",
+        "prior_mfe_price_5m",
+        "prior_mae_price_5m",
+        "prior_mfe_atr_5m",
+        "prior_mae_atr_5m",
+        "prior_terminal_displacement_atr_5m",
+        "prior_rotation_seq_5m",
+        "prior_start_price_15m",
+        "prior_end_price_15m",
+        "prior_frozen_atr_15m",
+        "prior_duration_s_15m",
+        "prior_bars_15m",
+        "prior_mfe_price_15m",
+        "prior_mae_price_15m",
+        "prior_mfe_atr_15m",
+        "prior_mae_atr_15m",
+        "prior_terminal_displacement_atr_15m",
+        "prior_rotation_seq_15m",
+        "prior_start_price_1h",
+        "prior_end_price_1h",
+        "prior_frozen_atr_1h",
+        "prior_duration_s_1h",
+        "prior_bars_1h",
+        "prior_mfe_price_1h",
+        "prior_mae_price_1h",
+        "prior_mfe_atr_1h",
+        "prior_mae_atr_1h",
+        "prior_terminal_displacement_atr_1h",
+        "prior_rotation_seq_1h"
+      ],
+      "final_fit_rows": 7475,
+      "final_fit_unique_regimes": 7475,
+      "hyperparameters": {
+        "colsample_bytree": 0.8,
+        "learning_rate": 0.05,
+        "min_child_samples": 100,
+        "n_estimators": 400,
+        "num_leaves": 31,
+        "subsample": 0.8,
+        "verbosity": -1
+      },
+      "metrics": {
+        "final_validation": null,
+        "folds": [],
+        "tuning": null
+      },
+      "model_id": "410e6146680484b6e1b5a1bc039ee670b7bf07c2ae5da68cb80a895dc37bd6e3",
+      "model_store_tier": "registry",
+      "n_features": 71,
+      "subset": {
+        "checkpoint_index": 0
+      }
+    }
+  ],
+  "month_folds": [],
+  "new_models_trained": true,
+  "paired_deltas_vs_baseline_arm": {
+    "t0": {
+      "arms": {
+        "direction_only": {
+          "per_fold": [],
+          "summary": {
+            "brier": null,
+            "pr_auc_over_base_rate": null,
+            "roc_auc": null
+          }
+        },
+        "geometry_no_direction": {
+          "per_fold": [],
+          "summary": {
+            "brier": null,
+            "pr_auc_over_base_rate": null,
+            "roc_auc": null
+          }
+        },
+        "mtf_state_only": {
+          "per_fold": [],
+          "summary": {
+            "brier": null,
+            "pr_auc_over_base_rate": null,
+            "roc_auc": null
+          }
+        }
+      },
+      "baseline_arm": "full"
+    }
+  },
+  "plan_sha256": "c5737cb1d2cca831430a349ddcf631f150928a6956cc65ca869058ba56fac4f0",
+  "reference_models": [],
+  "rows": {
+    "binary": 261552,
+    "total": 261997
+  },
+  "schema_version": 3,
+  "target": {
+    "eligible_n": 261552,
+    "expr": "terminal_gross_pnl_atr > 0",
+    "expression_sha256": "edb73ed2b2d0a79ad955d595a8b6cb00307b16974e19956adf0b39d82e7986f1",
+    "id": "A_win",
+    "negative_n": 176094,
+    "null_n": 445,
+    "positive_n": 85458
+  },
+  "training_population_identity": "ae405af224dbc798b6101770735bec7cf0b76304185d2fd4404f31def0c64e37",
+  "tuning_years": [
+    2023
+  ]
+}

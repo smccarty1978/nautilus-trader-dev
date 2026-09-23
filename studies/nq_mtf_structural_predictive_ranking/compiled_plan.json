@@ -243,7 +243,7 @@
     "windows": []
   },
   "closure": {
-    "composite_sha256": "3d07b58f406fb227de5a639fa6f49ad0f08d2e641c85c69a0f59550b8e2af568",
+    "composite_sha256": "6ced7ced583a3a877a451a373b2350edc7807db3471005b74c7e1cdb1c9a924a",
     "file_count": 163,
     "files": {
       "backtests/nt_runtime/__init__.py": "8a091704d4e8c5dfeeb2fc16e97035e3b7e1986440e5050d9d530d1f4691614f",
@@ -363,13 +363,13 @@
       "research_workflow/governed_controller.py": "0ebe4791a068ae46a2042d01b9ca004d2501dab8512953636f0f2513496b59ae",
       "research_workflow/governed_controller_v2.py": "e878042b11555a7fe5a5f6b75d6c369e8d331bd839c4a5d1f325781eeeda9714",
       "research_workflow/grammar/__init__.py": "8346e9b1ae1cf1c7950e06d278e21d162678d0345ad5b8b2a6aa2a7eeaba5eba",
-      "research_workflow/grammar/compiler.py": "c30e6514229d718d88b922805b125f27000a358304c012d6f10db0a43a87e06e",
+      "research_workflow/grammar/compiler.py": "c23a5ea5278534f36eebb55024de195917c7f758540b177519ddcfb660ad9dbc",
       "research_workflow/grammar/deliverables.py": "f147d4f7f6fc8cf239a49440765d2410c3c6650f3f0f868b9c902e2ca9e87909",
       "research_workflow/grammar/expansion.py": "0b8124662c11dacba7a5680e229fb77433514894f10a51365287b2c8054de20d",
       "research_workflow/grammar/gaps.py": "9e3341d65135484e56e868bbe9fbb2f13637d133156ce17bdffee988c0d46b48",
       "research_workflow/grammar/plan.py": "57d130b47dab4757f27c2ea6948e67f4e5507cf62c02cc60a5f55be9d07b7270",
       "research_workflow/grammar/predicates.py": "7b0fa449a526e3f0d9a7eca1444b5e35f381426517172716651a28042831c417",
-      "research_workflow/grammar/spec.py": "450e8b9af77d3a3cf9fc353fa20f0373dced4fad7e8f93d62758bb62fed6c72a",
+      "research_workflow/grammar/spec.py": "ad53278ddb8d0af5e6491c08f77612b0fe00e4351952fe35bbff780e90762dec",
       "research_workflow/host/__init__.py": "eeb674dcd8d9ce76b484669752dc2e9cb6b15934cab13257a7b010750ea1f79c",
       "research_workflow/host/interfaces.py": "daa5844a4e770bfdceb765dd677bb59466aecb4a3dd0a2e3d84ab156b8022094",
       "research_workflow/host/mux.py": "44c7322624469f7293f09496fdb8cf640addefd639e0027f2cdc9757589c7419",
@@ -379,7 +379,7 @@
       "research_workflow/host/strategy.py": "5e0148f1ca55a0fb823f1f6e96c6ccc4c72c32c1f2bd41dec2147d6ce8fab7c5",
       "research_workflow/host/triggers.py": "f256b699e3f5cd17d8167b12d6c74ea477e4a80772aec77ba47da1bdf7fc3a83",
       "research_workflow/host_runner.py": "d1f4bbdbfe467a1cc4d9e90164b86eb9b568f31fd7422ba0a2c36a92e7d51373",
-      "research_workflow/lifecycle_v2.py": "a936d204e8cdf441e19f89f4b76bc2ecd7985a5e7dfabe9227c7de985321c040",
+      "research_workflow/lifecycle_v2.py": "3972da951dea4a423361afd11367c12d5b13dca2284d9f92c63e728a4a1ac629",
       "research_workflow/locks.py": "8acc08e35fb743e2cd2f84d57b7a7e08ef4963a350fefb592377651f722b2258",
       "research_workflow/model_artifacts.py": "e861172a2023b04c6bb005a8b82f20d46ec9143936d26a587b721438c784508c",
       "research_workflow/model_store.py": "5755d5e16509990e570dab3712ffc17cacc54280a563aefb9f30cf36a5fb9d80",
@@ -419,7 +419,7 @@
         ]
       },
       "collection": {
-        "composite_sha256": "32394ad8744cd05147f02445d2ba4777e35a88d60621ea935c539da04c6d8c17",
+        "composite_sha256": "49668f935339fe2e0d03436efa440a394e232e230adeae064a5cc7e1516c11b6",
         "files": [
           "backtests/nt_runtime/__init__.py",
           "backtests/nt_runtime/compiled_study_loader.py",
@@ -572,7 +572,7 @@
         ]
       },
       "lifecycle": {
-        "composite_sha256": "79b4b4c77109273df003e62f4b219a942aff8c63bc6f2b0ea42227aaa970b894",
+        "composite_sha256": "323a67dcdff5192d2b0f1c8a7116330bc1182bf739a34f40f33796235ddf09cd",
         "files": [
           "research_workflow/closure_hash.py",
           "research_workflow/controller_contracts.py",
@@ -619,7 +619,7 @@
         ]
       },
       "replay": {
-        "composite_sha256": "2e30c4f75c08cf25da0ff10ad09261f937c54b2b96139ee0330df87d6a1809a6",
+        "composite_sha256": "060ee6d99bb6958d71ba8356547fb96d48830c50d8f7f0944b63ac8c5a5a8aac",
         "files": [
           "backtests/nt_runtime/__init__.py",
           "backtests/nt_runtime/compiled_study_loader.py",
@@ -1517,10 +1517,7 @@
       {
         "baseline": false,
         "features": [
-          "dir_1m",
-          "dir_5m",
-          "dir_15m",
-          "dir_1h"
+          "dir_1m"
         ],
         "id": "direction_only",
         "params": {}
@@ -1719,10 +1716,16 @@
     },
     "reference_models": [],
     "search_space": {},
-    "validation": {
-      "final_train_validation_years": [
-        2024
+    "target": {
+      "columns": [
+        "terminal_gross_pnl_atr"
       ],
+      "expr": "terminal_gross_pnl_atr > 0",
+      "expression_sha256": "edb73ed2b2d0a79ad955d595a8b6cb00307b16974e19956adf0b39d82e7986f1",
+      "id": "A_win"
+    },
+    "validation": {
+      "final_train_validation_years": [],
       "max_trials": null,
       "primary_metric": null,
       "protocol": "validation.model_selection.random",
@@ -1734,10 +1737,6 @@
         {
           "role": "tuning",
           "year": 2023
-        },
-        {
-          "role": "final_validation",
-          "year": 2024
         },
         {
           "role": "prohibited",
@@ -2036,7 +2035,7 @@
     "strict_gap_rule": "max_gap must be shorter than the horizon under strict, else a horizon with zero interior observations expires instead of censoring GAP",
     "terminal_outcome": true
   },
-  "plan_sha256": "75709c91306db839984712b54f4123c87de7cf211f1c6048c69401d85282b0d0",
+  "plan_sha256": "c5737cb1d2cca831430a349ddcf631f150928a6956cc65ca869058ba56fac4f0",
   "plan_version": 1,
   "population": {
     "anchor_identity": "regime_1m.start_ns",
@@ -2068,7 +2067,7 @@
     ],
     "session": "RTH"
   },
-  "spec_sha256": "78cfbf34288cde5030b0a4077ea459767e8910694e0b2242101f1ef6428b48dc",
+  "spec_sha256": "fb44868e5ac70ad0152f138a59e5a5ec9e46cdfdae6f49dab4cb4287b697fdf3",
   "streams": [
     {
       "bar_type": "NQ.XCME-1-SECOND-LAST-EXTERNAL",
