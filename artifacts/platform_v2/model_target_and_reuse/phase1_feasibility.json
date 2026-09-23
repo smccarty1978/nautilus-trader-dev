@@ -1,0 +1,78 @@
+{
+  "A_recorded_atlas_replay_plan_sha256": "d917443a59fdd79ea37a9dc3269d0c780f5d37583943c0d24452dc04b90b4578",
+  "B_current_replay_plan_sha256": "d917443a59fdd79ea37a9dc3269d0c780f5d37583943c0d24452dc04b90b4578",
+  "replay_plan_identical": true,
+  "C_recorded_replay_closure": "16aa903966e539810e188023eeead17cfcb73b37e0195423c6aa0d430327f580",
+  "D_current_replay_closure": "2e30c4f75c08cf25da0ff10ad09261f937c54b2b96139ee0330df87d6a1809a6",
+  "closure_file_count": {
+    "recorded": 140,
+    "current": 140
+  },
+  "closure_membership_identical": true,
+  "E_changed_replay_closure_files": [
+    {
+      "file": "research_workflow/grammar/spec.py",
+      "sha_at_atlas_commit": "7794e10174dd2b086fad2c4a4b1454ea9464a2a6df816ed855acf027c9a6806c",
+      "sha_current": "7fdf10140bc82e57f972347f1957f1b008d1cd9fb0fa137897b73c797a602fb6"
+    }
+  ],
+  "F_classification": [
+    {
+      "file": "research_workflow/grammar/spec.py",
+      "replay_path_importers": [
+        "features/trackers/host_bindings.py:172:        from research_workflow.grammar.spec import duration_seconds",
+        "features/trackers/host_bindings.py:269:        from research_workflow.grammar.spec import duration_seconds"
+      ],
+      "symbols_imported_on_replay_path": [
+        "duration_seconds"
+      ],
+      "lines_added": 13,
+      "lines_removed": 0,
+      "added": [
+        "    # THE MODEL INPUT SURFACE, when it is not the declared feature surface. Each entry names a column",
+        "    # this study ALREADY EMITS -- a feature alias, a derived input, or a declared `features.metadata`",
+        "    # column (tracker state read at the decision epoch). It selects model inputs; it never changes what",
+        "    # collection emits, so a partition collected without it stays valid (the reuse key excludes `model`).",
+        "    # Eligibility is per column and explicit: the compiler refuses an unknown column, an identity column,",
+        "    # any observation/outcome column of this study's own outcome contract, and anything the forward-outcome",
+        "    # guard rejects. There is no blanket \"metadata is safe\" rule. Declaration order IS the feature order.",
+        "    feature_columns: List[str] = Field(default_factory=list)",
+        "        if self.mode == \"score\" and self.feature_columns:",
+        "            raise ValueError(\"model.feature_columns is a train-mode declaration; mode: score uses each frozen model's own ordered_inputs\")",
+        "        dupes = sorted({c for c in self.feature_columns if self.feature_columns.count(c) > 1})",
+        "        if dupes:",
+        "            raise ValueError(f\"model.feature_columns has duplicates {dupes}; declaration order is the feature order\")"
+      ],
+      "removed": [],
+      "replay_time_helper_unchanged": true
+    }
+  ],
+  "EMPIRICAL_smoke_equivalence": {
+    "date": "2023-10-02",
+    "recorded_source": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_mtf_regime_structural_geometry_atlas\\studies\\nq_mtf_regime_structural_geometry_atlas\\runs\\20260922_164333_nq_mtf_regime_structural_geometry_atlas_smoke\\collection\\manifest.json",
+    "recorded_under_plan": "c408c4d9fe81a36136d614e6e47f71f002e6c5377915fbca846b2abee7824679",
+    "recorded_under_closure": "16aa903966e539810e188023eeead17cfcb73b37e0195423c6aa0d430327f580",
+    "replayed_under_plan": "75709c91306db839984712b54f4123c87de7cf211f1c6048c69401d85282b0d0",
+    "replayed_under_closure": "2e30c4f75c08cf25da0ff10ad09261f937c54b2b96139ee0330df87d6a1809a6",
+    "recorded_rows": {
+      "candidates": 558,
+      "observations": 558
+    },
+    "replayed_rows": {
+      "candidates": 558,
+      "observations": 558
+    },
+    "recorded_bars": 213431,
+    "replayed_bars": 213431,
+    "candidates_sha256": {
+      "recorded": "4ca2e159e47d6ddfc8b284e28f8a60c25a649be2b5250ef6c669781bd309e2fb",
+      "replayed": "4ca2e159e47d6ddfc8b284e28f8a60c25a649be2b5250ef6c669781bd309e2fb",
+      "identical": true
+    },
+    "observations_sha256": {
+      "recorded": "e79814a8e580da54fa931b12a7066c258fda0c49b454e3df853b2c14c96e6de0",
+      "replayed": "e79814a8e580da54fa931b12a7066c258fda0c49b454e3df853b2c14c96e6de0",
+      "identical": true
+    }
+  }
+}
