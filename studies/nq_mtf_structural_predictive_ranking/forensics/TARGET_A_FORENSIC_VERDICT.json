@@ -1,0 +1,114 @@
+{
+  "auc_recomputation_paths": [
+    "research.analysis.metrics.roc_auc",
+    "hand-rolled Mann-Whitney rank AUC",
+    "sklearn.metrics.roc_auc_score"
+  ],
+  "auc_reproduced_all_arms_both_years": true,
+  "audit_scope": "read-only forensic audit; no frozen artifact modified, no frozen model refitted, no tuning, no feature search, Targets B-E not opened, 2025/2026 untouched",
+  "audited_result": "Target A (terminal_gross_pnl_atr > 0), 2023 fit -> frozen -> 2024 scored once",
+  "capacity": {
+    "early_stopping": "none (no validation set passed to fit)",
+    "lightgbm_version": "4.6.0",
+    "subsample_declared": 0.8,
+    "subsample_effective": false,
+    "subsample_note": "LightGBM bags only when subsample_freq > 0; it is unset, so the declared row subsampling never applied",
+    "total_leaves": 12400,
+    "training_rows": 7475,
+    "training_rows_per_leaf": 0.6028225806451613,
+    "trees": 400
+  },
+  "evidence": [
+    "TARGET_A_FORENSIC_AUDIT.md",
+    "TARGET_A_POPULATION_PARITY.csv",
+    "TARGET_A_FEATURE_PARITY.csv",
+    "TARGET_A_PREDICTION_PARITY.csv",
+    "TARGET_A_2023_TEMPORAL_HOLDOUT.md",
+    "TARGET_A_RANDOM_LABEL_CAPACITY.md",
+    "TARGET_A_FORENSIC_PHASE1TO6.json",
+    "TARGET_A_FORENSIC_PHASE7TO10.json"
+  ],
+  "feature_order_parity": true,
+  "feature_semantic_parity": true,
+  "findings_not_invalidating_the_result": [
+    {
+      "affects_computed_numbers": false,
+      "detail": "22 of 78 features are absolute price levels; 94.8-96.0% of 2024 rows fall outside the entire 2023 range of each. NQ traded roughly 10,750-17,165 in 2023 and 16,334-22,152 in 2024. Within 2023 these columns are near-unique memorisation handles; in 2024 they are pure extrapolation (2024/2023 score sd ratio 0.616, frozen deciles D1/D10 nearly empty).",
+      "id": "NON_STATIONARY_PRICE_FEATURES",
+      "severity": "design defect in the declared feature surface",
+      "why_not_the_explanation": "the within-2023 holdout has only ~25% of rows outside the train range on these columns and still collapses to 0.5169"
+    },
+    {
+      "affects_computed_numbers": false,
+      "detail": "subsample 0.8 never applied because subsample_freq is unset; one of two declared regularisers did nothing",
+      "id": "INERT_ROW_SUBSAMPLING",
+      "severity": "silent hyperparameter default"
+    },
+    {
+      "affects_computed_numbers": false,
+      "detail": "constant across all 2023 training rows: checkpoint_seconds_since_flip, bars_1m",
+      "id": "CONSTANT_FEATURES_2023",
+      "severity": "cosmetic"
+    },
+    {
+      "affects_computed_numbers": false,
+      "detail": "prior_frozen_atr_1h, prior_mfe_atr_1h, prior_mae_atr_1h and prior_terminal_displacement_atr_1h move from 0.0% to 1.206% null in 2024",
+      "id": "NULL_RATE_SHIFT_4_COLUMNS",
+      "severity": "immaterial"
+    }
+  ],
+  "golden_frame_max_abs_diff_any_arm": 0.0,
+  "holdout_pct_outside_train_range_price_cols_mean": 25.196483552098524,
+  "interpretation": "The pipeline is correct: population, target, feature order and semantics, the fit-time matrix (golden-frame parity at max_abs_diff 0.0), persisted predictions and both reported AUCs all reproduce exactly under independent reimplementation. The collapse is a real result and the study NO_INFORMATION verdict stands. Its cause is memorisation, not domain shift: the estimator reaches 0.9711 training AUC on RANDOMLY SHUFFLED labels, so the 0.9783 in-sample figure measures capacity and nothing else; and the model already fails inside 2023, scoring 0.5169 on a predeclared chronological holdout against 0.5137 on 2024, at a quarter of the price extrapolation. CASE 3 (temporal shift) is contradicted. The null is corroborated by the two low-capacity, price-free controls, which also show no holdout skill (0.5091, 0.4985), so no signal is being masked. CAVEAT: this experiment did not cleanly TEST the research question, because it ran at a capacity that fits noise to 0.97 over a surface containing 22 non-stationary absolute price columns. A re-specified run (price levels removed or ATR-normalised, capacity matched to the sample, subsample_freq set so the declared bagging applies, within-2023 holdout carried) remains untested and was NOT performed here.",
+  "kind": "target_a_forensic_verdict",
+  "max_prediction_abs_diff_any_arm_any_year": 0.0,
+  "pipeline_population_parity": true,
+  "prediction_parity_2023": true,
+  "prediction_parity_2024": true,
+  "random_label_seed": 20260923,
+  "random_label_train_auc": 0.9711100606060606,
+  "real_label_train_auc": 0.9782538989898989,
+  "recomputed_auc_2023": 0.9782538989898989,
+  "recomputed_auc_2024": 0.5136545628423324,
+  "reported_auc_2023": 0.9782538989898989,
+  "reported_auc_2024": 0.5136545628423324,
+  "schema_version": 1,
+  "stop_condition_rationale": "No parity failure was found. The defects recorded above are specification/capacity defects that EXPLAIN the measured numbers rather than invalidate them, so no repaired pipeline is being silently reused over the already-opened 2024 result.",
+  "stop_condition_triggered": false,
+  "study_id": "nq_mtf_structural_predictive_ranking",
+  "target_parity": true,
+  "temporal_holdout_all_arms": {
+    "direction_only": {
+      "frozen_2024_auc": 0.5167699251419586,
+      "holdout_auc": 0.5091230925626039,
+      "train_auc": 0.5334716832303285
+    },
+    "full": {
+      "frozen_2024_auc": 0.5136545628423324,
+      "holdout_auc": 0.5168674687790848,
+      "train_auc": 0.9898623117977887
+    },
+    "geometry_no_direction": {
+      "frozen_2024_auc": 0.5112492414131755,
+      "holdout_auc": 0.514717420234021,
+      "train_auc": 0.9865467950878661
+    },
+    "mtf_state_only": {
+      "frozen_2024_auc": 0.5207801451911314,
+      "holdout_auc": 0.4985281209726549,
+      "train_auc": 0.5485799440311036
+    }
+  },
+  "temporal_holdout_split": {
+    "holdout_n": 2244,
+    "predeclared": true,
+    "rule": "first 70% of 2023 session days train / final 30% holdout, by complete session",
+    "split_date_ct": "2023-09-11",
+    "splits_searched": 0,
+    "train_n": 5231
+  },
+  "temporal_holdout_test_auc": 0.5168674687790848,
+  "temporal_holdout_train_auc": 0.9898623117977887,
+  "verdict": "PIPELINE_CORRECT_OVERFIT_CONFIRMED",
+  "verdict_sha256": "402b3ac2d57d5e3a146529b823d412225d374bdfb96edef05a22966683ccc4bf"
+}

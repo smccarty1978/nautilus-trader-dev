@@ -1,7 +1,7 @@
 # Authoritative decision contract (research_decision.yaml > SPEC.md > study.yaml > compiled_study.json > code)
 study_id: nq_mtf_structural_predictive_ranking
 research_question: "# NQ MTF + Structural Geometry Predictive Ranking (lean modeling follow-up)\n\nPRIMARY QUESTION. Can the JOINT continuous entry-time information in 1m/5m/15m/1h regime orientation,\ncurrent 5m/15m/1h regime geometry, immediately prior 5m/15m/1h regime geometry, ATR-normalized distances to\ncurrent/prior structural levels, and regime age/progress/excursion state RANK 1m V_A flips into economically\ndifferent lifecycle populations OUT OF SAMPLE?\n\nThe completed atlas (studies/nq_mtf_regime_structural_geometry_atlas, verdict D_NOT_FOUND) tested HUMAN-DEFINED\nrectangular segmentation only. JOINT PREDICTIVE INFORMATION IN THE CONTINUOUS SURFACE IS UNTESTED and is what\nthis study tests.\n\nKEY EXPERIMENT. TRAIN = 2023 only. Freeze model, feature order, preprocessing, hyperparameters, score definition\nand the 2023 score-bucket boundaries. Score untouched 2024 ONCE. Decide whether the frozen score creates\neconomically ordered 2024 populations, against direction-only and exact-MTF controls.\n\nNOT: another NT collection, another bucket search, exit/stop/target optimization, post-entry management, ML zoo.\nOne primary nonlinear tabular model (LightGBM) plus one simple baseline; fixed modest configuration; no sweeps.\n\nTARGETS (predeclared): A terminal_gross_pnl_atr > 0 (+ continuous g for economics); B reach +2A before the\nopposite 1m flip; C reach +3A; D (diagnostic) +5A; E reach -2A.\n\nSTOP CONDITION. Stop after the frozen 2024 evaluation, diagnostics and descriptive top-50/30/20/10 retention\nsurfaces. 2025 and 2026 remain untouched. Verdict is one of NO_INFORMATION / WEAK_RANKING /\nTARGET_SPECIFIC_INFORMATION / REPRODUCIBLE_ECONOMIC_RANKING.\n\nREUSE CONSTRAINT (owner). Do not recollect the already-audited 2023/2024 atlas frame. If the workflow forces a\nrecollection of identical bars, STOP and resolve reuse."
-status: TARGET_A_COMPLETE_NO_INFORMATION   # 2023 fit -> freeze 357302cb -> 2024 scored once; verdict NO_INFORMATION (2026-09-23)
+status: TARGET_A_COMPLETE_NO_INFORMATION_AUDITED   # verdict NO_INFORMATION, forensically audited PIPELINE_CORRECT_OVERFIT_CONFIRMED (2026-09-23)
 dataset_id: NQ_1S_V2_GLOBEX
 terminal_decisions: {}
 # Predeclared fork policy (WORKFLOW.md §N.4). Agents follow these instead of asking again; a genuine
@@ -185,3 +185,45 @@ verdict:
     check: "all four authenticate; golden max_abs_diff 0.0; canonical bytes match; train_years [2023]; feature-order SHAs match the freeze"
   freeze_sha256: 357302cbc632f504dbf4acafa4877c88bb65aafef4f7be878d9ab955eedd28cd
   untouched: [2025, 2026]
+
+# ---------------------------------------------------------------------------------------------
+# Phase B FORENSIC AUDIT (2026-09-23, session a2b50fd4). Read-only. Report: forensics/TARGET_A_FORENSIC_AUDIT.md
+forensic_audit:
+  verdict: PIPELINE_CORRECT_OVERFIT_CONFIRMED
+  verdict_sha256: 402b3ac2d57d5e3a146529b823d412225d374bdfb96edef05a22966683ccc4bf
+  question: "is 0.9783 -> 0.5137 a real research result or a broken experiment?"
+  answer: >-
+    REAL. The pipeline is correct and the NO_INFORMATION verdict stands, better supported than before. The
+    cause is memorisation, not domain shift.
+  parity:   # every check exact, not within tolerance
+    population: "0 duplicate keys either year; identical filter rule; 7475/7047 match the fit and scoring receipts"
+    target: "0 mismatches and 0 null differences over 261,997 rows vs an independent pandas derivation"
+    feature_order_and_semantics: "golden fit-time matrix rebuilt independently, max_abs_diff 0.0, NaN pattern and column order identical, all 4 arms"
+    predictions: "model_store.score vs raw lightgbm Booster from canonical bytes: max_abs_diff 0.0, both years, all 4 arms"
+    auc: "0.9783 and 0.5137 reproduced by platform metric, hand-rolled Mann-Whitney and sklearn"
+  discriminators:
+    random_label_train_auc: 0.9711    # seed 20260923; real-label train AUC 0.9783 -> in-sample AUC measures capacity only
+    chronological_2023_holdout: {split_date_ct: '2023-09-11', train_n: 5231, holdout_n: 2244,
+                                 full_train_auc: 0.9899, full_holdout_auc: 0.5169, frozen_2024_auc: 0.5137}
+    controls_holdout_auc: {direction_only: 0.5091, mtf_state_only: 0.4985}   # price-free, no capacity: nothing is masked
+    case_3_temporal_shift: CONTRADICTED   # holdout collapses at ~25% price extrapolation vs ~95% for 2024
+  defects_found_not_invalidating:
+    NON_STATIONARY_PRICE_FEATURES: >-
+      22 of 78 features are ABSOLUTE PRICE LEVELS (start_price_*, highest_high_*, lowest_low_*, prior_start_price_*,
+      prior_end_price_*, prior_mfe_price_*, prior_mae_price_*). 94.8-96.0% of 2024 rows fall outside the ENTIRE 2023
+      range of each (NQ ~10,750-17,165 in 2023 vs ~16,334-22,152 in 2024). Within 2023 they are near-unique
+      memorisation handles; in 2024 they are pure extrapolation (score sd ratio 0.616). A design defect in the
+      declared feature surface -- but NOT the cause of the null, per the within-2023 holdout.
+    INERT_ROW_SUBSAMPLING: >-
+      subsample 0.8 never applied: LightGBM bags only when subsample_freq > 0, which is unset. One of two declared
+      regularisers did nothing. Recorded, NOT fixed (fixing it would be tuning).
+    CONSTANT_FEATURES_2023: "checkpoint_seconds_since_flip and bars_1m are constant across all 2023 training rows"
+  capacity: {trees: 400, total_leaves: 12400, training_rows: 7475, training_rows_per_leaf: 0.603,
+             early_stopping: none, lightgbm: 4.6.0}
+  caveat_added_to_the_conclusion: >-
+    The experiment did not cleanly TEST the research question: it ran at a capacity that fits noise to 0.97 over a
+    surface containing 22 non-stationary absolute price columns. NO_INFORMATION is the correct verdict for THIS
+    model on THIS surface; a re-specified run (price levels removed or ATR-normalised, capacity matched to the
+    sample, subsample_freq set, within-2023 holdout carried) is untested and was deliberately NOT performed.
+  stop_condition_triggered: false
+  scope: "read-only; no frozen artifact modified, no frozen model refitted, no tuning, no feature search, Targets B-E not opened, 2025/2026 untouched"

@@ -1,0 +1,356 @@
+{
+  "phase10_scores": {
+    "calibration": {
+      "2023_in_sample_frozen_model": [
+        {
+          "actual_rate": 0.0,
+          "decile": 1,
+          "n": 748,
+          "predicted_mean": 0.0887305719041425
+        },
+        {
+          "actual_rate": 0.0,
+          "decile": 2,
+          "n": 747,
+          "predicted_mean": 0.1343470389939379
+        },
+        {
+          "actual_rate": 0.004010695187165776,
+          "decile": 3,
+          "n": 748,
+          "predicted_mean": 0.17005933023975214
+        },
+        {
+          "actual_rate": 0.014725568942436412,
+          "decile": 4,
+          "n": 747,
+          "predicted_mean": 0.2073135538989276
+        },
+        {
+          "actual_rate": 0.029451137884872823,
+          "decile": 5,
+          "n": 747,
+          "predicted_mean": 0.24888868513719625
+        },
+        {
+          "actual_rate": 0.0962566844919786,
+          "decile": 6,
+          "n": 748,
+          "predicted_mean": 0.3028284322315138
+        },
+        {
+          "actual_rate": 0.3868808567603748,
+          "decile": 7,
+          "n": 747,
+          "predicted_mean": 0.37906022300765085
+        },
+        {
+          "actual_rate": 0.8061497326203209,
+          "decile": 8,
+          "n": 748,
+          "predicted_mean": 0.48150700587556194
+        },
+        {
+          "actual_rate": 0.9759036144578314,
+          "decile": 9,
+          "n": 747,
+          "predicted_mean": 0.5867744201564231
+        },
+        {
+          "actual_rate": 0.9973262032085561,
+          "decile": 10,
+          "n": 748,
+          "predicted_mean": 0.7118940541238646
+        }
+      ],
+      "2024_frozen_oos": [
+        {
+          "actual_rate": 0.33617021276595743,
+          "decile": 1,
+          "n": 705,
+          "predicted_mean": 0.14296989498006735
+        },
+        {
+          "actual_rate": 0.3347517730496454,
+          "decile": 2,
+          "n": 705,
+          "predicted_mean": 0.19697499805388902
+        },
+        {
+          "actual_rate": 0.3153409090909091,
+          "decile": 3,
+          "n": 704,
+          "predicted_mean": 0.2333227408554464
+        },
+        {
+          "actual_rate": 0.33191489361702126,
+          "decile": 4,
+          "n": 705,
+          "predicted_mean": 0.2639419462882382
+        },
+        {
+          "actual_rate": 0.3380681818181818,
+          "decile": 5,
+          "n": 704,
+          "predicted_mean": 0.29300345396021205
+        },
+        {
+          "actual_rate": 0.30921985815602837,
+          "decile": 6,
+          "n": 705,
+          "predicted_mean": 0.3252439159805397
+        },
+        {
+          "actual_rate": 0.34184397163120567,
+          "decile": 7,
+          "n": 705,
+          "predicted_mean": 0.35921347564628225
+        },
+        {
+          "actual_rate": 0.34232954545454547,
+          "decile": 8,
+          "n": 704,
+          "predicted_mean": 0.3995406870296069
+        },
+        {
+          "actual_rate": 0.3617021276595745,
+          "decile": 9,
+          "n": 705,
+          "predicted_mean": 0.4549502685682312
+        },
+        {
+          "actual_rate": 0.36312056737588655,
+          "decile": 10,
+          "n": 705,
+          "predicted_mean": 0.5613487201770199
+        }
+      ],
+      "late2023_holdout_early2023_model": [
+        {
+          "actual_rate": 0.3022222222222222,
+          "decile": 1,
+          "n": 225,
+          "predicted_mean": 0.1499181728149504
+        },
+        {
+          "actual_rate": 0.3080357142857143,
+          "decile": 2,
+          "n": 224,
+          "predicted_mean": 0.22512722459000084
+        },
+        {
+          "actual_rate": 0.32142857142857145,
+          "decile": 3,
+          "n": 224,
+          "predicted_mean": 0.2736925465383162
+        },
+        {
+          "actual_rate": 0.27555555555555555,
+          "decile": 4,
+          "n": 225,
+          "predicted_mean": 0.3186428503714842
+        },
+        {
+          "actual_rate": 0.2544642857142857,
+          "decile": 5,
+          "n": 224,
+          "predicted_mean": 0.36275359080676417
+        },
+        {
+          "actual_rate": 0.3794642857142857,
+          "decile": 6,
+          "n": 224,
+          "predicted_mean": 0.40702957804522477
+        },
+        {
+          "actual_rate": 0.3422222222222222,
+          "decile": 7,
+          "n": 225,
+          "predicted_mean": 0.45252836235668725
+        },
+        {
+          "actual_rate": 0.4107142857142857,
+          "decile": 8,
+          "n": 224,
+          "predicted_mean": 0.5121137929183348
+        },
+        {
+          "actual_rate": 0.29464285714285715,
+          "decile": 9,
+          "n": 224,
+          "predicted_mean": 0.579000997880963
+        },
+        {
+          "actual_rate": 0.30666666666666664,
+          "decile": 10,
+          "n": 225,
+          "predicted_mean": 0.6935974340552838
+        }
+      ]
+    },
+    "distributions": {
+      "2023_in_sample_frozen_model": {
+        "max": 0.921957364274073,
+        "mean": 0.3311536182106215,
+        "min": 0.01789087241869929,
+        "n": 7475,
+        "p01": 0.060106803292115256,
+        "p10": 0.11622220664092672,
+        "p25": 0.17026795626338515,
+        "p50": 0.2747627970738067,
+        "p75": 0.48234116642419805,
+        "p90": 0.6406900658155663,
+        "p99": 0.8011646226280509,
+        "std": 0.1971978133968629
+      },
+      "2024_frozen_oos": {
+        "max": 0.8162574586868293,
+        "mean": 0.3230571526470165,
+        "min": 0.05428501817659172,
+        "n": 7047,
+        "p01": 0.11026536225282615,
+        "p10": 0.17508231839615956,
+        "p25": 0.23381638892286444,
+        "p50": 0.30866456819646515,
+        "p75": 0.39901050729359544,
+        "p90": 0.48977013163913413,
+        "p99": 0.645333993954172,
+        "std": 0.12138511586976368
+      },
+      "early2023_train_of_holdout_model": {
+        "max": 0.9327906495393427,
+        "mean": 0.3361244666567788,
+        "min": 0.01659937568522713,
+        "n": 5231,
+        "p01": 0.04480474245077514,
+        "p10": 0.09205440527618272,
+        "p25": 0.14575279895569904,
+        "p50": 0.2547249212800478,
+        "p75": 0.5335537945188038,
+        "p90": 0.6991778988448639,
+        "p99": 0.8422952340428481,
+        "std": 0.2308506374080598
+      },
+      "late2023_holdout_early2023_model": {
+        "max": 0.848633062592307,
+        "mean": 0.3974515624350591,
+        "min": 0.03736665923534795,
+        "n": 2244,
+        "p01": 0.10243631295749764,
+        "p10": 0.19684545185309082,
+        "p25": 0.2747890081925929,
+        "p50": 0.3839072101540808,
+        "p75": 0.5118940052602531,
+        "p90": 0.6188455803310666,
+        "p99": 0.7792568479380575,
+        "std": 0.16033602175139547
+      }
+    },
+    "score_iqr_2023": 0.3120732101608129,
+    "score_iqr_2024": 0.165194118370731,
+    "score_std_ratio_2024_over_2023": 0.6155500092968815
+  },
+  "phase7_holdout": {
+    "arms": {
+      "direction_only": {
+        "frozen_2024_auc": 0.5167699251419586,
+        "frozen_full_year_in_sample_auc": 0.5262868686868687,
+        "holdout_auc": 0.5091230925626039,
+        "n_features": 1,
+        "train_auc": 0.5334716832303285
+      },
+      "full": {
+        "frozen_2024_auc": 0.5136545628423324,
+        "frozen_full_year_in_sample_auc": 0.9782538989898989,
+        "holdout_auc": 0.5168674687790848,
+        "n_features": 78,
+        "train_auc": 0.9898623117977887
+      },
+      "geometry_no_direction": {
+        "frozen_2024_auc": 0.5112492414131755,
+        "frozen_full_year_in_sample_auc": 0.9728121212121212,
+        "holdout_auc": 0.514717420234021,
+        "n_features": 71,
+        "train_auc": 0.9865467950878661
+      },
+      "mtf_state_only": {
+        "frozen_2024_auc": 0.5207801451911314,
+        "frozen_full_year_in_sample_auc": 0.5376206868686869,
+        "holdout_auc": 0.4985281209726549,
+        "n_features": 4,
+        "train_auc": 0.5485799440311036
+      }
+    },
+    "holdout_n": 2244,
+    "holdout_pct_outside_train_range_price_cols": {
+      "max": 35.82887700534759,
+      "mean": 25.196483552098524,
+      "min": 20.276292335115865
+    },
+    "holdout_positive_rate": 0.3195187165775401,
+    "holdout_sessions": 78,
+    "price_columns_n": 22,
+    "split_date_ct": "2023-09-11",
+    "train_n": 5231,
+    "train_positive_rate": 0.33607340852609446,
+    "train_sessions": 179
+  },
+  "phase8_random_label": {
+    "features": 78,
+    "interpretation_rule": "a shuffled-label train AUC near the real-label train AUC means 0.9783 measures capacity to memorise this sample, not structure",
+    "n": 7475,
+    "real_label_TRAIN_auc": 0.9782538989898989,
+    "real_positive_rate": 0.3311036789297659,
+    "scored_2024": false,
+    "seed": 20260923,
+    "shuffled_label_TRAIN_auc": 0.9711100606060606,
+    "shuffled_positive_rate": 0.3311036789297659
+  },
+  "phase9_capacity": {
+    "class_weighting": "none (unweighted)",
+    "early_stopping": "none (no validation set passed to fit)",
+    "estimator_class": "LGBMClassifier",
+    "family": "lightgbm",
+    "features": 78,
+    "frozen_hyperparameters": {
+      "colsample_bytree": 0.8,
+      "learning_rate": 0.05,
+      "min_child_samples": 100,
+      "n_estimators": 400,
+      "num_leaves": 31,
+      "subsample": 0.8,
+      "verbosity": -1
+    },
+    "leaves_per_training_row": 1.6588628762541806,
+    "lightgbm_version": "4.6.0",
+    "max_leaves_per_tree": 31,
+    "mean_leaves_per_tree": 31.0,
+    "note": "subsample is only active when subsample_freq > 0 in LightGBM; if subsample_freq is unset the declared row subsampling does not take effect.",
+    "random_seed": 42,
+    "regularisation": {
+      "colsample_bytree": 0.8,
+      "max_depth": "default/unset",
+      "min_child_samples": 100,
+      "min_child_weight": "default/unset",
+      "num_leaves": 31,
+      "reg_alpha": "default/unset",
+      "reg_lambda": "default/unset",
+      "subsample": 0.8,
+      "subsample_freq": "default/unset"
+    },
+    "sklearn_version": "1.7.2",
+    "subsample_effective": false,
+    "total_leaves_persisted": 12400,
+    "training_rows": 7475,
+    "training_rows_per_leaf": 0.6028225806451613,
+    "trees_persisted": 400
+  },
+  "predeclared": {
+    "feature_selection": "none",
+    "shuffle_seed": 20260923,
+    "split_fraction_of_sessions": 0.7,
+    "split_unit": "complete trading session (CT date)",
+    "splits_searched": 0,
+    "tuning": "none"
+  }
+}

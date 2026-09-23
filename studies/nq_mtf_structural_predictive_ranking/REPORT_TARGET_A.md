@@ -226,6 +226,43 @@ moment of the flip, and at that moment the eventual sign of the trade is close t
 
 ---
 
+## ADDENDUM (2026-09-23) — forensic audit of this result
+
+A read-only forensic audit of everything above was run afterwards: `forensics/TARGET_A_FORENSIC_AUDIT.md`,
+verdict `forensics/TARGET_A_FORENSIC_VERDICT.json`. **Verdict: `PIPELINE_CORRECT_OVERFIT_CONFIRMED`.** No
+number in this report changed.
+
+Every parity check is exact at max abs diff **0.0**: population (0 duplicates, identical filter rules both
+years, counts matching the receipts), target (0 mismatches over 261,997 rows against an independent pandas
+derivation), feature order and semantics (golden fit-time matrix rebuilt independently, cell for cell),
+persisted predictions (`model_store.score` vs a raw booster loaded from canonical bytes), and both reported
+AUCs under three independent implementations.
+
+Two diagnostics then explain the collapse, and they sharpen two claims made above:
+
+- **The estimator reaches training AUC 0.9711 on randomly shuffled labels** (seed 20260923). So §8's statement
+  that the 0.978 "quantifies the in-sample/out-of-sample gap" was too generous — it quantifies capacity and
+  nothing else. It has 12,400 leaves for 7,475 rows (0.603 rows per leaf), no early stopping, and its declared
+  `subsample: 0.8` never applied because `subsample_freq` is unset.
+- **It already fails inside 2023**: on a predeclared chronological split (first 70% of sessions train), FULL
+  trains to 0.9899 and scores **0.5169** on the held-out final 30% — the same as its 0.5137 on 2024. §5's
+  framing ("did not transfer") is right but understated: there was no relationship to transfer, and 2024 was
+  not where it broke.
+
+The audit also found a real design defect that this report did not: **22 of the 78 features are absolute price
+levels**, and 94.8–96.0% of 2024 rows fall outside the entire 2023 range of each (NQ ~10,750–17,165 in 2023 vs
+~16,334–22,152 in 2024). That explains the coverage collapse and score compression noted in §4, but it is
+*not* the cause of the null — the within-2023 holdout collapses at a quarter of that extrapolation.
+
+**Net effect on the conclusion: none. `NO_INFORMATION` stands and is better supported**, because the two
+controls that carry no price columns and almost no capacity also show no within-2023 holdout skill (0.5091,
+0.4985). But the audit adds a caveat this report should have carried: the experiment did not cleanly *test*
+the research question, since it ran at a capacity that fits noise to 0.97 over a partly non-stationary
+surface. Re-specifying it (price levels removed or ATR-normalised, capacity matched to the sample,
+`subsample_freq` set, within-2023 holdout carried) is untested and was deliberately not done.
+
+---
+
 ### Artifacts
 
 | file | sha256 / id |
