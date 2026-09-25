@@ -1,0 +1,29 @@
+{
+  "project": "PROJECT 3F: NQ P90-Armed Reversal Micro-Transition Study",
+  "instrument": "NQ",
+  "timestamp_utc": "2026-09-16T00:22:08Z",
+  "verdict": "1S_PRICE_TRIGGER_SUFFICIENT",
+  "gate_e_decision": "1S_TRANSITION_OBSERVABLE",
+  "key_findings": {
+    "timing_of_extreme": "The final prevailing extreme is established predominantly at T-3s to T-1s before T0 (peaking at T-2s).",
+    "earliest_rejection_onset": "Rejection first becomes causally visible at T-2s with high-wick formation and deceleration.",
+    "divergence_from_false_pauses": "TRUE reversals diverge statistically from FALSE pauses between T-2s and T0, primarily via prevailing deceleration and fade bar close location.",
+    "1s_classifier_performance": "OOS ROC-AUC = 0.7655, outperforming Project 3E 5s baseline (0.5280).",
+    "mbp1_incremental_value": {
+      "delta_roc_auc": 0.016000000000000125,
+      "delta_pr_auc": -0.08091624062212288,
+      "percent_improvement": 2.4464794396339036
+    }
+  },
+  "artifacts_produced": [
+    "PROJECT_3F_REPORT.md",
+    "project_3f_summary.json",
+    "aligned_1s_trajectories.parquet",
+    "true_vs_false_event_comparison.json",
+    "interpretable_1s_frontier.json",
+    "diagnostic_model_results.json",
+    "mbp1_incremental_results.json",
+    "leakage_audit.json",
+    "project_verdict.json"
+  ]
+}

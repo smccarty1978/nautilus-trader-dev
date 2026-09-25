@@ -1,0 +1,21 @@
+{
+  "status": "EVALUATED",
+  "sample_size": 100,
+  "model_a_1s_price_volume": {
+    "mean_roc_auc": 0.6539999999999999,
+    "mean_pr_auc": 0.6901619948678771
+  },
+  "model_b_1s_price_volume_plus_mbp1": {
+    "mean_roc_auc": 0.67,
+    "mean_pr_auc": 0.6092457542457542
+  },
+  "incremental_delta": {
+    "delta_roc_auc": 0.016000000000000125,
+    "delta_pr_auc": -0.08091624062212288,
+    "percent_improvement": 2.4464794396339036
+  },
+  "order_flow_findings": {
+    "fade_delta_effect": "Modest positive correlation with reversal start (exhaustion absorption)",
+    "fade_book_imbalance_effect": "Weak and ephemeral (top-of-book replenishment occurs concurrently with price turn)"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "verdict": "1S_PRICE_TRIGGER_SUFFICIENT",
+  "summary": "1-second price/volume features successfully localize the reversal transition with positive expectancy, rendering MBP-1 unnecessary.",
+  "metrics": {
+    "population_regimes": 5497,
+    "true_reversal_starts": 10618,
+    "matched_false_pauses": 10618,
+    "oos_roc_auc_1s_model": 0.7655004593447545,
+    "oos_pr_auc_1s_model": 0.7650573035089454,
+    "benchmark_3e_roc_auc": 0.528,
+    "incremental_mbp1_delta_auc": 0.016000000000000125,
+    "best_interpretable_state": "THRUST_EXHAUSTION_REJECTION",
+    "best_interpretable_state_win_rate": 0.7333333333333333,
+    "best_interpretable_state_expectancy_atr": 0.5333333333333332
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "status": "PASS",
+  "audit_timestamp_utc": "2026-09-16T00:22:08Z",
+  "causal_checks": {
+    "A_feature_availability": {
+      "passed": true,
+      "rule": "Every 1s bar feature at relative second t uses ts_init <= (event_ts + t*1e9)",
+      "verified": true
+    },
+    "B_no_future_extrema": {
+      "passed": true,
+      "rule": "Running regime extreme is updated sequentially up to second t; future extrema after t are never used",
+      "verified": true
+    },
+    "C_no_completed_run_labels_in_features": {
+      "passed": true,
+      "rule": "Winning run duration and outcome labels are used strictly as evaluation targets and never passed into X",
+      "verified": true
+    },
+    "D_chronological_split_integrity": {
+      "passed": true,
+      "rule": "Diagnostic model trained on 2023-2024 TRAIN only; 2025 Q1 OOS strictly untouched during feature construction and fitting",
+      "verified": true
+    },
+    "E_native_1s_unfilled_catalog": {
+      "passed": true,
+      "rule": "1-second bars sourced from immutable NQ_1S_V2_GLOBEX catalog with native rows only",
+      "verified": true
+    }
+  },
+  "critical_violations": 0,
+  "warnings": 0
+}

@@ -1,0 +1,2375 @@
+{
+  "description": "Comparison of theoretical decision-close entry vs realistic next-bar-open entry",
+  "rules": {
+    "THRUST_EXHAUSTION_REJECTION": {
+      "all_triggers": {
+        "2023": {
+          "FADE_BULL": {
+            "next_bar_open": {
+              "n": 2414,
+              "resolved_n": 2411,
+              "wins": 1014,
+              "losses": 1397,
+              "unresolved_count": 3,
+              "win_rate": 0.4205723766072169,
+              "gross_expectancy_atr": -0.013998340937370402,
+              "mean_outcome_atr": -0.014122139851745772,
+              "mean_mfe": 11.315263544629316,
+              "mean_mae": 12.886161571387781,
+              "median_hold_seconds": 5.0,
+              "regimes_triggered": 605
+            },
+            "decision_close": {
+              "n": 2414,
+              "resolved_n": 2411,
+              "wins": 861,
+              "losses": 1550,
+              "unresolved_count": 3,
+              "win_rate": 0.3571132310244712,
+              "gross_expectancy_atr": -0.12505184570717548,
+              "mean_outcome_atr": -0.1250660147721059,
+              "mean_mfe": 11.293106351220873,
+              "mean_mae": 12.909788322607955,
+              "median_hold_seconds": 5.0,
+              "regimes_triggered": 605
+            },
+            "delta_win_rate": 0.06345914558274574,
+            "delta_expectancy_atr": 0.11105350476980508
+          },
+          "FADE_BEAR": {
+            "next_bar_open": {
+              "n": 2496,
+              "resolved_n": 2496,
+              "wins": 1052,
+              "losses": 1444,
+              "unresolved_count": 0,
+              "win_rate": 0.421474358974359,
+              "gross_expectancy_atr": -0.01241987179487175,
+              "mean_outcome_atr": -0.012419871794871794,
+              "mean_mfe": 11.764918897802987,
+              "mean_mae": 11.017797430729019,
+              "median_hold_seconds": 5.0,
+              "regimes_triggered": 681
+            },
+            "decision_close": {
+              "n": 2496,
+              "resolved_n": 2496,
+              "wins": 923,
+              "losses": 1573,
+              "unresolved_count": 0,
+              "win_rate": 0.3697916666666667,
+              "gross_expectancy_atr": -0.10286458333333326,
+              "mean_outcome_atr": -0.10286458333333333,
+              "mean_mfe": 11.748473394014878,
+              "mean_mae": 11.033842300540082,
+              "median_hold_seconds": 5.0,
+              "regimes_triggered": 681
+            },
+            "delta_win_rate": 0.05168269230769229,
+            "delta_expectancy_atr": 0.09044471153846151
+          },
+          "pooled": {
+            "next_bar_open": {
+              "n": 4910,
+              "resolved_n": 4907,
+              "wins": 2066,
+              "losses": 2841,
+              "unresolved_count": 3,
+              "win_rate": 0.42103117994701444,
+              "gross_expectancy_atr": -0.013195435092724694,
+              "mean_outcome_atr": -0.01325679136499273,
+              "mean_mfe": 11.543845980784406,
+              "mean_mae": 11.936378089700558,
+              "median_hold_seconds": 5.0,
+              "regimes_triggered": 1286
+            },
+            "decision_close": {
+              "n": 4910,
+              "resolved_n": 4907,
+              "wins": 1784,
+              "losses": 3123,
+              "unresolved_count": 3,
+              "win_rate": 0.3635622579987773,
+              "gross_expectancy_atr": -0.11376604850213978,
+              "mean_outcome_atr": -0.11377991031769116,
+              "mean_mfe": 11.524592326539375,
+              "mean_mae": 11.956150589190152,
+              "median_hold_seconds": 5.0,
+              "regimes_triggered": 1286
+            },
+            "delta_win_rate": 0.05746892194823716,
+            "delta_expectancy_atr": 0.10057061340941509
+          }
+        },
+        "2024": {
+          "FADE_BULL": {
+            "next_bar_open": {
+              "n": 4017,
+              "resolved_n": 4010,
+              "wins": 1670,
+              "losses": 2340,
+              "unresolved_count": 7,
+              "win_rate": 0.4164588528678304,
+              "gross_expectancy_atr": -0.021197007481296826,
+              "mean_outcome_atr": -0.020147848207412385,
+              "mean_mfe": 14.519407291555467,
+              "mean_mae": 15.988930887620768,
+              "median_hold_seconds": 4.0,
+              "regimes_triggered": 773
+            },
+            "decision_close": {
+              "n": 4017,
+              "resolved_n": 4010,
+              "wins": 1319,
+              "losses": 2691,
+              "unresolved_count": 7,
+              "win_rate": 0.328927680798005,
+              "gross_expectancy_atr": -0.17437655860349116,
+              "mean_outcome_atr": -0.1730574004586623,
+              "mean_mfe": 14.483155652239772,
+              "mean_mae": 16.026287395212318,
+              "median_hold_seconds": 4.0,
+              "regimes_triggered": 773
+            },
+            "delta_win_rate": 0.08753117206982541,
+            "delta_expectancy_atr": 0.15317955112219434
+          },
+          "FADE_BEAR": {
+            "next_bar_open": {
+              "n": 5649,
+              "resolved_n": 5649,
+              "wins": 2450,
+              "losses": 3199,
+              "unresolved_count": 0,
+              "win_rate": 0.43370508054522927,
+              "gross_expectancy_atr": 0.008983890954151197,
+              "mean_outcome_atr": 0.008983890954151178,
+              "mean_mfe": 15.38734469240058,
+              "mean_mae": 19.150801164027353,
+              "median_hold_seconds": 2.0,
+              "regimes_triggered": 853
+            },
+            "decision_close": {
+              "n": 5649,
+              "resolved_n": 5649,
+              "wins": 1780,
+              "losses": 3869,
+              "unresolved_count": 0,
+              "win_rate": 0.31510001770224816,
+              "gross_expectancy_atr": -0.19857496902106575,
+              "mean_outcome_atr": -0.19857496902106567,
+              "mean_mfe": 15.367543201797869,
+              "mean_mae": 19.16870715839483,
+              "median_hold_seconds": 2.0,
+              "regimes_triggered": 853
+            },
+            "delta_win_rate": 0.11860506284298111,
+            "delta_expectancy_atr": 0.20755885997521695
+          },
+          "pooled": {
+            "next_bar_open": {
+              "n": 9666,
+              "resolved_n": 9659,
+              "wins": 4120,
+              "losses": 5539,
+              "unresolved_count": 7,
+              "win_rate": 0.4265451910135625,
+              "gross_expectancy_atr": -0.0035459157262656693,
+              "mean_outcome_atr": -0.0031226884180814763,
+              "mean_mfe": 15.026646933328076,
+              "mean_mae": 17.83678989769947,
+              "median_hold_seconds": 3.0,
+              "regimes_triggered": 1626
+            },
+            "decision_close": {
+              "n": 9666,
+              "resolved_n": 9659,
+              "wins": 3099,
+              "losses": 6560,
+              "unresolved_count": 7,
+              "win_rate": 0.3208406667356869,
+              "gross_expectancy_atr": -0.18852883321254787,
+              "mean_outcome_atr": -0.18797036805736048,
+              "mean_mfe": 15.000009083592314,
+              "mean_mae": 17.862779143838225,
+              "median_hold_seconds": 3.0,
+              "regimes_triggered": 1626
+            },
+            "delta_win_rate": 0.10570452427787558,
+            "delta_expectancy_atr": 0.1849829174862822
+          }
+        },
+        "2025_Q1": {
+          "FADE_BULL": {
+            "next_bar_open": {
+              "n": 2475,
+              "resolved_n": 2475,
+              "wins": 1119,
+              "losses": 1356,
+              "unresolved_count": 0,
+              "win_rate": 0.45212121212121215,
+              "gross_expectancy_atr": 0.041212121212121255,
+              "mean_outcome_atr": 0.041212121212121214,
+              "mean_mfe": 19.187204095864406,
+              "mean_mae": 17.724718270678146,
+              "median_hold_seconds": 2.0,
+              "regimes_triggered": 275
+            },
+            "decision_close": {
+              "n": 2475,
+              "resolved_n": 2475,
+              "wins": 862,
+              "losses": 1613,
+              "unresolved_count": 0,
+              "win_rate": 0.3482828282828283,
+              "gross_expectancy_atr": -0.14050505050505047,
+              "mean_outcome_atr": -0.1405050505050505,
+              "mean_mfe": 19.156678442868806,
+              "mean_mae": 17.759416900969555,
+              "median_hold_seconds": 2.0,
+              "regimes_triggered": 275
+            },
+            "delta_win_rate": 0.10383838383838384,
+            "delta_expectancy_atr": 0.18171717171717172
+          },
+          "FADE_BEAR": {
+            "next_bar_open": {
+              "n": 3152,
+              "resolved_n": 3147,
+              "wins": 1356,
+              "losses": 1791,
+              "unresolved_count": 5,
+              "win_rate": 0.43088655862726405,
+              "gross_expectancy_atr": 0.0040514775977121276,
+              "mean_outcome_atr": 0.004868355843980682,
+              "mean_mfe": 23.327423634258853,
+              "mean_mae": 24.469650330458638,
+              "median_hold_seconds": 1.0,
+              "regimes_triggered": 284
+            },
+            "decision_close": {
+              "n": 3152,
+              "resolved_n": 3146,
+              "wins": 862,
+              "losses": 2284,
+              "unresolved_count": 6,
+              "win_rate": 0.2739987285441831,
+              "gross_expectancy_atr": -0.27050222504767946,
+              "mean_outcome_atr": -0.2690444487085377,
+              "mean_mfe": 23.287197269273275,
+              "mean_mae": 24.518202742173898,
+              "median_hold_seconds": 1.0,
+              "regimes_triggered": 284
+            },
+            "delta_win_rate": 0.15688783008308094,
+            "delta_expectancy_atr": 0.2745537026453916
+          },
+          "pooled": {
+            "next_bar_open": {
+              "n": 5627,
+              "resolved_n": 5622,
+              "wins": 2475,
+              "losses": 3147,
+              "unresolved_count": 5,
+              "win_rate": 0.4402347918890075,
+              "gross_expectancy_atr": 0.020410885805763113,
+              "mean_outcome_atr": 0.02085392884667267,
+              "mean_mfe": 21.506374521494276,
+              "mean_mae": 21.502935056252714,
+              "median_hold_seconds": 2.0,
+              "regimes_triggered": 559
+            },
+            "decision_close": {
+              "n": 5627,
+              "resolved_n": 5621,
+              "wins": 1724,
+              "losses": 3897,
+              "unresolved_count": 6,
+              "win_rate": 0.30670699163849846,
+              "gross_expectancy_atr": -0.21326276463262772,
+              "mean_outcome_atr": -0.21250721562632147,
+              "mean_mfe": 21.470414952701205,
+              "mean_mae": 21.54539397071828,
+              "median_hold_seconds": 2.0,
+              "regimes_triggered": 559
+            },
+            "delta_win_rate": 0.13352780025050903,
+            "delta_expectancy_atr": 0.23367365043839083
+          }
+        },
+        "pooled": {
+          "FADE_BULL": {
+            "next_bar_open": {
+              "n": 8906,
+              "resolved_n": 8896,
+              "wins": 3803,
+              "losses": 5093,
+              "unresolved_count": 10,
+              "win_rate": 0.4274955035971223,
+              "gross_expectancy_atr": -0.001882868705035956,
+              "mean_outcome_atr": -0.0014624693298102237,
+              "mean_mfe": 14.948106380437668,
+              "mean_mae": 15.630294984149016,
+              "median_hold_seconds": 4.0,
+              "regimes_triggered": 1653
+            },
+            "decision_close": {
+              "n": 8906,
+              "resolved_n": 8896,
+              "wins": 3042,
+              "losses": 5854,
+              "unresolved_count": 10,
+              "win_rate": 0.3419514388489209,
+              "gross_expectancy_atr": -0.15158498201438847,
+              "mean_outcome_atr": -0.15100280005640135,
+              "mean_mfe": 14.917266352233847,
+              "mean_mae": 15.663191366184945,
+              "median_hold_seconds": 4.0,
+              "regimes_triggered": 1653
+            },
+            "delta_win_rate": 0.08554406474820142,
+            "delta_expectancy_atr": 0.1497021133093525
+          },
+          "FADE_BEAR": {
+            "next_bar_open": {
+              "n": 11297,
+              "resolved_n": 11292,
+              "wins": 4858,
+              "losses": 6434,
+              "unresolved_count": 5,
+              "win_rate": 0.4302160821820758,
+              "gross_expectancy_atr": 0.002878143818632606,
+              "mean_outcome_atr": 0.0031065820678257156,
+              "mean_mfe": 16.80237116327087,
+              "mean_mae": 18.837889351535434,
+              "median_hold_seconds": 2.0,
+              "regimes_triggered": 1818
+            },
+            "decision_close": {
+              "n": 11297,
+              "resolved_n": 11291,
+              "wins": 3565,
+              "losses": 7726,
+              "unresolved_count": 6,
+              "win_rate": 0.31573819856522894,
+              "gross_expectancy_atr": -0.19745815251084925,
+              "mean_outcome_atr": -0.19709020999639826,
+              "mean_mfe": 16.777612368873744,
+              "mean_mae": 18.86393486441113,
+              "median_hold_seconds": 2.0,
+              "regimes_triggered": 1818
+            },
+            "delta_win_rate": 0.11447788361684685,
+            "delta_expectancy_atr": 0.20033629632948186
+          },
+          "pooled": {
+            "next_bar_open": {
+              "n": 20203,
+              "resolved_n": 20188,
+              "wins": 8661,
+              "losses": 11527,
+              "unresolved_count": 15,
+              "win_rate": 0.42901723796314645,
+              "gross_expectancy_atr": 0.0007801664355063243,
+              "mean_outcome_atr": 0.0010924271528454813,
+              "mean_mfe": 15.98496374081319,
+              "mean_mae": 17.42389957596034,
+              "median_hold_seconds": 3.0,
+              "regimes_triggered": 3471
+            },
+            "decision_close": {
+              "n": 20203,
+              "resolved_n": 20187,
+              "wins": 6607,
+              "losses": 13580,
+              "unresolved_count": 16,
+              "win_rate": 0.32728983999603706,
+              "gross_expectancy_atr": -0.1772427800069351,
+              "mean_outcome_atr": -0.17677369893736677,
+              "mean_mfe": 15.95752418275312,
+              "mean_mae": 17.452965127480855,
+              "median_hold_seconds": 3.0,
+              "regimes_triggered": 3471
+            },
+            "delta_win_rate": 0.10172739796710939,
+            "delta_expectancy_atr": 0.17802294644244143
+          }
+        }
+      },
+      "first_trigger": {
+        "2023": {
+          "FADE_BULL": {
+            "next_bar_open": {
+              "n": 605,
+              "resolved_n": 603,
+              "wins": 260,
+              "losses": 343,
+              "unresolved_count": 2,
+              "win_rate": 0.4311774461028192,
+              "gross_expectancy_atr": 0.004560530679933672,
+              "mean_outcome_atr": 0.0041865853859095895,
+              "mean_mfe": 10.683828579337133,
+              "mean_mae": 10.533448351823044,
+              "median_hold_seconds": 7.0,
+              "regimes_triggered": 605
+            },
+            "decision_close": {
+              "n": 605,
+              "resolved_n": 603,
+              "wins": 234,
+              "losses": 369,
+              "unresolved_count": 2,
+              "win_rate": 0.3880597014925373,
+              "gross_expectancy_atr": -0.07089552238805968,
+              "mean_outcome_atr": -0.07117709656099247,
+              "mean_mfe": 10.665501119060373,
+              "mean_mae": 10.552931604496408,
+              "median_hold_seconds": 7.0,
+              "regimes_triggered": 605
+            },
+            "delta_win_rate": 0.043117744610281894,
+            "delta_expectancy_atr": 0.07545605306799336
+          },
+          "FADE_BEAR": {
+            "next_bar_open": {
+              "n": 681,
+              "resolved_n": 681,
+              "wins": 287,
+              "losses": 394,
+              "unresolved_count": 0,
+              "win_rate": 0.42143906020558003,
+              "gross_expectancy_atr": -0.01248164464023499,
+              "mean_outcome_atr": -0.012481644640234948,
+              "mean_mfe": 10.786164568452657,
+              "mean_mae": 10.523868223032023,
+              "median_hold_seconds": 6.0,
+              "regimes_triggered": 681
+            },
+            "decision_close": {
+              "n": 681,
+              "resolved_n": 681,
+              "wins": 264,
+              "losses": 417,
+              "unresolved_count": 0,
+              "win_rate": 0.3876651982378855,
+              "gross_expectancy_atr": -0.07158590308370039,
+              "mean_outcome_atr": -0.07158590308370044,
+              "mean_mfe": 10.76767331880261,
+              "mean_mae": 10.53726911773863,
+              "median_hold_seconds": 6.0,
+              "regimes_triggered": 681
+            },
+            "delta_win_rate": 0.03377386196769455,
+            "delta_expectancy_atr": 0.059104258443465396
+          },
+          "pooled": {
+            "next_bar_open": {
+              "n": 1286,
+              "resolved_n": 1284,
+              "wins": 547,
+              "losses": 737,
+              "unresolved_count": 2,
+              "win_rate": 0.42601246105919005,
+              "gross_expectancy_atr": -0.004478193146417453,
+              "mean_outcome_atr": -0.004640058974747044,
+              "mean_mfe": 10.738020498923193,
+              "mean_mae": 10.52837520430618,
+              "median_hold_seconds": 6.0,
+              "regimes_triggered": 1286
+            },
+            "decision_close": {
+              "n": 1286,
+              "resolved_n": 1284,
+              "wins": 498,
+              "losses": 786,
+              "unresolved_count": 2,
+              "win_rate": 0.3878504672897196,
+              "gross_expectancy_atr": -0.07126168224299068,
+              "mean_outcome_atr": -0.07139357964183549,
+              "mean_mfe": 10.71960630414938,
+              "mean_mae": 10.544637550466824,
+              "median_hold_seconds": 6.0,
+              "regimes_triggered": 1286
+            },
+            "delta_win_rate": 0.03816199376947044,
+            "delta_expectancy_atr": 0.06678348909657322
+          }
+        },
+        "2024": {
+          "FADE_BULL": {
+            "next_bar_open": {
+              "n": 773,
+              "resolved_n": 772,
+              "wins": 320,
+              "losses": 452,
+              "unresolved_count": 1,
+              "win_rate": 0.41450777202072536,
+              "gross_expectancy_atr": -0.024611398963730657,
+              "mean_outcome_atr": -0.02377114013437475,
+              "mean_mfe": 12.222251695796515,
+              "mean_mae": 12.036356324534946,
+              "median_hold_seconds": 6.0,
+              "regimes_triggered": 773
+            },
+            "decision_close": {
+              "n": 773,
+              "resolved_n": 772,
+              "wins": 273,
+              "losses": 499,
+              "unresolved_count": 1,
+              "win_rate": 0.3536269430051813,
+              "gross_expectancy_atr": -0.13115284974093272,
+              "mean_outcome_atr": -0.13020585546307056,
+              "mean_mfe": 12.185206660814318,
+              "mean_mae": 12.078010070520312,
+              "median_hold_seconds": 6.0,
+              "regimes_triggered": 773
+            },
+            "delta_win_rate": 0.060880829015544036,
+            "delta_expectancy_atr": 0.10654145077720206
+          },
+          "FADE_BEAR": {
+            "next_bar_open": {
+              "n": 853,
+              "resolved_n": 853,
+              "wins": 362,
+              "losses": 491,
+              "unresolved_count": 0,
+              "win_rate": 0.4243845252051583,
+              "gross_expectancy_atr": -0.007327080890972948,
+              "mean_outcome_atr": -0.007327080890973036,
+              "mean_mfe": 12.887059676134959,
+              "mean_mae": 14.944361005630265,
+              "median_hold_seconds": 4.0,
+              "regimes_triggered": 853
+            },
+            "decision_close": {
+              "n": 853,
+              "resolved_n": 853,
+              "wins": 284,
+              "losses": 569,
+              "unresolved_count": 0,
+              "win_rate": 0.33294255568581477,
+              "gross_expectancy_atr": -0.16735052754982416,
+              "mean_outcome_atr": -0.16735052754982416,
+              "mean_mfe": 12.873712558852752,
+              "mean_mae": 14.969346876868569,
+              "median_hold_seconds": 4.0,
+              "regimes_triggered": 853
+            },
+            "delta_win_rate": 0.09144196951934352,
+            "delta_expectancy_atr": 0.1600234466588512
+          },
+          "pooled": {
+            "next_bar_open": {
+              "n": 1626,
+              "resolved_n": 1625,
+              "wins": 682,
+              "losses": 943,
+              "unresolved_count": 1,
+              "win_rate": 0.4196923076923077,
+              "gross_expectancy_atr": -0.015538461538461501,
+              "mean_outcome_atr": -0.015144582610007186,
+              "mean_mfe": 12.571010125826461,
+              "mean_mae": 13.561896295613856,
+              "median_hold_seconds": 4.0,
+              "regimes_triggered": 1626
+            },
+            "decision_close": {
+              "n": 1626,
+              "resolved_n": 1625,
+              "wins": 557,
+              "losses": 1068,
+              "unresolved_count": 1,
+              "win_rate": 0.34276923076923077,
+              "gross_expectancy_atr": -0.1501538461538462,
+              "mean_outcome_atr": -0.1496919595774622,
+              "mean_mfe": 12.546397024299425,
+              "mean_mae": 13.594806070406575,
+              "median_hold_seconds": 4.0,
+              "regimes_triggered": 1626
+            },
+            "delta_win_rate": 0.07692307692307693,
+            "delta_expectancy_atr": 0.1346153846153847
+          }
+        },
+        "2025_Q1": {
+          "FADE_BULL": {
+            "next_bar_open": {
+              "n": 275,
+              "resolved_n": 275,
+              "wins": 122,
+              "losses": 153,
+              "unresolved_count": 0,
+              "win_rate": 0.44363636363636366,
+              "gross_expectancy_atr": 0.026363636363636367,
+              "mean_outcome_atr": 0.026363636363636363,
+              "mean_mfe": 15.826828880814087,
+              "mean_mae": 15.329792784243374,
+              "median_hold_seconds": 3.0,
+              "regimes_triggered": 275
+            },
+            "decision_close": {
+              "n": 275,
+              "resolved_n": 275,
+              "wins": 102,
+              "losses": 173,
+              "unresolved_count": 0,
+              "win_rate": 0.3709090909090909,
+              "gross_expectancy_atr": -0.10090909090909095,
+              "mean_outcome_atr": -0.1009090909090909,
+              "mean_mfe": 15.798624105582256,
+              "mean_mae": 15.36817685821524,
+              "median_hold_seconds": 3.0,
+              "regimes_triggered": 275
+            },
+            "delta_win_rate": 0.07272727272727275,
+            "delta_expectancy_atr": 0.12727272727272732
+          },
+          "FADE_BEAR": {
+            "next_bar_open": {
+              "n": 284,
+              "resolved_n": 284,
+              "wins": 125,
+              "losses": 159,
+              "unresolved_count": 0,
+              "win_rate": 0.44014084507042256,
+              "gross_expectancy_atr": 0.020246478873239437,
+              "mean_outcome_atr": 0.020246478873239437,
+              "mean_mfe": 17.233489838853167,
+              "mean_mae": 20.252850073109656,
+              "median_hold_seconds": 2.0,
+              "regimes_triggered": 284
+            },
+            "decision_close": {
+              "n": 284,
+              "resolved_n": 284,
+              "wins": 97,
+              "losses": 187,
+              "unresolved_count": 0,
+              "win_rate": 0.3415492957746479,
+              "gross_expectancy_atr": -0.15228873239436624,
+              "mean_outcome_atr": -0.1522887323943662,
+              "mean_mfe": 17.20975722388862,
+              "mean_mae": 20.281432135034084,
+              "median_hold_seconds": 2.0,
+              "regimes_triggered": 284
+            },
+            "delta_win_rate": 0.09859154929577468,
+            "delta_expectancy_atr": 0.17253521126760568
+          },
+          "pooled": {
+            "next_bar_open": {
+              "n": 559,
+              "resolved_n": 559,
+              "wins": 247,
+              "losses": 312,
+              "unresolved_count": 0,
+              "win_rate": 0.4418604651162791,
+              "gross_expectancy_atr": 0.023255813953488413,
+              "mean_outcome_atr": 0.023255813953488372,
+              "mean_mfe": 16.54148310636525,
+              "mean_mae": 17.830952480196906,
+              "median_hold_seconds": 3.0,
+              "regimes_triggered": 559
+            },
+            "decision_close": {
+              "n": 559,
+              "resolved_n": 559,
+              "wins": 199,
+              "losses": 360,
+              "unresolved_count": 0,
+              "win_rate": 0.3559928443649374,
+              "gross_expectancy_atr": -0.12701252236135957,
+              "mean_outcome_atr": -0.12701252236135957,
+              "mean_mfe": 16.515550412557225,
+              "mean_mae": 17.864356641071325,
+              "median_hold_seconds": 3.0,
+              "regimes_triggered": 559
+            },
+            "delta_win_rate": 0.08586762075134169,
+            "delta_expectancy_atr": 0.15026833631484798
+          }
+        },
+        "pooled": {
+          "FADE_BULL": {
+            "next_bar_open": {
+              "n": 1653,
+              "resolved_n": 1650,
+              "wins": 702,
+              "losses": 948,
+              "unresolved_count": 3,
+              "win_rate": 0.4254545454545455,
+              "gross_expectancy_atr": -0.005454545454545379,
+              "mean_outcome_atr": -0.005197947468479359,
+              "mean_mfe": 12.25885952424292,
+              "mean_mae": 12.034200064963935,
+              "median_hold_seconds": 6.0,
+              "regimes_triggered": 1653
+            },
+            "decision_close": {
+              "n": 1653,
+              "resolved_n": 1650,
+              "wins": 609,
+              "losses": 1041,
+              "unresolved_count": 3,
+              "win_rate": 0.3690909090909091,
+              "gross_expectancy_atr": -0.10409090909090907,
+              "mean_outcome_atr": -0.10372732588769147,
+              "mean_mfe": 12.230135846870002,
+              "mean_mae": 12.067195427248468,
+              "median_hold_seconds": 6.0,
+              "regimes_triggered": 1653
+            },
+            "delta_win_rate": 0.056363636363636394,
+            "delta_expectancy_atr": 0.09863636363636369
+          },
+          "FADE_BEAR": {
+            "next_bar_open": {
+              "n": 1818,
+              "resolved_n": 1818,
+              "wins": 774,
+              "losses": 1044,
+              "unresolved_count": 0,
+              "win_rate": 0.42574257425742573,
+              "gross_expectancy_atr": -0.00495049504950501,
+              "mean_outcome_atr": -0.0049504950495049506,
+              "mean_mfe": 12.77907100610213,
+              "mean_mae": 14.117768767024513,
+              "median_hold_seconds": 4.0,
+              "regimes_triggered": 1818
+            },
+            "decision_close": {
+              "n": 1818,
+              "resolved_n": 1818,
+              "wins": 645,
+              "losses": 1173,
+              "unresolved_count": 0,
+              "win_rate": 0.3547854785478548,
+              "gross_expectancy_atr": -0.1291254125412541,
+              "mean_outcome_atr": -0.12912541254125412,
+              "mean_mfe": 12.762174584373124,
+              "mean_mae": 14.138976832507469,
+              "median_hold_seconds": 4.0,
+              "regimes_triggered": 1818
+            },
+            "delta_win_rate": 0.07095709570957093,
+            "delta_expectancy_atr": 0.12417491749174908
+          },
+          "pooled": {
+            "next_bar_open": {
+              "n": 3471,
+              "resolved_n": 3468,
+              "wins": 1476,
+              "losses": 1992,
+              "unresolved_count": 3,
+              "win_rate": 0.42560553633217996,
+              "gross_expectancy_atr": -0.005190311418685034,
+              "mean_outcome_atr": -0.005068339719215322,
+              "mean_mfe": 12.531329842312655,
+              "mean_mae": 13.125507440459796,
+              "median_hold_seconds": 5.0,
+              "regimes_triggered": 3471
+            },
+            "decision_close": {
+              "n": 3471,
+              "resolved_n": 3468,
+              "wins": 1254,
+              "losses": 2214,
+              "unresolved_count": 3,
+              "win_rate": 0.3615916955017301,
+              "gross_expectancy_atr": -0.11721453287197237,
+              "mean_outcome_atr": -0.11703004024556439,
+              "mean_mfe": 12.50880090730811,
+              "mean_mae": 13.15232898955353,
+              "median_hold_seconds": 5.0,
+              "regimes_triggered": 3471
+            },
+            "delta_win_rate": 0.06401384083044986,
+            "delta_expectancy_atr": 0.11202422145328733
+          }
+        }
+      }
+    },
+    "VOLUME_ABSORPTION": {
+      "all_triggers": {
+        "2023": {
+          "FADE_BULL": {
+            "next_bar_open": {
+              "n": 9027,
+              "resolved_n": 9002,
+              "wins": 3803,
+              "losses": 5199,
+              "unresolved_count": 25,
+              "win_rate": 0.4224616751832926,
+              "gross_expectancy_atr": -0.010692068429237978,
+              "mean_outcome_atr": -0.010818355150355247,
+              "mean_mfe": 8.454534027719806,
+              "mean_mae": 8.356642193588447,
+              "median_hold_seconds": 11.0,
+              "regimes_triggered": 1049
+            },
+            "decision_close": {
+              "n": 9027,
+              "resolved_n": 9003,
+              "wins": 3295,
+              "losses": 5708,
+              "unresolved_count": 24,
+              "win_rate": 0.3659891147395313,
+              "gross_expectancy_atr": -0.10951904920582023,
+              "mean_outcome_atr": -0.10940167075398016,
+              "mean_mfe": 8.434153321044754,
+              "mean_mae": 8.382659487753282,
+              "median_hold_seconds": 11.0,
+              "regimes_triggered": 1049
+            },
+            "delta_win_rate": 0.05647256044376131,
+            "delta_expectancy_atr": 0.09882698077658225
+          },
+          "FADE_BEAR": {
+            "next_bar_open": {
+              "n": 7373,
+              "resolved_n": 7373,
+              "wins": 3282,
+              "losses": 4091,
+              "unresolved_count": 0,
+              "win_rate": 0.44513766445137665,
+              "gross_expectancy_atr": 0.028990912789909173,
+              "mean_outcome_atr": 0.02899091278990913,
+              "mean_mfe": 9.383415532101946,
+              "mean_mae": 9.307175566641988,
+              "median_hold_seconds": 7.0,
+              "regimes_triggered": 921
+            },
+            "decision_close": {
+              "n": 7373,
+              "resolved_n": 7373,
+              "wins": 2745,
+              "losses": 4628,
+              "unresolved_count": 0,
+              "win_rate": 0.37230435372304355,
+              "gross_expectancy_atr": -0.09846738098467384,
+              "mean_outcome_atr": -0.09846738098467381,
+              "mean_mfe": 9.366065961654233,
+              "mean_mae": 9.33020456863252,
+              "median_hold_seconds": 7.0,
+              "regimes_triggered": 921
+            },
+            "delta_win_rate": 0.0728333107283331,
+            "delta_expectancy_atr": 0.127458293774583
+          },
+          "pooled": {
+            "next_bar_open": {
+              "n": 16400,
+              "resolved_n": 16375,
+              "wins": 7085,
+              "losses": 9290,
+              "unresolved_count": 25,
+              "win_rate": 0.43267175572519084,
+              "gross_expectancy_atr": 0.007175572519084017,
+              "mean_outcome_atr": 0.00707882366205751,
+              "mean_mfe": 8.872134230878924,
+              "mean_mae": 8.783976495998433,
+              "median_hold_seconds": 9.0,
+              "regimes_triggered": 1970
+            },
+            "decision_close": {
+              "n": 16400,
+              "resolved_n": 16376,
+              "wins": 6040,
+              "losses": 10336,
+              "unresolved_count": 24,
+              "win_rate": 0.3688324377137274,
+              "gross_expectancy_atr": -0.10454323400097698,
+              "mean_outcome_atr": -0.10448590743269384,
+              "mean_mfe": 8.853116241728513,
+              "mean_mae": 8.808650334175393,
+              "median_hold_seconds": 9.0,
+              "regimes_triggered": 1970
+            },
+            "delta_win_rate": 0.06383931801146342,
+            "delta_expectancy_atr": 0.111718806520061
+          }
+        },
+        "2024": {
+          "FADE_BULL": {
+            "next_bar_open": {
+              "n": 9487,
+              "resolved_n": 9480,
+              "wins": 4119,
+              "losses": 5361,
+              "unresolved_count": 7,
+              "win_rate": 0.43449367088607593,
+              "gross_expectancy_atr": 0.010363924050632911,
+              "mean_outcome_atr": 0.010753065730784975,
+              "mean_mfe": 10.128867831053487,
+              "mean_mae": 10.444772095276047,
+              "median_hold_seconds": 9.0,
+              "regimes_triggered": 1069
+            },
+            "decision_close": {
+              "n": 9487,
+              "resolved_n": 9480,
+              "wins": 3441,
+              "losses": 6039,
+              "unresolved_count": 7,
+              "win_rate": 0.3629746835443038,
+              "gross_expectancy_atr": -0.11479430379746841,
+              "mean_outcome_atr": -0.11430978166575402,
+              "mean_mfe": 10.105433950044345,
+              "mean_mae": 10.477526440882249,
+              "median_hold_seconds": 9.0,
+              "regimes_triggered": 1069
+            },
+            "delta_win_rate": 0.07151898734177214,
+            "delta_expectancy_atr": 0.12515822784810132
+          },
+          "FADE_BEAR": {
+            "next_bar_open": {
+              "n": 7224,
+              "resolved_n": 7224,
+              "wins": 3218,
+              "losses": 4006,
+              "unresolved_count": 0,
+              "win_rate": 0.44545957918050944,
+              "gross_expectancy_atr": 0.02955426356589147,
+              "mean_outcome_atr": 0.029554263565891473,
+              "mean_mfe": 12.359637669623003,
+              "mean_mae": 14.011078361712826,
+              "median_hold_seconds": 4.0,
+              "regimes_triggered": 940
+            },
+            "decision_close": {
+              "n": 7224,
+              "resolved_n": 7224,
+              "wins": 2213,
+              "losses": 5011,
+              "unresolved_count": 0,
+              "win_rate": 0.30633997785160577,
+              "gross_expectancy_atr": -0.21390503875968986,
+              "mean_outcome_atr": -0.2139050387596899,
+              "mean_mfe": 12.341707932058895,
+              "mean_mae": 14.039865048704208,
+              "median_hold_seconds": 4.0,
+              "regimes_triggered": 940
+            },
+            "delta_win_rate": 0.13911960132890366,
+            "delta_expectancy_atr": 0.24345930232558133
+          },
+          "pooled": {
+            "next_bar_open": {
+              "n": 16711,
+              "resolved_n": 16704,
+              "wins": 7337,
+              "losses": 9367,
+              "unresolved_count": 7,
+              "win_rate": 0.4392361111111111,
+              "gross_expectancy_atr": 0.018663194444444475,
+              "mean_outcome_atr": 0.018880637579316444,
+              "mean_mfe": 11.0932075661876,
+              "mean_mae": 11.986451017467374,
+              "median_hold_seconds": 6.0,
+              "regimes_triggered": 2009
+            },
+            "decision_close": {
+              "n": 16711,
+              "resolved_n": 16704,
+              "wins": 5654,
+              "losses": 11050,
+              "unresolved_count": 7,
+              "win_rate": 0.33848180076628354,
+              "gross_expectancy_atr": -0.1576568486590038,
+              "mean_outcome_atr": -0.15736382614224215,
+              "mean_mfe": 11.072153071944477,
+              "mean_mae": 12.017490183501232,
+              "median_hold_seconds": 6.0,
+              "regimes_triggered": 2009
+            },
+            "delta_win_rate": 0.10075431034482757,
+            "delta_expectancy_atr": 0.1763200431034483
+          }
+        },
+        "2025_Q1": {
+          "FADE_BULL": {
+            "next_bar_open": {
+              "n": 2202,
+              "resolved_n": 2202,
+              "wins": 976,
+              "losses": 1226,
+              "unresolved_count": 0,
+              "win_rate": 0.44323342415985467,
+              "gross_expectancy_atr": 0.025658492279745704,
+              "mean_outcome_atr": 0.025658492279745686,
+              "mean_mfe": 15.866035863978981,
+              "mean_mae": 14.446239685596883,
+              "median_hold_seconds": 4.0,
+              "regimes_triggered": 244
+            },
+            "decision_close": {
+              "n": 2202,
+              "resolved_n": 2202,
+              "wins": 673,
+              "losses": 1529,
+              "unresolved_count": 0,
+              "win_rate": 0.30563124432334243,
+              "gross_expectancy_atr": -0.21514532243415074,
+              "mean_outcome_atr": -0.21514532243415077,
+              "mean_mfe": 15.829950453068822,
+              "mean_mae": 14.490492026254998,
+              "median_hold_seconds": 4.0,
+              "regimes_triggered": 244
+            },
+            "delta_win_rate": 0.13760217983651224,
+            "delta_expectancy_atr": 0.24080381471389645
+          },
+          "FADE_BEAR": {
+            "next_bar_open": {
+              "n": 1933,
+              "resolved_n": 1933,
+              "wins": 901,
+              "losses": 1032,
+              "unresolved_count": 0,
+              "win_rate": 0.4661148473874806,
+              "gross_expectancy_atr": 0.06570098292809101,
+              "mean_outcome_atr": 0.06570098292809105,
+              "mean_mfe": 17.209940802541734,
+              "mean_mae": 18.053168866308717,
+              "median_hold_seconds": 3.0,
+              "regimes_triggered": 241
+            },
+            "decision_close": {
+              "n": 1933,
+              "resolved_n": 1933,
+              "wins": 567,
+              "losses": 1366,
+              "unresolved_count": 0,
+              "win_rate": 0.2933264355923435,
+              "gross_expectancy_atr": -0.23667873771339887,
+              "mean_outcome_atr": -0.23667873771339887,
+              "mean_mfe": 17.17353388771632,
+              "mean_mae": 18.091203673982488,
+              "median_hold_seconds": 3.0,
+              "regimes_triggered": 241
+            },
+            "delta_win_rate": 0.1727884117951371,
+            "delta_expectancy_atr": 0.3023797206414899
+          },
+          "pooled": {
+            "next_bar_open": {
+              "n": 4135,
+              "resolved_n": 4135,
+              "wins": 1877,
+              "losses": 2258,
+              "unresolved_count": 0,
+              "win_rate": 0.4539298669891173,
+              "gross_expectancy_atr": 0.04437726723095525,
+              "mean_outcome_atr": 0.04437726723095526,
+              "mean_mfe": 16.49427485944254,
+              "mean_mae": 16.13238094468176,
+              "median_hold_seconds": 3.0,
+              "regimes_triggered": 485
+            },
+            "decision_close": {
+              "n": 4135,
+              "resolved_n": 4135,
+              "wins": 1240,
+              "losses": 2895,
+              "unresolved_count": 0,
+              "win_rate": 0.2998790810157195,
+              "gross_expectancy_atr": -0.22521160822249087,
+              "mean_outcome_atr": -0.22521160822249092,
+              "mean_mfe": 16.45803915419908,
+              "mean_mae": 16.173726757828696,
+              "median_hold_seconds": 3.0,
+              "regimes_triggered": 485
+            },
+            "delta_win_rate": 0.15405078597339783,
+            "delta_expectancy_atr": 0.2695888754534461
+          }
+        },
+        "pooled": {
+          "FADE_BULL": {
+            "next_bar_open": {
+              "n": 20716,
+              "resolved_n": 20684,
+              "wins": 8898,
+              "losses": 11786,
+              "unresolved_count": 32,
+              "win_rate": 0.4301875846064591,
+              "gross_expectancy_atr": 0.0028282730613034546,
+              "mean_outcome_atr": 0.002937683078089411,
+              "mean_mfe": 10.009106910306661,
+              "mean_mae": 9.960203791132027,
+              "median_hold_seconds": 9.0,
+              "regimes_triggered": 2362
+            },
+            "decision_close": {
+              "n": 20716,
+              "resolved_n": 20685,
+              "wins": 7409,
+              "losses": 13276,
+              "unresolved_count": 31,
+              "win_rate": 0.35818225767464346,
+              "gross_expectancy_atr": -0.123181049069374,
+              "mean_outcome_atr": -0.1228893502876611,
+              "mean_mfe": 9.985658660494266,
+              "mean_mae": 9.991244640973754,
+              "median_hold_seconds": 9.0,
+              "regimes_triggered": 2362
+            },
+            "delta_win_rate": 0.07200532693181566,
+            "delta_expectancy_atr": 0.12600932213067745
+          },
+          "FADE_BEAR": {
+            "next_bar_open": {
+              "n": 16530,
+              "resolved_n": 16530,
+              "wins": 7401,
+              "losses": 9129,
+              "unresolved_count": 0,
+              "win_rate": 0.4477313974591652,
+              "gross_expectancy_atr": 0.03352994555353911,
+              "mean_outcome_atr": 0.03352994555353902,
+              "mean_mfe": 11.599320073494097,
+              "mean_mae": 12.385638896336332,
+              "median_hold_seconds": 5.0,
+              "regimes_triggered": 2102
+            },
+            "decision_close": {
+              "n": 16530,
+              "resolved_n": 16530,
+              "wins": 5525,
+              "losses": 11005,
+              "unresolved_count": 0,
+              "win_rate": 0.33424077434966726,
+              "gross_expectancy_atr": -0.16507864488808233,
+              "mean_outcome_atr": -0.16507864488808227,
+              "mean_mfe": 11.579488411459515,
+              "mean_mae": 12.412938904910762,
+              "median_hold_seconds": 5.0,
+              "regimes_triggered": 2102
+            },
+            "delta_win_rate": 0.11349062310949792,
+            "delta_expectancy_atr": 0.19860859044162144
+          },
+          "pooled": {
+            "next_bar_open": {
+              "n": 37246,
+              "resolved_n": 37214,
+              "wins": 16299,
+              "losses": 20915,
+              "unresolved_count": 32,
+              "win_rate": 0.4379803299833396,
+              "gross_expectancy_atr": 0.01646557747084426,
+              "mean_outcome_atr": 0.01651471413428825,
+              "mean_mfe": 10.714853127014182,
+              "mean_mae": 11.03662655569808,
+              "median_hold_seconds": 7.0,
+              "regimes_triggered": 4464
+            },
+            "decision_close": {
+              "n": 37246,
+              "resolved_n": 37215,
+              "wins": 12934,
+              "losses": 24281,
+              "unresolved_count": 31,
+              "win_rate": 0.34754803170764476,
+              "gross_expectancy_atr": -0.14179094451162172,
+              "mean_outcome_atr": -0.14161321431990515,
+              "mean_mfe": 10.693009940724506,
+              "mean_mae": 11.06600719756718,
+              "median_hold_seconds": 7.0,
+              "regimes_triggered": 4464
+            },
+            "delta_win_rate": 0.09043229827569482,
+            "delta_expectancy_atr": 0.15825652198246598
+          }
+        }
+      },
+      "first_trigger": {
+        "2023": {
+          "FADE_BULL": {
+            "next_bar_open": {
+              "n": 1049,
+              "resolved_n": 1047,
+              "wins": 443,
+              "losses": 604,
+              "unresolved_count": 2,
+              "win_rate": 0.42311365807067813,
+              "gross_expectancy_atr": -0.009551098376313294,
+              "mean_outcome_atr": -0.009484311851184549,
+              "mean_mfe": 8.540279522690883,
+              "mean_mae": 8.898448460089993,
+              "median_hold_seconds": 12.0,
+              "regimes_triggered": 1049
+            },
+            "decision_close": {
+              "n": 1049,
+              "resolved_n": 1047,
+              "wins": 389,
+              "losses": 658,
+              "unresolved_count": 2,
+              "win_rate": 0.37153772683858644,
+              "gross_expectancy_atr": -0.09980897803247374,
+              "mean_outcome_atr": -0.09958869095710968,
+              "mean_mfe": 8.51905061641799,
+              "mean_mae": 8.923466856292267,
+              "median_hold_seconds": 12.0,
+              "regimes_triggered": 1049
+            },
+            "delta_win_rate": 0.0515759312320917,
+            "delta_expectancy_atr": 0.09025787965616044
+          },
+          "FADE_BEAR": {
+            "next_bar_open": {
+              "n": 921,
+              "resolved_n": 921,
+              "wins": 414,
+              "losses": 507,
+              "unresolved_count": 0,
+              "win_rate": 0.4495114006514658,
+              "gross_expectancy_atr": 0.03664495114006511,
+              "mean_outcome_atr": 0.03664495114006515,
+              "mean_mfe": 8.997641197758787,
+              "mean_mae": 9.293142467083143,
+              "median_hold_seconds": 9.0,
+              "regimes_triggered": 921
+            },
+            "decision_close": {
+              "n": 921,
+              "resolved_n": 921,
+              "wins": 351,
+              "losses": 570,
+              "unresolved_count": 0,
+              "win_rate": 0.3811074918566775,
+              "gross_expectancy_atr": -0.08306188925081437,
+              "mean_outcome_atr": -0.08306188925081433,
+              "mean_mfe": 8.980379347318577,
+              "mean_mae": 9.310467448004816,
+              "median_hold_seconds": 9.0,
+              "regimes_triggered": 921
+            },
+            "delta_win_rate": 0.06840390879478825,
+            "delta_expectancy_atr": 0.11970684039087948
+          },
+          "pooled": {
+            "next_bar_open": {
+              "n": 1970,
+              "resolved_n": 1968,
+              "wins": 857,
+              "losses": 1111,
+              "unresolved_count": 2,
+              "win_rate": 0.43546747967479676,
+              "gross_expectancy_atr": 0.01206808943089438,
+              "mean_outcome_atr": 0.012081703993963152,
+              "mean_mfe": 8.7541019098673,
+              "mean_mae": 9.082972917166485,
+              "median_hold_seconds": 10.0,
+              "regimes_triggered": 1970
+            },
+            "decision_close": {
+              "n": 1970,
+              "resolved_n": 1968,
+              "wins": 740,
+              "losses": 1228,
+              "unresolved_count": 2,
+              "win_rate": 0.37601626016260165,
+              "gross_expectancy_atr": -0.09197154471544716,
+              "mean_outcome_atr": -0.09186220142843048,
+              "mean_mfe": 8.734727652539533,
+              "mean_mae": 9.104394544092907,
+              "median_hold_seconds": 10.0,
+              "regimes_triggered": 1970
+            },
+            "delta_win_rate": 0.05945121951219512,
+            "delta_expectancy_atr": 0.10403963414634154
+          }
+        },
+        "2024": {
+          "FADE_BULL": {
+            "next_bar_open": {
+              "n": 1069,
+              "resolved_n": 1069,
+              "wins": 457,
+              "losses": 612,
+              "unresolved_count": 0,
+              "win_rate": 0.4275023386342376,
+              "gross_expectancy_atr": -0.00187090739008422,
+              "mean_outcome_atr": -0.0018709073900841909,
+              "mean_mfe": 10.575219115266961,
+              "mean_mae": 10.18696881491329,
+              "median_hold_seconds": 9.0,
+              "regimes_triggered": 1069
+            },
+            "decision_close": {
+              "n": 1069,
+              "resolved_n": 1069,
+              "wins": 389,
+              "losses": 680,
+              "unresolved_count": 0,
+              "win_rate": 0.3638914873713751,
+              "gross_expectancy_atr": -0.11318989710009353,
+              "mean_outcome_atr": -0.11318989710009354,
+              "mean_mfe": 10.546560113125024,
+              "mean_mae": 10.223162365300787,
+              "median_hold_seconds": 9.0,
+              "regimes_triggered": 1069
+            },
+            "delta_win_rate": 0.06361085126286248,
+            "delta_expectancy_atr": 0.11131898971000931
+          },
+          "FADE_BEAR": {
+            "next_bar_open": {
+              "n": 940,
+              "resolved_n": 940,
+              "wins": 397,
+              "losses": 543,
+              "unresolved_count": 0,
+              "win_rate": 0.4223404255319149,
+              "gross_expectancy_atr": -0.010904255319148848,
+              "mean_outcome_atr": -0.010904255319148936,
+              "mean_mfe": 11.477678909885011,
+              "mean_mae": 13.103005285878478,
+              "median_hold_seconds": 5.0,
+              "regimes_triggered": 940
+            },
+            "decision_close": {
+              "n": 940,
+              "resolved_n": 940,
+              "wins": 291,
+              "losses": 649,
+              "unresolved_count": 0,
+              "win_rate": 0.30957446808510636,
+              "gross_expectancy_atr": -0.20824468085106385,
+              "mean_outcome_atr": -0.20824468085106382,
+              "mean_mfe": 11.45511081540502,
+              "mean_mae": 13.132938069462178,
+              "median_hold_seconds": 5.0,
+              "regimes_triggered": 940
+            },
+            "delta_win_rate": 0.11276595744680856,
+            "delta_expectancy_atr": 0.197340425531915
+          },
+          "pooled": {
+            "next_bar_open": {
+              "n": 2009,
+              "resolved_n": 2009,
+              "wins": 854,
+              "losses": 1155,
+              "unresolved_count": 0,
+              "win_rate": 0.4250871080139373,
+              "gross_expectancy_atr": -0.006097560975609706,
+              "mean_outcome_atr": -0.006097560975609756,
+              "mean_mfe": 10.997475066954848,
+              "mean_mae": 11.551366168177239,
+              "median_hold_seconds": 7.0,
+              "regimes_triggered": 2009
+            },
+            "decision_close": {
+              "n": 2009,
+              "resolved_n": 2009,
+              "wins": 680,
+              "losses": 1329,
+              "unresolved_count": 0,
+              "win_rate": 0.3384768541562967,
+              "gross_expectancy_atr": -0.15766550522648082,
+              "mean_outcome_atr": -0.15766550522648085,
+              "mean_mfe": 10.971665966854838,
+              "mean_mae": 11.584630340368834,
+              "median_hold_seconds": 7.0,
+              "regimes_triggered": 2009
+            },
+            "delta_win_rate": 0.0866102538576406,
+            "delta_expectancy_atr": 0.1515679442508711
+          }
+        },
+        "2025_Q1": {
+          "FADE_BULL": {
+            "next_bar_open": {
+              "n": 244,
+              "resolved_n": 244,
+              "wins": 106,
+              "losses": 138,
+              "unresolved_count": 0,
+              "win_rate": 0.4344262295081967,
+              "gross_expectancy_atr": 0.01024590163934419,
+              "mean_outcome_atr": 0.010245901639344262,
+              "mean_mfe": 16.034007812808497,
+              "mean_mae": 14.015713915515175,
+              "median_hold_seconds": 4.0,
+              "regimes_triggered": 244
+            },
+            "decision_close": {
+              "n": 244,
+              "resolved_n": 244,
+              "wins": 72,
+              "losses": 172,
+              "unresolved_count": 0,
+              "win_rate": 0.29508196721311475,
+              "gross_expectancy_atr": -0.23360655737704916,
+              "mean_outcome_atr": -0.2336065573770492,
+              "mean_mfe": 15.992569177594099,
+              "mean_mae": 14.059470527067083,
+              "median_hold_seconds": 4.0,
+              "regimes_triggered": 244
+            },
+            "delta_win_rate": 0.13934426229508196,
+            "delta_expectancy_atr": 0.24385245901639335
+          },
+          "FADE_BEAR": {
+            "next_bar_open": {
+              "n": 241,
+              "resolved_n": 241,
+              "wins": 111,
+              "losses": 130,
+              "unresolved_count": 0,
+              "win_rate": 0.4605809128630705,
+              "gross_expectancy_atr": 0.056016597510373356,
+              "mean_outcome_atr": 0.056016597510373446,
+              "mean_mfe": 16.1085830086653,
+              "mean_mae": 18.916078669653928,
+              "median_hold_seconds": 3.0,
+              "regimes_triggered": 241
+            },
+            "decision_close": {
+              "n": 241,
+              "resolved_n": 241,
+              "wins": 82,
+              "losses": 159,
+              "unresolved_count": 0,
+              "win_rate": 0.34024896265560167,
+              "gross_expectancy_atr": -0.1545643153526971,
+              "mean_outcome_atr": -0.1545643153526971,
+              "mean_mfe": 16.09650469553188,
+              "mean_mae": 18.927940090004913,
+              "median_hold_seconds": 3.0,
+              "regimes_triggered": 241
+            },
+            "delta_win_rate": 0.12033195020746884,
+            "delta_expectancy_atr": 0.21058091286307046
+          },
+          "pooled": {
+            "next_bar_open": {
+              "n": 485,
+              "resolved_n": 485,
+              "wins": 217,
+              "losses": 268,
+              "unresolved_count": 0,
+              "win_rate": 0.44742268041237115,
+              "gross_expectancy_atr": 0.03298969072164948,
+              "mean_outcome_atr": 0.032989690721649485,
+              "mean_mfe": 16.071064765801257,
+              "mean_mae": 16.450740525303708,
+              "median_hold_seconds": 3.0,
+              "regimes_triggered": 485
+            },
+            "decision_close": {
+              "n": 485,
+              "resolved_n": 485,
+              "wins": 154,
+              "losses": 331,
+              "unresolved_count": 0,
+              "win_rate": 0.31752577319587627,
+              "gross_expectancy_atr": -0.19432989690721647,
+              "mean_outcome_atr": -0.1943298969072165,
+              "mean_mfe": 16.04421548650751,
+              "mean_mae": 16.478648186176393,
+              "median_hold_seconds": 3.0,
+              "regimes_triggered": 485
+            },
+            "delta_win_rate": 0.12989690721649488,
+            "delta_expectancy_atr": 0.22731958762886595
+          }
+        },
+        "pooled": {
+          "FADE_BULL": {
+            "next_bar_open": {
+              "n": 2362,
+              "resolved_n": 2360,
+              "wins": 1006,
+              "losses": 1354,
+              "unresolved_count": 2,
+              "win_rate": 0.42627118644067796,
+              "gross_expectancy_atr": -0.0040254237288135375,
+              "mean_outcome_atr": -0.004000441630775864,
+              "mean_mfe": 10.235376951671633,
+              "mean_mae": 10.010235517850301,
+              "median_hold_seconds": 10.0,
+              "regimes_triggered": 2362
+            },
+            "decision_close": {
+              "n": 2362,
+              "resolved_n": 2360,
+              "wins": 850,
+              "losses": 1510,
+              "unresolved_count": 2,
+              "win_rate": 0.3601694915254237,
+              "gross_expectancy_atr": -0.11970338983050854,
+              "mean_outcome_atr": -0.1195887116062693,
+              "mean_mfe": 10.208697602407316,
+              "mean_mae": 10.042247294395215,
+              "median_hold_seconds": 10.0,
+              "regimes_triggered": 2362
+            },
+            "delta_win_rate": 0.06610169491525425,
+            "delta_expectancy_atr": 0.115677966101695
+          },
+          "FADE_BEAR": {
+            "next_bar_open": {
+              "n": 2102,
+              "resolved_n": 2102,
+              "wins": 922,
+              "losses": 1180,
+              "unresolved_count": 0,
+              "win_rate": 0.4386298763082778,
+              "gross_expectancy_atr": 0.01760228353948623,
+              "mean_outcome_atr": 0.017602283539486202,
+              "mean_mfe": 10.921985834213173,
+              "mean_mae": 12.100182749902922,
+              "median_hold_seconds": 6.0,
+              "regimes_triggered": 2102
+            },
+            "decision_close": {
+              "n": 2102,
+              "resolved_n": 2102,
+              "wins": 724,
+              "losses": 1378,
+              "unresolved_count": 0,
+              "win_rate": 0.34443387250237867,
+              "gross_expectancy_atr": -0.14724072312083736,
+              "mean_outcome_atr": -0.1472407231208373,
+              "mean_mfe": 10.902945374397865,
+              "mean_mae": 12.122519441768823,
+              "median_hold_seconds": 6.0,
+              "regimes_triggered": 2102
+            },
+            "delta_win_rate": 0.09419600380589915,
+            "delta_expectancy_atr": 0.1648430066603236
+          },
+          "pooled": {
+            "next_bar_open": {
+              "n": 4464,
+              "resolved_n": 4462,
+              "wins": 1928,
+              "losses": 2534,
+              "unresolved_count": 2,
+              "win_rate": 0.43209323173464814,
+              "gross_expectancy_atr": 0.00616315553563429,
+              "mean_outcome_atr": 0.006171809334253452,
+              "mean_mfe": 10.55868606258165,
+              "mean_mae": 10.994345975237088,
+              "median_hold_seconds": 8.0,
+              "regimes_triggered": 4464
+            },
+            "decision_close": {
+              "n": 4464,
+              "resolved_n": 4462,
+              "wins": 1574,
+              "losses": 2888,
+              "unresolved_count": 2,
+              "win_rate": 0.3527566113850291,
+              "gross_expectancy_atr": -0.13267593007619904,
+              "mean_outcome_atr": -0.13260943925044985,
+              "mean_mfe": 10.535603699343728,
+              "mean_mae": 11.021801965940764,
+              "median_hold_seconds": 8.0,
+              "regimes_triggered": 4464
+            },
+            "delta_win_rate": 0.07933662034961902,
+            "delta_expectancy_atr": 0.13883908561183333
+          }
+        }
+      }
+    },
+    "EXTREME_SPIKE_REVERSAL": {
+      "all_triggers": {
+        "2023": {
+          "FADE_BULL": {
+            "next_bar_open": {
+              "n": 8745,
+              "resolved_n": 8728,
+              "wins": 3778,
+              "losses": 4950,
+              "unresolved_count": 17,
+              "win_rate": 0.4328597616865261,
+              "gross_expectancy_atr": 0.007504582951420757,
+              "mean_outcome_atr": 0.007549776310132119,
+              "mean_mfe": 8.762291217908263,
+              "mean_mae": 8.49843566147634,
+              "median_hold_seconds": 11.0,
+              "regimes_triggered": 1048
+            },
+            "decision_close": {
+              "n": 8745,
+              "resolved_n": 8728,
+              "wins": 3302,
+              "losses": 5426,
+              "unresolved_count": 17,
+              "win_rate": 0.37832263978001834,
+              "gross_expectancy_atr": -0.0879353803849679,
+              "mean_outcome_atr": -0.08772054554326665,
+              "mean_mfe": 8.73167338760851,
+              "mean_mae": 8.53214679561111,
+              "median_hold_seconds": 11.0,
+              "regimes_triggered": 1048
+            },
+            "delta_win_rate": 0.05453712190650778,
+            "delta_expectancy_atr": 0.09543996333638866
+          },
+          "FADE_BEAR": {
+            "next_bar_open": {
+              "n": 6976,
+              "resolved_n": 6976,
+              "wins": 3166,
+              "losses": 3810,
+              "unresolved_count": 0,
+              "win_rate": 0.45384174311926606,
+              "gross_expectancy_atr": 0.04422305045871561,
+              "mean_outcome_atr": 0.04422305045871559,
+              "mean_mfe": 9.847349963386897,
+              "mean_mae": 9.2270441113755,
+              "median_hold_seconds": 7.0,
+              "regimes_triggered": 918
+            },
+            "decision_close": {
+              "n": 6976,
+              "resolved_n": 6976,
+              "wins": 2687,
+              "losses": 4289,
+              "unresolved_count": 0,
+              "win_rate": 0.385177752293578,
+              "gross_expectancy_atr": -0.07593893348623854,
+              "mean_outcome_atr": -0.07593893348623854,
+              "mean_mfe": 9.816974777815823,
+              "mean_mae": 9.261181195366046,
+              "median_hold_seconds": 7.0,
+              "regimes_triggered": 918
+            },
+            "delta_win_rate": 0.06866399082568808,
+            "delta_expectancy_atr": 0.12016198394495414
+          },
+          "pooled": {
+            "next_bar_open": {
+              "n": 15721,
+              "resolved_n": 15704,
+              "wins": 6944,
+              "losses": 8760,
+              "unresolved_count": 17,
+              "win_rate": 0.4421803362200713,
+              "gross_expectancy_atr": 0.02381558838512482,
+              "mean_outcome_atr": 0.02382308974188063,
+              "mean_mfe": 9.243772663647018,
+              "mean_mae": 8.821746681544816,
+              "median_hold_seconds": 9.0,
+              "regimes_triggered": 1966
+            },
+            "decision_close": {
+              "n": 15721,
+              "resolved_n": 15704,
+              "wins": 5989,
+              "losses": 9715,
+              "unresolved_count": 17,
+              "win_rate": 0.3813678043810494,
+              "gross_expectancy_atr": -0.08260634233316361,
+              "mean_outcome_atr": -0.08249260039284187,
+              "mean_mfe": 9.213262503955193,
+              "mean_mae": 8.855646825678562,
+              "median_hold_seconds": 9.0,
+              "regimes_triggered": 1966
+            },
+            "delta_win_rate": 0.06081253183902191,
+            "delta_expectancy_atr": 0.10642193071828843
+          }
+        },
+        "2024": {
+          "FADE_BULL": {
+            "next_bar_open": {
+              "n": 8839,
+              "resolved_n": 8831,
+              "wins": 3885,
+              "losses": 4946,
+              "unresolved_count": 8,
+              "win_rate": 0.4399275280262711,
+              "gross_expectancy_atr": 0.01987317404597444,
+              "mean_outcome_atr": 0.020239159550374676,
+              "mean_mfe": 10.39863083387328,
+              "mean_mae": 10.864976287603017,
+              "median_hold_seconds": 8.0,
+              "regimes_triggered": 1072
+            },
+            "decision_close": {
+              "n": 8839,
+              "resolved_n": 8831,
+              "wins": 3235,
+              "losses": 5596,
+              "unresolved_count": 8,
+              "win_rate": 0.36632317970784734,
+              "gross_expectancy_atr": -0.10893443551126714,
+              "mean_outcome_atr": -0.1084490107119082,
+              "mean_mfe": 10.361978112863605,
+              "mean_mae": 10.905988467134321,
+              "median_hold_seconds": 8.0,
+              "regimes_triggered": 1072
+            },
+            "delta_win_rate": 0.07360434831842377,
+            "delta_expectancy_atr": 0.12880760955724158
+          },
+          "FADE_BEAR": {
+            "next_bar_open": {
+              "n": 6756,
+              "resolved_n": 6756,
+              "wins": 3024,
+              "losses": 3732,
+              "unresolved_count": 0,
+              "win_rate": 0.44760213143872113,
+              "gross_expectancy_atr": 0.033303730017761934,
+              "mean_outcome_atr": 0.03330373001776199,
+              "mean_mfe": 12.79003068242673,
+              "mean_mae": 14.33006471736593,
+              "median_hold_seconds": 4.0,
+              "regimes_triggered": 929
+            },
+            "decision_close": {
+              "n": 6756,
+              "resolved_n": 6756,
+              "wins": 2125,
+              "losses": 4631,
+              "unresolved_count": 0,
+              "win_rate": 0.3145352279455299,
+              "gross_expectancy_atr": -0.19956335109532264,
+              "mean_outcome_atr": -0.19956335109532267,
+              "mean_mfe": 12.758131584103134,
+              "mean_mae": 14.37175671494511,
+              "median_hold_seconds": 4.0,
+              "regimes_triggered": 929
+            },
+            "delta_win_rate": 0.13306690349319122,
+            "delta_expectancy_atr": 0.23286708111308457
+          },
+          "pooled": {
+            "next_bar_open": {
+              "n": 15595,
+              "resolved_n": 15587,
+              "wins": 6909,
+              "losses": 8678,
+              "unresolved_count": 8,
+              "win_rate": 0.4432539937127093,
+              "gross_expectancy_atr": 0.025694488997241305,
+              "mean_outcome_atr": 0.025898937561126115,
+              "mean_mfe": 11.434622970893294,
+              "mean_mae": 12.366107254674404,
+              "median_hold_seconds": 6.0,
+              "regimes_triggered": 2001
+            },
+            "decision_close": {
+              "n": 15595,
+              "resolved_n": 15587,
+              "wins": 5360,
+              "losses": 10227,
+              "unresolved_count": 8,
+              "win_rate": 0.3438763071790595,
+              "gross_expectancy_atr": -0.14821646243664588,
+              "mean_outcome_atr": -0.14792118022972467,
+              "mean_mfe": 11.400029594216235,
+              "mean_mae": 12.40741394210769,
+              "median_hold_seconds": 6.0,
+              "regimes_triggered": 2001
+            },
+            "delta_win_rate": 0.09937768653364981,
+            "delta_expectancy_atr": 0.17391095143388718
+          }
+        },
+        "2025_Q1": {
+          "FADE_BULL": {
+            "next_bar_open": {
+              "n": 2201,
+              "resolved_n": 2201,
+              "wins": 988,
+              "losses": 1213,
+              "unresolved_count": 0,
+              "win_rate": 0.4488868696047251,
+              "gross_expectancy_atr": 0.035552021808268996,
+              "mean_outcome_atr": 0.03555202180826897,
+              "mean_mfe": 16.579123305908603,
+              "mean_mae": 14.203906110108681,
+              "median_hold_seconds": 4.0,
+              "regimes_triggered": 247
+            },
+            "decision_close": {
+              "n": 2201,
+              "resolved_n": 2201,
+              "wins": 724,
+              "losses": 1477,
+              "unresolved_count": 0,
+              "win_rate": 0.32894139027714675,
+              "gross_expectancy_atr": -0.17435256701499324,
+              "mean_outcome_atr": -0.1743525670149932,
+              "mean_mfe": 16.530266120764608,
+              "mean_mae": 14.259989067261735,
+              "median_hold_seconds": 4.0,
+              "regimes_triggered": 247
+            },
+            "delta_win_rate": 0.11994547932757837,
+            "delta_expectancy_atr": 0.20990458882326224
+          },
+          "FADE_BEAR": {
+            "next_bar_open": {
+              "n": 1926,
+              "resolved_n": 1926,
+              "wins": 885,
+              "losses": 1041,
+              "unresolved_count": 0,
+              "win_rate": 0.45950155763239875,
+              "gross_expectancy_atr": 0.054127725856697784,
+              "mean_outcome_atr": 0.05412772585669782,
+              "mean_mfe": 19.368626981768795,
+              "mean_mae": 19.701524237457882,
+              "median_hold_seconds": 2.0,
+              "regimes_triggered": 239
+            },
+            "decision_close": {
+              "n": 1926,
+              "resolved_n": 1926,
+              "wins": 541,
+              "losses": 1385,
+              "unresolved_count": 0,
+              "win_rate": 0.2808930425752856,
+              "gross_expectancy_atr": -0.2584371754932502,
+              "mean_outcome_atr": -0.25843717549325024,
+              "mean_mfe": 19.311921782352776,
+              "mean_mae": 19.763655789471514,
+              "median_hold_seconds": 2.0,
+              "regimes_triggered": 239
+            },
+            "delta_win_rate": 0.17860851505711317,
+            "delta_expectancy_atr": 0.31256490134994797
+          },
+          "pooled": {
+            "next_bar_open": {
+              "n": 4127,
+              "resolved_n": 4127,
+              "wins": 1873,
+              "losses": 2254,
+              "unresolved_count": 0,
+              "win_rate": 0.45384056215168406,
+              "gross_expectancy_atr": 0.04422098376544714,
+              "mean_outcome_atr": 0.04422098376544706,
+              "mean_mfe": 17.880936749016605,
+              "mean_mae": 16.76955004354085,
+              "median_hold_seconds": 3.0,
+              "regimes_triggered": 486
+            },
+            "decision_close": {
+              "n": 4127,
+              "resolved_n": 4127,
+              "wins": 1265,
+              "losses": 2862,
+              "unresolved_count": 0,
+              "win_rate": 0.3065180518536467,
+              "gross_expectancy_atr": -0.2135934092561182,
+              "mean_outcome_atr": -0.21359340925611825,
+              "mean_mfe": 17.828417030437205,
+              "mean_mae": 16.828455776003203,
+              "median_hold_seconds": 3.0,
+              "regimes_triggered": 486
+            },
+            "delta_win_rate": 0.14732251029803733,
+            "delta_expectancy_atr": 0.25781439302156534
+          }
+        },
+        "pooled": {
+          "FADE_BULL": {
+            "next_bar_open": {
+              "n": 19785,
+              "resolved_n": 19760,
+              "wins": 8651,
+              "losses": 11109,
+              "unresolved_count": 25,
+              "win_rate": 0.4378036437246964,
+              "gross_expectancy_atr": 0.016156376518218662,
+              "mean_outcome_atr": 0.01633392595895209,
+              "mean_mfe": 10.362920648851075,
+              "mean_mae": 10.190403973418393,
+              "median_hold_seconds": 8.0,
+              "regimes_triggered": 2367
+            },
+            "decision_close": {
+              "n": 19785,
+              "resolved_n": 19760,
+              "wins": 7261,
+              "losses": 12499,
+              "unresolved_count": 25,
+              "win_rate": 0.36745951417004047,
+              "gross_expectancy_atr": -0.10694585020242914,
+              "mean_outcome_atr": -0.10661849767290489,
+              "mean_mfe": 10.327577662170368,
+              "mean_mae": 10.229865641933912,
+              "median_hold_seconds": 8.0,
+              "regimes_triggered": 2367
+            },
+            "delta_win_rate": 0.07034412955465591,
+            "delta_expectancy_atr": 0.1231022267206478
+          },
+          "FADE_BEAR": {
+            "next_bar_open": {
+              "n": 15658,
+              "resolved_n": 15658,
+              "wins": 7075,
+              "losses": 8583,
+              "unresolved_count": 0,
+              "win_rate": 0.45184570187763445,
+              "gross_expectancy_atr": 0.040729978285860335,
+              "mean_outcome_atr": 0.040729978285860266,
+              "mean_mfe": 12.288193651931836,
+              "mean_mae": 12.71726354788757,
+              "median_hold_seconds": 5.0,
+              "regimes_triggered": 2086
+            },
+            "decision_close": {
+              "n": 15658,
+              "resolved_n": 15658,
+              "wins": 5353,
+              "losses": 10305,
+              "unresolved_count": 0,
+              "win_rate": 0.3418699706220462,
+              "gross_expectancy_atr": -0.15172755141141908,
+              "mean_outcome_atr": -0.15172755141141908,
+              "mean_mfe": 12.253922236879257,
+              "mean_mae": 12.758103808632319,
+              "median_hold_seconds": 5.0,
+              "regimes_triggered": 2086
+            },
+            "delta_win_rate": 0.10997573125558824,
+            "delta_expectancy_atr": 0.19245752969727942
+          },
+          "pooled": {
+            "next_bar_open": {
+              "n": 35443,
+              "resolved_n": 35418,
+              "wins": 15726,
+              "losses": 19692,
+              "unresolved_count": 25,
+              "win_rate": 0.44401151956632223,
+              "gross_expectancy_atr": 0.027020159241063935,
+              "mean_outcome_atr": 0.02711160807769848,
+              "mean_mfe": 11.213467292257064,
+              "mean_mae": 11.30671938737992,
+              "median_hold_seconds": 7.0,
+              "regimes_triggered": 4453
+            },
+            "decision_close": {
+              "n": 35443,
+              "resolved_n": 35418,
+              "wins": 12614,
+              "losses": 22804,
+              "unresolved_count": 25,
+              "win_rate": 0.35614659212829636,
+              "gross_expectancy_atr": -0.1267434637754814,
+              "mean_outcome_atr": -0.12654676456446753,
+              "mean_mfe": 11.178597704232038,
+              "mean_mae": 11.346790090038295,
+              "median_hold_seconds": 7.0,
+              "regimes_triggered": 4453
+            },
+            "delta_win_rate": 0.08786492743802587,
+            "delta_expectancy_atr": 0.15376362301654534
+          }
+        }
+      },
+      "first_trigger": {
+        "2023": {
+          "FADE_BULL": {
+            "next_bar_open": {
+              "n": 1048,
+              "resolved_n": 1045,
+              "wins": 465,
+              "losses": 580,
+              "unresolved_count": 3,
+              "win_rate": 0.4449760765550239,
+              "gross_expectancy_atr": 0.02870813397129185,
+              "mean_outcome_atr": 0.028560169147944615,
+              "mean_mfe": 8.623752888288283,
+              "mean_mae": 8.913570342244041,
+              "median_hold_seconds": 13.0,
+              "regimes_triggered": 1048
+            },
+            "decision_close": {
+              "n": 1048,
+              "resolved_n": 1045,
+              "wins": 412,
+              "losses": 633,
+              "unresolved_count": 3,
+              "win_rate": 0.39425837320574164,
+              "gross_expectancy_atr": -0.06004784688995213,
+              "mean_outcome_atr": -0.06002571610001803,
+              "mean_mfe": 8.58776067019771,
+              "mean_mae": 8.948399962635843,
+              "median_hold_seconds": 13.0,
+              "regimes_triggered": 1048
+            },
+            "delta_win_rate": 0.05071770334928227,
+            "delta_expectancy_atr": 0.08875598086124398
+          },
+          "FADE_BEAR": {
+            "next_bar_open": {
+              "n": 918,
+              "resolved_n": 918,
+              "wins": 418,
+              "losses": 500,
+              "unresolved_count": 0,
+              "win_rate": 0.4553376906318083,
+              "gross_expectancy_atr": 0.04684095860566451,
+              "mean_outcome_atr": 0.046840958605664486,
+              "mean_mfe": 8.920108386372306,
+              "mean_mae": 9.48702328789,
+              "median_hold_seconds": 10.0,
+              "regimes_triggered": 918
+            },
+            "decision_close": {
+              "n": 918,
+              "resolved_n": 918,
+              "wins": 362,
+              "losses": 556,
+              "unresolved_count": 0,
+              "win_rate": 0.39433551198257083,
+              "gross_expectancy_atr": -0.059912854030501006,
+              "mean_outcome_atr": -0.05991285403050109,
+              "mean_mfe": 8.884413822285127,
+              "mean_mae": 9.521338072444179,
+              "median_hold_seconds": 10.0,
+              "regimes_triggered": 918
+            },
+            "delta_win_rate": 0.06100217864923746,
+            "delta_expectancy_atr": 0.10675381263616551
+          },
+          "pooled": {
+            "next_bar_open": {
+              "n": 1966,
+              "resolved_n": 1963,
+              "wins": 883,
+              "losses": 1080,
+              "unresolved_count": 3,
+              "win_rate": 0.44982170147733064,
+              "gross_expectancy_atr": 0.03718797758532866,
+              "mean_outcome_atr": 0.0370961634115188,
+              "mean_mfe": 8.762132515572683,
+              "mean_mae": 9.18133728227608,
+              "median_hold_seconds": 11.0,
+              "regimes_triggered": 1966
+            },
+            "decision_close": {
+              "n": 1966,
+              "resolved_n": 1963,
+              "wins": 774,
+              "losses": 1189,
+              "unresolved_count": 3,
+              "win_rate": 0.39429444727457974,
+              "gross_expectancy_atr": -0.059984717269485455,
+              "mean_outcome_atr": -0.059973016517201876,
+              "mean_mfe": 8.726279283430797,
+              "mean_mae": 9.215926506279818,
+              "median_hold_seconds": 11.0,
+              "regimes_triggered": 1966
+            },
+            "delta_win_rate": 0.0555272542027509,
+            "delta_expectancy_atr": 0.09717269485481411
+          }
+        },
+        "2024": {
+          "FADE_BULL": {
+            "next_bar_open": {
+              "n": 1072,
+              "resolved_n": 1071,
+              "wins": 481,
+              "losses": 590,
+              "unresolved_count": 1,
+              "win_rate": 0.44911297852474324,
+              "gross_expectancy_atr": 0.03594771241830064,
+              "mean_outcome_atr": 0.03562998996924127,
+              "mean_mfe": 10.743244242311375,
+              "mean_mae": 10.104477044837811,
+              "median_hold_seconds": 9.0,
+              "regimes_triggered": 1072
+            },
+            "decision_close": {
+              "n": 1072,
+              "resolved_n": 1071,
+              "wins": 402,
+              "losses": 669,
+              "unresolved_count": 1,
+              "win_rate": 0.3753501400560224,
+              "gross_expectancy_atr": -0.09313725490196079,
+              "mean_outcome_atr": -0.09335699825392546,
+              "mean_mfe": 10.705974510771231,
+              "mean_mae": 10.14704912444395,
+              "median_hold_seconds": 9.0,
+              "regimes_triggered": 1072
+            },
+            "delta_win_rate": 0.07376283846872084,
+            "delta_expectancy_atr": 0.12908496732026142
+          },
+          "FADE_BEAR": {
+            "next_bar_open": {
+              "n": 929,
+              "resolved_n": 929,
+              "wins": 407,
+              "losses": 522,
+              "unresolved_count": 0,
+              "win_rate": 0.4381054897739505,
+              "gross_expectancy_atr": 0.01668460710441333,
+              "mean_outcome_atr": 0.016684607104413347,
+              "mean_mfe": 11.60739060275343,
+              "mean_mae": 13.12302855191345,
+              "median_hold_seconds": 5.0,
+              "regimes_triggered": 929
+            },
+            "decision_close": {
+              "n": 929,
+              "resolved_n": 929,
+              "wins": 311,
+              "losses": 618,
+              "unresolved_count": 0,
+              "win_rate": 0.33476856835306784,
+              "gross_expectancy_atr": -0.16415500538213124,
+              "mean_outcome_atr": -0.16415500538213132,
+              "mean_mfe": 11.576657683658684,
+              "mean_mae": 13.160733340918123,
+              "median_hold_seconds": 5.0,
+              "regimes_triggered": 929
+            },
+            "delta_win_rate": 0.10333692142088263,
+            "delta_expectancy_atr": 0.18083961248654457
+          },
+          "pooled": {
+            "next_bar_open": {
+              "n": 2001,
+              "resolved_n": 2000,
+              "wins": 888,
+              "losses": 1112,
+              "unresolved_count": 1,
+              "win_rate": 0.444,
+              "gross_expectancy_atr": 0.02699999999999997,
+              "mean_outcome_atr": 0.026834257494765937,
+              "mean_mfe": 11.144439629043342,
+              "mean_mae": 11.505893511641045,
+              "median_hold_seconds": 7.0,
+              "regimes_triggered": 2001
+            },
+            "decision_close": {
+              "n": 2001,
+              "resolved_n": 2000,
+              "wins": 713,
+              "losses": 1287,
+              "unresolved_count": 1,
+              "win_rate": 0.3565,
+              "gross_expectancy_atr": -0.126125,
+              "mean_outcome_atr": -0.12622623794513146,
+              "mean_mfe": 11.110204729468105,
+              "mean_mae": 11.546205864626112,
+              "median_hold_seconds": 7.0,
+              "regimes_triggered": 2001
+            },
+            "delta_win_rate": 0.08750000000000002,
+            "delta_expectancy_atr": 0.15312499999999996
+          }
+        },
+        "2025_Q1": {
+          "FADE_BULL": {
+            "next_bar_open": {
+              "n": 247,
+              "resolved_n": 247,
+              "wins": 110,
+              "losses": 137,
+              "unresolved_count": 0,
+              "win_rate": 0.44534412955465585,
+              "gross_expectancy_atr": 0.029352226720647745,
+              "mean_outcome_atr": 0.029352226720647773,
+              "mean_mfe": 15.172537202432501,
+              "mean_mae": 13.906820572189034,
+              "median_hold_seconds": 4.0,
+              "regimes_triggered": 247
+            },
+            "decision_close": {
+              "n": 247,
+              "resolved_n": 247,
+              "wins": 78,
+              "losses": 169,
+              "unresolved_count": 0,
+              "win_rate": 0.3157894736842105,
+              "gross_expectancy_atr": -0.19736842105263164,
+              "mean_outcome_atr": -0.19736842105263158,
+              "mean_mfe": 15.119290658842612,
+              "mean_mae": 13.962981264193896,
+              "median_hold_seconds": 4.0,
+              "regimes_triggered": 247
+            },
+            "delta_win_rate": 0.12955465587044535,
+            "delta_expectancy_atr": 0.22672064777327938
+          },
+          "FADE_BEAR": {
+            "next_bar_open": {
+              "n": 239,
+              "resolved_n": 239,
+              "wins": 113,
+              "losses": 126,
+              "unresolved_count": 0,
+              "win_rate": 0.47280334728033474,
+              "gross_expectancy_atr": 0.07740585774058584,
+              "mean_outcome_atr": 0.07740585774058577,
+              "mean_mfe": 16.419622105856398,
+              "mean_mae": 19.549895233288442,
+              "median_hold_seconds": 3.0,
+              "regimes_triggered": 239
+            },
+            "decision_close": {
+              "n": 239,
+              "resolved_n": 239,
+              "wins": 83,
+              "losses": 156,
+              "unresolved_count": 0,
+              "win_rate": 0.3472803347280335,
+              "gross_expectancy_atr": -0.14225941422594135,
+              "mean_outcome_atr": -0.14225941422594143,
+              "mean_mfe": 16.34369752019304,
+              "mean_mae": 19.634187611203785,
+              "median_hold_seconds": 3.0,
+              "regimes_triggered": 239
+            },
+            "delta_win_rate": 0.12552301255230125,
+            "delta_expectancy_atr": 0.2196652719665272
+          },
+          "pooled": {
+            "next_bar_open": {
+              "n": 486,
+              "resolved_n": 486,
+              "wins": 223,
+              "losses": 263,
+              "unresolved_count": 0,
+              "win_rate": 0.4588477366255144,
+              "gross_expectancy_atr": 0.0529835390946502,
+              "mean_outcome_atr": 0.05298353909465021,
+              "mean_mfe": 15.78581558086524,
+              "mean_mae": 16.68191284379965,
+              "median_hold_seconds": 3.0,
+              "regimes_triggered": 486
+            },
+            "decision_close": {
+              "n": 486,
+              "resolved_n": 486,
+              "wins": 161,
+              "losses": 325,
+              "unresolved_count": 0,
+              "win_rate": 0.33127572016460904,
+              "gross_expectancy_atr": -0.17026748971193417,
+              "mean_outcome_atr": -0.17026748971193414,
+              "mean_mfe": 15.721416666790665,
+              "mean_mae": 16.7519078422502,
+              "median_hold_seconds": 3.0,
+              "regimes_triggered": 486
+            },
+            "delta_win_rate": 0.12757201646090538,
+            "delta_expectancy_atr": 0.22325102880658437
+          }
+        },
+        "pooled": {
+          "FADE_BULL": {
+            "next_bar_open": {
+              "n": 2367,
+              "resolved_n": 2363,
+              "wins": 1056,
+              "losses": 1307,
+              "unresolved_count": 4,
+              "win_rate": 0.4468895471857808,
+              "gross_expectancy_atr": 0.03205670757511636,
+              "mean_outcome_atr": 0.03184470068190647,
+              "mean_mfe": 10.267033182798793,
+              "mean_mae": 9.973977943417227,
+              "median_hold_seconds": 10.0,
+              "regimes_triggered": 2367
+            },
+            "decision_close": {
+              "n": 2367,
+              "resolved_n": 2363,
+              "wins": 892,
+              "losses": 1471,
+              "unresolved_count": 4,
+              "win_rate": 0.37748624629708,
+              "gross_expectancy_atr": -0.08939906898010996,
+              "mean_outcome_atr": -0.08945316966667806,
+              "mean_mfe": 10.228661871841187,
+              "mean_mae": 10.014540006126815,
+              "median_hold_seconds": 10.0,
+              "regimes_triggered": 2367
+            },
+            "delta_win_rate": 0.06940330088870078,
+            "delta_expectancy_atr": 0.12145577655522632
+          },
+          "FADE_BEAR": {
+            "next_bar_open": {
+              "n": 2086,
+              "resolved_n": 2086,
+              "wins": 938,
+              "losses": 1148,
+              "unresolved_count": 0,
+              "win_rate": 0.44966442953020136,
+              "gross_expectancy_atr": 0.03691275167785235,
+              "mean_outcome_atr": 0.03691275167785235,
+              "mean_mfe": 10.976133773704408,
+              "mean_mae": 12.259254968248587,
+              "median_hold_seconds": 6.5,
+              "regimes_triggered": 2086
+            },
+            "decision_close": {
+              "n": 2086,
+              "resolved_n": 2086,
+              "wins": 756,
+              "losses": 1330,
+              "unresolved_count": 0,
+              "win_rate": 0.3624161073825503,
+              "gross_expectancy_atr": -0.115771812080537,
+              "mean_outcome_atr": -0.11577181208053691,
+              "mean_mfe": 10.938039589790414,
+              "mean_mae": 12.300805591224542,
+              "median_hold_seconds": 6.5,
+              "regimes_triggered": 2086
+            },
+            "delta_win_rate": 0.08724832214765105,
+            "delta_expectancy_atr": 0.15268456375838935
+          },
+          "pooled": {
+            "next_bar_open": {
+              "n": 4453,
+              "resolved_n": 4449,
+              "wins": 1994,
+              "losses": 2455,
+              "unresolved_count": 4,
+              "win_rate": 0.448190604630254,
+              "gross_expectancy_atr": 0.03433355810294447,
+              "mean_outcome_atr": 0.03421882023671067,
+              "mean_mfe": 10.599210104565941,
+              "mean_mae": 11.044511937084017,
+              "median_hold_seconds": 8.0,
+              "regimes_triggered": 4453
+            },
+            "decision_close": {
+              "n": 4453,
+              "resolved_n": 4449,
+              "wins": 1648,
+              "losses": 2801,
+              "unresolved_count": 4,
+              "win_rate": 0.37042031917284785,
+              "gross_expectancy_atr": -0.10176444144751623,
+              "mean_outcome_atr": -0.10178209130946035,
+              "mean_mfe": 10.560968613283379,
+              "mean_mae": 11.085537089107694,
+              "median_hold_seconds": 8.0,
+              "regimes_triggered": 4453
+            },
+            "delta_win_rate": 0.07777028545740616,
+            "delta_expectancy_atr": 0.1360979995504607
+          }
+        }
+      }
+    }
+  }
+}

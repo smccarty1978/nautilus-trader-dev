@@ -1,0 +1,114 @@
+{
+  "benchmark_3e": {
+    "description": "5-second price state + Model-C baseline from Project 3E",
+    "oos_roc_auc": 0.528,
+    "oos_pr_auc": 0.376,
+    "oos_expectancy_atr": -0.0114
+  },
+  "logistic_regression": {
+    "train_roc_auc": 0.747943584547286,
+    "oos_roc_auc": 0.751305250763418,
+    "train_pr_auc": 0.7499027530005562,
+    "oos_pr_auc": 0.7602347013406601,
+    "oos_brier": 0.20330372573451538
+  },
+  "gradient_boosting": {
+    "train_roc_auc": 0.7863917565612053,
+    "oos_roc_auc": 0.7655004593447545,
+    "train_pr_auc": 0.7903434735290601,
+    "oos_pr_auc": 0.7650573035089454,
+    "oos_brier": 0.1977045686896215
+  },
+  "top_decile_lift": {
+    "top_decile_win_rate": 0.8699551569506726,
+    "top_decile_expectancy_atr": 0.7724215246636771,
+    "bottom_decile_win_rate": 0.15695067264573992,
+    "bottom_decile_expectancy_atr": -0.4753363228699552
+  },
+  "decile_table": [
+    {
+      "decile": 0,
+      "count": 223,
+      "win_rate": 0.15695067264573992,
+      "expectancy_atr": -0.4753363228699552
+    },
+    {
+      "decile": 1,
+      "count": 222,
+      "win_rate": 0.22522522522522523,
+      "expectancy_atr": -0.3558558558558558
+    },
+    {
+      "decile": 2,
+      "count": 222,
+      "win_rate": 0.2972972972972973,
+      "expectancy_atr": -0.22972972972972966
+    },
+    {
+      "decile": 3,
+      "count": 223,
+      "win_rate": 0.3991031390134529,
+      "expectancy_atr": -0.05156950672645738
+    },
+    {
+      "decile": 4,
+      "count": 222,
+      "win_rate": 0.47297297297297297,
+      "expectancy_atr": 0.07770270270270274
+    },
+    {
+      "decile": 5,
+      "count": 222,
+      "win_rate": 0.47297297297297297,
+      "expectancy_atr": 0.07770270270270274
+    },
+    {
+      "decile": 6,
+      "count": 223,
+      "win_rate": 0.6053811659192825,
+      "expectancy_atr": 0.30941704035874434
+    },
+    {
+      "decile": 7,
+      "count": 222,
+      "win_rate": 0.6981981981981982,
+      "expectancy_atr": 0.4718468468468468
+    },
+    {
+      "decile": 8,
+      "count": 222,
+      "win_rate": 0.8018018018018018,
+      "expectancy_atr": 0.6531531531531531
+    },
+    {
+      "decile": 9,
+      "count": 223,
+      "win_rate": 0.8699551569506726,
+      "expectancy_atr": 0.7724215246636771
+    }
+  ],
+  "feature_names": [
+    "dist_from_ext_pts",
+    "dist_from_ext_atr",
+    "is_new_extreme",
+    "sec_since_extreme",
+    "ret_1s_fade",
+    "ret_3s_fade",
+    "ret_5s_fade",
+    "ret_1s_prev",
+    "ret_3s_prev",
+    "fade_close_loc",
+    "prev_wick_ratio",
+    "body_ratio",
+    "vel_1s",
+    "vel_3s",
+    "vel_5s",
+    "range_1s",
+    "range_3s",
+    "range_5s",
+    "volume_1s",
+    "volume_3s",
+    "volume_accel",
+    "volume_absorption"
+  ]
+}
