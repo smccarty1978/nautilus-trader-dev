@@ -1,0 +1,128 @@
+{
+  "Full Population": {
+    "P90": {
+      "checkpoints": 208516,
+      "resolved": 198250,
+      "wins": 84496,
+      "losses": 113754,
+      "win_rate": 0.4262093316519546,
+      "gross_expectancy": -0.004133669609079445,
+      "prob_inside_run_pct": 29.696522089431987,
+      "prob_starts_within_30s_pct": 36.84417502733603
+    },
+    "P95": {
+      "checkpoints": 188929,
+      "resolved": 174571,
+      "wins": 73972,
+      "losses": 100599,
+      "win_rate": 0.4237359011519668,
+      "gross_expectancy": -0.008462172984058063,
+      "prob_inside_run_pct": 29.211502733831228,
+      "prob_starts_within_30s_pct": 35.93042889127662
+    },
+    "P97.5": {
+      "checkpoints": 119359,
+      "resolved": 109722,
+      "wins": 45726,
+      "losses": 63996,
+      "win_rate": 0.4167441351779953,
+      "gross_expectancy": -0.02069776343850823,
+      "prob_inside_run_pct": 29.426352432577353,
+      "prob_starts_within_30s_pct": 35.876641057649614
+    },
+    "P99": {
+      "checkpoints": 70093,
+      "resolved": 64942,
+      "wins": 27877,
+      "losses": 37065,
+      "win_rate": 0.4292599550368021,
+      "gross_expectancy": 0.0012049213144036217,
+      "prob_inside_run_pct": 33.063216013011285,
+      "prob_starts_within_30s_pct": 39.57741857246801
+    }
+  },
+  "Price Failure (Stagnation >=30s & Giveback >=0.20 ATR)": {
+    "P90": {
+      "checkpoints": 86871,
+      "resolved": 82819,
+      "wins": 35011,
+      "losses": 47808,
+      "win_rate": 0.4227411584298289,
+      "gross_expectancy": -0.010202972747799417,
+      "prob_inside_run_pct": 30.677671489910324,
+      "prob_starts_within_30s_pct": 37.47165337109047
+    },
+    "P95": {
+      "checkpoints": 92550,
+      "resolved": 85728,
+      "wins": 36170,
+      "losses": 49558,
+      "win_rate": 0.42191582680104517,
+      "gross_expectancy": -0.011647303098170959,
+      "prob_inside_run_pct": 29.70394381415451,
+      "prob_starts_within_30s_pct": 36.151269584008645
+    },
+    "P97.5": {
+      "checkpoints": 65057,
+      "resolved": 59954,
+      "wins": 24756,
+      "losses": 35198,
+      "win_rate": 0.4129165693698502,
+      "gross_expectancy": -0.027396003602762117,
+      "prob_inside_run_pct": 29.678589544553237,
+      "prob_starts_within_30s_pct": 35.9254192477366
+    },
+    "P99": {
+      "checkpoints": 40842,
+      "resolved": 37942,
+      "wins": 16514,
+      "losses": 21428,
+      "win_rate": 0.4352432660376364,
+      "gross_expectancy": 0.011675715565863687,
+      "prob_inside_run_pct": 33.92586063366142,
+      "prob_starts_within_30s_pct": 40.26002644336712
+    }
+  },
+  "Price Failure + Score Cooling": {
+    "P90": {
+      "checkpoints": 83320,
+      "resolved": 79470,
+      "wins": 33597,
+      "losses": 45873,
+      "win_rate": 0.42276330690826724,
+      "gross_expectancy": -0.010164212910532277,
+      "prob_inside_run_pct": 30.54368698991839,
+      "prob_starts_within_30s_pct": 37.40998559769563
+    },
+    "P95": {
+      "checkpoints": 87604,
+      "resolved": 81055,
+      "wins": 34301,
+      "losses": 46754,
+      "win_rate": 0.42318179014249585,
+      "gross_expectancy": -0.009431867250632288,
+      "prob_inside_run_pct": 29.544313045066435,
+      "prob_starts_within_30s_pct": 36.06113876078718
+    },
+    "P97.5": {
+      "checkpoints": 61364,
+      "resolved": 56552,
+      "wins": 23372,
+      "losses": 33180,
+      "win_rate": 0.41328334983731785,
+      "gross_expectancy": -0.026754137784693734,
+      "prob_inside_run_pct": 29.494491884492536,
+      "prob_starts_within_30s_pct": 35.78482497881494
+    },
+    "P99": {
+      "checkpoints": 37318,
+      "resolved": 34671,
+      "wins": 15158,
+      "losses": 19513,
+      "win_rate": 0.43719535058117737,
+      "gross_expectancy": 0.015091863517060367,
+      "prob_inside_run_pct": 33.69419583043036,
+      "prob_starts_within_30s_pct": 40.13612733801383
+    }
+  }
+}

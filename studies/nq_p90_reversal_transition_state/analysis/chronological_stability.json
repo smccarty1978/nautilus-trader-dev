@@ -1,0 +1,57 @@
+{
+  "state_evaluated": "Stagnation (>=30s) + Giveback (>=0.20 ATR)",
+  "by_period": {
+    "2023": {
+      "checkpoints": 127602,
+      "pct_checkpoints_retained": 48.432239576414325,
+      "win_rate": 0.42079991955554436,
+      "gross_expectancy": -0.01360014077779733,
+      "baseline_expectancy": -0.007818790308807144,
+      "expectancy_delta": -0.005781350468990186,
+      "pct_run_starts_captured": 39.85370950888193,
+      "pct_regimes_retained": 92.2192151556157
+    },
+    "2024": {
+      "checkpoints": 127525,
+      "pct_checkpoints_retained": 49.01960784313725,
+      "win_rate": 0.42492187237474377,
+      "gross_expectancy": -0.006386723344198394,
+      "baseline_expectancy": -0.005387935468209329,
+      "expectancy_delta": -0.0009987878759890653,
+      "pct_run_starts_captured": 40.24571065452235,
+      "pct_regimes_retained": 92.65927977839335
+    },
+    "2025_Q1": {
+      "checkpoints": 30193,
+      "pct_checkpoints_retained": 47.71258355588565,
+      "win_rate": 0.41514071962949767,
+      "gross_expectancy": -0.023503740648379054,
+      "baseline_expectancy": -0.02148117140513942,
+      "expectancy_delta": -0.002022569243239635,
+      "pct_run_starts_captured": 39.92805755395683,
+      "pct_regimes_retained": 90.4895104895105
+    }
+  },
+  "by_direction": {
+    "FADE_BULL": {
+      "checkpoints": 149070,
+      "pct_checkpoints_retained": 46.87293651542308,
+      "win_rate": 0.4152714631501074,
+      "gross_expectancy": -0.023274939487312088,
+      "baseline_expectancy": -0.021586850635689495,
+      "expectancy_delta": -0.0016880888516225927,
+      "pct_run_starts_captured": 39.11643713110356,
+      "pct_regimes_retained": 92.12962962962963
+    },
+    "FADE_BEAR": {
+      "checkpoints": 136250,
+      "pct_checkpoints_retained": 50.67561284947576,
+      "win_rate": 0.42945855867186516,
+      "gross_expectancy": 0.0015524776757640548,
+      "baseline_expectancy": 0.007681525203070214,
+      "expectancy_delta": -0.006129047527306159,
+      "pct_run_starts_captured": 41.05828525959817,
+      "pct_regimes_retained": 92.33000322268772
+    }
+  }
+}

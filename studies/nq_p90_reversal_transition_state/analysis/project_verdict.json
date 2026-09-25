@@ -1,0 +1,59 @@
+{
+  "verdict": "TRANSITION_UNOBSERVABLE_WITH_5S_PRICE_AND_MODEL_INPUTS",
+  "verdict_rationale": "Across the entire P90-armed NQ population (6,559 regimes, 586,897 checkpoints), causally observable 5-second price-action (stagnation duration, giveback from extreme) and Model-C dynamics (score drawdown, cooling) FAIL to separate dangerous trend continuation from the +1.00/-0.75 ATR winning reversal zone. Specifically: (1) Baseline expectancy across all P90 checkpoints is -0.0082 ATR (42.39% win rate); (2) Price failure states (e.g. stagnation >=30s and giveback >=0.20 ATR) produce essentially identical negative economics (-0.0114 ATR, 42.20% win rate); (3) Adding Model-C score cooling yields -0.0102 ATR (42.28% win rate), failing to achieve the 42.86% breakeven requirement; (4) In event-study trajectories, Model-C score cooling lags rather than leads the start of winning runs, while price stagnation and minor givebacks occur routinely throughout continuation trends; (5) A chronological OOS diagnostic classifier achieves an ROC-AUC of only 0.528 (essentially random) with top-decile expectancy of -0.0390 ATR. Therefore, ordinary 5-second price and model state information cannot localize reversal execution, conclusively justifying the transition to high-frequency / MBP-1 order-flow absorption research.",
+  "key_findings": {
+    "baseline_all_p90": {
+      "checkpoints": 586897,
+      "win_rate": 0.4238855859064632,
+      "gross_expectancy": -0.008200224663689417,
+      "prob_inside_run_pct": 29.887527112934638,
+      "prob_run_starts_within_30s_pct": 36.67968996263399
+    },
+    "best_simple_causal_state": {
+      "name": "Combo 1: Stagnation (>=30s) + Giveback (>=0.20 ATR)",
+      "checkpoints_retained": 285320,
+      "pct_checkpoints_retained": 48.615003995590364,
+      "win_rate": 0.4220452404454236,
+      "gross_expectancy": -0.011420829220508702,
+      "expectancy_gain_over_baseline": -0.0032206045568192853,
+      "prob_inside_run_pct": 30.598976587691013,
+      "prob_run_starts_within_30s_pct": 37.08993410907052,
+      "regimes_retained": 6049,
+      "pct_p90_regimes_retained": 92.2244244549474,
+      "pct_all_wins_captured": 48.45542958835873,
+      "pct_starts_captured": 40.03578828404596
+    },
+    "best_combination_state": {
+      "name": "Combo 3: Stagnation (>=30s) + Giveback (>=0.20 ATR) + Score Cooling (dd>=0.02)",
+      "win_rate": 0.4227560894227561,
+      "gross_expectancy": -0.010176843510176843,
+      "pct_p90_regimes_retained": 91.62982161914927,
+      "pct_all_wins_captured": 45.86010315808524,
+      "pct_starts_captured": 39.27293275569787
+    },
+    "severity_as_gate_opportunity_cost": {
+      "p95_gate_pct_regimes_retained": 74.63027900594604,
+      "p95_gate_expectancy": -0.010508683264850315,
+      "incremental_value_of_severity_within_price_failure": "NEGATIVE_TO_NEGLIGIBLE"
+    },
+    "classifier_diagnostic_summary": {
+      "target": "starts_ge30_run_within_30s",
+      "oos_roc_auc": 0.5277788225457091,
+      "oos_pr_auc": 0.37559489808346114,
+      "oos_baseline_pr": 0.35849623109622164,
+      "oos_top_decile_win_rate": 0.40629346314325454,
+      "oos_top_decile_expectancy": -0.03898643949930459
+    }
+  },
+  "answers_to_core_questions": {
+    "1_is_transition_causally_observable": false,
+    "2_lead_variables_before_T0": "None provide actionable lead separation; Model-C cooling lags T0, while price giveback/stagnation occurs routinely during trend pauses",
+    "3_primary_association": "Reversal zones occur after local exhaustion climaxes (T-5s), but cannot be discriminated from continuation pauses with 5s price/model features",
+    "4_does_higher_severity_add_value": false,
+    "5_population_retained_by_best_state": "92.2%",
+    "6_pct_starts_captured": "40.0%",
+    "7_does_localization_improve_economics": "NO: Gross expectancy remains negative across all states (-0.008 ATR baseline vs -0.011 ATR in Combo 1)",
+    "8_is_relationship_stable": true,
+    "9_research_justification": "Concludes D (transition unobservable with 5s price/model inputs) and strongly justifies C: Moving to MBP-1 / tick-level order-flow absorption research"
+  }
+}

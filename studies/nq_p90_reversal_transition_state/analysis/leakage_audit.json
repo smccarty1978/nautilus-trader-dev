@@ -1,0 +1,33 @@
+{
+  "audit_timestamp_utc": "2026-09-15T23:12:22Z",
+  "causal_checks": {
+    "future_maximum_score_in_features": false,
+    "future_price_extrema_in_features": false,
+    "eventual_severity_in_features": false,
+    "eventual_regime_duration_in_features": false,
+    "future_winning_zone_location_in_features": false,
+    "oracle_outcome_in_predictors": false,
+    "all_features_strictly_at_or_before_T": true
+  },
+  "feature_temporal_boundary": "T (exact observation timestamp)",
+  "features_inspected": [
+    "max_score_so_far",
+    "score_drawdown_from_peak",
+    "seconds_since_peak_score",
+    "score_delta_5s",
+    "model_c_score_delta_15s",
+    "model_c_score_delta_30s",
+    "model_c_score_delta_60s",
+    "max_severity_so_far",
+    "current_severity_band",
+    "post_p90_extension_atr",
+    "current_distance_from_p90_price_atr",
+    "seconds_since_latest_extreme",
+    "regime_giveback_atr",
+    "rolling_30s_giveback_atr",
+    "rolling_60s_giveback_atr",
+    "trade_efficiency_30s",
+    "trade_efficiency_60s"
+  ],
+  "verdict": "PASSED_ZERO_LEAKAGE"
+}
