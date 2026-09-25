@@ -1,0 +1,45 @@
+{
+  "verdict": "SCORE_SEVERITY_PREDICTS_FLIP_NOT_ENTRY",
+  "verdict_rationale": "Model-C score progression from P90 to P99 identifies increasingly severe macro trend deterioration. However, score severity actively worsens adverse prevailing excursion (+2.04 ATR at P99 vs +1.78 ATR at P90; 99.1% extending >= +1.00 ATR and 100.0% extending >= +0.75 ATR) and fails to localize entry: immediate fade expectancy deteriorates from -0.016 ATR at P90 to -0.032 ATR at P99. While temporal delay to a winning zone drops from 110s to 15s, taking an immediate fade entry at P99 is guaranteed to hit a -0.75 ATR stop before reaching the reversal. Therefore, P90 was NOT simply 'too early' on a monotonic timing curve; Model C inherently reflects macro deterioration velocity rather than local turning-point geometry, and moving deeper into the score tail does not make the signal economically actionable without an independent causal timing mechanism.",
+  "key_metrics_summary": {
+    "pooled": {
+      "P90": {
+        "regimes_reaching": 6534,
+        "median_remaining_mfe_atr": 1.7841954666446949,
+        "pct_ge_1_atr_extension": 81.61922252831344,
+        "median_delay_to_ge_30s_run_seconds": 110.0,
+        "immediate_win_rate": 0.41921155483520206,
+        "immediate_gross_expectancy_atr": -0.01637977903839644,
+        "flip_within_180s_pct": 29.24701561065197
+      },
+      "P95": {
+        "regimes_reaching": 4895,
+        "median_remaining_mfe_atr": 1.8635953459813228,
+        "pct_ge_1_atr_extension": 90.05107252298264,
+        "median_delay_to_ge_30s_run_seconds": 65.0,
+        "immediate_win_rate": 0.4161849710982659,
+        "immediate_gross_expectancy_atr": -0.02167630057803468,
+        "flip_within_180s_pct": 28.355464759959144
+      },
+      "P97.5": {
+        "regimes_reaching": 2797,
+        "median_remaining_mfe_atr": 1.9926472732294762,
+        "pct_ge_1_atr_extension": 96.42474079370754,
+        "median_delay_to_ge_30s_run_seconds": 35.0,
+        "immediate_win_rate": 0.4130380170825657,
+        "immediate_gross_expectancy_atr": -0.027183470105509963,
+        "flip_within_180s_pct": 27.744011440829457
+      },
+      "P99": {
+        "regimes_reaching": 1172,
+        "median_remaining_mfe_atr": 2.0396809752298206,
+        "pct_ge_1_atr_extension": 99.14675767918088,
+        "median_delay_to_ge_30s_run_seconds": 15.0,
+        "immediate_win_rate": 0.4103967168262654,
+        "immediate_gross_expectancy_atr": -0.03180574555403557,
+        "flip_within_180s_pct": 26.96245733788396
+      }
+    }
+  },
+  "recommendation_for_next_experiment": "Cease attempting to extract execution entry timing directly from Model-C score levels or tail quantiles. Treat Model C strictly as an upstream macro regime-deterioration gate (ARMED state), and test an explicit causal microstructure / order-flow / price-action trigger (e.g. 1-second delta absorption, failed continuation break, or local micro-regime change) during the post-P90 window to time the actual +1.00/-0.75 ATR entry."
+}

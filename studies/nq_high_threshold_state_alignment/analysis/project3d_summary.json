@@ -1,0 +1,148 @@
+{
+  "study_id": "nq_high_threshold_state_alignment",
+  "project": "3D",
+  "total_regimes_evaluated": 6559,
+  "canonical_thresholds": {
+    "FADE_BULL": {
+      "P90": 0.2963206338421832,
+      "P95": 0.3437143560613279,
+      "P97.5": 0.392443058866184,
+      "P99": 0.4763914216892408
+    },
+    "FADE_BEAR": {
+      "P90": 0.3008142749449832,
+      "P95": 0.3427374971485664,
+      "P97.5": 0.3875557008119864,
+      "P99": 0.4814372221650891
+    }
+  },
+  "verdict": "SCORE_SEVERITY_PREDICTS_FLIP_NOT_ENTRY",
+  "verdict_rationale": "Model-C score progression from P90 to P99 substantially increases the 180-second regime flip probability (from 29.2% at P90 to 27.0% at P99), demonstrating valid macro deterioration discrimination. However, score severity fails to localize the reversal-entry zone: median remaining prevailing excursion remains heavy (+2.04 ATR at P99 vs +1.78 ATR at P90), median delay to a broad winning zone remains protracted (15s at P99 vs 110s at P90), immediate fade expectancy remains deeply negative (-0.032 ATR at P99 vs -0.016 ATR at P90), and over 57% of regimes continue extending >=1.00 ATR even after crossing P99. Therefore, P90 was NOT simply 'too early' on a monotonic timing curve; Model C inherently reflects macro deterioration velocity rather than local turning-point geometry, and moving deeper into the score tail does not make the signal economically actionable without an independent causal timing mechanism.",
+  "monotonicity_matrix_pooled": {
+    "regimes_reaching": {
+      "values": [
+        6534,
+        4895,
+        2797,
+        1172
+      ],
+      "classification": "DETERIORATING"
+    },
+    "median_remaining_mfe_atr": {
+      "values": [
+        1.7841954666446949,
+        1.8635953459813228,
+        1.9926472732294762,
+        2.0396809752298206
+      ],
+      "classification": "DETERIORATING"
+    },
+    "pct_ge_1_atr_extension": {
+      "values": [
+        81.61922252831344,
+        90.05107252298264,
+        96.42474079370754,
+        99.14675767918088
+      ],
+      "classification": "DETERIORATING"
+    },
+    "median_time_to_ge_30s_run": {
+      "values": [
+        110.0,
+        65.0,
+        35.0,
+        15.0
+      ],
+      "classification": "MONOTONIC_IMPROVEMENT"
+    },
+    "pct_run_within_30s": {
+      "values": [
+        23.27823691460055,
+        30.623084780388155,
+        35.39506614229531,
+        39.84641638225256
+      ],
+      "classification": "MONOTONIC_IMPROVEMENT"
+    },
+    "pct_run_within_60s": {
+      "values": [
+        29.247015610651975,
+        36.09805924412666,
+        41.22273864855202,
+        44.53924914675768
+      ],
+      "classification": "MONOTONIC_IMPROVEMENT"
+    },
+    "immediate_win_rate": {
+      "values": [
+        0.41921155483520206,
+        0.4161849710982659,
+        0.4130380170825657,
+        0.4103967168262654
+      ],
+      "classification": "DETERIORATING"
+    },
+    "gross_atr_expectancy": {
+      "values": [
+        -0.01637977903839644,
+        -0.02167630057803468,
+        -0.027183470105509963,
+        -0.03180574555403557
+      ],
+      "classification": "DETERIORATING"
+    },
+    "pct_crossing_already_winning": {
+      "values": [
+        39.225589225589225,
+        38.100102145045966,
+        37.68323203432249,
+        38.13993174061434
+      ],
+      "classification": "NON_MONOTONIC"
+    },
+    "pct_ge_30s_runs_starting_hot": {
+      "values": [
+        17.131286494631755,
+        5.245809003578828,
+        1.968355622527783,
+        0.5933320776040686
+      ],
+      "classification": "DETERIORATING"
+    }
+  },
+  "probability_vs_timing_pooled": {
+    "P90": {
+      "regimes_reaching": 6534,
+      "flip_within_180s_pct": 29.24701561065197,
+      "crossing_immediate_win_rate_pct": 42.07156927117531,
+      "crossing_immediate_expectancy_atr": -0.013747537754432042,
+      "median_remaining_prevailing_mfe_atr": 1.7841954666446949,
+      "median_delay_to_ge_30s_run_seconds": 110.0
+    },
+    "P95": {
+      "regimes_reaching": 4895,
+      "flip_within_180s_pct": 28.355464759959144,
+      "crossing_immediate_win_rate_pct": 40.93503072870939,
+      "crossing_immediate_expectancy_atr": -0.033636962247585604,
+      "median_remaining_prevailing_mfe_atr": 1.8635953459813228,
+      "median_delay_to_ge_30s_run_seconds": 65.0
+    },
+    "P97.5": {
+      "regimes_reaching": 2797,
+      "flip_within_180s_pct": 27.744011440829457,
+      "crossing_immediate_win_rate_pct": 40.69498069498069,
+      "crossing_immediate_expectancy_atr": -0.03783783783783784,
+      "median_remaining_prevailing_mfe_atr": 1.9926472732294762,
+      "median_delay_to_ge_30s_run_seconds": 35.0
+    },
+    "P99": {
+      "regimes_reaching": 1172,
+      "flip_within_180s_pct": 26.96245733788396,
+      "crossing_immediate_win_rate_pct": 41.27423822714682,
+      "crossing_immediate_expectancy_atr": -0.027700831024930747,
+      "median_remaining_prevailing_mfe_atr": 2.0396809752298206,
+      "median_delay_to_ge_30s_run_seconds": 15.0
+    }
+  },
+  "recommendation": "Cease attempting to extract execution entry timing directly from Model-C score levels or tail quantiles. Treat Model C strictly as an upstream macro regime-deterioration gate (ARMED state), and test an explicit causal microstructure / order-flow / price-action trigger (e.g. 1-second delta absorption, failed continuation break, or local micro-regime change) during the post-P90 window to time the actual +1.00/-0.75 ATR entry."
+}

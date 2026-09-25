@@ -1,0 +1,3682 @@
+{
+  "P90": {
+    "FADE_BULL": {
+      "ALL": {
+        "regimes_reaching": 3441,
+        "first_hot_episode_duration_seconds": {
+          "count": 3441,
+          "mean": 6.564952048823017,
+          "std": 12.891334148947134,
+          "median": 5.0,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 15.0,
+          "min": 0.0,
+          "max": 340.0
+        },
+        "remaining_hot_fraction": {
+          "count": 3441,
+          "mean": 0.2848560864071919,
+          "std": 0.26100943538814614,
+          "median": 0.2,
+          "p25": 0.09166666666666666,
+          "p75": 0.3870967741935484,
+          "p90": 0.6774193548387096,
+          "min": 0.0037174721189591076,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 3441,
+          "mean": 5.065678581807614,
+          "std": 4.2072561777646715,
+          "median": 4.0,
+          "p25": 2.0,
+          "p75": 7.0,
+          "p90": 11.0,
+          "min": 1.0,
+          "max": 28.0
+        },
+        "number_down_crosses": {
+          "count": 3441,
+          "mean": 4.4431851206044755,
+          "std": 4.166302548149811,
+          "median": 3.0,
+          "p25": 1.0,
+          "p75": 7.0,
+          "p90": 10.0,
+          "min": 0.0,
+          "max": 29.0
+        },
+        "number_re_crosses": {
+          "count": 3441,
+          "mean": 3.976460331299041,
+          "std": 4.211672425858425,
+          "median": 3.0,
+          "p25": 1.0,
+          "p75": 6.0,
+          "p90": 10.0,
+          "min": 0.0,
+          "max": 27.0
+        },
+        "hot_economics": {
+          "checkpoints": 55447,
+          "resolved": 51930,
+          "wins": 21563,
+          "losses": 30367,
+          "win_rate": 0.4152320431349894,
+          "gross_atr_expectancy": -0.023343924513768533
+        },
+        "cold_economics": {
+          "checkpoints": 260492,
+          "resolved": 243279,
+          "wins": 101512,
+          "losses": 141767,
+          "win_rate": 0.41726577304247386,
+          "gross_atr_expectancy": -0.01978489717567073
+        },
+        "expectancy_delta_hot_minus_cold": -0.0035590273380978026,
+        "pct_ge_30s_runs_starting_hot": 17.38508316937936
+      },
+      "2023": {
+        "regimes_reaching": 1558,
+        "first_hot_episode_duration_seconds": {
+          "count": 1558,
+          "mean": 6.643132220795892,
+          "std": 11.424350205108466,
+          "median": 5.0,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 15.0,
+          "min": 0.0,
+          "max": 115.0
+        },
+        "remaining_hot_fraction": {
+          "count": 1558,
+          "mean": 0.29381670416162226,
+          "std": 0.2682050471958439,
+          "median": 0.20647857889237198,
+          "p25": 0.09189814814814815,
+          "p75": 0.4,
+          "p90": 0.7350724637681156,
+          "min": 0.0037174721189591076,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 1558,
+          "mean": 5.034659820282413,
+          "std": 4.164318168504855,
+          "median": 4.0,
+          "p25": 2.0,
+          "p75": 7.0,
+          "p90": 11.0,
+          "min": 1.0,
+          "max": 28.0
+        },
+        "number_down_crosses": {
+          "count": 1558,
+          "mean": 4.392811296534018,
+          "std": 4.118245782192035,
+          "median": 3.0,
+          "p25": 1.0,
+          "p75": 7.0,
+          "p90": 10.0,
+          "min": 0.0,
+          "max": 29.0
+        },
+        "number_re_crosses": {
+          "count": 1558,
+          "mean": 3.9454428754813864,
+          "std": 4.166801570770691,
+          "median": 3.0,
+          "p25": 1.0,
+          "p75": 6.0,
+          "p90": 10.0,
+          "min": 0.0,
+          "max": 27.0
+        },
+        "hot_economics": {
+          "checkpoints": 25250,
+          "resolved": 23803,
+          "wins": 10061,
+          "losses": 13742,
+          "win_rate": 0.4226778137209595,
+          "gross_atr_expectancy": -0.0103138259883208
+        },
+        "cold_economics": {
+          "checkpoints": 116834,
+          "resolved": 109449,
+          "wins": 45727,
+          "losses": 63722,
+          "win_rate": 0.41779276192564574,
+          "gross_atr_expectancy": -0.018862666630119963
+        },
+        "expectancy_delta_hot_minus_cold": 0.008548840641799163,
+        "pct_ge_30s_runs_starting_hot": 17.596229379418695
+      },
+      "2024": {
+        "regimes_reaching": 1514,
+        "first_hot_episode_duration_seconds": {
+          "count": 1514,
+          "mean": 6.165785997357992,
+          "std": 13.222948200935082,
+          "median": 5.0,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 15.0,
+          "min": 0.0,
+          "max": 340.0
+        },
+        "remaining_hot_fraction": {
+          "count": 1514,
+          "mean": 0.26947277539467596,
+          "std": 0.2497211145379243,
+          "median": 0.1875,
+          "p25": 0.08756451123254402,
+          "p75": 0.36363636363636365,
+          "p90": 0.6285375494071146,
+          "min": 0.0044444444444444444,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 1514,
+          "mean": 5.116248348745046,
+          "std": 4.2179352454593575,
+          "median": 4.0,
+          "p25": 2.0,
+          "p75": 7.0,
+          "p90": 11.0,
+          "min": 1.0,
+          "max": 23.0
+        },
+        "number_down_crosses": {
+          "count": 1514,
+          "mean": 4.521796565389696,
+          "std": 4.1939269102156835,
+          "median": 3.0,
+          "p25": 1.0,
+          "p75": 7.0,
+          "p90": 11.0,
+          "min": 0.0,
+          "max": 22.0
+        },
+        "number_re_crosses": {
+          "count": 1514,
+          "mean": 4.027080581241743,
+          "std": 4.225472365093612,
+          "median": 3.0,
+          "p25": 1.0,
+          "p75": 6.0,
+          "p90": 10.0,
+          "min": 0.0,
+          "max": 22.0
+        },
+        "hot_economics": {
+          "checkpoints": 24193,
+          "resolved": 22575,
+          "wins": 9038,
+          "losses": 13537,
+          "win_rate": 0.4003543743078627,
+          "gross_atr_expectancy": -0.04937984496124031
+        },
+        "cold_economics": {
+          "checkpoints": 117642,
+          "resolved": 109821,
+          "wins": 45510,
+          "losses": 64311,
+          "win_rate": 0.41440161717704266,
+          "gross_atr_expectancy": -0.024797169940175376
+        },
+        "expectancy_delta_hot_minus_cold": -0.024582675021064933,
+        "pct_ge_30s_runs_starting_hot": 17.28744939271255
+      },
+      "2025_Q1": {
+        "regimes_reaching": 369,
+        "first_hot_episode_duration_seconds": {
+          "count": 369,
+          "mean": 7.872628726287263,
+          "std": 16.69956213421843,
+          "median": 5.0,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 20.0,
+          "min": 0.0,
+          "max": 220.0
+        },
+        "remaining_hot_fraction": {
+          "count": 369,
+          "mean": 0.3101398002596218,
+          "std": 0.2715755002615145,
+          "median": 0.2222222222222222,
+          "p25": 0.10975609756097561,
+          "p75": 0.425,
+          "p90": 0.7533333333333332,
+          "min": 0.004,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 369,
+          "mean": 4.989159891598916,
+          "std": 4.33925693923888,
+          "median": 4.0,
+          "p25": 2.0,
+          "p75": 7.0,
+          "p90": 11.0,
+          "min": 1.0,
+          "max": 28.0
+        },
+        "number_down_crosses": {
+          "count": 369,
+          "mean": 4.333333333333333,
+          "std": 4.247747689494321,
+          "median": 3.0,
+          "p25": 1.0,
+          "p75": 6.0,
+          "p90": 10.199999999999989,
+          "min": 0.0,
+          "max": 23.0
+        },
+        "number_re_crosses": {
+          "count": 369,
+          "mean": 3.899728997289973,
+          "std": 4.339048755199608,
+          "median": 3.0,
+          "p25": 0.0,
+          "p75": 6.0,
+          "p90": 10.0,
+          "min": 0.0,
+          "max": 27.0
+        },
+        "hot_economics": {
+          "checkpoints": 6004,
+          "resolved": 5552,
+          "wins": 2464,
+          "losses": 3088,
+          "win_rate": 0.4438040345821326,
+          "gross_atr_expectancy": 0.026657060518731988
+        },
+        "cold_economics": {
+          "checkpoints": 26016,
+          "resolved": 24009,
+          "wins": 10275,
+          "losses": 13734,
+          "win_rate": 0.4279645133075097,
+          "gross_atr_expectancy": -0.0010621017118580532
+        },
+        "expectancy_delta_hot_minus_cold": 0.027719162230590042,
+        "pct_ge_30s_runs_starting_hot": 16.869565217391305
+      }
+    },
+    "FADE_BEAR": {
+      "ALL": {
+        "regimes_reaching": 3093,
+        "first_hot_episode_duration_seconds": {
+          "count": 3093,
+          "mean": 6.821855803427093,
+          "std": 13.874510824297301,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 20.0,
+          "min": 0.0,
+          "max": 265.0
+        },
+        "remaining_hot_fraction": {
+          "count": 3093,
+          "mean": 0.29410895773467766,
+          "std": 0.26233632923762573,
+          "median": 0.2,
+          "p25": 0.10344827586206896,
+          "p75": 0.4107142857142857,
+          "p90": 0.7,
+          "min": 0.0036363636363636364,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 3093,
+          "mean": 5.123504688005173,
+          "std": 4.252110835774354,
+          "median": 4.0,
+          "p25": 2.0,
+          "p75": 7.0,
+          "p90": 11.0,
+          "min": 1.0,
+          "max": 28.0
+        },
+        "number_down_crosses": {
+          "count": 3093,
+          "mean": 4.435822825735531,
+          "std": 4.1889000409986314,
+          "median": 3.0,
+          "p25": 1.0,
+          "p75": 7.0,
+          "p90": 10.0,
+          "min": 0.0,
+          "max": 27.0
+        },
+        "number_re_crosses": {
+          "count": 3093,
+          "mean": 4.019075331393469,
+          "std": 4.260506480710761,
+          "median": 3.0,
+          "p25": 1.0,
+          "p75": 6.0,
+          "p90": 10.0,
+          "min": 0.0,
+          "max": 27.0
+        },
+        "hot_economics": {
+          "checkpoints": 48914,
+          "resolved": 45553,
+          "wins": 19303,
+          "losses": 26250,
+          "win_rate": 0.4237481614822295,
+          "gross_atr_expectancy": -0.008440717406098391
+        },
+        "cold_economics": {
+          "checkpoints": 218224,
+          "resolved": 203416,
+          "wins": 88612,
+          "losses": 114804,
+          "win_rate": 0.43561961694262,
+          "gross_atr_expectancy": 0.012334329649585087
+        },
+        "expectancy_delta_hot_minus_cold": -0.020775047055683477,
+        "pct_ge_30s_runs_starting_hot": 16.849015317286653
+      },
+      "2023": {
+        "regimes_reaching": 1386,
+        "first_hot_episode_duration_seconds": {
+          "count": 1386,
+          "mean": 6.771284271284271,
+          "std": 12.140248764065298,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 20.0,
+          "min": 0.0,
+          "max": 175.0
+        },
+        "remaining_hot_fraction": {
+          "count": 1386,
+          "mean": 0.29542310722364196,
+          "std": 0.2665313709841646,
+          "median": 0.2,
+          "p25": 0.1,
+          "p75": 0.42536753675367533,
+          "p90": 0.729020979020979,
+          "min": 0.0036363636363636364,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 1386,
+          "mean": 5.0230880230880235,
+          "std": 4.237472937954866,
+          "median": 4.0,
+          "p25": 2.0,
+          "p75": 7.0,
+          "p90": 11.0,
+          "min": 1.0,
+          "max": 28.0
+        },
+        "number_down_crosses": {
+          "count": 1386,
+          "mean": 4.3441558441558445,
+          "std": 4.188112571751568,
+          "median": 3.0,
+          "p25": 1.0,
+          "p75": 6.0,
+          "p90": 10.0,
+          "min": 0.0,
+          "max": 27.0
+        },
+        "number_re_crosses": {
+          "count": 1386,
+          "mean": 3.9314574314574315,
+          "std": 4.235193072087272,
+          "median": 3.0,
+          "p25": 1.0,
+          "p75": 6.0,
+          "p90": 10.0,
+          "min": 0.0,
+          "max": 27.0
+        },
+        "hot_economics": {
+          "checkpoints": 21486,
+          "resolved": 20088,
+          "wins": 8520,
+          "losses": 11568,
+          "win_rate": 0.4241338112305854,
+          "gross_atr_expectancy": -0.007765830346475508
+        },
+        "cold_economics": {
+          "checkpoints": 98408,
+          "resolved": 91460,
+          "wins": 39563,
+          "losses": 51897,
+          "win_rate": 0.4325716160069976,
+          "gross_atr_expectancy": 0.00700032801224579
+        },
+        "expectancy_delta_hot_minus_cold": -0.014766158358721297,
+        "pct_ge_30s_runs_starting_hot": 17.329164805716836
+      },
+      "2024": {
+        "regimes_reaching": 1364,
+        "first_hot_episode_duration_seconds": {
+          "count": 1364,
+          "mean": 6.579912023460411,
+          "std": 14.54012270652163,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 15.0,
+          "min": 0.0,
+          "max": 265.0
+        },
+        "remaining_hot_fraction": {
+          "count": 1364,
+          "mean": 0.2898540770460482,
+          "std": 0.2557288011520214,
+          "median": 0.2,
+          "p25": 0.10550833605753515,
+          "p75": 0.3957179771133259,
+          "p90": 0.6666666666666666,
+          "min": 0.0045045045045045045,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 1364,
+          "mean": 5.197214076246334,
+          "std": 4.258676619500391,
+          "median": 4.0,
+          "p25": 2.0,
+          "p75": 7.0,
+          "p90": 11.0,
+          "min": 1.0,
+          "max": 26.0
+        },
+        "number_down_crosses": {
+          "count": 1364,
+          "mean": 4.502199413489736,
+          "std": 4.184263337638937,
+          "median": 3.0,
+          "p25": 1.0,
+          "p75": 7.0,
+          "p90": 10.0,
+          "min": 0.0,
+          "max": 24.0
+        },
+        "number_re_crosses": {
+          "count": 1364,
+          "mean": 4.0791788856304985,
+          "std": 4.283180694580615,
+          "median": 3.0,
+          "p25": 1.0,
+          "p75": 6.0,
+          "p90": 10.0,
+          "min": 0.0,
+          "max": 25.0
+        },
+        "hot_economics": {
+          "checkpoints": 21924,
+          "resolved": 20379,
+          "wins": 8784,
+          "losses": 11595,
+          "win_rate": 0.43103194464890326,
+          "gross_atr_expectancy": 0.004305903135580745
+        },
+        "cold_economics": {
+          "checkpoints": 94882,
+          "resolved": 88758,
+          "wins": 39610,
+          "losses": 49148,
+          "win_rate": 0.44626963203316883,
+          "gross_atr_expectancy": 0.030971856058045474
+        },
+        "expectancy_delta_hot_minus_cold": -0.02666595292246473,
+        "pct_ge_30s_runs_starting_hot": 16.614837849844513
+      },
+      "2025_Q1": {
+        "regimes_reaching": 343,
+        "first_hot_episode_duration_seconds": {
+          "count": 343,
+          "mean": 7.988338192419825,
+          "std": 17.262503674103993,
+          "median": 5.0,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 20.0,
+          "min": 0.0,
+          "max": 165.0
+        },
+        "remaining_hot_fraction": {
+          "count": 343,
+          "mean": 0.305719004578952,
+          "std": 0.2706551675534987,
+          "median": 0.2,
+          "p25": 0.10526315789473684,
+          "p75": 0.42857142857142855,
+          "p90": 0.7306666666666668,
+          "min": 0.004329004329004329,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 343,
+          "mean": 5.236151603498542,
+          "std": 4.276136140476024,
+          "median": 4.0,
+          "p25": 2.0,
+          "p75": 8.0,
+          "p90": 11.0,
+          "min": 1.0,
+          "max": 27.0
+        },
+        "number_down_crosses": {
+          "count": 343,
+          "mean": 4.542274052478134,
+          "std": 4.202989712749524,
+          "median": 3.0,
+          "p25": 1.0,
+          "p75": 7.0,
+          "p90": 10.0,
+          "min": 0.0,
+          "max": 27.0
+        },
+        "number_re_crosses": {
+          "count": 343,
+          "mean": 4.134110787172012,
+          "std": 4.265199506846925,
+          "median": 3.0,
+          "p25": 0.5,
+          "p75": 6.0,
+          "p90": 10.0,
+          "min": 0.0,
+          "max": 26.0
+        },
+        "hot_economics": {
+          "checkpoints": 5504,
+          "resolved": 5086,
+          "wins": 1999,
+          "losses": 3087,
+          "win_rate": 0.3930397168698388,
+          "gross_atr_expectancy": -0.06218049547778215
+        },
+        "cold_economics": {
+          "checkpoints": 24934,
+          "resolved": 23198,
+          "wins": 9439,
+          "losses": 13759,
+          "win_rate": 0.4068885248728339,
+          "gross_atr_expectancy": -0.037945081472540734
+        },
+        "expectancy_delta_hot_minus_cold": -0.024235414005241415,
+        "pct_ge_30s_runs_starting_hot": 15.828677839851025
+      }
+    },
+    "POOLED": {
+      "ALL": {
+        "regimes_reaching": 6534,
+        "first_hot_episode_duration_seconds": {
+          "count": 6534,
+          "mean": 6.686562595653505,
+          "std": 13.366373664295137,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 15.0,
+          "min": 0.0,
+          "max": 340.0
+        },
+        "remaining_hot_fraction": {
+          "count": 6534,
+          "mean": 0.28923611870225063,
+          "std": 0.2616791703942959,
+          "median": 0.2,
+          "p25": 0.09803921568627451,
+          "p75": 0.4,
+          "p90": 0.6923076923076923,
+          "min": 0.0036363636363636364,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 6534,
+          "mean": 5.093051729415365,
+          "std": 4.228646902899605,
+          "median": 4.0,
+          "p25": 2.0,
+          "p75": 7.0,
+          "p90": 11.0,
+          "min": 1.0,
+          "max": 28.0
+        },
+        "number_down_crosses": {
+          "count": 6534,
+          "mean": 4.439700030609122,
+          "std": 4.177016380392363,
+          "median": 3.0,
+          "p25": 1.0,
+          "p75": 7.0,
+          "p90": 10.0,
+          "min": 0.0,
+          "max": 29.0
+        },
+        "number_re_crosses": {
+          "count": 6534,
+          "mean": 3.9966329966329965,
+          "std": 4.234912648832246,
+          "median": 3.0,
+          "p25": 1.0,
+          "p75": 6.0,
+          "p90": 10.0,
+          "min": 0.0,
+          "max": 27.0
+        },
+        "hot_economics": {
+          "checkpoints": 104361,
+          "resolved": 97483,
+          "wins": 40866,
+          "losses": 56617,
+          "win_rate": 0.41921155483520206,
+          "gross_atr_expectancy": -0.01637977903839644
+        },
+        "cold_economics": {
+          "checkpoints": 478716,
+          "resolved": 446695,
+          "wins": 190124,
+          "losses": 256571,
+          "win_rate": 0.4256237477473444,
+          "gross_atr_expectancy": -0.005158441442147326
+        },
+        "expectancy_delta_hot_minus_cold": -0.011221337596249114,
+        "pct_ge_30s_runs_starting_hot": 17.131286494631755
+      },
+      "2023": {
+        "regimes_reaching": 2944,
+        "first_hot_episode_duration_seconds": {
+          "count": 2944,
+          "mean": 6.703464673913044,
+          "std": 11.766987671685557,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 18.500000000001364,
+          "min": 0.0,
+          "max": 175.0
+        },
+        "remaining_hot_fraction": {
+          "count": 2944,
+          "mean": 0.294572979516228,
+          "std": 0.26741960745169974,
+          "median": 0.2015114770740511,
+          "p25": 0.09632761816496757,
+          "p75": 0.41029346376167186,
+          "p90": 0.7325641025641032,
+          "min": 0.0036363636363636364,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 2944,
+          "mean": 5.029211956521739,
+          "std": 4.198921306699739,
+          "median": 4.0,
+          "p25": 2.0,
+          "p75": 7.0,
+          "p90": 11.0,
+          "min": 1.0,
+          "max": 28.0
+        },
+        "number_down_crosses": {
+          "count": 2944,
+          "mean": 4.369904891304348,
+          "std": 4.151355755716384,
+          "median": 3.0,
+          "p25": 1.0,
+          "p75": 6.0,
+          "p90": 10.0,
+          "min": 0.0,
+          "max": 29.0
+        },
+        "number_re_crosses": {
+          "count": 2944,
+          "mean": 3.938858695652174,
+          "std": 4.199144038247096,
+          "median": 3.0,
+          "p25": 1.0,
+          "p75": 6.0,
+          "p90": 10.0,
+          "min": 0.0,
+          "max": 27.0
+        },
+        "hot_economics": {
+          "checkpoints": 46736,
+          "resolved": 43891,
+          "wins": 18581,
+          "losses": 25310,
+          "win_rate": 0.42334419357043584,
+          "gross_atr_expectancy": -0.009147661251737257
+        },
+        "cold_economics": {
+          "checkpoints": 215242,
+          "resolved": 200909,
+          "wins": 85290,
+          "losses": 115619,
+          "win_rate": 0.4245205540816987,
+          "gross_atr_expectancy": -0.007089030357027311
+        },
+        "expectancy_delta_hot_minus_cold": -0.0020586308947099464,
+        "pct_ge_30s_runs_starting_hot": 17.47126436781609
+      },
+      "2024": {
+        "regimes_reaching": 2878,
+        "first_hot_episode_duration_seconds": {
+          "count": 2878,
+          "mean": 6.362056984016678,
+          "std": 13.864362510366334,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 15.0,
+          "min": 0.0,
+          "max": 340.0
+        },
+        "remaining_hot_fraction": {
+          "count": 2878,
+          "mean": 0.2791322943149233,
+          "std": 0.25279114299335625,
+          "median": 0.19385507506967545,
+          "p25": 0.0975609756097561,
+          "p75": 0.375,
+          "p90": 0.6666666666666666,
+          "min": 0.0044444444444444444,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 2878,
+          "mean": 5.1546212647672,
+          "std": 4.237485910779048,
+          "median": 4.0,
+          "p25": 2.0,
+          "p75": 7.0,
+          "p90": 11.0,
+          "min": 1.0,
+          "max": 26.0
+        },
+        "number_down_crosses": {
+          "count": 2878,
+          "mean": 4.512508686587909,
+          "std": 4.18936116107245,
+          "median": 3.0,
+          "p25": 1.0,
+          "p75": 7.0,
+          "p90": 11.0,
+          "min": 0.0,
+          "max": 24.0
+        },
+        "number_re_crosses": {
+          "count": 2878,
+          "mean": 4.051772063933287,
+          "std": 4.252999839073406,
+          "median": 3.0,
+          "p25": 1.0,
+          "p75": 6.0,
+          "p90": 10.0,
+          "min": 0.0,
+          "max": 25.0
+        },
+        "hot_economics": {
+          "checkpoints": 46117,
+          "resolved": 42954,
+          "wins": 17822,
+          "losses": 25132,
+          "win_rate": 0.4149089723890674,
+          "gross_atr_expectancy": -0.023909298319132095
+        },
+        "cold_economics": {
+          "checkpoints": 212524,
+          "resolved": 198579,
+          "wins": 85120,
+          "losses": 113459,
+          "win_rate": 0.42864552646553766,
+          "gross_atr_expectancy": 0.0001296713146908787
+        },
+        "expectancy_delta_hot_minus_cold": -0.024038969633822974,
+        "pct_ge_30s_runs_starting_hot": 16.96674433382758
+      },
+      "2025_Q1": {
+        "regimes_reaching": 712,
+        "first_hot_episode_duration_seconds": {
+          "count": 712,
+          "mean": 7.928370786516854,
+          "std": 16.97318386100178,
+          "median": 5.0,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 20.0,
+          "min": 0.0,
+          "max": 220.0
+        },
+        "remaining_hot_fraction": {
+          "count": 712,
+          "mean": 0.30801011919435534,
+          "std": 0.27114152564093263,
+          "median": 0.21466973886328725,
+          "p25": 0.10653939507094846,
+          "p75": 0.42857142857142855,
+          "p90": 0.7366272824919441,
+          "min": 0.004,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 712,
+          "mean": 5.10814606741573,
+          "std": 4.310731440451611,
+          "median": 4.0,
+          "p25": 2.0,
+          "p75": 7.0,
+          "p90": 11.0,
+          "min": 1.0,
+          "max": 28.0
+        },
+        "number_down_crosses": {
+          "count": 712,
+          "mean": 4.433988764044944,
+          "std": 4.227534389110242,
+          "median": 3.0,
+          "p25": 1.0,
+          "p75": 7.0,
+          "p90": 10.0,
+          "min": 0.0,
+          "max": 27.0
+        },
+        "number_re_crosses": {
+          "count": 712,
+          "mean": 4.012640449438202,
+          "std": 4.305223870902483,
+          "median": 3.0,
+          "p25": 0.0,
+          "p75": 6.0,
+          "p90": 10.0,
+          "min": 0.0,
+          "max": 27.0
+        },
+        "hot_economics": {
+          "checkpoints": 11508,
+          "resolved": 10638,
+          "wins": 4463,
+          "losses": 6175,
+          "win_rate": 0.41953374694491447,
+          "gross_atr_expectancy": -0.0158159428463997
+        },
+        "cold_economics": {
+          "checkpoints": 50950,
+          "resolved": 47207,
+          "wins": 19714,
+          "losses": 27493,
+          "win_rate": 0.4176075582011142,
+          "gross_atr_expectancy": -0.019186773148050076
+        },
+        "expectancy_delta_hot_minus_cold": 0.0033708303016503766,
+        "pct_ge_30s_runs_starting_hot": 16.366906474820144
+      }
+    }
+  },
+  "P95": {
+    "FADE_BULL": {
+      "ALL": {
+        "regimes_reaching": 2551,
+        "first_hot_episode_duration_seconds": {
+          "count": 2551,
+          "mean": 6.054488435907487,
+          "std": 10.447896262042168,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 15.0,
+          "min": 0.0,
+          "max": 135.0
+        },
+        "remaining_hot_fraction": {
+          "count": 2551,
+          "mean": 0.26347633988097463,
+          "std": 0.27332722710760365,
+          "median": 0.16279069767441862,
+          "p25": 0.0589975635224504,
+          "p75": 0.375,
+          "p90": 0.6923076923076923,
+          "min": 0.0037174721189591076,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 2551,
+          "mean": 3.6519012152097217,
+          "std": 3.1782833443998944,
+          "median": 3.0,
+          "p25": 1.0,
+          "p75": 5.0,
+          "p90": 8.0,
+          "min": 1.0,
+          "max": 25.0
+        },
+        "number_down_crosses": {
+          "count": 2551,
+          "mean": 3.1317130537044298,
+          "std": 3.118824398198061,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 4.0,
+          "p90": 7.0,
+          "min": 0.0,
+          "max": 22.0
+        },
+        "number_re_crosses": {
+          "count": 2551,
+          "mean": 2.5801646413171304,
+          "std": 3.180038456190446,
+          "median": 1.0,
+          "p25": 0.0,
+          "p75": 4.0,
+          "p90": 7.0,
+          "min": 0.0,
+          "max": 24.0
+        },
+        "hot_economics": {
+          "checkpoints": 27474,
+          "resolved": 25771,
+          "wins": 10705,
+          "losses": 15066,
+          "win_rate": 0.4153893911761282,
+          "gross_atr_expectancy": -0.02306856544177564
+        },
+        "cold_economics": {
+          "checkpoints": 174140,
+          "resolved": 160668,
+          "wins": 66487,
+          "losses": 94181,
+          "win_rate": 0.4138160679164488,
+          "gross_atr_expectancy": -0.025821881146214556
+        },
+        "expectancy_delta_hot_minus_cold": 0.002753315704438916,
+        "pct_ge_30s_runs_starting_hot": 5.526739402611339
+      },
+      "2023": {
+        "regimes_reaching": 1153,
+        "first_hot_episode_duration_seconds": {
+          "count": 1153,
+          "mean": 6.526452732003469,
+          "std": 11.164365439809437,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 20.0,
+          "min": 0.0,
+          "max": 105.0
+        },
+        "remaining_hot_fraction": {
+          "count": 1153,
+          "mean": 0.2700506289340033,
+          "std": 0.2781472282941533,
+          "median": 0.16666666666666666,
+          "p25": 0.0625,
+          "p75": 0.375,
+          "p90": 0.7244444444444443,
+          "min": 0.004048582995951417,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 1153,
+          "mean": 3.681699913269731,
+          "std": 3.1686046444824183,
+          "median": 3.0,
+          "p25": 1.0,
+          "p75": 5.0,
+          "p90": 8.0,
+          "min": 1.0,
+          "max": 20.0
+        },
+        "number_down_crosses": {
+          "count": 1153,
+          "mean": 3.1465741543798784,
+          "std": 3.1002656305506804,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 4.0,
+          "p90": 7.0,
+          "min": 0.0,
+          "max": 19.0
+        },
+        "number_re_crosses": {
+          "count": 1153,
+          "mean": 2.614050303555941,
+          "std": 3.176951413217526,
+          "median": 1.0,
+          "p25": 0.0,
+          "p75": 4.0,
+          "p90": 7.0,
+          "min": 0.0,
+          "max": 19.0
+        },
+        "hot_economics": {
+          "checkpoints": 12785,
+          "resolved": 12124,
+          "wins": 5125,
+          "losses": 6999,
+          "win_rate": 0.42271527548663806,
+          "gross_atr_expectancy": -0.010248267898383371
+        },
+        "cold_economics": {
+          "checkpoints": 78301,
+          "resolved": 72089,
+          "wins": 29910,
+          "losses": 42179,
+          "win_rate": 0.4149037994700995,
+          "gross_atr_expectancy": -0.023918350927325943
+        },
+        "expectancy_delta_hot_minus_cold": 0.013670083028942572,
+        "pct_ge_30s_runs_starting_hot": 5.616653574234093
+      },
+      "2024": {
+        "regimes_reaching": 1131,
+        "first_hot_episode_duration_seconds": {
+          "count": 1131,
+          "mean": 5.358090185676392,
+          "std": 9.51893145908322,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 15.0,
+          "min": 0.0,
+          "max": 135.0
+        },
+        "remaining_hot_fraction": {
+          "count": 1131,
+          "mean": 0.25245048778537893,
+          "std": 0.27037734440356487,
+          "median": 0.14754098360655737,
+          "p25": 0.05415880997276346,
+          "p75": 0.34891304347826085,
+          "p90": 0.6666666666666666,
+          "min": 0.003745318352059925,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 1131,
+          "mean": 3.6109637488947834,
+          "std": 3.2470927007906,
+          "median": 3.0,
+          "p25": 1.0,
+          "p75": 5.0,
+          "p90": 8.0,
+          "min": 1.0,
+          "max": 25.0
+        },
+        "number_down_crosses": {
+          "count": 1131,
+          "mean": 3.1061007957559683,
+          "std": 3.1805759818069292,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 4.0,
+          "p90": 7.0,
+          "min": 0.0,
+          "max": 22.0
+        },
+        "number_re_crosses": {
+          "count": 1131,
+          "mean": 2.537577365163572,
+          "std": 3.2427778643646277,
+          "median": 1.0,
+          "p25": 0.0,
+          "p75": 4.0,
+          "p90": 7.0,
+          "min": 0.0,
+          "max": 24.0
+        },
+        "hot_economics": {
+          "checkpoints": 11682,
+          "resolved": 10865,
+          "wins": 4350,
+          "losses": 6515,
+          "win_rate": 0.40036815462494246,
+          "gross_atr_expectancy": -0.04935572940635067
+        },
+        "cold_economics": {
+          "checkpoints": 77975,
+          "resolved": 72144,
+          "wins": 29483,
+          "losses": 42661,
+          "win_rate": 0.4086687735639831,
+          "gross_atr_expectancy": -0.0348296462630295
+        },
+        "expectancy_delta_hot_minus_cold": -0.01452608314332117,
+        "pct_ge_30s_runs_starting_hot": 5.141700404858299
+      },
+      "2025_Q1": {
+        "regimes_reaching": 267,
+        "first_hot_episode_duration_seconds": {
+          "count": 267,
+          "mean": 6.966292134831461,
+          "std": 10.81729379527218,
+          "median": 5.0,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 17.00000000000003,
+          "min": 0.0,
+          "max": 75.0
+        },
+        "remaining_hot_fraction": {
+          "count": 267,
+          "mean": 0.28179125913931474,
+          "std": 0.262651830863666,
+          "median": 0.19696969696969696,
+          "p25": 0.07011956643200357,
+          "p75": 0.42857142857142855,
+          "p90": 0.6666666666666666,
+          "min": 0.0037174721189591076,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 267,
+          "mean": 3.696629213483146,
+          "std": 2.912215629680144,
+          "median": 3.0,
+          "p25": 1.0,
+          "p75": 5.0,
+          "p90": 7.400000000000006,
+          "min": 1.0,
+          "max": 17.0
+        },
+        "number_down_crosses": {
+          "count": 267,
+          "mean": 3.1760299625468167,
+          "std": 2.9277994649510086,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 5.0,
+          "p90": 7.0,
+          "min": 0.0,
+          "max": 17.0
+        },
+        "number_re_crosses": {
+          "count": 267,
+          "mean": 2.614232209737828,
+          "std": 2.91146893797448,
+          "median": 2.0,
+          "p25": 0.0,
+          "p75": 4.0,
+          "p90": 6.0,
+          "min": 0.0,
+          "max": 16.0
+        },
+        "hot_economics": {
+          "checkpoints": 3007,
+          "resolved": 2782,
+          "wins": 1230,
+          "losses": 1552,
+          "win_rate": 0.4421279654924515,
+          "gross_atr_expectancy": 0.02372393961179008
+        },
+        "cold_economics": {
+          "checkpoints": 17864,
+          "resolved": 16435,
+          "wins": 7094,
+          "losses": 9341,
+          "win_rate": 0.43163979312442957,
+          "gross_atr_expectancy": 0.005369637967751749
+        },
+        "expectancy_delta_hot_minus_cold": 0.01835430164403833,
+        "pct_ge_30s_runs_starting_hot": 6.782608695652175
+      }
+    },
+    "FADE_BEAR": {
+      "ALL": {
+        "regimes_reaching": 2344,
+        "first_hot_episode_duration_seconds": {
+          "count": 2344,
+          "mean": 6.141211604095563,
+          "std": 11.578163271591036,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 15.0,
+          "min": 0.0,
+          "max": 165.0
+        },
+        "remaining_hot_fraction": {
+          "count": 2344,
+          "mean": 0.26995927208370185,
+          "std": 0.28239402144861564,
+          "median": 0.15384615384615385,
+          "p25": 0.0625,
+          "p75": 0.3882669983416252,
+          "p90": 0.75,
+          "min": 0.00423728813559322,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 2344,
+          "mean": 3.6040955631399316,
+          "std": 3.0415636613797923,
+          "median": 3.0,
+          "p25": 1.0,
+          "p75": 5.0,
+          "p90": 8.0,
+          "min": 1.0,
+          "max": 21.0
+        },
+        "number_down_crosses": {
+          "count": 2344,
+          "mean": 3.0750853242320817,
+          "std": 3.040313956117714,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 4.0,
+          "p90": 7.0,
+          "min": 0.0,
+          "max": 21.0
+        },
+        "number_re_crosses": {
+          "count": 2344,
+          "mean": 2.5311433447098977,
+          "std": 3.038414923222945,
+          "median": 2.0,
+          "p25": 0.0,
+          "p75": 4.0,
+          "p90": 7.0,
+          "min": 0.0,
+          "max": 20.0
+        },
+        "hot_economics": {
+          "checkpoints": 24321,
+          "resolved": 22669,
+          "wins": 9455,
+          "losses": 13214,
+          "win_rate": 0.4170894172658697,
+          "gross_atr_expectancy": -0.020093519784728044
+        },
+        "cold_economics": {
+          "checkpoints": 152446,
+          "resolved": 140127,
+          "wins": 60928,
+          "losses": 79199,
+          "win_rate": 0.4348055692336238,
+          "gross_atr_expectancy": 0.010909746158841622
+        },
+        "expectancy_delta_hot_minus_cold": -0.031003265943569665,
+        "pct_ge_30s_runs_starting_hot": 4.933359856773423
+      },
+      "2023": {
+        "regimes_reaching": 1050,
+        "first_hot_episode_duration_seconds": {
+          "count": 1050,
+          "mean": 6.233333333333333,
+          "std": 11.12816389823729,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 15.0,
+          "min": 0.0,
+          "max": 125.0
+        },
+        "remaining_hot_fraction": {
+          "count": 1050,
+          "mean": 0.2837206474448496,
+          "std": 0.2946502333533292,
+          "median": 0.1576875259013676,
+          "p25": 0.0630335681723995,
+          "p75": 0.4199561403508772,
+          "p90": 0.8,
+          "min": 0.004329004329004329,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 1050,
+          "mean": 3.460952380952381,
+          "std": 2.8878891694238,
+          "median": 3.0,
+          "p25": 1.0,
+          "p75": 5.0,
+          "p90": 7.0,
+          "min": 1.0,
+          "max": 17.0
+        },
+        "number_down_crosses": {
+          "count": 1050,
+          "mean": 2.921904761904762,
+          "std": 2.8468188077682495,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 4.0,
+          "p90": 7.0,
+          "min": 0.0,
+          "max": 16.0
+        },
+        "number_re_crosses": {
+          "count": 1050,
+          "mean": 2.400952380952381,
+          "std": 2.8775318537178696,
+          "median": 2.0,
+          "p25": 0.0,
+          "p75": 4.0,
+          "p90": 6.0,
+          "min": 0.0,
+          "max": 16.0
+        },
+        "hot_economics": {
+          "checkpoints": 10556,
+          "resolved": 9933,
+          "wins": 4228,
+          "losses": 5705,
+          "win_rate": 0.42565186751233264,
+          "gross_atr_expectancy": -0.0051092318534179
+        },
+        "cold_economics": {
+          "checkpoints": 66594,
+          "resolved": 60879,
+          "wins": 26633,
+          "losses": 34246,
+          "win_rate": 0.4374743343353209,
+          "gross_atr_expectancy": 0.015580085086811545
+        },
+        "expectancy_delta_hot_minus_cold": -0.020689316940229446,
+        "pct_ge_30s_runs_starting_hot": 5.046895935685574
+      },
+      "2024": {
+        "regimes_reaching": 1037,
+        "first_hot_episode_duration_seconds": {
+          "count": 1037,
+          "mean": 5.930568948891032,
+          "std": 11.82796161449729,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 15.0,
+          "min": 0.0,
+          "max": 165.0
+        },
+        "remaining_hot_fraction": {
+          "count": 1037,
+          "mean": 0.2618226076180665,
+          "std": 0.2718350624415828,
+          "median": 0.1510791366906475,
+          "p25": 0.0625,
+          "p75": 0.3793103448275862,
+          "p90": 0.7068627450980391,
+          "min": 0.00423728813559322,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 1037,
+          "mean": 3.7348119575699132,
+          "std": 3.220605261899038,
+          "median": 3.0,
+          "p25": 1.0,
+          "p75": 5.0,
+          "p90": 8.0,
+          "min": 1.0,
+          "max": 21.0
+        },
+        "number_down_crosses": {
+          "count": 1037,
+          "mean": 3.210221793635487,
+          "std": 3.254871232417877,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 5.0,
+          "p90": 8.0,
+          "min": 0.0,
+          "max": 21.0
+        },
+        "number_re_crosses": {
+          "count": 1037,
+          "mean": 2.6509161041465767,
+          "std": 3.227418640299132,
+          "median": 1.0,
+          "p25": 0.0,
+          "p75": 4.0,
+          "p90": 7.0,
+          "min": 0.0,
+          "max": 20.0
+        },
+        "hot_economics": {
+          "checkpoints": 11124,
+          "resolved": 10297,
+          "wins": 4308,
+          "losses": 5989,
+          "win_rate": 0.41837428377197244,
+          "gross_atr_expectancy": -0.017845003399048265
+        },
+        "cold_economics": {
+          "checkpoints": 67471,
+          "resolved": 62087,
+          "wins": 27440,
+          "losses": 34647,
+          "win_rate": 0.44196047481759465,
+          "gross_atr_expectancy": 0.023430830930790663
+        },
+        "expectancy_delta_hot_minus_cold": -0.04127583432983893,
+        "pct_ge_30s_runs_starting_hot": 4.66459351399378
+      },
+      "2025_Q1": {
+        "regimes_reaching": 257,
+        "first_hot_episode_duration_seconds": {
+          "count": 257,
+          "mean": 6.614785992217898,
+          "std": 12.319492607488007,
+          "median": 5.0,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 15.0,
+          "min": 0.0,
+          "max": 130.0
+        },
+        "remaining_hot_fraction": {
+          "count": 257,
+          "mean": 0.2465673534909341,
+          "std": 0.26995683019893074,
+          "median": 0.14285714285714285,
+          "p25": 0.06060606060606061,
+          "p75": 0.3142857142857143,
+          "p90": 0.6666666666666666,
+          "min": 0.006896551724137931,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 257,
+          "mean": 3.6614785992217898,
+          "std": 2.879924230339959,
+          "median": 3.0,
+          "p25": 1.0,
+          "p75": 5.0,
+          "p90": 7.400000000000006,
+          "min": 1.0,
+          "max": 13.0
+        },
+        "number_down_crosses": {
+          "count": 257,
+          "mean": 3.1556420233463034,
+          "std": 2.876020758778811,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 5.0,
+          "p90": 7.0,
+          "min": 0.0,
+          "max": 14.0
+        },
+        "number_re_crosses": {
+          "count": 257,
+          "mean": 2.5797665369649807,
+          "std": 2.8657475281174642,
+          "median": 2.0,
+          "p25": 0.0,
+          "p75": 4.0,
+          "p90": 6.0,
+          "min": 0.0,
+          "max": 12.0
+        },
+        "hot_economics": {
+          "checkpoints": 2641,
+          "resolved": 2439,
+          "wins": 919,
+          "losses": 1520,
+          "win_rate": 0.3767937679376794,
+          "gross_atr_expectancy": -0.09061090610906108
+        },
+        "cold_economics": {
+          "checkpoints": 18381,
+          "resolved": 17161,
+          "wins": 6855,
+          "losses": 10306,
+          "win_rate": 0.399452246372589,
+          "gross_atr_expectancy": -0.05095856884796923
+        },
+        "expectancy_delta_hot_minus_cold": -0.03965233726109185,
+        "pct_ge_30s_runs_starting_hot": 5.58659217877095
+      }
+    },
+    "POOLED": {
+      "ALL": {
+        "regimes_reaching": 4895,
+        "first_hot_episode_duration_seconds": {
+          "count": 4895,
+          "mean": 6.096016343207355,
+          "std": 11.003712553167961,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 15.0,
+          "min": 0.0,
+          "max": 165.0
+        },
+        "remaining_hot_fraction": {
+          "count": 4895,
+          "mean": 0.26658073070491595,
+          "std": 0.27772473787525287,
+          "median": 0.15789473684210525,
+          "p25": 0.061224489795918366,
+          "p75": 0.3778652668416448,
+          "p90": 0.7233716475095793,
+          "min": 0.0037174721189591076,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 4895,
+          "mean": 3.629009193054137,
+          "std": 3.1136550781643453,
+          "median": 3.0,
+          "p25": 1.0,
+          "p75": 5.0,
+          "p90": 8.0,
+          "min": 1.0,
+          "max": 25.0
+        },
+        "number_down_crosses": {
+          "count": 4895,
+          "mean": 3.1045965270684373,
+          "std": 3.0816086488697354,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 4.0,
+          "p90": 7.0,
+          "min": 0.0,
+          "max": 22.0
+        },
+        "number_re_crosses": {
+          "count": 4895,
+          "mean": 2.5566905005107254,
+          "std": 3.1131215391122513,
+          "median": 1.0,
+          "p25": 0.0,
+          "p75": 4.0,
+          "p90": 7.0,
+          "min": 0.0,
+          "max": 24.0
+        },
+        "hot_economics": {
+          "checkpoints": 51795,
+          "resolved": 48440,
+          "wins": 20160,
+          "losses": 28280,
+          "win_rate": 0.4161849710982659,
+          "gross_atr_expectancy": -0.02167630057803468
+        },
+        "cold_economics": {
+          "checkpoints": 326586,
+          "resolved": 300795,
+          "wins": 127415,
+          "losses": 173380,
+          "win_rate": 0.4235941421898635,
+          "gross_atr_expectancy": -0.008710251167738825
+        },
+        "expectancy_delta_hot_minus_cold": -0.012966049410295857,
+        "pct_ge_30s_runs_starting_hot": 5.245809003578828
+      },
+      "2023": {
+        "regimes_reaching": 2203,
+        "first_hot_episode_duration_seconds": {
+          "count": 2203,
+          "mean": 6.386745347253745,
+          "std": 11.148086942217446,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 15.0,
+          "min": 0.0,
+          "max": 125.0
+        },
+        "remaining_hot_fraction": {
+          "count": 2203,
+          "mean": 0.2765660712564674,
+          "std": 0.2862131261238675,
+          "median": 0.16379310344827586,
+          "p25": 0.06263075313807531,
+          "p75": 0.4,
+          "p90": 0.7597241379310344,
+          "min": 0.004048582995951417,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 2203,
+          "mean": 3.5764866091693146,
+          "std": 3.0400460796340267,
+          "median": 3.0,
+          "p25": 1.0,
+          "p75": 5.0,
+          "p90": 8.0,
+          "min": 1.0,
+          "max": 20.0
+        },
+        "number_down_crosses": {
+          "count": 2203,
+          "mean": 3.0394916023604175,
+          "std": 2.9842653056832575,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 4.0,
+          "p90": 7.0,
+          "min": 0.0,
+          "max": 19.0
+        },
+        "number_re_crosses": {
+          "count": 2203,
+          "mean": 2.512482977757603,
+          "std": 3.0397881043790096,
+          "median": 1.0,
+          "p25": 0.0,
+          "p75": 4.0,
+          "p90": 7.0,
+          "min": 0.0,
+          "max": 19.0
+        },
+        "hot_economics": {
+          "checkpoints": 23341,
+          "resolved": 22057,
+          "wins": 9353,
+          "losses": 12704,
+          "win_rate": 0.42403772045155735,
+          "gross_atr_expectancy": -0.007933989209774674
+        },
+        "cold_economics": {
+          "checkpoints": 144895,
+          "resolved": 132968,
+          "wins": 56543,
+          "losses": 76425,
+          "win_rate": 0.4252376511641899,
+          "gross_atr_expectancy": -0.00583411046266771
+        },
+        "expectancy_delta_hot_minus_cold": -0.0020998787471069643,
+        "pct_ge_30s_runs_starting_hot": 5.350052246603971
+      },
+      "2024": {
+        "regimes_reaching": 2168,
+        "first_hot_episode_duration_seconds": {
+          "count": 2168,
+          "mean": 5.631918819188192,
+          "std": 10.68964804307993,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 15.0,
+          "min": 0.0,
+          "max": 165.0
+        },
+        "remaining_hot_fraction": {
+          "count": 2168,
+          "mean": 0.2569333698271211,
+          "std": 0.27111600422434046,
+          "median": 0.15014450867052023,
+          "p25": 0.058823529411764705,
+          "p75": 0.36363636363636365,
+          "p90": 0.6876923076923074,
+          "min": 0.003745318352059925,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 2168,
+          "mean": 3.6702029520295203,
+          "std": 3.2350418698634926,
+          "median": 3.0,
+          "p25": 1.0,
+          "p75": 5.0,
+          "p90": 8.0,
+          "min": 1.0,
+          "max": 25.0
+        },
+        "number_down_crosses": {
+          "count": 2168,
+          "mean": 3.1559040590405902,
+          "std": 3.2167476031057896,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 4.0,
+          "p90": 7.2999999999999545,
+          "min": 0.0,
+          "max": 22.0
+        },
+        "number_re_crosses": {
+          "count": 2168,
+          "mean": 2.5917896678966788,
+          "std": 3.2359356380984137,
+          "median": 1.0,
+          "p25": 0.0,
+          "p75": 4.0,
+          "p90": 7.0,
+          "min": 0.0,
+          "max": 24.0
+        },
+        "hot_economics": {
+          "checkpoints": 22806,
+          "resolved": 21162,
+          "wins": 8658,
+          "losses": 12504,
+          "win_rate": 0.409129571874114,
+          "gross_atr_expectancy": -0.03402324922030054
+        },
+        "cold_economics": {
+          "checkpoints": 145446,
+          "resolved": 134231,
+          "wins": 56923,
+          "losses": 77308,
+          "win_rate": 0.42406746578659177,
+          "gross_atr_expectancy": -0.007881934873464402
+        },
+        "expectancy_delta_hot_minus_cold": -0.02614131434683614,
+        "pct_ge_30s_runs_starting_hot": 4.914213090446939
+      },
+      "2025_Q1": {
+        "regimes_reaching": 524,
+        "first_hot_episode_duration_seconds": {
+          "count": 524,
+          "mean": 6.793893129770993,
+          "std": 11.57977148929563,
+          "median": 5.0,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 15.0,
+          "min": 0.0,
+          "max": 130.0
+        },
+        "remaining_hot_fraction": {
+          "count": 524,
+          "mean": 0.2645154122850517,
+          "std": 0.26684130128629363,
+          "median": 0.170111616370401,
+          "p25": 0.06592174450974328,
+          "p75": 0.36976650563607083,
+          "p90": 0.6666666666666666,
+          "min": 0.0037174721189591076,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 524,
+          "mean": 3.6793893129770994,
+          "std": 2.8964763419680204,
+          "median": 3.0,
+          "p25": 1.0,
+          "p75": 5.0,
+          "p90": 7.699999999999989,
+          "min": 1.0,
+          "max": 17.0
+        },
+        "number_down_crosses": {
+          "count": 524,
+          "mean": 3.1660305343511452,
+          "std": 2.9025374998437057,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 5.0,
+          "p90": 7.0,
+          "min": 0.0,
+          "max": 17.0
+        },
+        "number_re_crosses": {
+          "count": 524,
+          "mean": 2.5973282442748094,
+          "std": 2.889186294075551,
+          "median": 2.0,
+          "p25": 0.0,
+          "p75": 4.0,
+          "p90": 6.0,
+          "min": 0.0,
+          "max": 16.0
+        },
+        "hot_economics": {
+          "checkpoints": 5648,
+          "resolved": 5221,
+          "wins": 2149,
+          "losses": 3072,
+          "win_rate": 0.41160697184447426,
+          "gross_atr_expectancy": -0.029687799272170082
+        },
+        "cold_economics": {
+          "checkpoints": 36245,
+          "resolved": 33596,
+          "wins": 13949,
+          "losses": 19647,
+          "win_rate": 0.41519823788546256,
+          "gross_atr_expectancy": -0.02340308370044053
+        },
+        "expectancy_delta_hot_minus_cold": -0.006284715571729552,
+        "pct_ge_30s_runs_starting_hot": 6.205035971223022
+      }
+    }
+  },
+  "P97.5": {
+    "FADE_BULL": {
+      "ALL": {
+        "regimes_reaching": 1495,
+        "first_hot_episode_duration_seconds": {
+          "count": 1495,
+          "mean": 6.585284280936455,
+          "std": 10.981677542233351,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 15.0,
+          "min": 0.0,
+          "max": 175.0
+        },
+        "remaining_hot_fraction": {
+          "count": 1495,
+          "mean": 0.2873075959872103,
+          "std": 0.3040963544421092,
+          "median": 0.15151515151515152,
+          "p25": 0.05,
+          "p75": 0.4486842105263158,
+          "p90": 0.8,
+          "min": 0.004291845493562232,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 1495,
+          "mean": 3.0622073578595317,
+          "std": 2.855167786214586,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 4.0,
+          "p90": 7.0,
+          "min": 1.0,
+          "max": 31.0
+        },
+        "number_down_crosses": {
+          "count": 1495,
+          "mean": 2.5672240802675583,
+          "std": 2.8264155277915544,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 3.0,
+          "p90": 6.0,
+          "min": 0.0,
+          "max": 28.0
+        },
+        "number_re_crosses": {
+          "count": 1495,
+          "mean": 2.0100334448160537,
+          "std": 2.8532501561782033,
+          "median": 1.0,
+          "p25": 0.0,
+          "p75": 3.0,
+          "p90": 6.0,
+          "min": 0.0,
+          "max": 30.0
+        },
+        "hot_economics": {
+          "checkpoints": 13592,
+          "resolved": 12743,
+          "wins": 5247,
+          "losses": 7496,
+          "win_rate": 0.41175547359334536,
+          "gross_atr_expectancy": -0.02942792121164561
+        },
+        "cold_economics": {
+          "checkpoints": 91214,
+          "resolved": 83797,
+          "wins": 35181,
+          "losses": 48616,
+          "win_rate": 0.4198360323161927,
+          "gross_atr_expectancy": -0.015286943446662768
+        },
+        "expectancy_delta_hot_minus_cold": -0.014140977764982842,
+        "pct_ge_30s_runs_starting_hot": 2.1105347880522265
+      },
+      "2023": {
+        "regimes_reaching": 678,
+        "first_hot_episode_duration_seconds": {
+          "count": 678,
+          "mean": 6.873156342182891,
+          "std": 10.941726272088662,
+          "median": 2.5,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 20.0,
+          "min": 0.0,
+          "max": 110.0
+        },
+        "remaining_hot_fraction": {
+          "count": 678,
+          "mean": 0.29436102667401604,
+          "std": 0.31010179758379114,
+          "median": 0.1571514272859071,
+          "p25": 0.0508744467235237,
+          "p75": 0.4675245098039216,
+          "p90": 0.8433198380566804,
+          "min": 0.004291845493562232,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 678,
+          "mean": 3.131268436578171,
+          "std": 2.8329386613400676,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 4.0,
+          "p90": 7.0,
+          "min": 1.0,
+          "max": 19.0
+        },
+        "number_down_crosses": {
+          "count": 678,
+          "mean": 2.6327433628318584,
+          "std": 2.7926243716332526,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 4.0,
+          "p90": 6.0,
+          "min": 0.0,
+          "max": 18.0
+        },
+        "number_re_crosses": {
+          "count": 678,
+          "mean": 2.0958702064896757,
+          "std": 2.841114191203942,
+          "median": 1.0,
+          "p25": 0.0,
+          "p75": 3.0,
+          "p90": 6.0,
+          "min": 0.0,
+          "max": 18.0
+        },
+        "hot_economics": {
+          "checkpoints": 6428,
+          "resolved": 6103,
+          "wins": 2569,
+          "losses": 3534,
+          "win_rate": 0.42094052105521873,
+          "gross_atr_expectancy": -0.013354088153367196
+        },
+        "cold_economics": {
+          "checkpoints": 40360,
+          "resolved": 37650,
+          "wins": 16042,
+          "losses": 21608,
+          "win_rate": 0.4260823373173971,
+          "gross_atr_expectancy": -0.004355909694555113
+        },
+        "expectancy_delta_hot_minus_cold": -0.008998178458812083,
+        "pct_ge_30s_runs_starting_hot": 2.2388059701492535
+      },
+      "2024": {
+        "regimes_reaching": 653,
+        "first_hot_episode_duration_seconds": {
+          "count": 653,
+          "mean": 5.980091883614088,
+          "std": 9.196072568258936,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 15.0,
+          "min": 0.0,
+          "max": 65.0
+        },
+        "remaining_hot_fraction": {
+          "count": 653,
+          "mean": 0.27212355904022584,
+          "std": 0.2991712687125157,
+          "median": 0.13793103448275862,
+          "p25": 0.04697986577181208,
+          "p75": 0.42857142857142855,
+          "p90": 0.769354838709679,
+          "min": 0.0043859649122807015,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 653,
+          "mean": 2.995405819295559,
+          "std": 2.959394990489851,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 4.0,
+          "p90": 6.800000000000068,
+          "min": 1.0,
+          "max": 31.0
+        },
+        "number_down_crosses": {
+          "count": 653,
+          "mean": 2.5191424196018377,
+          "std": 2.9401926991872003,
+          "median": 1.0,
+          "p25": 1.0,
+          "p75": 3.0,
+          "p90": 6.0,
+          "min": 0.0,
+          "max": 28.0
+        },
+        "number_re_crosses": {
+          "count": 653,
+          "mean": 1.9295558958652375,
+          "std": 2.94741030754035,
+          "median": 1.0,
+          "p25": 0.0,
+          "p75": 3.0,
+          "p90": 5.800000000000068,
+          "min": 0.0,
+          "max": 30.0
+        },
+        "hot_economics": {
+          "checkpoints": 5593,
+          "resolved": 5196,
+          "wins": 2037,
+          "losses": 3159,
+          "win_rate": 0.3920323325635104,
+          "gross_atr_expectancy": -0.0639434180138568
+        },
+        "cold_economics": {
+          "checkpoints": 40966,
+          "resolved": 37139,
+          "wins": 15046,
+          "losses": 22093,
+          "win_rate": 0.4051266862328011,
+          "gross_atr_expectancy": -0.04102829909259808
+        },
+        "expectancy_delta_hot_minus_cold": -0.022915118921258727,
+        "pct_ge_30s_runs_starting_hot": 2.064777327935223
+      },
+      "2025_Q1": {
+        "regimes_reaching": 164,
+        "first_hot_episode_duration_seconds": {
+          "count": 164,
+          "mean": 7.804878048780488,
+          "std": 16.260035568609464,
+          "median": 5.0,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 20.0,
+          "min": 0.0,
+          "max": 175.0
+        },
+        "remaining_hot_fraction": {
+          "count": 164,
+          "mean": 0.31860607233310373,
+          "std": 0.2948772892568058,
+          "median": 0.24456521739130435,
+          "p25": 0.07198085419734904,
+          "p75": 0.5,
+          "p90": 0.7495798319327739,
+          "min": 0.004739336492890996,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 164,
+          "mean": 3.042682926829268,
+          "std": 2.4947520766310323,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 4.0,
+          "p90": 7.0,
+          "min": 1.0,
+          "max": 14.0
+        },
+        "number_down_crosses": {
+          "count": 164,
+          "mean": 2.4878048780487805,
+          "std": 2.4754595653107323,
+          "median": 1.0,
+          "p25": 1.0,
+          "p75": 4.0,
+          "p90": 6.0,
+          "min": 0.0,
+          "max": 14.0
+        },
+        "number_re_crosses": {
+          "count": 164,
+          "mean": 1.975609756097561,
+          "std": 2.488880685613895,
+          "median": 1.0,
+          "p25": 0.0,
+          "p75": 3.0,
+          "p90": 6.0,
+          "min": 0.0,
+          "max": 13.0
+        },
+        "hot_economics": {
+          "checkpoints": 1571,
+          "resolved": 1444,
+          "wins": 641,
+          "losses": 803,
+          "win_rate": 0.4439058171745152,
+          "gross_atr_expectancy": 0.026835180055401663
+        },
+        "cold_economics": {
+          "checkpoints": 9888,
+          "resolved": 9008,
+          "wins": 4093,
+          "losses": 4915,
+          "win_rate": 0.45437388987566607,
+          "gross_atr_expectancy": 0.04515430728241563
+        },
+        "expectancy_delta_hot_minus_cold": -0.018319127227013968,
+        "pct_ge_30s_runs_starting_hot": 1.7391304347826086
+      }
+    },
+    "FADE_BEAR": {
+      "ALL": {
+        "regimes_reaching": 1302,
+        "first_hot_episode_duration_seconds": {
+          "count": 1302,
+          "mean": 7.788018433179723,
+          "std": 13.508246701400473,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 20.0,
+          "min": 0.0,
+          "max": 155.0
+        },
+        "remaining_hot_fraction": {
+          "count": 1302,
+          "mean": 0.3190302370796387,
+          "std": 0.32775679516503375,
+          "median": 0.16666666666666666,
+          "p25": 0.05405405405405406,
+          "p75": 0.5371794871794872,
+          "p90": 0.908181818181819,
+          "min": 0.003215434083601286,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 1302,
+          "mean": 2.8632872503840248,
+          "std": 2.52478727649027,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 4.0,
+          "p90": 6.0,
+          "min": 1.0,
+          "max": 17.0
+        },
+        "number_down_crosses": {
+          "count": 1302,
+          "mean": 2.393241167434716,
+          "std": 2.513964152909656,
+          "median": 1.5,
+          "p25": 1.0,
+          "p75": 3.0,
+          "p90": 6.0,
+          "min": 0.0,
+          "max": 17.0
+        },
+        "number_re_crosses": {
+          "count": 1302,
+          "mean": 1.8218125960061444,
+          "std": 2.52037176357594,
+          "median": 1.0,
+          "p25": 0.0,
+          "p75": 3.0,
+          "p90": 5.0,
+          "min": 0.0,
+          "max": 16.0
+        },
+        "hot_economics": {
+          "checkpoints": 11969,
+          "resolved": 11141,
+          "wins": 4618,
+          "losses": 6523,
+          "win_rate": 0.41450498159949734,
+          "gross_atr_expectancy": -0.024616282200879632
+        },
+        "cold_economics": {
+          "checkpoints": 72677,
+          "resolved": 66983,
+          "wins": 28557,
+          "losses": 38426,
+          "win_rate": 0.42633205440186317,
+          "gross_atr_expectancy": -0.003918904796739471
+        },
+        "expectancy_delta_hot_minus_cold": -0.020697377404140162,
+        "pct_ge_30s_runs_starting_hot": 1.8102247861547645
+      },
+      "2023": {
+        "regimes_reaching": 562,
+        "first_hot_episode_duration_seconds": {
+          "count": 562,
+          "mean": 7.8113879003558715,
+          "std": 13.856663743564045,
+          "median": 5.0,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 20.0,
+          "min": 0.0,
+          "max": 155.0
+        },
+        "remaining_hot_fraction": {
+          "count": 562,
+          "mean": 0.3448266595146295,
+          "std": 0.34188035795170096,
+          "median": 0.18074364457115705,
+          "p25": 0.05786777091521617,
+          "p75": 0.6443850267379679,
+          "p90": 1.0,
+          "min": 0.003952569169960474,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 562,
+          "mean": 2.7669039145907472,
+          "std": 2.373663479647233,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 4.0,
+          "p90": 6.0,
+          "min": 1.0,
+          "max": 15.0
+        },
+        "number_down_crosses": {
+          "count": 562,
+          "mean": 2.263345195729537,
+          "std": 2.3436994022180717,
+          "median": 1.0,
+          "p25": 1.0,
+          "p75": 3.0,
+          "p90": 5.0,
+          "min": 0.0,
+          "max": 15.0
+        },
+        "number_re_crosses": {
+          "count": 562,
+          "mean": 1.7295373665480427,
+          "std": 2.369321148371355,
+          "median": 1.0,
+          "p25": 0.0,
+          "p75": 2.0,
+          "p90": 5.0,
+          "min": 0.0,
+          "max": 14.0
+        },
+        "hot_economics": {
+          "checkpoints": 5148,
+          "resolved": 4857,
+          "wins": 2067,
+          "losses": 2790,
+          "win_rate": 0.4255713403335392,
+          "gross_atr_expectancy": -0.005250154416306362
+        },
+        "cold_economics": {
+          "checkpoints": 30075,
+          "resolved": 27496,
+          "wins": 11735,
+          "losses": 15761,
+          "win_rate": 0.4267893511783532,
+          "gross_atr_expectancy": -0.003118635437881874
+        },
+        "expectancy_delta_hot_minus_cold": -0.002131518978424488,
+        "pct_ge_30s_runs_starting_hot": 1.9205002233139794
+      },
+      "2024": {
+        "regimes_reaching": 593,
+        "first_hot_episode_duration_seconds": {
+          "count": 593,
+          "mean": 7.799325463743676,
+          "std": 13.536106218249994,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 20.0,
+          "min": 0.0,
+          "max": 110.0
+        },
+        "remaining_hot_fraction": {
+          "count": 593,
+          "mean": 0.3005879876777515,
+          "std": 0.3149236979555423,
+          "median": 0.16666666666666666,
+          "p25": 0.05263157894736842,
+          "p75": 0.4827586206896552,
+          "p90": 0.852380952380954,
+          "min": 0.003215434083601286,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 593,
+          "mean": 2.9561551433389543,
+          "std": 2.704334174686209,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 4.0,
+          "p90": 7.0,
+          "min": 1.0,
+          "max": 17.0
+        },
+        "number_down_crosses": {
+          "count": 593,
+          "mean": 2.519392917369309,
+          "std": 2.6928257008942698,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 3.0,
+          "p90": 6.0,
+          "min": 0.0,
+          "max": 17.0
+        },
+        "number_re_crosses": {
+          "count": 593,
+          "mean": 1.912310286677909,
+          "std": 2.698272551792332,
+          "median": 1.0,
+          "p25": 0.0,
+          "p75": 3.0,
+          "p90": 6.0,
+          "min": 0.0,
+          "max": 16.0
+        },
+        "hot_economics": {
+          "checkpoints": 5593,
+          "resolved": 5172,
+          "wins": 2142,
+          "losses": 3030,
+          "win_rate": 0.41415313225058004,
+          "gross_atr_expectancy": -0.02523201856148492
+        },
+        "cold_economics": {
+          "checkpoints": 33532,
+          "resolved": 31134,
+          "wins": 13427,
+          "losses": 17707,
+          "win_rate": 0.4312648551422882,
+          "gross_atr_expectancy": 0.004713496499004304
+        },
+        "expectancy_delta_hot_minus_cold": -0.029945515060489224,
+        "pct_ge_30s_runs_starting_hot": 1.6437139049311416
+      },
+      "2025_Q1": {
+        "regimes_reaching": 147,
+        "first_hot_episode_duration_seconds": {
+          "count": 147,
+          "mean": 7.653061224489796,
+          "std": 11.956641089332267,
+          "median": 5.0,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 20.0,
+          "min": 0.0,
+          "max": 60.0
+        },
+        "remaining_hot_fraction": {
+          "count": 147,
+          "mean": 0.2948034648813686,
+          "std": 0.31628217252919094,
+          "median": 0.1452513966480447,
+          "p25": 0.04271534916696207,
+          "p75": 0.5,
+          "p90": 0.8184615384615388,
+          "min": 0.004424778761061947,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 147,
+          "mean": 2.857142857142857,
+          "std": 2.3123448651769496,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 4.0,
+          "p90": 5.400000000000006,
+          "min": 1.0,
+          "max": 14.0
+        },
+        "number_down_crosses": {
+          "count": 147,
+          "mean": 2.380952380952381,
+          "std": 2.365665209214137,
+          "median": 1.0,
+          "p25": 1.0,
+          "p75": 3.5,
+          "p90": 5.0,
+          "min": 0.0,
+          "max": 14.0
+        },
+        "number_re_crosses": {
+          "count": 147,
+          "mean": 1.8095238095238095,
+          "std": 2.316264096574345,
+          "median": 1.0,
+          "p25": 0.0,
+          "p75": 3.0,
+          "p90": 4.400000000000006,
+          "min": 0.0,
+          "max": 13.0
+        },
+        "hot_economics": {
+          "checkpoints": 1228,
+          "resolved": 1112,
+          "wins": 409,
+          "losses": 703,
+          "win_rate": 0.36780575539568344,
+          "gross_atr_expectancy": -0.10633992805755396
+        },
+        "cold_economics": {
+          "checkpoints": 9070,
+          "resolved": 8353,
+          "wins": 3395,
+          "losses": 4958,
+          "win_rate": 0.4064407997126781,
+          "gross_atr_expectancy": -0.03872860050281336
+        },
+        "expectancy_delta_hot_minus_cold": -0.0676113275547406,
+        "pct_ge_30s_runs_starting_hot": 2.0484171322160147
+      }
+    },
+    "POOLED": {
+      "ALL": {
+        "regimes_reaching": 2797,
+        "first_hot_episode_duration_seconds": {
+          "count": 2797,
+          "mean": 7.145155523775474,
+          "std": 12.237651899383819,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 20.0,
+          "min": 0.0,
+          "max": 175.0
+        },
+        "remaining_hot_fraction": {
+          "count": 2797,
+          "mean": 0.3020744457199031,
+          "std": 0.3157279641065346,
+          "median": 0.16,
+          "p25": 0.05128205128205128,
+          "p75": 0.5,
+          "p90": 0.8571428571428571,
+          "min": 0.003215434083601286,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 2797,
+          "mean": 2.9696102967465143,
+          "std": 2.708216346506755,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 4.0,
+          "p90": 6.0,
+          "min": 1.0,
+          "max": 31.0
+        },
+        "number_down_crosses": {
+          "count": 2797,
+          "mean": 2.4862352520557742,
+          "std": 2.686897993683524,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 3.0,
+          "p90": 6.0,
+          "min": 0.0,
+          "max": 28.0
+        },
+        "number_re_crosses": {
+          "count": 2797,
+          "mean": 1.9224168752234536,
+          "std": 2.7050294436472857,
+          "median": 1.0,
+          "p25": 0.0,
+          "p75": 3.0,
+          "p90": 5.0,
+          "min": 0.0,
+          "max": 30.0
+        },
+        "hot_economics": {
+          "checkpoints": 25561,
+          "resolved": 23884,
+          "wins": 9865,
+          "losses": 14019,
+          "win_rate": 0.4130380170825657,
+          "gross_atr_expectancy": -0.027183470105509963
+        },
+        "cold_economics": {
+          "checkpoints": 163891,
+          "resolved": 150780,
+          "wins": 63738,
+          "losses": 87042,
+          "win_rate": 0.4227218463987266,
+          "gross_atr_expectancy": -0.010236768802228412
+        },
+        "expectancy_delta_hot_minus_cold": -0.01694670130328155,
+        "pct_ge_30s_runs_starting_hot": 1.968355622527783
+      },
+      "2023": {
+        "regimes_reaching": 1240,
+        "first_hot_episode_duration_seconds": {
+          "count": 1240,
+          "mean": 7.298387096774194,
+          "std": 12.357236249304448,
+          "median": 5.0,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 20.0,
+          "min": 0.0,
+          "max": 155.0
+        },
+        "remaining_hot_fraction": {
+          "count": 1240,
+          "mean": 0.31723335381629403,
+          "std": 0.32585987489775564,
+          "median": 0.16666666666666666,
+          "p25": 0.053751601537475976,
+          "p75": 0.5333333333333333,
+          "p90": 0.8892857142857148,
+          "min": 0.003952569169960474,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 1240,
+          "mean": 2.9661290322580647,
+          "std": 2.6409580097300163,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 4.0,
+          "p90": 6.0,
+          "min": 1.0,
+          "max": 19.0
+        },
+        "number_down_crosses": {
+          "count": 1240,
+          "mean": 2.4653225806451613,
+          "std": 2.605284467002835,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 3.0,
+          "p90": 6.0,
+          "min": 0.0,
+          "max": 18.0
+        },
+        "number_re_crosses": {
+          "count": 1240,
+          "mean": 1.9298387096774194,
+          "std": 2.6440584591259997,
+          "median": 1.0,
+          "p25": 0.0,
+          "p75": 3.0,
+          "p90": 5.0,
+          "min": 0.0,
+          "max": 18.0
+        },
+        "hot_economics": {
+          "checkpoints": 11576,
+          "resolved": 10960,
+          "wins": 4636,
+          "losses": 6324,
+          "win_rate": 0.422992700729927,
+          "gross_atr_expectancy": -0.009762773722627738
+        },
+        "cold_economics": {
+          "checkpoints": 70435,
+          "resolved": 65146,
+          "wins": 27777,
+          "losses": 37369,
+          "win_rate": 0.42638074478862864,
+          "gross_atr_expectancy": -0.003833696619899917
+        },
+        "expectancy_delta_hot_minus_cold": -0.005929077102727821,
+        "pct_ge_30s_runs_starting_hot": 2.089864158829676
+      },
+      "2024": {
+        "regimes_reaching": 1246,
+        "first_hot_episode_duration_seconds": {
+          "count": 1246,
+          "mean": 6.845906902086678,
+          "std": 11.504218436470573,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 20.0,
+          "min": 0.0,
+          "max": 110.0
+        },
+        "remaining_hot_fraction": {
+          "count": 1246,
+          "mean": 0.2856704339856936,
+          "std": 0.30709830511383807,
+          "median": 0.148094816127603,
+          "p25": 0.04838709677419355,
+          "p75": 0.4444444444444444,
+          "p90": 0.8,
+          "min": 0.003215434083601286,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 1246,
+          "mean": 2.976725521669342,
+          "std": 2.8409306345081724,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 4.0,
+          "p90": 7.0,
+          "min": 1.0,
+          "max": 31.0
+        },
+        "number_down_crosses": {
+          "count": 1246,
+          "mean": 2.519261637239165,
+          "std": 2.8251674648450753,
+          "median": 1.0,
+          "p25": 1.0,
+          "p75": 3.0,
+          "p90": 6.0,
+          "min": 0.0,
+          "max": 28.0
+        },
+        "number_re_crosses": {
+          "count": 1246,
+          "mean": 1.9213483146067416,
+          "std": 2.8315880630723385,
+          "median": 1.0,
+          "p25": 0.0,
+          "p75": 3.0,
+          "p90": 6.0,
+          "min": 0.0,
+          "max": 30.0
+        },
+        "hot_economics": {
+          "checkpoints": 11186,
+          "resolved": 10368,
+          "wins": 4179,
+          "losses": 6189,
+          "win_rate": 0.40306712962962965,
+          "gross_atr_expectancy": -0.04463252314814815
+        },
+        "cold_economics": {
+          "checkpoints": 74498,
+          "resolved": 68273,
+          "wins": 28473,
+          "losses": 39800,
+          "win_rate": 0.41704627012142426,
+          "gross_atr_expectancy": -0.020169027287507506
+        },
+        "expectancy_delta_hot_minus_cold": -0.02446349586064064,
+        "pct_ge_30s_runs_starting_hot": 1.8640118618936667
+      },
+      "2025_Q1": {
+        "regimes_reaching": 311,
+        "first_hot_episode_duration_seconds": {
+          "count": 311,
+          "mean": 7.733118971061093,
+          "std": 14.387477682562421,
+          "median": 5.0,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 20.0,
+          "min": 0.0,
+          "max": 175.0
+        },
+        "remaining_hot_fraction": {
+          "count": 311,
+          "mean": 0.3073553221871067,
+          "std": 0.305413147926045,
+          "median": 0.17699115044247787,
+          "p25": 0.05744914788345244,
+          "p75": 0.5,
+          "p90": 0.7894736842105263,
+          "min": 0.004424778761061947,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 311,
+          "mean": 2.954983922829582,
+          "std": 2.4120342543410356,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 4.0,
+          "p90": 6.0,
+          "min": 1.0,
+          "max": 14.0
+        },
+        "number_down_crosses": {
+          "count": 311,
+          "mean": 2.437299035369775,
+          "std": 2.4247699073322178,
+          "median": 1.0,
+          "p25": 1.0,
+          "p75": 4.0,
+          "p90": 6.0,
+          "min": 0.0,
+          "max": 14.0
+        },
+        "number_re_crosses": {
+          "count": 311,
+          "mean": 1.8971061093247588,
+          "std": 2.4102590189811632,
+          "median": 1.0,
+          "p25": 0.0,
+          "p75": 3.0,
+          "p90": 5.0,
+          "min": 0.0,
+          "max": 13.0
+        },
+        "hot_economics": {
+          "checkpoints": 2799,
+          "resolved": 2556,
+          "wins": 1050,
+          "losses": 1506,
+          "win_rate": 0.4107981220657277,
+          "gross_atr_expectancy": -0.031103286384976527
+        },
+        "cold_economics": {
+          "checkpoints": 18958,
+          "resolved": 17361,
+          "wins": 7488,
+          "losses": 9873,
+          "win_rate": 0.43131156039398655,
+          "gross_atr_expectancy": 0.004795230689476413
+        },
+        "expectancy_delta_hot_minus_cold": -0.03589851707445294,
+        "pct_ge_30s_runs_starting_hot": 1.8884892086330936
+      }
+    }
+  },
+  "P99": {
+    "FADE_BULL": {
+      "ALL": {
+        "regimes_reaching": 589,
+        "first_hot_episode_duration_seconds": {
+          "count": 589,
+          "mean": 7.088285229202038,
+          "std": 9.865944337505992,
+          "median": 5.0,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 20.0,
+          "min": 0.0,
+          "max": 50.0
+        },
+        "remaining_hot_fraction": {
+          "count": 589,
+          "mean": 0.33971622764558684,
+          "std": 0.31653452989874364,
+          "median": 0.2222222222222222,
+          "p25": 0.06976744186046512,
+          "p75": 0.5454545454545454,
+          "p90": 0.875,
+          "min": 0.0038461538461538464,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 589,
+          "mean": 3.0865874363327674,
+          "std": 2.4013946290138186,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 4.0,
+          "p90": 6.0,
+          "min": 1.0,
+          "max": 19.0
+        },
+        "number_down_crosses": {
+          "count": 589,
+          "mean": 2.5823429541595924,
+          "std": 2.4436801711388254,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 4.0,
+          "p90": 6.0,
+          "min": 0.0,
+          "max": 18.0
+        },
+        "number_re_crosses": {
+          "count": 589,
+          "mean": 2.0509337860780983,
+          "std": 2.4013550173214786,
+          "median": 1.0,
+          "p25": 0.0,
+          "p75": 3.0,
+          "p90": 5.0,
+          "min": 0.0,
+          "max": 18.0
+        },
+        "hot_economics": {
+          "checkpoints": 5199,
+          "resolved": 4876,
+          "wins": 1977,
+          "losses": 2899,
+          "win_rate": 0.4054552912223134,
+          "gross_atr_expectancy": -0.040453240360951596
+        },
+        "cold_economics": {
+          "checkpoints": 32490,
+          "resolved": 30389,
+          "wins": 13150,
+          "losses": 17239,
+          "win_rate": 0.4327223666458258,
+          "gross_atr_expectancy": 0.0072641416301951365
+        },
+        "expectancy_delta_hot_minus_cold": -0.04771738199114673,
+        "pct_ge_30s_runs_starting_hot": 0.5902343051332499
+      },
+      "2023": {
+        "regimes_reaching": 274,
+        "first_hot_episode_duration_seconds": {
+          "count": 274,
+          "mean": 7.755474452554744,
+          "std": 10.197791514940578,
+          "median": 5.0,
+          "p25": 0.0,
+          "p75": 13.75,
+          "p90": 20.0,
+          "min": 0.0,
+          "max": 50.0
+        },
+        "remaining_hot_fraction": {
+          "count": 274,
+          "mean": 0.37367731666696513,
+          "std": 0.32392488350211385,
+          "median": 0.25,
+          "p25": 0.08893836049008463,
+          "p75": 0.6129032258064516,
+          "p90": 1.0,
+          "min": 0.00546448087431694,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 274,
+          "mean": 3.113138686131387,
+          "std": 2.268068328836194,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 4.0,
+          "p90": 6.0,
+          "min": 1.0,
+          "max": 11.0
+        },
+        "number_down_crosses": {
+          "count": 274,
+          "mean": 2.565693430656934,
+          "std": 2.2903459068814307,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 4.0,
+          "p90": 6.0,
+          "min": 0.0,
+          "max": 11.0
+        },
+        "number_re_crosses": {
+          "count": 274,
+          "mean": 2.076642335766423,
+          "std": 2.276017868829149,
+          "median": 1.0,
+          "p25": 0.0,
+          "p75": 3.0,
+          "p90": 5.0,
+          "min": 0.0,
+          "max": 10.0
+        },
+        "hot_economics": {
+          "checkpoints": 2536,
+          "resolved": 2421,
+          "wins": 1008,
+          "losses": 1413,
+          "win_rate": 0.4163568773234201,
+          "gross_atr_expectancy": -0.02137546468401487
+        },
+        "cold_economics": {
+          "checkpoints": 13518,
+          "resolved": 13022,
+          "wins": 5936,
+          "losses": 7086,
+          "win_rate": 0.4558439563815082,
+          "gross_atr_expectancy": 0.04772692366763938
+        },
+        "expectancy_delta_hot_minus_cold": -0.06910238835165425,
+        "pct_ge_30s_runs_starting_hot": 0.7462686567164178
+      },
+      "2024": {
+        "regimes_reaching": 237,
+        "first_hot_episode_duration_seconds": {
+          "count": 237,
+          "mean": 6.751054852320675,
+          "std": 9.39034251998088,
+          "median": 5.0,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 20.0,
+          "min": 0.0,
+          "max": 50.0
+        },
+        "remaining_hot_fraction": {
+          "count": 237,
+          "mean": 0.3033464900827124,
+          "std": 0.30228478899418404,
+          "median": 0.1875,
+          "p25": 0.05084745762711865,
+          "p75": 0.4857142857142857,
+          "p90": 0.7895652173913045,
+          "min": 0.0038461538461538464,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 237,
+          "mean": 3.0548523206751055,
+          "std": 2.6098538684144246,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 4.0,
+          "p90": 6.400000000000006,
+          "min": 1.0,
+          "max": 19.0
+        },
+        "number_down_crosses": {
+          "count": 237,
+          "mean": 2.6244725738396624,
+          "std": 2.6589376856813347,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 4.0,
+          "p90": 6.0,
+          "min": 0.0,
+          "max": 18.0
+        },
+        "number_re_crosses": {
+          "count": 237,
+          "mean": 2.029535864978903,
+          "std": 2.6054092132609274,
+          "median": 1.0,
+          "p25": 0.0,
+          "p75": 3.0,
+          "p90": 5.0,
+          "min": 0.0,
+          "max": 18.0
+        },
+        "hot_economics": {
+          "checkpoints": 2018,
+          "resolved": 1872,
+          "wins": 711,
+          "losses": 1161,
+          "win_rate": 0.3798076923076923,
+          "gross_atr_expectancy": -0.08533653846153846
+        },
+        "cold_economics": {
+          "checkpoints": 14565,
+          "resolved": 13337,
+          "wins": 5299,
+          "losses": 8038,
+          "win_rate": 0.3973157381720027,
+          "gross_atr_expectancy": -0.054697458198995276
+        },
+        "expectancy_delta_hot_minus_cold": -0.030639080262543188,
+        "pct_ge_30s_runs_starting_hot": 0.5668016194331984
+      },
+      "2025_Q1": {
+        "regimes_reaching": 78,
+        "first_hot_episode_duration_seconds": {
+          "count": 78,
+          "mean": 5.769230769230769,
+          "std": 9.905868601067619,
+          "median": 0.0,
+          "p25": 0.0,
+          "p75": 5.0,
+          "p90": 20.0,
+          "min": 0.0,
+          "max": 50.0
+        },
+        "remaining_hot_fraction": {
+          "count": 78,
+          "mean": 0.33092506624229967,
+          "std": 0.31970671854221977,
+          "median": 0.2244357045143639,
+          "p25": 0.05839520274129069,
+          "p75": 0.4959677419354839,
+          "p90": 0.8874999999999998,
+          "min": 0.0051813471502590676,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 78,
+          "mean": 3.08974358974359,
+          "std": 2.184947910168848,
+          "median": 2.0,
+          "p25": 2.0,
+          "p75": 4.0,
+          "p90": 6.0,
+          "min": 1.0,
+          "max": 10.0
+        },
+        "number_down_crosses": {
+          "count": 78,
+          "mean": 2.5128205128205128,
+          "std": 2.274403780670429,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 3.75,
+          "p90": 5.299999999999997,
+          "min": 0.0,
+          "max": 9.0
+        },
+        "number_re_crosses": {
+          "count": 78,
+          "mean": 2.0256410256410255,
+          "std": 2.1719326084740276,
+          "median": 1.0,
+          "p25": 0.0,
+          "p75": 3.0,
+          "p90": 5.0,
+          "min": 0.0,
+          "max": 9.0
+        },
+        "hot_economics": {
+          "checkpoints": 645,
+          "resolved": 583,
+          "wins": 258,
+          "losses": 325,
+          "win_rate": 0.4425385934819897,
+          "gross_atr_expectancy": 0.02444253859348199
+        },
+        "cold_economics": {
+          "checkpoints": 4407,
+          "resolved": 4030,
+          "wins": 1915,
+          "losses": 2115,
+          "win_rate": 0.47518610421836227,
+          "gross_atr_expectancy": 0.081575682382134
+        },
+        "expectancy_delta_hot_minus_cold": -0.057133143788652016,
+        "pct_ge_30s_runs_starting_hot": 0.0
+      }
+    },
+    "FADE_BEAR": {
+      "ALL": {
+        "regimes_reaching": 583,
+        "first_hot_episode_duration_seconds": {
+          "count": 583,
+          "mean": 10.214408233276158,
+          "std": 14.011034549376028,
+          "median": 5.0,
+          "p25": 0.0,
+          "p75": 15.0,
+          "p90": 25.0,
+          "min": 0.0,
+          "max": 95.0
+        },
+        "remaining_hot_fraction": {
+          "count": 583,
+          "mean": 0.37211775992246554,
+          "std": 0.3347127827532559,
+          "median": 0.25,
+          "p25": 0.07284718010915706,
+          "p75": 0.6396103896103896,
+          "p90": 1.0,
+          "min": 0.005291005291005291,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 583,
+          "mean": 2.710120068610635,
+          "std": 2.1052944333528942,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 3.0,
+          "p90": 6.0,
+          "min": 1.0,
+          "max": 12.0
+        },
+        "number_down_crosses": {
+          "count": 583,
+          "mean": 2.1972555746140654,
+          "std": 2.1441674082606776,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 3.0,
+          "p90": 5.0,
+          "min": 0.0,
+          "max": 11.0
+        },
+        "number_re_crosses": {
+          "count": 583,
+          "mean": 1.6912521440823327,
+          "std": 2.0915682175840167,
+          "median": 1.0,
+          "p25": 0.0,
+          "p75": 2.0,
+          "p90": 5.0,
+          "min": 0.0,
+          "max": 11.0
+        },
+        "hot_economics": {
+          "checkpoints": 4947,
+          "resolved": 4627,
+          "wins": 1923,
+          "losses": 2704,
+          "win_rate": 0.41560406310784526,
+          "gross_atr_expectancy": -0.0226928895612708
+        },
+        "cold_economics": {
+          "checkpoints": 27457,
+          "resolved": 25050,
+          "wins": 10827,
+          "losses": 14223,
+          "win_rate": 0.43221556886227547,
+          "gross_atr_expectancy": 0.006377245508982036
+        },
+        "expectancy_delta_hot_minus_cold": -0.02907013507025284,
+        "pct_ge_30s_runs_starting_hot": 0.5967774020290432
+      },
+      "2023": {
+        "regimes_reaching": 264,
+        "first_hot_episode_duration_seconds": {
+          "count": 264,
+          "mean": 10.132575757575758,
+          "std": 14.722220868634828,
+          "median": 5.0,
+          "p25": 0.0,
+          "p75": 15.0,
+          "p90": 30.0,
+          "min": 0.0,
+          "max": 80.0
+        },
+        "remaining_hot_fraction": {
+          "count": 264,
+          "mean": 0.40100307689909775,
+          "std": 0.3437683253864256,
+          "median": 0.3333333333333333,
+          "p25": 0.07142857142857142,
+          "p75": 0.6666666666666666,
+          "p90": 1.0,
+          "min": 0.005291005291005291,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 264,
+          "mean": 2.481060606060606,
+          "std": 1.9481005735874506,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 3.0,
+          "p90": 5.0,
+          "min": 1.0,
+          "max": 12.0
+        },
+        "number_down_crosses": {
+          "count": 264,
+          "mean": 1.9356060606060606,
+          "std": 1.9904176726201013,
+          "median": 1.0,
+          "p25": 1.0,
+          "p75": 2.0,
+          "p90": 4.0,
+          "min": 0.0,
+          "max": 11.0
+        },
+        "number_re_crosses": {
+          "count": 264,
+          "mean": 1.4734848484848484,
+          "std": 1.9402186634221523,
+          "median": 1.0,
+          "p25": 0.0,
+          "p75": 2.0,
+          "p90": 4.0,
+          "min": 0.0,
+          "max": 11.0
+        },
+        "hot_economics": {
+          "checkpoints": 2136,
+          "resolved": 2010,
+          "wins": 856,
+          "losses": 1154,
+          "win_rate": 0.42587064676616915,
+          "gross_atr_expectancy": -0.00472636815920398
+        },
+        "cold_economics": {
+          "checkpoints": 11196,
+          "resolved": 9979,
+          "wins": 4443,
+          "losses": 5536,
+          "win_rate": 0.4452349934863213,
+          "gross_atr_expectancy": 0.02916123860106223
+        },
+        "expectancy_delta_hot_minus_cold": -0.03388760676026621,
+        "pct_ge_30s_runs_starting_hot": 0.49129075480125056
+      },
+      "2024": {
+        "regimes_reaching": 258,
+        "first_hot_episode_duration_seconds": {
+          "count": 258,
+          "mean": 10.813953488372093,
+          "std": 14.22807980412555,
+          "median": 5.0,
+          "p25": 0.0,
+          "p75": 15.0,
+          "p90": 30.0,
+          "min": 0.0,
+          "max": 95.0
+        },
+        "remaining_hot_fraction": {
+          "count": 258,
+          "mean": 0.3526712805596808,
+          "std": 0.3271710371814056,
+          "median": 0.22857142857142856,
+          "p25": 0.07478632478632478,
+          "p75": 0.5922619047619048,
+          "p90": 1.0,
+          "min": 0.007692307692307693,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 258,
+          "mean": 2.945736434108527,
+          "std": 2.2919139204832963,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 4.0,
+          "p90": 6.0,
+          "min": 1.0,
+          "max": 12.0
+        },
+        "number_down_crosses": {
+          "count": 258,
+          "mean": 2.4573643410852712,
+          "std": 2.3127813114056757,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 4.0,
+          "p90": 6.0,
+          "min": 0.0,
+          "max": 11.0
+        },
+        "number_re_crosses": {
+          "count": 258,
+          "mean": 1.9147286821705427,
+          "std": 2.2705769090762034,
+          "median": 1.0,
+          "p25": 0.0,
+          "p75": 3.0,
+          "p90": 5.0,
+          "min": 0.0,
+          "max": 10.0
+        },
+        "hot_economics": {
+          "checkpoints": 2342,
+          "resolved": 2188,
+          "wins": 914,
+          "losses": 1274,
+          "win_rate": 0.41773308957952465,
+          "gross_atr_expectancy": -0.01896709323583181
+        },
+        "cold_economics": {
+          "checkpoints": 13005,
+          "resolved": 12043,
+          "wins": 5126,
+          "losses": 6917,
+          "win_rate": 0.4256414514655817,
+          "gross_atr_expectancy": -0.005127459935232085
+        },
+        "expectancy_delta_hot_minus_cold": -0.013839633300599724,
+        "pct_ge_30s_runs_starting_hot": 0.6219458018658374
+      },
+      "2025_Q1": {
+        "regimes_reaching": 61,
+        "first_hot_episode_duration_seconds": {
+          "count": 61,
+          "mean": 8.032786885245901,
+          "std": 8.697026462099041,
+          "median": 5.0,
+          "p25": 0.0,
+          "p75": 15.0,
+          "p90": 20.0,
+          "min": 0.0,
+          "max": 35.0
+        },
+        "remaining_hot_fraction": {
+          "count": 61,
+          "mean": 0.32935494014816297,
+          "std": 0.3154611295973348,
+          "median": 0.16216216216216217,
+          "p25": 0.05714285714285714,
+          "p75": 0.5,
+          "p90": 0.8,
+          "min": 0.0136986301369863,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 61,
+          "mean": 2.7049180327868854,
+          "std": 1.8047683861669357,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 3.0,
+          "p90": 5.0,
+          "min": 1.0,
+          "max": 9.0
+        },
+        "number_down_crosses": {
+          "count": 61,
+          "mean": 2.2295081967213113,
+          "std": 1.8938506408724038,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 3.0,
+          "p90": 5.0,
+          "min": 0.0,
+          "max": 8.0
+        },
+        "number_re_crosses": {
+          "count": 61,
+          "mean": 1.6885245901639345,
+          "std": 1.8156061500276632,
+          "median": 1.0,
+          "p25": 0.0,
+          "p75": 2.0,
+          "p90": 4.0,
+          "min": 0.0,
+          "max": 8.0
+        },
+        "hot_economics": {
+          "checkpoints": 469,
+          "resolved": 429,
+          "wins": 153,
+          "losses": 276,
+          "win_rate": 0.35664335664335667,
+          "gross_atr_expectancy": -0.1258741258741259
+        },
+        "cold_economics": {
+          "checkpoints": 3256,
+          "resolved": 3028,
+          "wins": 1258,
+          "losses": 1770,
+          "win_rate": 0.4154557463672391,
+          "gross_atr_expectancy": -0.022952443857331573
+        },
+        "expectancy_delta_hot_minus_cold": -0.10292168201679432,
+        "pct_ge_30s_runs_starting_hot": 0.931098696461825
+      }
+    },
+    "POOLED": {
+      "ALL": {
+        "regimes_reaching": 1172,
+        "first_hot_episode_duration_seconds": {
+          "count": 1172,
+          "mean": 8.643344709897612,
+          "std": 12.207076994295413,
+          "median": 5.0,
+          "p25": 0.0,
+          "p75": 15.0,
+          "p90": 25.0,
+          "min": 0.0,
+          "max": 95.0
+        },
+        "remaining_hot_fraction": {
+          "count": 1172,
+          "mean": 0.35583405470823215,
+          "std": 0.32610662718989814,
+          "median": 0.24223834418009177,
+          "p25": 0.07142857142857142,
+          "p75": 0.5916193181818182,
+          "p90": 1.0,
+          "min": 0.0038461538461538464,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 1172,
+          "mean": 2.8993174061433447,
+          "std": 2.2667878548988263,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 4.0,
+          "p90": 6.0,
+          "min": 1.0,
+          "max": 19.0
+        },
+        "number_down_crosses": {
+          "count": 1172,
+          "mean": 2.3907849829351537,
+          "std": 2.3076184252971883,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 3.0,
+          "p90": 6.0,
+          "min": 0.0,
+          "max": 18.0
+        },
+        "number_re_crosses": {
+          "count": 1172,
+          "mean": 1.872013651877133,
+          "std": 2.259753612430374,
+          "median": 1.0,
+          "p25": 0.0,
+          "p75": 3.0,
+          "p90": 5.0,
+          "min": 0.0,
+          "max": 18.0
+        },
+        "hot_economics": {
+          "checkpoints": 10146,
+          "resolved": 9503,
+          "wins": 3900,
+          "losses": 5603,
+          "win_rate": 0.4103967168262654,
+          "gross_atr_expectancy": -0.03180574555403557
+        },
+        "cold_economics": {
+          "checkpoints": 59947,
+          "resolved": 55439,
+          "wins": 23977,
+          "losses": 31462,
+          "win_rate": 0.43249337109255215,
+          "gross_atr_expectancy": 0.006863399411966305
+        },
+        "expectancy_delta_hot_minus_cold": -0.03866914496600188,
+        "pct_ge_30s_runs_starting_hot": 0.5933320776040686
+      },
+      "2023": {
+        "regimes_reaching": 538,
+        "first_hot_episode_duration_seconds": {
+          "count": 538,
+          "mean": 8.921933085501859,
+          "std": 12.678078817728402,
+          "median": 5.0,
+          "p25": 0.0,
+          "p75": 15.0,
+          "p90": 25.0,
+          "min": 0.0,
+          "max": 80.0
+        },
+        "remaining_hot_fraction": {
+          "count": 538,
+          "mean": 0.3870862399035506,
+          "std": 0.3340890159737758,
+          "median": 0.3,
+          "p25": 0.08525835866261398,
+          "p75": 0.6534280936454849,
+          "p90": 1.0,
+          "min": 0.005291005291005291,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 538,
+          "mean": 2.802973977695167,
+          "std": 2.1405603449566435,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 4.0,
+          "p90": 6.0,
+          "min": 1.0,
+          "max": 12.0
+        },
+        "number_down_crosses": {
+          "count": 538,
+          "mean": 2.2565055762081783,
+          "std": 2.1713760693061723,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 3.0,
+          "p90": 5.0,
+          "min": 0.0,
+          "max": 11.0
+        },
+        "number_re_crosses": {
+          "count": 538,
+          "mean": 1.7806691449814127,
+          "std": 2.139259052107048,
+          "median": 1.0,
+          "p25": 0.0,
+          "p75": 2.75,
+          "p90": 5.0,
+          "min": 0.0,
+          "max": 11.0
+        },
+        "hot_economics": {
+          "checkpoints": 4672,
+          "resolved": 4431,
+          "wins": 1864,
+          "losses": 2567,
+          "win_rate": 0.42067253441661023,
+          "gross_atr_expectancy": -0.01382306477093207
+        },
+        "cold_economics": {
+          "checkpoints": 24714,
+          "resolved": 23001,
+          "wins": 10379,
+          "losses": 12622,
+          "win_rate": 0.45124125038041824,
+          "gross_atr_expectancy": 0.039672188165731925
+        },
+        "expectancy_delta_hot_minus_cold": -0.053495252936663996,
+        "pct_ge_30s_runs_starting_hot": 0.6269592476489028
+      },
+      "2024": {
+        "regimes_reaching": 495,
+        "first_hot_episode_duration_seconds": {
+          "count": 495,
+          "mean": 8.868686868686869,
+          "std": 12.322801780854531,
+          "median": 5.0,
+          "p25": 0.0,
+          "p75": 15.0,
+          "p90": 25.0,
+          "min": 0.0,
+          "max": 95.0
+        },
+        "remaining_hot_fraction": {
+          "count": 495,
+          "mean": 0.32905516875555657,
+          "std": 0.31646155082557703,
+          "median": 0.2028985507246377,
+          "p25": 0.06497175141242938,
+          "p75": 0.5348557692307692,
+          "p90": 0.8571428571428571,
+          "min": 0.0038461538461538464,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 495,
+          "mean": 2.997979797979798,
+          "std": 2.449901247153444,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 4.0,
+          "p90": 6.0,
+          "min": 1.0,
+          "max": 19.0
+        },
+        "number_down_crosses": {
+          "count": 495,
+          "mean": 2.5373737373737373,
+          "std": 2.4859437513885645,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 4.0,
+          "p90": 6.0,
+          "min": 0.0,
+          "max": 18.0
+        },
+        "number_re_crosses": {
+          "count": 495,
+          "mean": 1.9696969696969697,
+          "std": 2.4373132477727593,
+          "median": 1.0,
+          "p25": 0.0,
+          "p75": 3.0,
+          "p90": 5.0,
+          "min": 0.0,
+          "max": 18.0
+        },
+        "hot_economics": {
+          "checkpoints": 4360,
+          "resolved": 4060,
+          "wins": 1625,
+          "losses": 2435,
+          "win_rate": 0.4002463054187192,
+          "gross_atr_expectancy": -0.04956896551724138
+        },
+        "cold_economics": {
+          "checkpoints": 27570,
+          "resolved": 25380,
+          "wins": 10425,
+          "losses": 14955,
+          "win_rate": 0.4107565011820331,
+          "gross_atr_expectancy": -0.03117612293144208
+        },
+        "expectancy_delta_hot_minus_cold": -0.0183928425857993,
+        "pct_ge_30s_runs_starting_hot": 0.593094683329803
+      },
+      "2025_Q1": {
+        "regimes_reaching": 139,
+        "first_hot_episode_duration_seconds": {
+          "count": 139,
+          "mean": 6.762589928057554,
+          "std": 9.46145739440207,
+          "median": 5.0,
+          "p25": 0.0,
+          "p75": 10.0,
+          "p90": 20.0,
+          "min": 0.0,
+          "max": 50.0
+        },
+        "remaining_hot_fraction": {
+          "count": 139,
+          "mean": 0.3302360181002684,
+          "std": 0.31785148411736014,
+          "median": 0.21739130434782608,
+          "p25": 0.05769764216366158,
+          "p75": 0.5,
+          "p90": 0.875,
+          "min": 0.0051813471502590676,
+          "max": 1.0
+        },
+        "number_up_crosses": {
+          "count": 139,
+          "mean": 2.920863309352518,
+          "std": 2.0358822463207473,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 4.0,
+          "p90": 6.0,
+          "min": 1.0,
+          "max": 10.0
+        },
+        "number_down_crosses": {
+          "count": 139,
+          "mean": 2.3884892086330933,
+          "std": 2.1205089363556384,
+          "median": 2.0,
+          "p25": 1.0,
+          "p75": 3.0,
+          "p90": 5.0,
+          "min": 0.0,
+          "max": 9.0
+        },
+        "number_re_crosses": {
+          "count": 139,
+          "mean": 1.8776978417266188,
+          "std": 2.0302051200712916,
+          "median": 1.0,
+          "p25": 0.0,
+          "p75": 3.0,
+          "p90": 5.0,
+          "min": 0.0,
+          "max": 9.0
+        },
+        "hot_economics": {
+          "checkpoints": 1114,
+          "resolved": 1012,
+          "wins": 411,
+          "losses": 601,
+          "win_rate": 0.4061264822134387,
+          "gross_atr_expectancy": -0.039278656126482216
+        },
+        "cold_economics": {
+          "checkpoints": 7663,
+          "resolved": 7058,
+          "wins": 3173,
+          "losses": 3885,
+          "win_rate": 0.449560782091244,
+          "gross_atr_expectancy": 0.03673136865967696
+        },
+        "expectancy_delta_hot_minus_cold": -0.07601002478615917,
+        "pct_ge_30s_runs_starting_hot": 0.44964028776978415
+      }
+    }
+  }
+}

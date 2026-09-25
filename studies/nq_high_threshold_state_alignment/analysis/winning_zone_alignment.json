@@ -1,0 +1,2670 @@
+{
+  "forward_alignment": {
+    "FADE_BULL": {
+      "ALL": {
+        "P90": {
+          "regimes_reaching": 3441,
+          "pct_crossing_already_winning_checkpoint": 39.43621040395234,
+          "pct_crossing_already_in_ge_30s_run": 14.850334205172915,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 73.35077012496367,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 3134,
+            "mean": 83.80025526483728,
+            "std": 140.89352585738104,
+            "median": 10.0,
+            "p25": 0.0,
+            "p75": 115.0,
+            "p90": 265.0,
+            "min": 0.0,
+            "max": 1300.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 2524,
+            "mean": 200.88153724247226,
+            "std": 244.00060856653238,
+            "median": 110.0,
+            "p25": 15.0,
+            "p75": 295.0,
+            "p90": 540.0,
+            "min": 0.0,
+            "max": 1455.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 18.715489683231617,
+            "15_to_30s": 3.7779715199070036,
+            "30_to_60s": 6.015693112467306,
+            "60_to_120s": 9.90990990990991,
+            "120_to_300s": 17.23336239465272,
+            "gt_300s": 17.698343504795115,
+            "no_subsequent_run": 26.64922987503633
+          },
+          "pct_ge_30s_run_within_30s": 22.493461203138622,
+          "pct_ge_30s_run_within_60s": 28.50915431560593
+        },
+        "P95": {
+          "regimes_reaching": 2551,
+          "pct_crossing_already_winning_checkpoint": 39.161113288906314,
+          "pct_crossing_already_in_ge_30s_run": 23.24578596628773,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 72.55978047824382,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 2250,
+            "mean": 75.45333333333333,
+            "std": 130.80798072832647,
+            "median": 10.0,
+            "p25": 0.0,
+            "p75": 100.0,
+            "p90": 245.0,
+            "min": 0.0,
+            "max": 940.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 1851,
+            "mean": 159.36520799567802,
+            "std": 220.84231599854144,
+            "median": 65.0,
+            "p25": 0.0,
+            "p75": 240.0,
+            "p90": 475.0,
+            "min": 0.0,
+            "max": 1290.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 26.538612308898475,
+            "15_to_30s": 4.037632301058409,
+            "30_to_60s": 5.409643277146217,
+            "60_to_120s": 7.9968639749118,
+            "120_to_300s": 15.170521364170913,
+            "gt_300s": 13.406507252058017,
+            "no_subsequent_run": 27.440219521756177
+          },
+          "pct_ge_30s_run_within_30s": 30.576244609956884,
+          "pct_ge_30s_run_within_60s": 35.985887887103104
+        },
+        "P97.5": {
+          "regimes_reaching": 1495,
+          "pct_crossing_already_winning_checkpoint": 37.725752508361204,
+          "pct_crossing_already_in_ge_30s_run": 27.959866220735783,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 71.70568561872909,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 1272,
+            "mean": 71.61949685534591,
+            "std": 121.87352268570199,
+            "median": 10.0,
+            "p25": 0.0,
+            "p75": 96.25,
+            "p90": 220.0,
+            "min": 0.0,
+            "max": 730.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 1072,
+            "mean": 133.544776119403,
+            "std": 202.67803545229222,
+            "median": 35.0,
+            "p25": 0.0,
+            "p75": 185.0,
+            "p90": 409.4999999999999,
+            "min": 0.0,
+            "max": 1235.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 31.505016722408026,
+            "15_to_30s": 3.411371237458194,
+            "30_to_60s": 5.551839464882943,
+            "60_to_120s": 6.688963210702341,
+            "120_to_300s": 13.779264214046824,
+            "gt_300s": 10.76923076923077,
+            "no_subsequent_run": 28.2943143812709
+          },
+          "pct_ge_30s_run_within_30s": 34.91638795986622,
+          "pct_ge_30s_run_within_60s": 40.468227424749166
+        },
+        "P99": {
+          "regimes_reaching": 589,
+          "pct_crossing_already_winning_checkpoint": 37.351443123938886,
+          "pct_crossing_already_in_ge_30s_run": 32.42784380305603,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 74.19354838709677,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 498,
+            "mean": 67.28915662650603,
+            "std": 118.14445892886361,
+            "median": 5.0,
+            "p25": 0.0,
+            "p75": 83.75,
+            "p90": 215.0,
+            "min": 0.0,
+            "max": 610.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 437,
+            "mean": 110.81235697940504,
+            "std": 179.85238425415608,
+            "median": 20.0,
+            "p25": 0.0,
+            "p75": 150.0,
+            "p90": 334.00000000000034,
+            "min": 0.0,
+            "max": 1050.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 36.502546689303905,
+            "15_to_30s": 2.7164685908319184,
+            "30_to_60s": 5.772495755517826,
+            "60_to_120s": 8.149405772495756,
+            "120_to_300s": 12.054329371816639,
+            "gt_300s": 8.998302207130731,
+            "no_subsequent_run": 25.806451612903224
+          },
+          "pct_ge_30s_run_within_30s": 39.21901528013582,
+          "pct_ge_30s_run_within_60s": 44.991511035653645
+        }
+      },
+      "2023": {
+        "P90": {
+          "regimes_reaching": 1558,
+          "pct_crossing_already_winning_checkpoint": 39.66623876765084,
+          "pct_crossing_already_in_ge_30s_run": 15.083440308087292,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 73.42747111681643,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 1420,
+            "mean": 82.59154929577464,
+            "std": 138.9548845078344,
+            "median": 10.0,
+            "p25": 0.0,
+            "p75": 120.0,
+            "p90": 255.50000000000068,
+            "min": 0.0,
+            "max": 1300.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 1144,
+            "mean": 199.05594405594405,
+            "std": 235.80464168055462,
+            "median": 115.0,
+            "p25": 15.0,
+            "p75": 301.25,
+            "p90": 515.0,
+            "min": 0.0,
+            "max": 1455.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 18.998716302952502,
+            "15_to_30s": 3.8510911424903727,
+            "30_to_60s": 6.033376123234917,
+            "60_to_120s": 8.536585365853659,
+            "120_to_300s": 17.65083440308087,
+            "gt_300s": 18.35686777920411,
+            "no_subsequent_run": 26.572528883183566
+          },
+          "pct_ge_30s_run_within_30s": 22.849807445442874,
+          "pct_ge_30s_run_within_60s": 28.88318356867779
+        },
+        "P95": {
+          "regimes_reaching": 1153,
+          "pct_crossing_already_winning_checkpoint": 40.1561144839549,
+          "pct_crossing_already_in_ge_30s_run": 24.45793581960104,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 72.85342584562012,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 1018,
+            "mean": 74.19449901768174,
+            "std": 130.1021190614415,
+            "median": 10.0,
+            "p25": 0.0,
+            "p75": 100.0,
+            "p90": 235.0,
+            "min": 0.0,
+            "max": 940.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 840,
+            "mean": 162.14880952380952,
+            "std": 218.43789680476127,
+            "median": 62.5,
+            "p25": 0.0,
+            "p75": 250.0,
+            "p90": 485.0,
+            "min": 0.0,
+            "max": 1235.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 27.75368603642671,
+            "15_to_30s": 3.2090199479618384,
+            "30_to_60s": 5.464006938421509,
+            "60_to_120s": 6.591500433651344,
+            "120_to_300s": 15.177797051170858,
+            "gt_300s": 14.657415437987858,
+            "no_subsequent_run": 27.146574154379877
+          },
+          "pct_ge_30s_run_within_30s": 30.96270598438855,
+          "pct_ge_30s_run_within_60s": 36.426712922810054
+        },
+        "P97.5": {
+          "regimes_reaching": 678,
+          "pct_crossing_already_winning_checkpoint": 38.05309734513274,
+          "pct_crossing_already_in_ge_30s_run": 29.20353982300885,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 73.74631268436578,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 582,
+            "mean": 70.02577319587628,
+            "std": 115.50185292842903,
+            "median": 7.5,
+            "p25": 0.0,
+            "p75": 95.0,
+            "p90": 220.0,
+            "min": 0.0,
+            "max": 690.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 500,
+            "mean": 132.2,
+            "std": 194.02154519537254,
+            "median": 40.0,
+            "p25": 0.0,
+            "p75": 196.25,
+            "p90": 392.00000000000045,
+            "min": 0.0,
+            "max": 1235.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 32.15339233038348,
+            "15_to_30s": 3.2448377581120944,
+            "30_to_60s": 6.489675516224189,
+            "60_to_120s": 6.047197640117994,
+            "120_to_300s": 14.454277286135694,
+            "gt_300s": 11.35693215339233,
+            "no_subsequent_run": 26.253687315634217
+          },
+          "pct_ge_30s_run_within_30s": 35.39823008849558,
+          "pct_ge_30s_run_within_60s": 41.88790560471977
+        },
+        "P99": {
+          "regimes_reaching": 274,
+          "pct_crossing_already_winning_checkpoint": 40.51094890510949,
+          "pct_crossing_already_in_ge_30s_run": 35.76642335766424,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 78.1021897810219,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 238,
+            "mean": 63.48739495798319,
+            "std": 111.34878698091559,
+            "median": 5.0,
+            "p25": 0.0,
+            "p75": 80.0,
+            "p90": 215.0,
+            "min": 0.0,
+            "max": 595.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 214,
+            "mean": 109.78971962616822,
+            "std": 176.43822271936992,
+            "median": 15.0,
+            "p25": 0.0,
+            "p75": 153.75,
+            "p90": 335.5000000000002,
+            "min": 0.0,
+            "max": 980.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 39.416058394160586,
+            "15_to_30s": 3.2846715328467155,
+            "30_to_60s": 5.109489051094891,
+            "60_to_120s": 8.394160583941606,
+            "120_to_300s": 12.043795620437956,
+            "gt_300s": 9.854014598540147,
+            "no_subsequent_run": 21.897810218978105
+          },
+          "pct_ge_30s_run_within_30s": 42.7007299270073,
+          "pct_ge_30s_run_within_60s": 47.81021897810219
+        }
+      },
+      "2024": {
+        "P90": {
+          "regimes_reaching": 1514,
+          "pct_crossing_already_winning_checkpoint": 38.90356671070013,
+          "pct_crossing_already_in_ge_30s_run": 14.861294583883753,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 73.44782034346103,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 1384,
+            "mean": 83.4320809248555,
+            "std": 137.41260390043794,
+            "median": 10.0,
+            "p25": 0.0,
+            "p75": 115.0,
+            "p90": 268.5000000000002,
+            "min": 0.0,
+            "max": 805.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 1112,
+            "mean": 206.41187050359713,
+            "std": 255.2970891803963,
+            "median": 110.0,
+            "p25": 15.0,
+            "p75": 295.0,
+            "p90": 554.4999999999999,
+            "min": 0.0,
+            "max": 1405.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 18.494055482166445,
+            "15_to_30s": 3.632760898282695,
+            "30_to_60s": 6.0105680317040955,
+            "60_to_120s": 10.898282694848085,
+            "120_to_300s": 16.842800528401586,
+            "gt_300s": 17.569352708058126,
+            "no_subsequent_run": 26.55217965653897
+          },
+          "pct_ge_30s_run_within_30s": 22.12681638044914,
+          "pct_ge_30s_run_within_60s": 28.137384412153235
+        },
+        "P95": {
+          "regimes_reaching": 1131,
+          "pct_crossing_already_winning_checkpoint": 38.1078691423519,
+          "pct_crossing_already_in_ge_30s_run": 22.4580017683466,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 71.97170645446508,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 996,
+            "mean": 75.64257028112449,
+            "std": 130.91751731675026,
+            "median": 10.0,
+            "p25": 0.0,
+            "p75": 100.0,
+            "p90": 250.0,
+            "min": 0.0,
+            "max": 815.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 814,
+            "mean": 158.3968058968059,
+            "std": 228.84332277347332,
+            "median": 65.0,
+            "p25": 0.0,
+            "p75": 228.75,
+            "p90": 467.00000000000045,
+            "min": 0.0,
+            "max": 1290.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 25.64102564102564,
+            "15_to_30s": 4.862953138815207,
+            "30_to_60s": 5.039787798408488,
+            "60_to_120s": 9.195402298850574,
+            "120_to_300s": 14.765694076038905,
+            "gt_300s": 12.46684350132626,
+            "no_subsequent_run": 28.028293545534925
+          },
+          "pct_ge_30s_run_within_30s": 30.503978779840846,
+          "pct_ge_30s_run_within_60s": 35.54376657824933
+        },
+        "P97.5": {
+          "regimes_reaching": 653,
+          "pct_crossing_already_winning_checkpoint": 37.21286370597244,
+          "pct_crossing_already_in_ge_30s_run": 26.79938744257274,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 68.60643185298622,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 546,
+            "mean": 73.73626373626374,
+            "std": 126.85385740746668,
+            "median": 10.0,
+            "p25": 0.0,
+            "p75": 103.75,
+            "p90": 230.0,
+            "min": 0.0,
+            "max": 730.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 448,
+            "mean": 137.45535714285714,
+            "std": 215.84137232471284,
+            "median": 35.0,
+            "p25": 0.0,
+            "p75": 176.25,
+            "p90": 420.0,
+            "min": 0.0,
+            "max": 1205.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 30.01531393568147,
+            "15_to_30s": 3.522205206738132,
+            "30_to_60s": 4.747320061255743,
+            "60_to_120s": 7.3506891271056665,
+            "120_to_300s": 12.710566615620214,
+            "gt_300s": 10.260336906584993,
+            "no_subsequent_run": 31.393568147013784
+          },
+          "pct_ge_30s_run_within_30s": 33.5375191424196,
+          "pct_ge_30s_run_within_60s": 38.28483920367534
+        },
+        "P99": {
+          "regimes_reaching": 237,
+          "pct_crossing_already_winning_checkpoint": 36.28691983122363,
+          "pct_crossing_already_in_ge_30s_run": 30.801687763713083,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 69.19831223628692,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 196,
+            "mean": 74.33673469387755,
+            "std": 131.56560743114264,
+            "median": 5.0,
+            "p25": 0.0,
+            "p75": 80.0,
+            "p90": 247.5,
+            "min": 0.0,
+            "max": 610.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 164,
+            "mean": 115.76219512195122,
+            "std": 195.9331911648955,
+            "median": 17.5,
+            "p25": 0.0,
+            "p75": 146.25,
+            "p90": 370.50000000000114,
+            "min": 0.0,
+            "max": 1050.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 34.59915611814346,
+            "15_to_30s": 1.6877637130801686,
+            "30_to_60s": 5.9071729957805905,
+            "60_to_120s": 8.016877637130802,
+            "120_to_300s": 10.548523206751055,
+            "gt_300s": 8.438818565400844,
+            "no_subsequent_run": 30.801687763713083
+          },
+          "pct_ge_30s_run_within_30s": 36.28691983122363,
+          "pct_ge_30s_run_within_60s": 42.19409282700422
+        }
+      },
+      "2025_Q1": {
+        "P90": {
+          "regimes_reaching": 369,
+          "pct_crossing_already_winning_checkpoint": 40.65040650406504,
+          "pct_crossing_already_in_ge_30s_run": 13.821138211382115,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 72.62872628726286,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 330,
+            "mean": 90.54545454545455,
+            "std": 161.85198829703168,
+            "median": 10.0,
+            "p25": 0.0,
+            "p75": 103.75,
+            "p90": 281.0000000000002,
+            "min": 0.0,
+            "max": 975.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 268,
+            "mean": 185.72761194029852,
+            "std": 229.23528872272198,
+            "median": 95.0,
+            "p25": 15.0,
+            "p75": 275.0,
+            "p90": 510.0,
+            "min": 0.0,
+            "max": 1170.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 18.428184281842817,
+            "15_to_30s": 4.0650406504065035,
+            "30_to_60s": 5.9620596205962055,
+            "60_to_120s": 11.653116531165312,
+            "120_to_300s": 17.073170731707318,
+            "gt_300s": 15.447154471544716,
+            "no_subsequent_run": 27.371273712737125
+          },
+          "pct_ge_30s_run_within_30s": 22.49322493224932,
+          "pct_ge_30s_run_within_60s": 28.455284552845526
+        },
+        "P95": {
+          "regimes_reaching": 267,
+          "pct_crossing_already_winning_checkpoint": 39.325842696629216,
+          "pct_crossing_already_in_ge_30s_run": 21.34831460674157,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 73.78277153558052,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 236,
+            "mean": 80.08474576271186,
+            "std": 133.2505653163946,
+            "median": 10.0,
+            "p25": 0.0,
+            "p75": 105.0,
+            "p90": 260.0,
+            "min": 0.0,
+            "max": 715.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 197,
+            "mean": 151.497461928934,
+            "std": 195.7282801187101,
+            "median": 65.0,
+            "p25": 0.0,
+            "p75": 250.0,
+            "p90": 420.0,
+            "min": 0.0,
+            "max": 985.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 25.0936329588015,
+            "15_to_30s": 4.119850187265917,
+            "30_to_60s": 6.741573033707865,
+            "60_to_120s": 8.98876404494382,
+            "120_to_300s": 16.853932584269664,
+            "gt_300s": 11.985018726591761,
+            "no_subsequent_run": 26.217228464419474
+          },
+          "pct_ge_30s_run_within_30s": 29.213483146067418,
+          "pct_ge_30s_run_within_60s": 35.95505617977528
+        },
+        "P97.5": {
+          "regimes_reaching": 164,
+          "pct_crossing_already_winning_checkpoint": 38.41463414634146,
+          "pct_crossing_already_in_ge_30s_run": 27.439024390243905,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 75.60975609756098,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 144,
+            "mean": 70.03472222222223,
+            "std": 127.4339378524791,
+            "median": 5.0,
+            "p25": 0.0,
+            "p75": 77.5,
+            "p90": 213.50000000000009,
+            "min": 0.0,
+            "max": 645.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 124,
+            "mean": 124.83870967741936,
+            "std": 186.770014995879,
+            "median": 27.5,
+            "p25": 0.0,
+            "p75": 180.0,
+            "p90": 383.5,
+            "min": 0.0,
+            "max": 985.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 34.756097560975604,
+            "15_to_30s": 3.6585365853658534,
+            "30_to_60s": 4.878048780487805,
+            "60_to_120s": 6.707317073170732,
+            "120_to_300s": 15.24390243902439,
+            "gt_300s": 10.365853658536585,
+            "no_subsequent_run": 24.390243902439025
+          },
+          "pct_ge_30s_run_within_30s": 38.414634146341456,
+          "pct_ge_30s_run_within_60s": 43.29268292682926
+        },
+        "P99": {
+          "regimes_reaching": 78,
+          "pct_crossing_already_winning_checkpoint": 29.48717948717949,
+          "pct_crossing_already_in_ge_30s_run": 25.64102564102564,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 75.64102564102564,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 64,
+            "mean": 59.84375,
+            "std": 96.08739816405426,
+            "median": 10.0,
+            "p25": 0.0,
+            "p75": 101.25,
+            "p90": 179.5000000000001,
+            "min": 0.0,
+            "max": 525.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 59,
+            "mean": 100.76271186440678,
+            "std": 140.6727587355594,
+            "median": 40.0,
+            "p25": 0.0,
+            "p75": 142.5,
+            "p90": 266.0000000000002,
+            "min": 0.0,
+            "max": 590.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 32.05128205128205,
+            "15_to_30s": 3.8461538461538463,
+            "30_to_60s": 7.6923076923076925,
+            "60_to_120s": 7.6923076923076925,
+            "120_to_300s": 16.666666666666664,
+            "gt_300s": 7.6923076923076925,
+            "no_subsequent_run": 24.358974358974358
+          },
+          "pct_ge_30s_run_within_30s": 35.8974358974359,
+          "pct_ge_30s_run_within_60s": 43.58974358974359
+        }
+      }
+    },
+    "FADE_BEAR": {
+      "ALL": {
+        "P90": {
+          "regimes_reaching": 3093,
+          "pct_crossing_already_winning_checkpoint": 38.991270611057224,
+          "pct_crossing_already_in_ge_30s_run": 15.97154865826059,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 75.62237310054964,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 2804,
+            "mean": 70.5688302425107,
+            "std": 115.03436767948574,
+            "median": 10.0,
+            "p25": 0.0,
+            "p75": 100.0,
+            "p90": 225.0,
+            "min": 0.0,
+            "max": 835.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 2339,
+            "mean": 183.60837964942283,
+            "std": 215.97096268545678,
+            "median": 110.0,
+            "p25": 15.0,
+            "p75": 280.0,
+            "p90": 485.0,
+            "min": 0.0,
+            "max": 1330.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 20.206918849013903,
+            "15_to_30s": 3.944390559327514,
+            "30_to_60s": 5.916585838991271,
+            "60_to_120s": 9.666989977368251,
+            "120_to_300s": 18.7520206918849,
+            "gt_300s": 17.13546718396379,
+            "no_subsequent_run": 24.377626899450373
+          },
+          "pct_ge_30s_run_within_30s": 24.151309408341415,
+          "pct_ge_30s_run_within_60s": 30.067895247332686
+        },
+        "P95": {
+          "regimes_reaching": 2344,
+          "pct_crossing_already_winning_checkpoint": 36.94539249146758,
+          "pct_crossing_already_in_ge_30s_run": 23.890784982935152,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 75.25597269624573,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 2066,
+            "mean": 71.51742497579865,
+            "std": 116.73450543559836,
+            "median": 10.0,
+            "p25": 0.0,
+            "p75": 100.0,
+            "p90": 225.0,
+            "min": 0.0,
+            "max": 825.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 1764,
+            "mean": 154.0731292517007,
+            "std": 200.61386739314543,
+            "median": 70.0,
+            "p25": 0.0,
+            "p75": 240.0,
+            "p90": 445.0,
+            "min": 0.0,
+            "max": 1100.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 27.64505119453925,
+            "15_to_30s": 3.02901023890785,
+            "30_to_60s": 5.546075085324232,
+            "60_to_120s": 9.044368600682594,
+            "120_to_300s": 15.656996587030717,
+            "gt_300s": 14.334470989761092,
+            "no_subsequent_run": 24.744027303754265
+          },
+          "pct_ge_30s_run_within_30s": 30.6740614334471,
+          "pct_ge_30s_run_within_60s": 36.220136518771334
+        },
+        "P97.5": {
+          "regimes_reaching": 1302,
+          "pct_crossing_already_winning_checkpoint": 37.634408602150536,
+          "pct_crossing_already_in_ge_30s_run": 29.56989247311828,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 72.96466973886328,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 1094,
+            "mean": 67.28976234003656,
+            "std": 117.59118421256716,
+            "median": 10.0,
+            "p25": 0.0,
+            "p75": 85.0,
+            "p90": 230.0,
+            "min": 0.0,
+            "max": 1070.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 950,
+            "mean": 122.53684210526316,
+            "std": 179.85282348727105,
+            "median": 35.0,
+            "p25": 0.0,
+            "p75": 190.0,
+            "p90": 380.5000000000001,
+            "min": 0.0,
+            "max": 1090.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 33.102918586789556,
+            "15_to_30s": 2.8417818740399383,
+            "30_to_60s": 6.1443932411674345,
+            "60_to_120s": 7.680491551459294,
+            "120_to_300s": 11.904761904761903,
+            "gt_300s": 11.29032258064516,
+            "no_subsequent_run": 27.035330261136714
+          },
+          "pct_ge_30s_run_within_30s": 35.944700460829495,
+          "pct_ge_30s_run_within_60s": 42.08909370199693
+        },
+        "P99": {
+          "regimes_reaching": 583,
+          "pct_crossing_already_winning_checkpoint": 38.93653516295026,
+          "pct_crossing_already_in_ge_30s_run": 34.81989708404803,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 70.84048027444254,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 472,
+            "mean": 61.980932203389834,
+            "std": 110.36220056878729,
+            "median": 5.0,
+            "p25": 0.0,
+            "p75": 80.0,
+            "p90": 224.50000000000017,
+            "min": 0.0,
+            "max": 640.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 413,
+            "mean": 98.6682808716707,
+            "std": 156.40573636922517,
+            "median": 10.0,
+            "p25": 0.0,
+            "p75": 135.0,
+            "p90": 344.00000000000006,
+            "min": 0.0,
+            "max": 795.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 38.078902229845625,
+            "15_to_30s": 2.401372212692967,
+            "30_to_60s": 3.6020583190394513,
+            "60_to_120s": 7.718696397941681,
+            "120_to_300s": 10.120068610634648,
+            "gt_300s": 8.919382504288166,
+            "no_subsequent_run": 29.15951972555746
+          },
+          "pct_ge_30s_run_within_30s": 40.480274442538594,
+          "pct_ge_30s_run_within_60s": 44.082332761578044
+        }
+      },
+      "2023": {
+        "P90": {
+          "regimes_reaching": 1386,
+          "pct_crossing_already_winning_checkpoint": 39.75468975468976,
+          "pct_crossing_already_in_ge_30s_run": 17.243867243867246,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 75.97402597402598,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 1265,
+            "mean": 72.87747035573122,
+            "std": 116.36397174079526,
+            "median": 10.0,
+            "p25": 0.0,
+            "p75": 105.0,
+            "p90": 230.0,
+            "min": 0.0,
+            "max": 800.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 1053,
+            "mean": 181.41975308641975,
+            "std": 219.71935062282446,
+            "median": 105.0,
+            "p25": 10.0,
+            "p75": 270.0,
+            "p90": 484.00000000000034,
+            "min": 0.0,
+            "max": 1330.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 21.284271284271284,
+            "15_to_30s": 3.318903318903319,
+            "30_to_60s": 6.0606060606060606,
+            "60_to_120s": 10.317460317460316,
+            "120_to_300s": 18.181818181818183,
+            "gt_300s": 16.81096681096681,
+            "no_subsequent_run": 24.025974025974026
+          },
+          "pct_ge_30s_run_within_30s": 24.603174603174605,
+          "pct_ge_30s_run_within_60s": 30.663780663780663
+        },
+        "P95": {
+          "regimes_reaching": 1050,
+          "pct_crossing_already_winning_checkpoint": 38.19047619047619,
+          "pct_crossing_already_in_ge_30s_run": 25.142857142857146,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 76.09523809523809,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 928,
+            "mean": 70.95905172413794,
+            "std": 113.74240427446246,
+            "median": 12.5,
+            "p25": 0.0,
+            "p75": 105.0,
+            "p90": 225.0,
+            "min": 0.0,
+            "max": 825.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 799,
+            "mean": 152.00250312891114,
+            "std": 201.95569470064393,
+            "median": 65.0,
+            "p25": 0.0,
+            "p75": 240.0,
+            "p90": 440.0,
+            "min": 0.0,
+            "max": 1095.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 29.333333333333332,
+            "15_to_30s": 2.380952380952381,
+            "30_to_60s": 5.6190476190476195,
+            "60_to_120s": 9.238095238095239,
+            "120_to_300s": 15.333333333333332,
+            "gt_300s": 14.19047619047619,
+            "no_subsequent_run": 23.904761904761905
+          },
+          "pct_ge_30s_run_within_30s": 31.71428571428571,
+          "pct_ge_30s_run_within_60s": 37.33333333333333
+        },
+        "P97.5": {
+          "regimes_reaching": 562,
+          "pct_crossing_already_winning_checkpoint": 39.50177935943061,
+          "pct_crossing_already_in_ge_30s_run": 31.13879003558719,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 73.13167259786478,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 476,
+            "mean": 66.03991596638656,
+            "std": 110.63187728797628,
+            "median": 7.5,
+            "p25": 0.0,
+            "p75": 100.0,
+            "p90": 217.5,
+            "min": 0.0,
+            "max": 815.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 411,
+            "mean": 128.28467153284672,
+            "std": 187.96461134435958,
+            "median": 35.0,
+            "p25": 0.0,
+            "p75": 205.0,
+            "p90": 390.0,
+            "min": 0.0,
+            "max": 1090.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 34.69750889679715,
+            "15_to_30s": 1.7793594306049825,
+            "30_to_60s": 5.160142348754448,
+            "60_to_120s": 7.11743772241993,
+            "120_to_300s": 12.099644128113878,
+            "gt_300s": 12.277580071174377,
+            "no_subsequent_run": 26.868327402135233
+          },
+          "pct_ge_30s_run_within_30s": 36.47686832740214,
+          "pct_ge_30s_run_within_60s": 41.637010676156585
+        },
+        "P99": {
+          "regimes_reaching": 264,
+          "pct_crossing_already_winning_checkpoint": 44.31818181818182,
+          "pct_crossing_already_in_ge_30s_run": 39.015151515151516,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 72.34848484848484,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 222,
+            "mean": 52.72522522522522,
+            "std": 96.52349381981315,
+            "median": 0.0,
+            "p25": 0.0,
+            "p75": 70.0,
+            "p90": 194.50000000000003,
+            "min": 0.0,
+            "max": 515.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 191,
+            "mean": 92.04188481675392,
+            "std": 151.76886644361008,
+            "median": 0.0,
+            "p25": 0.0,
+            "p75": 132.5,
+            "p90": 315.0,
+            "min": 0.0,
+            "max": 680.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 42.04545454545455,
+            "15_to_30s": 2.272727272727273,
+            "30_to_60s": 3.4090909090909087,
+            "60_to_120s": 5.681818181818182,
+            "120_to_300s": 9.848484848484848,
+            "gt_300s": 9.090909090909092,
+            "no_subsequent_run": 27.65151515151515
+          },
+          "pct_ge_30s_run_within_30s": 44.31818181818182,
+          "pct_ge_30s_run_within_60s": 47.72727272727273
+        }
+      },
+      "2024": {
+        "P90": {
+          "regimes_reaching": 1364,
+          "pct_crossing_already_winning_checkpoint": 38.41642228739003,
+          "pct_crossing_already_in_ge_30s_run": 15.395894428152493,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 76.31964809384164,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 1234,
+            "mean": 67.91329011345219,
+            "std": 114.66550508657886,
+            "median": 10.0,
+            "p25": 0.0,
+            "p75": 95.0,
+            "p90": 210.0,
+            "min": 0.0,
+            "max": 835.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 1041,
+            "mean": 182.76176753122,
+            "std": 213.47899292689976,
+            "median": 105.0,
+            "p25": 15.0,
+            "p75": 280.0,
+            "p90": 485.0,
+            "min": 0.0,
+            "max": 1125.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 20.161290322580644,
+            "15_to_30s": 4.765395894428153,
+            "30_to_60s": 6.011730205278592,
+            "60_to_120s": 9.090909090909092,
+            "120_to_300s": 18.841642228739,
+            "gt_300s": 17.44868035190616,
+            "no_subsequent_run": 23.680351906158357
+          },
+          "pct_ge_30s_run_within_30s": 24.926686217008797,
+          "pct_ge_30s_run_within_60s": 30.93841642228739
+        },
+        "P95": {
+          "regimes_reaching": 1037,
+          "pct_crossing_already_winning_checkpoint": 36.837029893924786,
+          "pct_crossing_already_in_ge_30s_run": 24.011571841851495,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 75.12054001928641,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 914,
+            "mean": 70.54157549234135,
+            "std": 119.1718181118805,
+            "median": 10.0,
+            "p25": 0.0,
+            "p75": 95.0,
+            "p90": 220.0,
+            "min": 0.0,
+            "max": 780.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 779,
+            "mean": 154.94865211810014,
+            "std": 203.17046709214395,
+            "median": 75.0,
+            "p25": 0.0,
+            "p75": 230.0,
+            "p90": 456.0000000000002,
+            "min": 0.0,
+            "max": 1100.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 27.38669238187078,
+            "15_to_30s": 3.3751205400192865,
+            "30_to_60s": 5.400192864030858,
+            "60_to_120s": 8.96817743490839,
+            "120_to_300s": 15.911282545805209,
+            "gt_300s": 14.07907425265188,
+            "no_subsequent_run": 24.879459980713598
+          },
+          "pct_ge_30s_run_within_30s": 30.761812921890066,
+          "pct_ge_30s_run_within_60s": 36.162005785920925
+        },
+        "P97.5": {
+          "regimes_reaching": 593,
+          "pct_crossing_already_winning_checkpoint": 37.09949409780776,
+          "pct_crossing_already_in_ge_30s_run": 29.34232715008432,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 73.86172006745363,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 499,
+            "mean": 64.96993987975952,
+            "std": 115.19717825516517,
+            "median": 10.0,
+            "p25": 0.0,
+            "p75": 75.0,
+            "p90": 240.99999999999994,
+            "min": 0.0,
+            "max": 670.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 438,
+            "mean": 117.95662100456622,
+            "std": 175.65530390368414,
+            "median": 35.0,
+            "p25": 0.0,
+            "p75": 175.0,
+            "p90": 361.50000000000006,
+            "min": 0.0,
+            "max": 850.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 33.05227655986509,
+            "15_to_30s": 3.709949409780776,
+            "30_to_60s": 7.251264755480608,
+            "60_to_120s": 7.251264755480608,
+            "120_to_300s": 11.63575042158516,
+            "gt_300s": 10.961214165261383,
+            "no_subsequent_run": 26.138279932546375
+          },
+          "pct_ge_30s_run_within_30s": 36.76222596964587,
+          "pct_ge_30s_run_within_60s": 44.01349072512647
+        },
+        "P99": {
+          "regimes_reaching": 258,
+          "pct_crossing_already_winning_checkpoint": 34.49612403100775,
+          "pct_crossing_already_in_ge_30s_run": 31.3953488372093,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 68.6046511627907,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 200,
+            "mean": 67.65,
+            "std": 116.98174002809158,
+            "median": 10.0,
+            "p25": 0.0,
+            "p75": 80.0,
+            "p90": 241.49999999999991,
+            "min": 0.0,
+            "max": 640.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 177,
+            "mean": 103.72881355932203,
+            "std": 158.08241759189954,
+            "median": 15.0,
+            "p25": 0.0,
+            "p75": 135.0,
+            "p90": 349.00000000000006,
+            "min": 0.0,
+            "max": 795.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 34.49612403100775,
+            "15_to_30s": 2.3255813953488373,
+            "30_to_60s": 3.875968992248062,
+            "60_to_120s": 8.527131782945736,
+            "120_to_300s": 10.852713178294573,
+            "gt_300s": 8.527131782945736,
+            "no_subsequent_run": 31.3953488372093
+          },
+          "pct_ge_30s_run_within_30s": 36.82170542635659,
+          "pct_ge_30s_run_within_60s": 40.69767441860465
+        }
+      },
+      "2025_Q1": {
+        "P90": {
+          "regimes_reaching": 343,
+          "pct_crossing_already_winning_checkpoint": 38.19241982507289,
+          "pct_crossing_already_in_ge_30s_run": 13.119533527696792,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 71.42857142857143,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 305,
+            "mean": 71.73770491803279,
+            "std": 110.6690386662989,
+            "median": 10.0,
+            "p25": 0.0,
+            "p75": 100.0,
+            "p90": 251.00000000000023,
+            "min": 0.0,
+            "max": 575.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 245,
+            "mean": 196.6122448979592,
+            "std": 209.7110564491087,
+            "median": 135.0,
+            "p25": 30.0,
+            "p75": 300.0,
+            "p90": 473.0,
+            "min": 0.0,
+            "max": 1110.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 16.034985422740526,
+            "15_to_30s": 3.206997084548105,
+            "30_to_60s": 4.956268221574344,
+            "60_to_120s": 9.329446064139942,
+            "120_to_300s": 20.699708454810494,
+            "gt_300s": 17.20116618075802,
+            "no_subsequent_run": 28.57142857142857
+          },
+          "pct_ge_30s_run_within_30s": 19.241982507288633,
+          "pct_ge_30s_run_within_60s": 24.198250728862977
+        },
+        "P95": {
+          "regimes_reaching": 257,
+          "pct_crossing_already_winning_checkpoint": 32.295719844357976,
+          "pct_crossing_already_in_ge_30s_run": 18.28793774319066,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 72.37354085603113,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 224,
+            "mean": 77.8125,
+            "std": 118.71386903345731,
+            "median": 20.0,
+            "p25": 0.0,
+            "p75": 106.25,
+            "p90": 263.5000000000001,
+            "min": 0.0,
+            "max": 585.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 186,
+            "mean": 159.30107526881721,
+            "std": 183.17479665029265,
+            "median": 85.0,
+            "p25": 1.25,
+            "p75": 278.75,
+            "p90": 427.5,
+            "min": 0.0,
+            "max": 845.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 21.78988326848249,
+            "15_to_30s": 4.280155642023346,
+            "30_to_60s": 5.836575875486381,
+            "60_to_120s": 8.560311284046692,
+            "120_to_300s": 15.953307392996107,
+            "gt_300s": 15.953307392996107,
+            "no_subsequent_run": 27.626459143968873
+          },
+          "pct_ge_30s_run_within_30s": 26.070038910505836,
+          "pct_ge_30s_run_within_60s": 31.90661478599222
+        },
+        "P97.5": {
+          "regimes_reaching": 147,
+          "pct_crossing_already_winning_checkpoint": 32.6530612244898,
+          "pct_crossing_already_in_ge_30s_run": 24.489795918367346,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 68.70748299319727,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 119,
+            "mean": 82.01680672268908,
+            "std": 149.2380075946184,
+            "median": 15.0,
+            "p25": 0.0,
+            "p75": 107.5,
+            "p90": 256.0,
+            "min": 0.0,
+            "max": 1070.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 101,
+            "mean": 119.00990099009901,
+            "std": 162.6011030523827,
+            "median": 50.0,
+            "p25": 0.0,
+            "p75": 175.0,
+            "p90": 385.0,
+            "min": 0.0,
+            "max": 660.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 27.2108843537415,
+            "15_to_30s": 3.4013605442176873,
+            "30_to_60s": 5.442176870748299,
+            "60_to_120s": 11.564625850340136,
+            "120_to_300s": 12.244897959183673,
+            "gt_300s": 8.843537414965986,
+            "no_subsequent_run": 31.292517006802722
+          },
+          "pct_ge_30s_run_within_30s": 30.612244897959187,
+          "pct_ge_30s_run_within_60s": 36.054421768707485
+        },
+        "P99": {
+          "regimes_reaching": 61,
+          "pct_crossing_already_winning_checkpoint": 34.42622950819672,
+          "pct_crossing_already_in_ge_30s_run": 31.147540983606557,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 73.77049180327869,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 50,
+            "mean": 80.4,
+            "std": 134.25289568571696,
+            "median": 10.0,
+            "p25": 0.0,
+            "p75": 102.5,
+            "p90": 318.50000000000006,
+            "min": 0.0,
+            "max": 525.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 45,
+            "mean": 106.88888888888889,
+            "std": 167.62818938514846,
+            "median": 30.0,
+            "p25": 0.0,
+            "p75": 120.0,
+            "p90": 354.0000000000001,
+            "min": 0.0,
+            "max": 660.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 36.0655737704918,
+            "15_to_30s": 3.278688524590164,
+            "30_to_60s": 3.278688524590164,
+            "60_to_120s": 13.114754098360656,
+            "120_to_300s": 8.19672131147541,
+            "gt_300s": 9.836065573770492,
+            "no_subsequent_run": 26.229508196721312
+          },
+          "pct_ge_30s_run_within_30s": 39.34426229508197,
+          "pct_ge_30s_run_within_60s": 42.622950819672134
+        }
+      }
+    },
+    "POOLED": {
+      "ALL": {
+        "P90": {
+          "regimes_reaching": 6534,
+          "pct_crossing_already_winning_checkpoint": 39.225589225589225,
+          "pct_crossing_already_in_ge_30s_run": 15.381083562901745,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 74.42607897153351,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 5938,
+            "mean": 77.5522061300101,
+            "std": 129.49701013628487,
+            "median": 10.0,
+            "p25": 0.0,
+            "p75": 110.0,
+            "p90": 245.0,
+            "min": 0.0,
+            "max": 1300.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 4863,
+            "mean": 192.57351429158956,
+            "std": 231.10516315322047,
+            "median": 110.0,
+            "p25": 15.0,
+            "p75": 290.0,
+            "p90": 510.0,
+            "min": 0.0,
+            "max": 1455.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 19.421487603305785,
+            "15_to_30s": 3.8567493112947657,
+            "30_to_60s": 5.968778696051423,
+            "60_to_120s": 9.794918885827977,
+            "120_to_300s": 17.95224977043159,
+            "gt_300s": 17.43189470462198,
+            "no_subsequent_run": 25.573921028466483
+          },
+          "pct_ge_30s_run_within_30s": 23.27823691460055,
+          "pct_ge_30s_run_within_60s": 29.247015610651975
+        },
+        "P95": {
+          "regimes_reaching": 4895,
+          "pct_crossing_already_winning_checkpoint": 38.100102145045966,
+          "pct_crossing_already_in_ge_30s_run": 23.55464759959142,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 73.8508682328907,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 4316,
+            "mean": 73.56927710843374,
+            "std": 124.28580985592907,
+            "median": 10.0,
+            "p25": 0.0,
+            "p75": 100.0,
+            "p90": 232.5,
+            "min": 0.0,
+            "max": 940.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 3615,
+            "mean": 156.78284923928078,
+            "std": 211.2302333712761,
+            "median": 65.0,
+            "p25": 0.0,
+            "p75": 240.0,
+            "p90": 460.0,
+            "min": 0.0,
+            "max": 1290.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 27.068437180796735,
+            "15_to_30s": 3.5546475995914197,
+            "30_to_60s": 5.4749744637385085,
+            "60_to_120s": 8.498467824310522,
+            "120_to_300s": 15.40347293156282,
+            "gt_300s": 13.850868232890704,
+            "no_subsequent_run": 26.149131767109296
+          },
+          "pct_ge_30s_run_within_30s": 30.623084780388155,
+          "pct_ge_30s_run_within_60s": 36.09805924412666
+        },
+        "P97.5": {
+          "regimes_reaching": 2797,
+          "pct_crossing_already_winning_checkpoint": 37.68323203432249,
+          "pct_crossing_already_in_ge_30s_run": 28.709331426528422,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 72.29174115123347,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 2366,
+            "mean": 69.61749788672866,
+            "std": 119.93187844472908,
+            "median": 10.0,
+            "p25": 0.0,
+            "p75": 90.0,
+            "p90": 222.5,
+            "min": 0.0,
+            "max": 1070.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 2022,
+            "mean": 128.3728981206726,
+            "std": 192.37022657524165,
+            "median": 35.0,
+            "p25": 0.0,
+            "p75": 185.0,
+            "p90": 390.0,
+            "min": 0.0,
+            "max": 1235.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 32.24883804075795,
+            "15_to_30s": 3.1462281015373614,
+            "30_to_60s": 5.827672506256704,
+            "60_to_120s": 7.150518412584912,
+            "120_to_300s": 12.906685734715767,
+            "gt_300s": 11.011798355380765,
+            "no_subsequent_run": 27.708258848766537
+          },
+          "pct_ge_30s_run_within_30s": 35.39506614229531,
+          "pct_ge_30s_run_within_60s": 41.22273864855202
+        },
+        "P99": {
+          "regimes_reaching": 1172,
+          "pct_crossing_already_winning_checkpoint": 38.13993174061434,
+          "pct_crossing_already_in_ge_30s_run": 33.617747440273035,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 72.52559726962457,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 970,
+            "mean": 64.70618556701031,
+            "std": 114.45451652727095,
+            "median": 5.0,
+            "p25": 0.0,
+            "p75": 80.0,
+            "p90": 220.0,
+            "min": 0.0,
+            "max": 640.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 850,
+            "mean": 104.91176470588235,
+            "std": 168.9762196368713,
+            "median": 15.0,
+            "p25": 0.0,
+            "p75": 145.0,
+            "p90": 340.5000000000001,
+            "min": 0.0,
+            "max": 1050.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 37.28668941979522,
+            "15_to_30s": 2.5597269624573378,
+            "30_to_60s": 4.692832764505119,
+            "60_to_120s": 7.935153583617748,
+            "120_to_300s": 11.092150170648464,
+            "gt_300s": 8.959044368600683,
+            "no_subsequent_run": 27.474402730375424
+          },
+          "pct_ge_30s_run_within_30s": 39.84641638225256,
+          "pct_ge_30s_run_within_60s": 44.53924914675768
+        }
+      },
+      "2023": {
+        "P90": {
+          "regimes_reaching": 2944,
+          "pct_crossing_already_winning_checkpoint": 39.70788043478261,
+          "pct_crossing_already_in_ge_30s_run": 16.10054347826087,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 74.62635869565217,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 2685,
+            "mean": 78.0148975791434,
+            "std": 128.89729921353114,
+            "median": 10.0,
+            "p25": 0.0,
+            "p75": 115.0,
+            "p90": 245.0,
+            "min": 0.0,
+            "max": 1300.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 2197,
+            "mean": 190.60309512972236,
+            "std": 228.40661972053024,
+            "median": 110.0,
+            "p25": 10.0,
+            "p75": 290.0,
+            "p90": 500.0,
+            "min": 0.0,
+            "max": 1455.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 20.074728260869566,
+            "15_to_30s": 3.6005434782608696,
+            "30_to_60s": 6.046195652173913,
+            "60_to_120s": 9.375,
+            "120_to_300s": 17.900815217391305,
+            "gt_300s": 17.629076086956523,
+            "no_subsequent_run": 25.373641304347828
+          },
+          "pct_ge_30s_run_within_30s": 23.675271739130437,
+          "pct_ge_30s_run_within_60s": 29.72146739130435
+        },
+        "P95": {
+          "regimes_reaching": 2203,
+          "pct_crossing_already_winning_checkpoint": 39.219246482069906,
+          "pct_crossing_already_in_ge_30s_run": 24.784384929641398,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 74.39854743531548,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 1946,
+            "mean": 72.65159301130524,
+            "std": 122.58388025296561,
+            "median": 10.0,
+            "p25": 0.0,
+            "p75": 103.75,
+            "p90": 230.0,
+            "min": 0.0,
+            "max": 940.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 1639,
+            "mean": 157.202562538133,
+            "std": 210.62524769356983,
+            "median": 65.0,
+            "p25": 0.0,
+            "p75": 242.5,
+            "p90": 465.0,
+            "min": 0.0,
+            "max": 1235.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 28.50658193372674,
+            "15_to_30s": 2.814344076259646,
+            "30_to_60s": 5.537902859736723,
+            "60_to_120s": 7.852927825692238,
+            "120_to_300s": 15.25192918747163,
+            "gt_300s": 14.434861552428508,
+            "no_subsequent_run": 25.601452564684525
+          },
+          "pct_ge_30s_run_within_30s": 31.320926009986387,
+          "pct_ge_30s_run_within_60s": 36.85882886972311
+        },
+        "P97.5": {
+          "regimes_reaching": 1240,
+          "pct_crossing_already_winning_checkpoint": 38.70967741935484,
+          "pct_crossing_already_in_ge_30s_run": 30.08064516129032,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 73.46774193548387,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 1058,
+            "mean": 68.23251417769376,
+            "std": 113.35406664460626,
+            "median": 7.5,
+            "p25": 0.0,
+            "p75": 98.75,
+            "p90": 220.0,
+            "min": 0.0,
+            "max": 815.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 911,
+            "mean": 130.43358946212953,
+            "std": 191.32260711007672,
+            "median": 35.0,
+            "p25": 0.0,
+            "p75": 200.0,
+            "p90": 390.0,
+            "min": 0.0,
+            "max": 1235.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 33.306451612903224,
+            "15_to_30s": 2.5806451612903225,
+            "30_to_60s": 5.887096774193548,
+            "60_to_120s": 6.532258064516129,
+            "120_to_300s": 13.38709677419355,
+            "gt_300s": 11.774193548387096,
+            "no_subsequent_run": 26.532258064516128
+          },
+          "pct_ge_30s_run_within_30s": 35.887096774193544,
+          "pct_ge_30s_run_within_60s": 41.77419354838709
+        },
+        "P99": {
+          "regimes_reaching": 538,
+          "pct_crossing_already_winning_checkpoint": 42.37918215613383,
+          "pct_crossing_already_in_ge_30s_run": 37.36059479553903,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 75.27881040892194,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 460,
+            "mean": 58.29347826086956,
+            "std": 104.5953421985933,
+            "median": 5.0,
+            "p25": 0.0,
+            "p75": 75.0,
+            "p90": 205.0,
+            "min": 0.0,
+            "max": 595.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 405,
+            "mean": 101.41975308641975,
+            "std": 165.50080110190143,
+            "median": 5.0,
+            "p25": 0.0,
+            "p75": 150.0,
+            "p90": 325.0,
+            "min": 0.0,
+            "max": 980.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 40.70631970260223,
+            "15_to_30s": 2.7881040892193307,
+            "30_to_60s": 4.275092936802974,
+            "60_to_120s": 7.063197026022305,
+            "120_to_300s": 10.966542750929369,
+            "gt_300s": 9.479553903345725,
+            "no_subsequent_run": 24.721189591078065
+          },
+          "pct_ge_30s_run_within_30s": 43.49442379182156,
+          "pct_ge_30s_run_within_60s": 47.76951672862454
+        }
+      },
+      "2024": {
+        "P90": {
+          "regimes_reaching": 2878,
+          "pct_crossing_already_winning_checkpoint": 38.6726893676164,
+          "pct_crossing_already_in_ge_30s_run": 15.114662960389158,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 74.80889506601807,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 2618,
+            "mean": 76.11726508785333,
+            "std": 127.43421586615469,
+            "median": 10.0,
+            "p25": 0.0,
+            "p75": 105.0,
+            "p90": 235.0,
+            "min": 0.0,
+            "max": 835.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 2153,
+            "mean": 194.97677659080352,
+            "std": 236.3003462072443,
+            "median": 110.0,
+            "p25": 15.0,
+            "p75": 285.0,
+            "p90": 530.0,
+            "min": 0.0,
+            "max": 1405.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 19.284225156358584,
+            "15_to_30s": 4.169562195969423,
+            "30_to_60s": 6.011118832522585,
+            "60_to_120s": 10.041695621959693,
+            "120_to_300s": 17.790132036136207,
+            "gt_300s": 17.512161223071576,
+            "no_subsequent_run": 25.191104933981933
+          },
+          "pct_ge_30s_run_within_30s": 23.453787352328007,
+          "pct_ge_30s_run_within_60s": 29.46490618485059
+        },
+        "P95": {
+          "regimes_reaching": 2168,
+          "pct_crossing_already_winning_checkpoint": 37.5,
+          "pct_crossing_already_in_ge_30s_run": 23.20110701107011,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 73.47785977859779,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 1910,
+            "mean": 73.20157068062828,
+            "std": 125.45998589335242,
+            "median": 10.0,
+            "p25": 0.0,
+            "p75": 95.0,
+            "p90": 230.0,
+            "min": 0.0,
+            "max": 815.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 1593,
+            "mean": 156.71060891399875,
+            "std": 216.67617477429468,
+            "median": 70.0,
+            "p25": 0.0,
+            "p75": 230.0,
+            "p90": 460.0,
+            "min": 0.0,
+            "max": 1290.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 26.476014760147603,
+            "15_to_30s": 4.1512915129151295,
+            "30_to_60s": 5.212177121771218,
+            "60_to_120s": 9.086715867158672,
+            "120_to_300s": 15.313653136531366,
+            "gt_300s": 13.238007380073801,
+            "no_subsequent_run": 26.522140221402214
+          },
+          "pct_ge_30s_run_within_30s": 30.627306273062732,
+          "pct_ge_30s_run_within_60s": 35.83948339483395
+        },
+        "P97.5": {
+          "regimes_reaching": 1246,
+          "pct_crossing_already_winning_checkpoint": 37.15890850722312,
+          "pct_crossing_already_in_ge_30s_run": 28.009630818619584,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 71.107544141252,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 1045,
+            "mean": 69.55023923444976,
+            "std": 121.50625089730897,
+            "median": 10.0,
+            "p25": 0.0,
+            "p75": 85.0,
+            "p90": 235.0,
+            "min": 0.0,
+            "max": 730.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 886,
+            "mean": 127.81602708803612,
+            "std": 197.2434156703323,
+            "median": 35.0,
+            "p25": 0.0,
+            "p75": 175.0,
+            "p90": 387.5,
+            "min": 0.0,
+            "max": 1205.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 31.46067415730337,
+            "15_to_30s": 3.611556982343499,
+            "30_to_60s": 5.9390048154093105,
+            "60_to_120s": 7.303370786516854,
+            "120_to_300s": 12.199036918138042,
+            "gt_300s": 10.593900481540931,
+            "no_subsequent_run": 28.892455858747994
+          },
+          "pct_ge_30s_run_within_30s": 35.07223113964687,
+          "pct_ge_30s_run_within_60s": 41.01123595505618
+        },
+        "P99": {
+          "regimes_reaching": 495,
+          "pct_crossing_already_winning_checkpoint": 35.35353535353536,
+          "pct_crossing_already_in_ge_30s_run": 31.11111111111111,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 68.88888888888889,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 396,
+            "mean": 70.95959595959596,
+            "std": 124.45878139570313,
+            "median": 5.0,
+            "p25": 0.0,
+            "p75": 80.0,
+            "p90": 247.5,
+            "min": 0.0,
+            "max": 640.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 341,
+            "mean": 109.51612903225806,
+            "std": 177.3997189880499,
+            "median": 15.0,
+            "p25": 0.0,
+            "p75": 145.0,
+            "p90": 355.0,
+            "min": 0.0,
+            "max": 1050.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 34.54545454545455,
+            "15_to_30s": 2.0202020202020203,
+            "30_to_60s": 4.848484848484849,
+            "60_to_120s": 8.282828282828284,
+            "120_to_300s": 10.707070707070706,
+            "gt_300s": 8.484848484848486,
+            "no_subsequent_run": 31.11111111111111
+          },
+          "pct_ge_30s_run_within_30s": 36.56565656565657,
+          "pct_ge_30s_run_within_60s": 41.41414141414142
+        }
+      },
+      "2025_Q1": {
+        "P90": {
+          "regimes_reaching": 712,
+          "pct_crossing_already_winning_checkpoint": 39.46629213483146,
+          "pct_crossing_already_in_ge_30s_run": 13.48314606741573,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 72.0505617977528,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 635,
+            "mean": 81.51181102362204,
+            "std": 139.94542615407124,
+            "median": 10.0,
+            "p25": 0.0,
+            "p75": 102.5,
+            "p90": 265.0,
+            "min": 0.0,
+            "max": 975.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 513,
+            "mean": 190.92592592592592,
+            "std": 220.19411596149587,
+            "median": 115.0,
+            "p25": 20.0,
+            "p75": 285.0,
+            "p90": 495.0,
+            "min": 0.0,
+            "max": 1170.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 17.275280898876407,
+            "15_to_30s": 3.651685393258427,
+            "30_to_60s": 5.477528089887641,
+            "60_to_120s": 10.53370786516854,
+            "120_to_300s": 18.820224719101123,
+            "gt_300s": 16.292134831460675,
+            "no_subsequent_run": 27.94943820224719
+          },
+          "pct_ge_30s_run_within_30s": 20.926966292134832,
+          "pct_ge_30s_run_within_60s": 26.404494382022474
+        },
+        "P95": {
+          "regimes_reaching": 524,
+          "pct_crossing_already_winning_checkpoint": 35.87786259541985,
+          "pct_crossing_already_in_ge_30s_run": 19.84732824427481,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 73.09160305343512,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 460,
+            "mean": 78.97826086956522,
+            "std": 126.3859666691222,
+            "median": 15.0,
+            "p25": 0.0,
+            "p75": 105.0,
+            "p90": 260.5000000000001,
+            "min": 0.0,
+            "max": 715.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 383,
+            "mean": 155.28720626631855,
+            "std": 189.77565707721317,
+            "median": 75.0,
+            "p25": 0.0,
+            "p75": 257.5,
+            "p90": 424.00000000000006,
+            "min": 0.0,
+            "max": 985.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 23.473282442748094,
+            "15_to_30s": 4.198473282442748,
+            "30_to_60s": 6.297709923664121,
+            "60_to_120s": 8.778625954198473,
+            "120_to_300s": 16.412213740458014,
+            "gt_300s": 13.931297709923665,
+            "no_subsequent_run": 26.908396946564885
+          },
+          "pct_ge_30s_run_within_30s": 27.67175572519084,
+          "pct_ge_30s_run_within_60s": 33.969465648854964
+        },
+        "P97.5": {
+          "regimes_reaching": 311,
+          "pct_crossing_already_winning_checkpoint": 35.69131832797427,
+          "pct_crossing_already_in_ge_30s_run": 26.04501607717042,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 72.34726688102894,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 263,
+            "mean": 75.45627376425855,
+            "std": 137.85697177133653,
+            "median": 10.0,
+            "p25": 0.0,
+            "p75": 95.0,
+            "p90": 238.0000000000001,
+            "min": 0.0,
+            "max": 1070.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 225,
+            "mean": 122.22222222222223,
+            "std": 176.35493111448588,
+            "median": 40.0,
+            "p25": 0.0,
+            "p75": 180.0,
+            "p90": 385.0,
+            "min": 0.0,
+            "max": 985.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 31.189710610932476,
+            "15_to_30s": 3.536977491961415,
+            "30_to_60s": 5.144694533762058,
+            "60_to_120s": 9.003215434083602,
+            "120_to_300s": 13.826366559485532,
+            "gt_300s": 9.646302250803858,
+            "no_subsequent_run": 27.652733118971064
+          },
+          "pct_ge_30s_run_within_30s": 34.72668810289389,
+          "pct_ge_30s_run_within_60s": 39.871382636655945
+        },
+        "P99": {
+          "regimes_reaching": 139,
+          "pct_crossing_already_winning_checkpoint": 31.654676258992804,
+          "pct_crossing_already_in_ge_30s_run": 28.05755395683453,
+          "pct_with_subsequent_or_concurrent_ge_30s_run": 74.82014388489209,
+          "delay_to_next_win_checkpoint_seconds": {
+            "count": 114,
+            "mean": 68.85964912280701,
+            "std": 114.85886665381862,
+            "median": 10.0,
+            "p25": 0.0,
+            "p75": 103.75,
+            "p90": 197.00000000000003,
+            "min": 0.0,
+            "max": 525.0
+          },
+          "delay_to_next_ge_30s_run_seconds": {
+            "count": 104,
+            "mean": 103.41346153846153,
+            "std": 152.95057086025957,
+            "median": 32.5,
+            "p25": 0.0,
+            "p75": 141.25,
+            "p90": 325.50000000000006,
+            "min": 0.0,
+            "max": 660.0
+          },
+          "delay_brackets_ge_30s_run_pct": {
+            "0_to_15s": 33.81294964028777,
+            "15_to_30s": 3.597122302158273,
+            "30_to_60s": 5.755395683453238,
+            "60_to_120s": 10.071942446043165,
+            "120_to_300s": 12.949640287769784,
+            "gt_300s": 8.633093525179856,
+            "no_subsequent_run": 25.179856115107913
+          },
+          "pct_ge_30s_run_within_30s": 37.410071942446045,
+          "pct_ge_30s_run_within_60s": 43.16546762589928
+        }
+      }
+    }
+  },
+  "inverse_alignment": {
+    "FADE_BULL": {
+      "ALL": {
+        "total_ge_30s_winning_runs": 5591,
+        "most_recent_severity_breakdown": {
+          "BELOW_P90": 37,
+          "P90+": 2333,
+          "P95+": 1628,
+          "P97.5+": 1032,
+          "P99+": 561
+        },
+        "most_recent_severity_pct": {
+          "BELOW_P90": 0.6617778572706134,
+          "P90+": 41.72777678411733,
+          "P95+": 29.11822571990699,
+          "P97.5+": 18.458236451439813,
+          "P99+": 10.033983187265248
+        },
+        "time_since_crossing_seconds": {
+          "P90": {
+            "count": 5554,
+            "mean": 387.8745048613612,
+            "std": 328.9612292849786,
+            "median": 310.0,
+            "p25": 105.0,
+            "p75": 610.0,
+            "p90": 880.0,
+            "min": 0.0,
+            "max": 1455.0
+          },
+          "P95": {
+            "count": 3221,
+            "mean": 364.75783918037877,
+            "std": 302.8072172846363,
+            "median": 285.0,
+            "p25": 110.0,
+            "p75": 565.0,
+            "p90": 825.0,
+            "min": 0.0,
+            "max": 1400.0
+          },
+          "P97.5": {
+            "count": 1593,
+            "mean": 337.187696170747,
+            "std": 283.68948578204294,
+            "median": 260.0,
+            "p25": 100.0,
+            "p75": 515.0,
+            "p90": 768.9999999999998,
+            "min": 0.0,
+            "max": 1400.0
+          },
+          "P99": {
+            "count": 561,
+            "mean": 318.83244206773617,
+            "std": 278.2382193080196,
+            "median": 240.0,
+            "p25": 100.0,
+            "p75": 475.0,
+            "p90": 715.0,
+            "min": 0.0,
+            "max": 1330.0
+          }
+        }
+      },
+      "2023": {
+        "total_ge_30s_winning_runs": 2546,
+        "most_recent_severity_breakdown": {
+          "BELOW_P90": 18,
+          "P90+": 1061,
+          "P95+": 733,
+          "P97.5+": 473,
+          "P99+": 261
+        },
+        "most_recent_severity_pct": {
+          "BELOW_P90": 0.7069913589945012,
+          "P90+": 41.673212882953656,
+          "P95+": 28.790259230164967,
+          "P97.5+": 18.578161822466615,
+          "P99+": 10.251374705420266
+        },
+        "time_since_crossing_seconds": {
+          "P90": {
+            "count": 2528,
+            "mean": 389.97428797468353,
+            "std": 327.61072466878386,
+            "median": 315.0,
+            "p25": 110.0,
+            "p75": 610.0,
+            "p90": 880.0,
+            "min": 0.0,
+            "max": 1455.0
+          },
+          "P95": {
+            "count": 1467,
+            "mean": 372.30402181322427,
+            "std": 302.8349491256079,
+            "median": 300.0,
+            "p25": 115.0,
+            "p75": 585.0,
+            "p90": 820.0,
+            "min": 0.0,
+            "max": 1400.0
+          },
+          "P97.5": {
+            "count": 734,
+            "mean": 328.732970027248,
+            "std": 274.59053405487475,
+            "median": 260.0,
+            "p25": 95.0,
+            "p75": 503.75,
+            "p90": 750.0,
+            "min": 0.0,
+            "max": 1380.0
+          },
+          "P99": {
+            "count": 261,
+            "mean": 304.9616858237548,
+            "std": 262.0114473301193,
+            "median": 235.0,
+            "p25": 95.0,
+            "p75": 465.0,
+            "p90": 700.0,
+            "min": 0.0,
+            "max": 1215.0
+          }
+        }
+      },
+      "2024": {
+        "total_ge_30s_winning_runs": 2470,
+        "most_recent_severity_breakdown": {
+          "BELOW_P90": 13,
+          "P90+": 1053,
+          "P95+": 728,
+          "P97.5+": 457,
+          "P99+": 219
+        },
+        "most_recent_severity_pct": {
+          "BELOW_P90": 0.5263157894736842,
+          "P90+": 42.63157894736842,
+          "P95+": 29.47368421052631,
+          "P97.5+": 18.502024291497975,
+          "P99+": 8.866396761133604
+        },
+        "time_since_crossing_seconds": {
+          "P90": {
+            "count": 2457,
+            "mean": 392.24257224257224,
+            "std": 331.75603217851346,
+            "median": 310.0,
+            "p25": 110.0,
+            "p75": 615.0,
+            "p90": 882.0000000000005,
+            "min": 0.0,
+            "max": 1420.0
+          },
+          "P95": {
+            "count": 1404,
+            "mean": 355.26353276353274,
+            "std": 301.32483169696815,
+            "median": 275.0,
+            "p25": 110.0,
+            "p75": 536.25,
+            "p90": 828.5000000000002,
+            "min": 0.0,
+            "max": 1380.0
+          },
+          "P97.5": {
+            "count": 676,
+            "mean": 336.8343195266272,
+            "std": 284.2702570774095,
+            "median": 255.0,
+            "p25": 105.0,
+            "p75": 505.0,
+            "p90": 775.0,
+            "min": 0.0,
+            "max": 1330.0
+          },
+          "P99": {
+            "count": 219,
+            "mean": 334.01826484018267,
+            "std": 295.33792986523173,
+            "median": 255.0,
+            "p25": 100.0,
+            "p75": 475.0,
+            "p90": 796.0000000000001,
+            "min": 0.0,
+            "max": 1330.0
+          }
+        }
+      },
+      "2025_Q1": {
+        "total_ge_30s_winning_runs": 575,
+        "most_recent_severity_breakdown": {
+          "BELOW_P90": 6,
+          "P90+": 219,
+          "P95+": 167,
+          "P97.5+": 102,
+          "P99+": 81
+        },
+        "most_recent_severity_pct": {
+          "BELOW_P90": 1.0434782608695654,
+          "P90+": 38.08695652173913,
+          "P95+": 29.043478260869566,
+          "P97.5+": 17.739130434782606,
+          "P99+": 14.08695652173913
+        },
+        "time_since_crossing_seconds": {
+          "P90": {
+            "count": 569,
+            "mean": 359.68365553602814,
+            "std": 321.3792307286748,
+            "median": 270.0,
+            "p25": 90.0,
+            "p75": 560.0,
+            "p90": 865.0,
+            "min": 0.0,
+            "max": 1400.0
+          },
+          "P95": {
+            "count": 350,
+            "mean": 371.2142857142857,
+            "std": 307.5261147032717,
+            "median": 290.0,
+            "p25": 120.0,
+            "p75": 560.0,
+            "p90": 821.5000000000003,
+            "min": 0.0,
+            "max": 1400.0
+          },
+          "P97.5": {
+            "count": 183,
+            "mean": 372.40437158469945,
+            "std": 313.22264708599204,
+            "median": 270.0,
+            "p25": 120.0,
+            "p75": 565.0,
+            "p90": 820.0000000000002,
+            "min": 0.0,
+            "max": 1400.0
+          },
+          "P99": {
+            "count": 81,
+            "mean": 322.4691358024691,
+            "std": 279.0870516178324,
+            "median": 240.0,
+            "p25": 120.0,
+            "p75": 490.0,
+            "p90": 695.0,
+            "min": 5.0,
+            "max": 1165.0
+          }
+        }
+      }
+    },
+    "FADE_BEAR": {
+      "ALL": {
+        "total_ge_30s_winning_runs": 5027,
+        "most_recent_severity_breakdown": {
+          "BELOW_P90": 39,
+          "P90+": 2011,
+          "P95+": 1669,
+          "P97.5+": 843,
+          "P99+": 465
+        },
+        "most_recent_severity_pct": {
+          "BELOW_P90": 0.7758106226377561,
+          "P90+": 40.003978516013525,
+          "P95+": 33.200716132882434,
+          "P97.5+": 16.769444997016116,
+          "P99+": 9.250049731450169
+        },
+        "time_since_crossing_seconds": {
+          "P90": {
+            "count": 4988,
+            "mean": 372.5250601443464,
+            "std": 329.39539699218557,
+            "median": 295.0,
+            "p25": 100.0,
+            "p75": 570.0,
+            "p90": 875.0,
+            "min": 0.0,
+            "max": 1515.0
+          },
+          "P95": {
+            "count": 2977,
+            "mean": 357.94088008061806,
+            "std": 300.31666614541064,
+            "median": 290.0,
+            "p25": 115.0,
+            "p75": 530.0,
+            "p90": 805.0,
+            "min": 0.0,
+            "max": 1510.0
+          },
+          "P97.5": {
+            "count": 1308,
+            "mean": 324.9388379204893,
+            "std": 274.887028653949,
+            "median": 260.0,
+            "p25": 100.0,
+            "p75": 475.0,
+            "p90": 736.4999999999998,
+            "min": 0.0,
+            "max": 1210.0
+          },
+          "P99": {
+            "count": 465,
+            "mean": 279.752688172043,
+            "std": 220.61885860538672,
+            "median": 240.0,
+            "p25": 90.0,
+            "p75": 425.0,
+            "p90": 573.0000000000001,
+            "min": 0.0,
+            "max": 1145.0
+          }
+        }
+      },
+      "2023": {
+        "total_ge_30s_winning_runs": 2239,
+        "most_recent_severity_breakdown": {
+          "BELOW_P90": 17,
+          "P90+": 929,
+          "P95+": 763,
+          "P97.5+": 342,
+          "P99+": 188
+        },
+        "most_recent_severity_pct": {
+          "BELOW_P90": 0.7592675301473872,
+          "P90+": 41.491737382760164,
+          "P95+": 34.07771326485038,
+          "P97.5+": 15.274676194729789,
+          "P99+": 8.396605627512283
+        },
+        "time_since_crossing_seconds": {
+          "P90": {
+            "count": 2222,
+            "mean": 372.3064806480648,
+            "std": 333.80501720009573,
+            "median": 285.0,
+            "p25": 95.0,
+            "p75": 575.0,
+            "p90": 885.0,
+            "min": 0.0,
+            "max": 1515.0
+          },
+          "P95": {
+            "count": 1293,
+            "mean": 349.74477958236656,
+            "std": 295.58129676732926,
+            "median": 290.0,
+            "p25": 105.0,
+            "p75": 510.0,
+            "p90": 805.0,
+            "min": 0.0,
+            "max": 1510.0
+          },
+          "P97.5": {
+            "count": 530,
+            "mean": 324.0943396226415,
+            "std": 270.0005775081835,
+            "median": 265.0,
+            "p25": 105.0,
+            "p75": 465.0,
+            "p90": 725.0,
+            "min": 0.0,
+            "max": 1195.0
+          },
+          "P99": {
+            "count": 188,
+            "mean": 265.77127659574467,
+            "std": 204.99368393090015,
+            "median": 240.0,
+            "p25": 88.75,
+            "p75": 396.25,
+            "p90": 533.0000000000001,
+            "min": 0.0,
+            "max": 1075.0
+          }
+        }
+      },
+      "2024": {
+        "total_ge_30s_winning_runs": 2251,
+        "most_recent_severity_breakdown": {
+          "BELOW_P90": 17,
+          "P90+": 894,
+          "P95+": 720,
+          "P97.5+": 402,
+          "P99+": 218
+        },
+        "most_recent_severity_pct": {
+          "BELOW_P90": 0.7552199022656597,
+          "P90+": 39.715681919147045,
+          "P95+": 31.985784095957353,
+          "P97.5+": 17.85872945357619,
+          "P99+": 9.684584629053754
+        },
+        "time_since_crossing_seconds": {
+          "P90": {
+            "count": 2234,
+            "mean": 368.00805729632947,
+            "std": 324.31908965337493,
+            "median": 295.0,
+            "p25": 100.0,
+            "p75": 555.0,
+            "p90": 860.0,
+            "min": 0.0,
+            "max": 1490.0
+          },
+          "P95": {
+            "count": 1340,
+            "mean": 361.1305970149254,
+            "std": 298.1778770755059,
+            "median": 292.5,
+            "p25": 120.0,
+            "p75": 545.0,
+            "p90": 790.0,
+            "min": 0.0,
+            "max": 1485.0
+          },
+          "P97.5": {
+            "count": 620,
+            "mean": 323.30645161290323,
+            "std": 275.49682913166623,
+            "median": 255.0,
+            "p25": 90.0,
+            "p75": 485.0,
+            "p90": 740.0,
+            "min": 0.0,
+            "max": 1210.0
+          },
+          "P99": {
+            "count": 218,
+            "mean": 292.408256880734,
+            "std": 224.4494862066506,
+            "median": 265.0,
+            "p25": 96.25,
+            "p75": 435.0,
+            "p90": 619.5000000000002,
+            "min": 0.0,
+            "max": 1075.0
+          }
+        }
+      },
+      "2025_Q1": {
+        "total_ge_30s_winning_runs": 537,
+        "most_recent_severity_breakdown": {
+          "BELOW_P90": 5,
+          "P90+": 188,
+          "P95+": 186,
+          "P97.5+": 99,
+          "P99+": 59
+        },
+        "most_recent_severity_pct": {
+          "BELOW_P90": 0.931098696461825,
+          "P90+": 35.00931098696462,
+          "P95+": 34.63687150837989,
+          "P97.5+": 18.435754189944134,
+          "P99+": 10.986964618249534
+        },
+        "time_since_crossing_seconds": {
+          "P90": {
+            "count": 532,
+            "mean": 392.406015037594,
+            "std": 331.2712478665594,
+            "median": 312.5,
+            "p25": 125.0,
+            "p75": 591.25,
+            "p90": 885.0,
+            "min": 0.0,
+            "max": 1510.0
+          },
+          "P95": {
+            "count": 344,
+            "mean": 376.32267441860466,
+            "std": 324.27254535639804,
+            "median": 292.5,
+            "p25": 125.0,
+            "p75": 570.0,
+            "p90": 858.9999999999998,
+            "min": 0.0,
+            "max": 1510.0
+          },
+          "P97.5": {
+            "count": 158,
+            "mean": 334.17721518987344,
+            "std": 288.23440089725455,
+            "median": 247.5,
+            "p25": 111.25,
+            "p75": 463.75,
+            "p90": 764.5000000000002,
+            "min": 5.0,
+            "max": 1185.0
+          },
+          "P99": {
+            "count": 59,
+            "mean": 277.54237288135596,
+            "std": 249.68857362274164,
+            "median": 200.0,
+            "p25": 77.5,
+            "p75": 377.5,
+            "p90": 579.0000000000001,
+            "min": 0.0,
+            "max": 1145.0
+          }
+        }
+      }
+    },
+    "POOLED": {
+      "ALL": {
+        "total_ge_30s_winning_runs": 10618,
+        "most_recent_severity_breakdown": {
+          "BELOW_P90": 76,
+          "P90+": 4344,
+          "P95+": 3297,
+          "P97.5+": 1875,
+          "P99+": 1026
+        },
+        "most_recent_severity_pct": {
+          "BELOW_P90": 0.7157656809191938,
+          "P90+": 40.91165944622339,
+          "P95+": 31.05104539461292,
+          "P97.5+": 17.658692785835374,
+          "P99+": 9.662836692409117
+        },
+        "time_since_crossing_seconds": {
+          "P90": {
+            "count": 10542,
+            "mean": 380.61183836084234,
+            "std": 329.2559296958173,
+            "median": 300.0,
+            "p25": 105.0,
+            "p75": 590.0,
+            "p90": 875.0,
+            "min": 0.0,
+            "max": 1515.0
+          },
+          "P95": {
+            "count": 6198,
+            "mean": 361.48354307841237,
+            "std": 301.6327607095018,
+            "median": 290.0,
+            "p25": 115.0,
+            "p75": 550.0,
+            "p90": 816.5000000000009,
+            "min": 0.0,
+            "max": 1510.0
+          },
+          "P97.5": {
+            "count": 2901,
+            "mean": 331.664943123061,
+            "std": 279.8213151257959,
+            "median": 260.0,
+            "p25": 100.0,
+            "p75": 490.0,
+            "p90": 755.0,
+            "min": 0.0,
+            "max": 1400.0
+          },
+          "P99": {
+            "count": 1026,
+            "mean": 301.1208576998051,
+            "std": 254.49518317428618,
+            "median": 240.0,
+            "p25": 95.0,
+            "p75": 443.75,
+            "p90": 662.5,
+            "min": 0.0,
+            "max": 1330.0
+          }
+        }
+      },
+      "2023": {
+        "total_ge_30s_winning_runs": 4785,
+        "most_recent_severity_breakdown": {
+          "BELOW_P90": 35,
+          "P90+": 1990,
+          "P95+": 1496,
+          "P97.5+": 815,
+          "P99+": 449
+        },
+        "most_recent_severity_pct": {
+          "BELOW_P90": 0.7314524555903866,
+          "P90+": 41.588296760710556,
+          "P95+": 31.264367816091955,
+          "P97.5+": 17.03239289446186,
+          "P99+": 9.383490073145245
+        },
+        "time_since_crossing_seconds": {
+          "P90": {
+            "count": 4750,
+            "mean": 381.70947368421054,
+            "std": 330.6403417528778,
+            "median": 305.0,
+            "p25": 100.0,
+            "p75": 595.0,
+            "p90": 880.5000000000018,
+            "min": 0.0,
+            "max": 1515.0
+          },
+          "P95": {
+            "count": 2760,
+            "mean": 361.7355072463768,
+            "std": 299.6701610202493,
+            "median": 295.0,
+            "p25": 110.0,
+            "p75": 550.0,
+            "p90": 815.0,
+            "min": 0.0,
+            "max": 1510.0
+          },
+          "P97.5": {
+            "count": 1264,
+            "mean": 326.7879746835443,
+            "std": 272.68496100199144,
+            "median": 260.0,
+            "p25": 95.0,
+            "p75": 480.0,
+            "p90": 740.0,
+            "min": 0.0,
+            "max": 1380.0
+          },
+          "P99": {
+            "count": 449,
+            "mean": 288.55233853006683,
+            "std": 240.5714661679039,
+            "median": 240.0,
+            "p25": 90.0,
+            "p75": 430.0,
+            "p90": 646.9999999999999,
+            "min": 0.0,
+            "max": 1215.0
+          }
+        }
+      },
+      "2024": {
+        "total_ge_30s_winning_runs": 4721,
+        "most_recent_severity_breakdown": {
+          "BELOW_P90": 30,
+          "P90+": 1947,
+          "P95+": 1448,
+          "P97.5+": 859,
+          "P99+": 437
+        },
+        "most_recent_severity_pct": {
+          "BELOW_P90": 0.6354585892819318,
+          "P90+": 41.24126244439738,
+          "P95+": 30.671467909341242,
+          "P97.5+": 18.195297606439315,
+          "P99+": 9.25651345054014
+        },
+        "time_since_crossing_seconds": {
+          "P90": {
+            "count": 4691,
+            "mean": 380.7013429972287,
+            "std": 328.4584260815047,
+            "median": 305.0,
+            "p25": 105.0,
+            "p75": 590.0,
+            "p90": 870.0,
+            "min": 0.0,
+            "max": 1490.0
+          },
+          "P95": {
+            "count": 2744,
+            "mean": 358.1286443148688,
+            "std": 299.80652506902493,
+            "median": 285.0,
+            "p25": 113.75,
+            "p75": 541.25,
+            "p90": 805.0,
+            "min": 0.0,
+            "max": 1485.0
+          },
+          "P97.5": {
+            "count": 1296,
+            "mean": 330.36265432098764,
+            "std": 280.1888824344538,
+            "median": 255.0,
+            "p25": 100.0,
+            "p75": 490.0,
+            "p90": 762.5,
+            "min": 0.0,
+            "max": 1330.0
+          },
+          "P99": {
+            "count": 437,
+            "mean": 313.2608695652174,
+            "std": 263.20341413102494,
+            "median": 260.0,
+            "p25": 100.0,
+            "p75": 450.0,
+            "p90": 682.0000000000002,
+            "min": 0.0,
+            "max": 1330.0
+          }
+        }
+      },
+      "2025_Q1": {
+        "total_ge_30s_winning_runs": 1112,
+        "most_recent_severity_breakdown": {
+          "BELOW_P90": 11,
+          "P90+": 407,
+          "P95+": 353,
+          "P97.5+": 201,
+          "P99+": 140
+        },
+        "most_recent_severity_pct": {
+          "BELOW_P90": 0.9892086330935251,
+          "P90+": 36.60071942446043,
+          "P95+": 31.744604316546766,
+          "P97.5+": 18.075539568345324,
+          "P99+": 12.589928057553957
+        },
+        "time_since_crossing_seconds": {
+          "P90": {
+            "count": 1101,
+            "mean": 375.49500454132607,
+            "std": 326.60607867735155,
+            "median": 290.0,
+            "p25": 105.0,
+            "p75": 575.0,
+            "p90": 870.0,
+            "min": 0.0,
+            "max": 1510.0
+          },
+          "P95": {
+            "count": 694,
+            "mean": 373.7463976945245,
+            "std": 315.94823055215977,
+            "median": 290.0,
+            "p25": 120.0,
+            "p75": 567.5,
+            "p90": 843.5000000000002,
+            "min": 0.0,
+            "max": 1510.0
+          },
+          "P97.5": {
+            "count": 341,
+            "mean": 354.69208211143695,
+            "std": 302.50296364909536,
+            "median": 265.0,
+            "p25": 115.0,
+            "p75": 535.0,
+            "p90": 800.0,
+            "min": 0.0,
+            "max": 1400.0
+          },
+          "P99": {
+            "count": 140,
+            "mean": 303.5357142857143,
+            "std": 268.01219083984876,
+            "median": 222.5,
+            "p25": 102.5,
+            "p75": 463.75,
+            "p90": 624.0000000000003,
+            "min": 0.0,
+            "max": 1165.0
+          }
+        }
+      }
+    }
+  }
+}
