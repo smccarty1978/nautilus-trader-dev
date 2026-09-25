@@ -1,0 +1,60 @@
+{
+  "study": "nq_regime_sequence_tradability_2023",
+  "verdict": "NO_SEQUENCE_HETEROGENEITY",
+  "can_prospectively_identify_poor_rotational_state": false,
+  "classifier_or_gate_justified": false,
+  "ml_fitted": false,
+  "population": {
+    "source": "nq_post_entry_path_mechanism_2023/artifacts/TRADE_EVENT_TIMELINE.parquet",
+    "n_regimes": 6024,
+    "sessions": 205,
+    "block_A_sessions": 154,
+    "block_B_sessions": 51,
+    "final_20pct_loaded": false,
+    "years_touched": [2023],
+    "segments": 289,
+    "in_session_holes": 84
+  },
+  "parity": {
+    "mismatches": 0,
+    "checks": ["dir", "atr", "entry price/ts (1s open)", "engine anchor start_price_1m == detection-bar open", "gross recomputed from terminal_exit_price", "session membership == TEMPORAL_SPLIT dev blocks", "contiguous chain T_i == S_(i+1): 5735 links"]
+  },
+  "cost_contract": {"name": "ntr nq_default_v1", "round_trip_points": 0.725, "mean_atr_units": 0.088, "reason": "terminal_cost_points is NULL in the audited frame"},
+  "base_rates": {"A": {"next_gross": -0.044, "next_net": -0.134}, "B": {"next_gross": 0.021, "next_net": -0.060}},
+  "evidence": {
+    "feature_vs_outcome_max_abs_spearman": 0.053,
+    "sign_agreement_A_vs_B_of_18": {"next_gross": 5, "next3_gross": 10, "next3_eff": 12},
+    "pooled_next3_ci_excluding_zero_of_18": 3,
+    "regime_autocorr_lag1_atr_units": {"duration": -0.001, "abs_disp": 0.030, "range": 0.036, "gross": 0.022},
+    "regime_autocorr_lag1_points": {"range": 0.373, "atr": 0.913},
+    "forward_state_persistence_non_overlapping": {"next3_eff": -0.015, "next3_flip_rate": 0.019, "next3_rotational": -0.015},
+    "hindsight_controls": {"next3_eff_vs_next3_gross": 0.339, "next3_escape_vs_next3_gross": 0.684},
+    "composite_rotation_minus_rest_next_gross": {"A": -0.120, "B": -0.126, "pooled": -0.122, "pooled_ci95": [-0.241, 0.038], "pooled_top1pct_removed": -0.060},
+    "composite_rotation_minus_rest_next3_eff": {"pooled": 0.014, "pooled_ci95": [-0.011, 0.037]},
+    "rotation_share": 0.147,
+    "retained_net_after_excluding_rotation": {"A": -0.116, "B": -0.043, "pooled": -0.097}
+  },
+  "residual_leads_not_findings": [
+    {"feature": "fails_at_level>=1", "share": 0.25, "next_gross_gap": {"A": -0.09, "B": -0.22}, "per_block_ci_include_zero": true, "mechanism_signature": "none (reach, forward efficiency unchanged)"},
+    {"feature": "composite ROTATION", "share": 0.147, "next_gross_gap": {"A": -0.120, "B": -0.126}, "ci_include_zero": true, "mechanism_signature": "none (forward efficiency/flip rate unchanged; state persistence is window overlap)"}
+  ],
+  "answers": {
+    "q1_distinguish_prospectively": "no",
+    "q3_low_efficiency_worse_next": "no (eff_5 points the opposite way in A, flat in B)",
+    "q4_high_overlap_worse": "no",
+    "q5_density_predicts_density": "no (duration lag-1 rho -0.001; flips_30m vs forward flip rate rho 0.034)",
+    "q6_no_progress_predicts_rotation": "no",
+    "q7_clustering_beyond_efficiency": "no",
+    "q8_tried_and_failed_here": "same-sign -0.1A residual in both blocks, CI includes zero; untested lead",
+    "q9_expansion_persists": "only through feature-window overlap",
+    "q10_rotation_persists": "only through feature-window overlap",
+    "q11_visible_next_regime": "no",
+    "q12_stronger_next_2_4": "no",
+    "q16_replicates": "no",
+    "q17_symmetric": "no consistent ordering by direction",
+    "q18_mtf_adds": "cells too small and inconsistent; stopped",
+    "q19_justify_classifier": "no",
+    "q21": "The visually obvious expansion/channel distinction is real in hindsight but not prospectively economically useful from completed-regime history."
+  },
+  "runtime_s": {"phase0_extract_parity_raw1s": 15.5, "phase1_to_6_features_atlas_composite": 1.7}
+}
