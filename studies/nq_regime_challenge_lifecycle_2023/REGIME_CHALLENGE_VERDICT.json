@@ -1,0 +1,47 @@
+{
+  "study": "nq_regime_challenge_lifecycle_2023",
+  "verdict": ["WEAK_CHALLENGE_CONTEXT"],
+  "qualifiers": {
+    "race_information": "REPLICATED: internal challenge context shifts P(new extreme before flip) by 5-15 pp beyond location, both blocks, above a circular-shift null",
+    "value_information": "NONE: no challenge-internal feature moves the value of holding vs exiting after robustness vetting; apparent value effects are regime-level drift (low ATR points in Apr-May longs, opening drive, 1h/15m context)",
+    "representation": "NOT the limiting factor: chart concepts reconstructed (candles, EMA/band, impulse, challenge sequence, level memory, HTF change, volume, session); near-identical feature vectors correspond to visually alike moments with different outcomes"
+  },
+  "ml_justified": false,
+  "dark_data_opened": false,
+  "population": {"regimes": 6024, "sessions": 205, "block_A_sessions": 154, "block_B_sessions": 51, "final_20pct_loaded": false,
+                 "years_touched": [2022, 2023], "note_2022": "1m engine warm-up 2022-12-20..31 only"},
+  "parity": {"mismatches": 0, "checks": ["1m flips/dir/ATR (6,024)", "terminal flips", "ledger end == terminal_ts", "5m/15m/1h dir+start at T0 (18,072)", "1s close at S == 1m close", "entry open/ts"]},
+  "lifecycle": {
+    "challenges_per_regime_mean": {"0.25": 9.8, "0.5": 4.6, "1.0": 2.2, "1.5": 1.5, "2.0": 1.25},
+    "p_new_extreme": {"0.25": 0.898, "0.5": 0.782, "1.0": 0.558, "1.5": 0.362, "2.0": 0.228},
+    "hold_from_touch_A": {"0.25": 0.054, "0.5": 0.050, "1.0": 0.009, "1.5": 0.022, "2.0": -0.019},
+    "median_since_extreme_at_onset_s": {"0.25": 1, "0.5": 8, "0.75": 21, "1.0": 39},
+    "topology": "next-challenge category distribution independent of the previous category (rows equal within ~3 pp)",
+    "rejected_challenge_hold_A_by_path": {"0.5A": [0.52, 0.57], "1.0A": [1.01, 1.02]}
+  },
+  "null_calibration": {
+    "onset_0p5": {"race_material": 4, "race_null_mean": 0.0, "race_same_sign": 0.695, "race_null_same_sign": 0.504, "hold_material": 14, "hold_null_mean": 3.6, "hold_null_p95": 9.1, "hold_same_sign": 0.524},
+    "onset_1p5": {"race_material": 5, "race_null_mean": 0.45, "race_same_sign": 0.655, "race_null_same_sign": 0.483, "hold_material": 13, "hold_null_mean": 4.45, "hold_null_p95": 8.5, "hold_same_sign": 0.563}
+  },
+  "replicated_race_effects_pp": {
+    "slow_challenge_0p5A_ch_dur_s": {"A": -6.4, "B": -6.7, "pooled_ci": [-7.7, -4.8]},
+    "fast_challenge_0p5A_ch_vel": {"A": 4.9, "B": 6.6, "pooled_ci": [3.9, 6.7]},
+    "wicky_challenge_candles_1p0A": {"A": 5.1, "B": 5.8},
+    "long_since_previous_challenge_1p5A": {"A": -7.7, "B": -7.7},
+    "large_previous_recovery_leg_1p5A": {"A": -5.6, "B": -5.8},
+    "long_impulse_bars_2p0A": {"A": -9.7, "B": -9.5},
+    "at_first_close_through_ema3_low_deeper_price_0p5A": {"A": -13.5, "B": -9.6},
+    "at_first_close_through_ema3_low_new_lows_1p0A": {"A": -10.7, "B": -10.2}
+  },
+  "rejected_value_candidates": {
+    "atr_points_low_vol": "long-only in block A (long -1.03 / short +0.01), vanishes at one episode per regime in A; lowest ATR quintile concentrated in Apr-May 2023",
+    "1h_aligned": "known regime-level 1h-opposition residual; A shorts reverse",
+    "15m_flipped_during_regime": "long-dominated, unstable at one episode per regime",
+    "opening_drive": "longs +, shorts - in both blocks (drift)",
+    "deep_challenge_after_long_impulse": "driven by one degenerate bin (imp_bars = 0, n = 135 + 31); bins 1-4 flat"
+  },
+  "information_timing": {"onset_0p5A": {"race_pp": "5-6", "remaining_mfe_A": 2.53}, "first_close_through_ema3": {"race_pp": "10-15", "remaining_mfe_A": 1.59}, "hold_value_any_point": "~0"},
+  "representation_check": {"deteriorating_transition_vs_nearest_clean_success_distance": 1.71, "closer_than_share_of_all_1p0A_challenges": 0.9997},
+  "recommended_platform_primitives": ["expose dual-EMA high/low + dist_flip_atr (flip-threshold distance) as features", "generic challenge-episode tracker (threshold_atr; armed/onset/new-extreme reset; per-challenge history)", "regime ledger per timeframe incl. collector-universe holes", "event-anchored observation checkpoints (first close through EMA3, recovery fractions, extreme retest)", "HTF flips/age since parent-regime start"],
+  "runtime_s": {"extract_engine_replay_parity_1s": 17.1, "challenge_episodes_features_checkpoints": 128.2, "atlas": 27.5, "null_shift_2_depths_x20": 34.9, "vetting": 1.1, "cases": 6}
+}
