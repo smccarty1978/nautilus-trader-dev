@@ -1,0 +1,64 @@
+{
+  "candidates_count_total": 558,
+  "checks": {
+    "candidates_nonempty": true,
+    "no_outcome_columns_in_candidates": true,
+    "observation_per_candidate": true,
+    "pending_resolved_at_run_end": true,
+    "primary_window_respected": true,
+    "replay_imports_within_collection_closure": true
+  },
+  "date": "2023-10-02",
+  "execution_manifest_composite_sha256": null,
+  "generated_at_utc": "2026-09-23T01:03:23.294386+00:00",
+  "manifest": {
+    "candidates_sha256": "4ca2e159e47d6ddfc8b284e28f8a60c25a649be2b5250ef6c669781bd309e2fb",
+    "composite_seal_hash": "acceptance-proof",
+    "dataset": {
+      "bytes_verification": "VERIFIED",
+      "dataset_id": "NQ_1S_V2_GLOBEX",
+      "logical_digest": "9e7aecb7a2910b4402a6cb4f34cc2f6deb5df19d0e889b2c696cf4f844292c64"
+    },
+    "date": "2023-10-02",
+    "elapsed_s": 71.60232940001879,
+    "execution_manifest_sha256": null,
+    "kind": "smoke",
+    "observations_sha256": "e79814a8e580da54fa931b12a7066c258fda0c49b454e3df853b2c14c96e6de0",
+    "plan_sha256": "928abd582cbd9c9139ce64596ab0de4d39e32ee2d7fd615ef0955d4ee7f01ab6",
+    "rows": {
+      "candidates": 558,
+      "observations": 558
+    },
+    "stats": {
+      "bars": 213431,
+      "bars_by_stream": {
+        "nq_15m": 368,
+        "nq_1h": 92,
+        "nq_1m": 5520,
+        "nq_1s": 207911,
+        "nq_5m": 1104
+      },
+      "candidates": 558,
+      "dropped_outside_primary": {
+        "candidates": 1655,
+        "observations": 1655
+      },
+      "empty_windows_published": {
+        "nq_15m": 0,
+        "nq_1h": 0,
+        "nq_5m": 0
+      },
+      "epochs": 4691,
+      "observations": 558,
+      "pending_at_end": 0
+    },
+    "status": "PASS",
+    "written_at_utc": "2026-09-23T01:03:23.286624+00:00"
+  },
+  "observations_count_total": 558,
+  "run_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-model_target_and_reuse\\studies\\nq_mtf_structural_predictive_ranking\\runs\\20260923_010205_nq_mtf_structural_predictive_ranking_smoke",
+  "sealed_composite_sha256": "acceptance-proof",
+  "status": "ACCEPTED",
+  "study_name": "nq_mtf_structural_predictive_ranking",
+  "validator": "research_workflow.lifecycle_v2"
+}

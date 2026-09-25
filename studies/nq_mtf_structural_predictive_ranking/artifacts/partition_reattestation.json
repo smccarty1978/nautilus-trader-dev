@@ -1,0 +1,203 @@
+{
+  "current_replay_closure_composite_sha256": "060ee6d99bb6958d71ba8356547fb96d48830c50d8f7f0944b63ac8c5a5a8aac",
+  "entries": [
+    {
+      "authorization_equivalence": {
+        "current": {
+          "authorization_sha256": "30b351e78130f5fd4d3b2c608aedf21e612bc34834f79b619aef26a1b7dc0a32",
+          "oos_years": [],
+          "prohibited_years": [
+            2025,
+            2026
+          ],
+          "study_id": "nq_mtf_structural_predictive_ranking",
+          "train_years": [
+            2023,
+            2024
+          ]
+        },
+        "differing_fields": [
+          "study_id",
+          "study_path"
+        ],
+        "recorded": {
+          "authorization_sha256": "1b859abd0f8139e13bd1607a9d62e73b33e8e264c7d707c674fb1cf611ee307d",
+          "oos_years": [],
+          "prohibited_years": [
+            2025,
+            2026
+          ],
+          "study_id": "nq_mtf_regime_structural_geometry_atlas",
+          "train_years": [
+            2023,
+            2024
+          ]
+        },
+        "year_roles_identical": true
+      },
+      "closure_delta": {
+        "current_composite_sha256": "060ee6d99bb6958d71ba8356547fb96d48830c50d8f7f0944b63ac8c5a5a8aac",
+        "file_count": 140,
+        "membership_identical": true,
+        "recorded_composite_sha256": "16aa903966e539810e188023eeead17cfcb73b37e0195423c6aa0d430327f580"
+      },
+      "current": {
+        "plan_sha256": "928abd582cbd9c9139ce64596ab0de4d39e32ee2d7fd615ef0955d4ee7f01ab6",
+        "replay_closure_composite_sha256": "060ee6d99bb6958d71ba8356547fb96d48830c50d8f7f0944b63ac8c5a5a8aac",
+        "replay_plan_sha256": "d917443a59fdd79ea37a9dc3269d0c780f5d37583943c0d24452dc04b90b4578",
+        "study": "nq_mtf_structural_predictive_ranking"
+      },
+      "equivalence_proof": {
+        "current": {
+          "bars": 213431,
+          "candidates_sha256": "4ca2e159e47d6ddfc8b284e28f8a60c25a649be2b5250ef6c669781bd309e2fb",
+          "observations_sha256": "e79814a8e580da54fa931b12a7066c258fda0c49b454e3df853b2c14c96e6de0",
+          "plan_sha256": "928abd582cbd9c9139ce64596ab0de4d39e32ee2d7fd615ef0955d4ee7f01ab6",
+          "replay_closure_composite_sha256": "060ee6d99bb6958d71ba8356547fb96d48830c50d8f7f0944b63ac8c5a5a8aac",
+          "rows": {
+            "candidates": 558,
+            "observations": 558
+          }
+        },
+        "date": "2023-10-02",
+        "identical": true,
+        "kind": "bounded_replay_byte_equality",
+        "reference": {
+          "bars": 213431,
+          "candidates_sha256": "4ca2e159e47d6ddfc8b284e28f8a60c25a649be2b5250ef6c669781bd309e2fb",
+          "observations_sha256": "e79814a8e580da54fa931b12a7066c258fda0c49b454e3df853b2c14c96e6de0",
+          "path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_mtf_regime_structural_geometry_atlas\\studies\\nq_mtf_regime_structural_geometry_atlas\\runs\\20260922_164333_nq_mtf_regime_structural_geometry_atlas_smoke\\collection",
+          "plan_sha256": "c408c4d9fe81a36136d614e6e47f71f002e6c5377915fbca846b2abee7824679",
+          "replay_closure_composite_sha256": "16aa903966e539810e188023eeead17cfcb73b37e0195423c6aa0d430327f580",
+          "rows": {
+            "candidates": 558,
+            "observations": 558
+          }
+        }
+      },
+      "partition_id": "train-2023",
+      "period": "train",
+      "recorded": {
+        "candidates_sha256": "bf176578acf65cfa400017d0a77bc85dc90beec698b0f3f633f6e38271139f64",
+        "composite_seal_hash": "519bc80e0eead4de2ef5e3d13d87590379ed88b20fd43657e0594eb8b17d761b",
+        "observations_sha256": "0dba125d961f5a8d7ae41e57c44533f96477cf9164311086d0c02107454eff42",
+        "plan_sha256": "4e7538b459db82aef27bda64ae4a800c563d022156b09945227ab5d5bd580372",
+        "replay_closure_composite_sha256": "16aa903966e539810e188023eeead17cfcb73b37e0195423c6aa0d430327f580",
+        "replay_closure_sha256": "7794dd71970ff3af0af1c6192f4289fb7cdf2db5e48b596cdcc6aa22a23e2b65",
+        "replay_plan_sha256": "d917443a59fdd79ea37a9dc3269d0c780f5d37583943c0d24452dc04b90b4578",
+        "rows": {
+          "candidates": 134664,
+          "observations": 134664
+        },
+        "source_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_mtf_regime_structural_geometry_atlas\\studies\\nq_mtf_regime_structural_geometry_atlas\\_work\\controller\\partitions\\train\\2023",
+        "source_study": "nq_mtf_regime_structural_geometry_atlas",
+        "written_at_utc": "2026-09-22T14:50:31.432336+00:00"
+      },
+      "verdict": "REUSABLE_BY_CLOSURE_ATTESTATION",
+      "why_replay_unnecessary": "the replay plan, dataset, interval, authorization and replay-time data files are identical; the replay-closure membership is identical; and a bounded replay under the current closure reproduced the reference replay byte for byte; the authorised year roles are identical and only the study identifiers differ",
+      "year": 2023
+    },
+    {
+      "authorization_equivalence": {
+        "current": {
+          "authorization_sha256": "30b351e78130f5fd4d3b2c608aedf21e612bc34834f79b619aef26a1b7dc0a32",
+          "oos_years": [],
+          "prohibited_years": [
+            2025,
+            2026
+          ],
+          "study_id": "nq_mtf_structural_predictive_ranking",
+          "train_years": [
+            2023,
+            2024
+          ]
+        },
+        "differing_fields": [
+          "study_id",
+          "study_path"
+        ],
+        "recorded": {
+          "authorization_sha256": "1b859abd0f8139e13bd1607a9d62e73b33e8e264c7d707c674fb1cf611ee307d",
+          "oos_years": [],
+          "prohibited_years": [
+            2025,
+            2026
+          ],
+          "study_id": "nq_mtf_regime_structural_geometry_atlas",
+          "train_years": [
+            2023,
+            2024
+          ]
+        },
+        "year_roles_identical": true
+      },
+      "closure_delta": {
+        "current_composite_sha256": "060ee6d99bb6958d71ba8356547fb96d48830c50d8f7f0944b63ac8c5a5a8aac",
+        "file_count": 140,
+        "membership_identical": true,
+        "recorded_composite_sha256": "16aa903966e539810e188023eeead17cfcb73b37e0195423c6aa0d430327f580"
+      },
+      "current": {
+        "plan_sha256": "928abd582cbd9c9139ce64596ab0de4d39e32ee2d7fd615ef0955d4ee7f01ab6",
+        "replay_closure_composite_sha256": "060ee6d99bb6958d71ba8356547fb96d48830c50d8f7f0944b63ac8c5a5a8aac",
+        "replay_plan_sha256": "d917443a59fdd79ea37a9dc3269d0c780f5d37583943c0d24452dc04b90b4578",
+        "study": "nq_mtf_structural_predictive_ranking"
+      },
+      "equivalence_proof": {
+        "current": {
+          "bars": 213431,
+          "candidates_sha256": "4ca2e159e47d6ddfc8b284e28f8a60c25a649be2b5250ef6c669781bd309e2fb",
+          "observations_sha256": "e79814a8e580da54fa931b12a7066c258fda0c49b454e3df853b2c14c96e6de0",
+          "plan_sha256": "928abd582cbd9c9139ce64596ab0de4d39e32ee2d7fd615ef0955d4ee7f01ab6",
+          "replay_closure_composite_sha256": "060ee6d99bb6958d71ba8356547fb96d48830c50d8f7f0944b63ac8c5a5a8aac",
+          "rows": {
+            "candidates": 558,
+            "observations": 558
+          }
+        },
+        "date": "2023-10-02",
+        "identical": true,
+        "kind": "bounded_replay_byte_equality",
+        "reference": {
+          "bars": 213431,
+          "candidates_sha256": "4ca2e159e47d6ddfc8b284e28f8a60c25a649be2b5250ef6c669781bd309e2fb",
+          "observations_sha256": "e79814a8e580da54fa931b12a7066c258fda0c49b454e3df853b2c14c96e6de0",
+          "path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_mtf_regime_structural_geometry_atlas\\studies\\nq_mtf_regime_structural_geometry_atlas\\runs\\20260922_164333_nq_mtf_regime_structural_geometry_atlas_smoke\\collection",
+          "plan_sha256": "c408c4d9fe81a36136d614e6e47f71f002e6c5377915fbca846b2abee7824679",
+          "replay_closure_composite_sha256": "16aa903966e539810e188023eeead17cfcb73b37e0195423c6aa0d430327f580",
+          "rows": {
+            "candidates": 558,
+            "observations": 558
+          }
+        }
+      },
+      "partition_id": "train-2024",
+      "period": "train",
+      "recorded": {
+        "candidates_sha256": "b8896d9950720cffd237b99c68d54aaaaf07d29975879d43a31530e3b0484c28",
+        "composite_seal_hash": "d9fd44dee28bb149e4c71fc26300823d42d9c9b9d8ebcdb15272d8cb218ef597",
+        "observations_sha256": "c31f07ddd92ae6c67705942c48f93388ae935afe47b0e8d5dabde70d2765d0f6",
+        "plan_sha256": "c408c4d9fe81a36136d614e6e47f71f002e6c5377915fbca846b2abee7824679",
+        "replay_closure_composite_sha256": "16aa903966e539810e188023eeead17cfcb73b37e0195423c6aa0d430327f580",
+        "replay_closure_sha256": "70ad0ab80c7737212ba5225118013eb217751d9eb5ee657ef3ae60758571ed19",
+        "replay_plan_sha256": "d917443a59fdd79ea37a9dc3269d0c780f5d37583943c0d24452dc04b90b4578",
+        "rows": {
+          "candidates": 127333,
+          "observations": 127333
+        },
+        "source_path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_mtf_regime_structural_geometry_atlas\\studies\\nq_mtf_regime_structural_geometry_atlas\\_work\\controller\\partitions\\train\\2024",
+        "source_study": "nq_mtf_regime_structural_geometry_atlas",
+        "written_at_utc": "2026-09-22T17:42:29.251916+00:00"
+      },
+      "verdict": "REUSABLE_BY_CLOSURE_ATTESTATION",
+      "why_replay_unnecessary": "the replay plan, dataset, interval, authorization and replay-time data files are identical; the replay-closure membership is identical; and a bounded replay under the current closure reproduced the reference replay byte for byte; the authorised year roles are identical and only the study identifiers differ",
+      "year": 2024
+    }
+  ],
+  "generated_at_utc": "2026-09-23T01:02:03.954396+00:00",
+  "kind": "partition_reattestation",
+  "plan_sha256": "928abd582cbd9c9139ce64596ab0de4d39e32ee2d7fd615ef0955d4ee7f01ab6",
+  "schema_version": 1,
+  "source_study": "nq_mtf_regime_structural_geometry_atlas",
+  "study_id": "nq_mtf_structural_predictive_ranking"
+}
