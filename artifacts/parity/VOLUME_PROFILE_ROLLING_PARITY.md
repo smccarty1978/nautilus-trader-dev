@@ -31,13 +31,27 @@ A (smoothing scale) is bit-identical on every joined row; window low / high iden
 centres identical on every 360 / 1380 row (the VP120 ledger stores no nodes); value-area fraction differs only on
 the 35 tie minutes.
 
-**Documented numerical tolerance (the only one).** 35 of 1,906,969 joined snapshots (0.0018%) differ in VAH or VAL
+**Explained population divergence: `LEGACY_WARMUP_OUTPUT_DIVERGENCE` (not a parity failure).** The capability
+publishes 280 timestamps per horizon at 360 and 1380 (2022: 160 = 4 rolls x 40; 2023dev: 120 = 3 rolls x 40) that the
+legacy ledgers do not contain; 0 at 120. Every one is a roll-truncated minute roll+30 .. roll+69 (00:30-01:09 UTC on
+each roll day, `window_minutes` 30-69, `window_complete` false). The legacy writer (`vp_v1.run_block`) skips a minute
+while `vp_v1.atr_series` is NaN; that Wilder ATR(14) of 5-minute bars is re-seeded at every roll and first defined at
+the 14th 5-minute bar end after it (roll + 70 min) -- which is exactly the first legacy row after each of the 7 rolls,
+with 0 legacy rows missing afterwards. The capability's eligibility is `window_minutes >= min_window` (30) and A
+defined; no row is `window_complete`, so the primary (`window_complete == true`) population is unaffected.
+Per-roll evidence: `volume_profile_rolling_roll_warmup.json` (`scripts/parity_volume_profile_rolling_roll_warmup.py`);
+summary: `volume_profile_rolling_divergences.json`.
+
+**`LEGACY_FLOAT_TIE_DIVERGENCE` (no numerical epsilon).** 35 of 1,906,969 joined snapshots (0.0018%) differ in VAH or VAL
 by one two-tick step. In every one the capability equals an independent exact-rational re-walk of the window
 (`fractions.Fraction`, built in the parity script directly from the bars), and the oracle does not. Each such walk
 contains an exact tie that the oracle's float arithmetic broke: 29 pair ties (the two-tick pairs above and below
 are rationally equal; the oracle rule is "tie adds both") and 6 stop ties (the accumulated volume equals exactly
 70% of the total; relative gap 4.4e-17, i.e. the rounding of the float product 0.7 x total decided). POC: zero
-differences.
+differences. By horizon: 120 = 29 pair + 2 stop, 360 = 4 stop, 1380 = 0. All 35 cases (ts, capability / oracle /
+exact VAH and VAL, class) are listed in `volume_profile_rolling_divergences.json`. The parity contract stays exact:
+POC, A, window bounds, node / LVN / HVN structure exact; VA exact except where the exact re-walk independently proves
+a legacy float-tie artifact.
 
 **How exactness is achieved.** Weights are int64 fixed point (scale 2^32), so the rolling add / subtract is exact
 and order-independent (bit-identical to a scratch rebuild). range_uniform weights v/n are rounded per bar, so each
@@ -77,3 +91,10 @@ three range_uniform kernels including the exact re-walks.
   next session's first bar). Causal, but a minute with no bar at :00 is published late.
 - `research cap scaffold` re-dumps the whole `capabilities_index.yaml` (comments and compact style lost); the
   file was restored by hand and only the new entry added.
+
+## Merge gate (broad test_delta)
+
+`python scripts/test_delta.py research_workflow/tests scripts/tests features/tests tests --baseline-reference c480d8af`
+on e443c2b0 (6,190 s): 2,621 ran, 2,525 passed, 58 KNOWN_BASELINE_FAILURE, 1 BASELINE_FAILURE_NOW_FIXED, 11 NEW_FAILURE.
+All 11 fail identically on a clean detached checkout of main 5fd71c48 (which lacks this capability): they are
+main-side drift relative to the stale baseline reference, none touches a file of this change. Not re-baselined here.

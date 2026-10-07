@@ -1,0 +1,1062 @@
+{
+ "verdict": "EXPLAINED_POPULATION_DIVERGENCE + LEGACY_FLOAT_TIE_DIVERGENCE; not parity failures",
+ "population_divergence": {
+  "classification": "LEGACY_WARMUP_OUTPUT_DIVERGENCE",
+  "reason": "legacy vp_v1.run_block skips a minute while vp_v1.atr_series is NaN; that Wilder ATR(14) of 5-minute bars is re-seeded at every roll and first defined at the 14th 5-minute bar end after the roll (roll + 70 min). The capability publishes a roll-truncated (window_complete=false) profile from window_minutes >= min_window=30 with A defined. Hence exactly minutes roll+30 .. roll+69 (40 per roll) exist only in the capability.",
+  "counts_by_block_horizon": {
+   "2022/360": 160,
+   "2022/1380": 160,
+   "2023dev/360": 120,
+   "2023dev/1380": 120
+  },
+  "per_roll": {
+   "2022": [
+    {
+     "roll": "2022-03-16T00:00:00+00:00",
+     "horizon": 360,
+     "extra": 40,
+     "extra_first": "2022-03-16T00:30:00+00:00",
+     "extra_last": "2022-03-16T01:09:00+00:00",
+     "extra_window_minutes": [
+      30,
+      69
+     ],
+     "extra_all_roll_truncated": true,
+     "extra_any_window_complete": false,
+     "first_oracle_row": "2022-03-16T01:10:00+00:00",
+     "legacy_atr_defined_from": "2022-03-16T01:10:00+00:00",
+     "first_oracle_equals_atr_seed": true,
+     "extra_are_exactly_minutes_before_atr_seed": true,
+     "oracle_rows_missing_after_seed": 0
+    },
+    {
+     "roll": "2022-03-16T00:00:00+00:00",
+     "horizon": 1380,
+     "extra": 40,
+     "extra_first": "2022-03-16T00:30:00+00:00",
+     "extra_last": "2022-03-16T01:09:00+00:00",
+     "extra_window_minutes": [
+      30,
+      69
+     ],
+     "extra_all_roll_truncated": true,
+     "extra_any_window_complete": false,
+     "first_oracle_row": "2022-03-16T01:10:00+00:00",
+     "legacy_atr_defined_from": "2022-03-16T01:10:00+00:00",
+     "first_oracle_equals_atr_seed": true,
+     "extra_are_exactly_minutes_before_atr_seed": true,
+     "oracle_rows_missing_after_seed": 0
+    },
+    {
+     "roll": "2022-06-15T00:00:00+00:00",
+     "horizon": 360,
+     "extra": 40,
+     "extra_first": "2022-06-15T00:30:00+00:00",
+     "extra_last": "2022-06-15T01:09:00+00:00",
+     "extra_window_minutes": [
+      30,
+      69
+     ],
+     "extra_all_roll_truncated": true,
+     "extra_any_window_complete": false,
+     "first_oracle_row": "2022-06-15T01:10:00+00:00",
+     "legacy_atr_defined_from": "2022-06-15T01:10:00+00:00",
+     "first_oracle_equals_atr_seed": true,
+     "extra_are_exactly_minutes_before_atr_seed": true,
+     "oracle_rows_missing_after_seed": 0
+    },
+    {
+     "roll": "2022-06-15T00:00:00+00:00",
+     "horizon": 1380,
+     "extra": 40,
+     "extra_first": "2022-06-15T00:30:00+00:00",
+     "extra_last": "2022-06-15T01:09:00+00:00",
+     "extra_window_minutes": [
+      30,
+      69
+     ],
+     "extra_all_roll_truncated": true,
+     "extra_any_window_complete": false,
+     "first_oracle_row": "2022-06-15T01:10:00+00:00",
+     "legacy_atr_defined_from": "2022-06-15T01:10:00+00:00",
+     "first_oracle_equals_atr_seed": true,
+     "extra_are_exactly_minutes_before_atr_seed": true,
+     "oracle_rows_missing_after_seed": 0
+    },
+    {
+     "roll": "2022-09-14T00:00:00+00:00",
+     "horizon": 360,
+     "extra": 40,
+     "extra_first": "2022-09-14T00:30:00+00:00",
+     "extra_last": "2022-09-14T01:09:00+00:00",
+     "extra_window_minutes": [
+      30,
+      69
+     ],
+     "extra_all_roll_truncated": true,
+     "extra_any_window_complete": false,
+     "first_oracle_row": "2022-09-14T01:10:00+00:00",
+     "legacy_atr_defined_from": "2022-09-14T01:10:00+00:00",
+     "first_oracle_equals_atr_seed": true,
+     "extra_are_exactly_minutes_before_atr_seed": true,
+     "oracle_rows_missing_after_seed": 0
+    },
+    {
+     "roll": "2022-09-14T00:00:00+00:00",
+     "horizon": 1380,
+     "extra": 40,
+     "extra_first": "2022-09-14T00:30:00+00:00",
+     "extra_last": "2022-09-14T01:09:00+00:00",
+     "extra_window_minutes": [
+      30,
+      69
+     ],
+     "extra_all_roll_truncated": true,
+     "extra_any_window_complete": false,
+     "first_oracle_row": "2022-09-14T01:10:00+00:00",
+     "legacy_atr_defined_from": "2022-09-14T01:10:00+00:00",
+     "first_oracle_equals_atr_seed": true,
+     "extra_are_exactly_minutes_before_atr_seed": true,
+     "oracle_rows_missing_after_seed": 0
+    },
+    {
+     "roll": "2022-12-14T00:00:00+00:00",
+     "horizon": 360,
+     "extra": 40,
+     "extra_first": "2022-12-14T00:30:00+00:00",
+     "extra_last": "2022-12-14T01:09:00+00:00",
+     "extra_window_minutes": [
+      30,
+      69
+     ],
+     "extra_all_roll_truncated": true,
+     "extra_any_window_complete": false,
+     "first_oracle_row": "2022-12-14T01:10:00+00:00",
+     "legacy_atr_defined_from": "2022-12-14T01:10:00+00:00",
+     "first_oracle_equals_atr_seed": true,
+     "extra_are_exactly_minutes_before_atr_seed": true,
+     "oracle_rows_missing_after_seed": 0
+    },
+    {
+     "roll": "2022-12-14T00:00:00+00:00",
+     "horizon": 1380,
+     "extra": 40,
+     "extra_first": "2022-12-14T00:30:00+00:00",
+     "extra_last": "2022-12-14T01:09:00+00:00",
+     "extra_window_minutes": [
+      30,
+      69
+     ],
+     "extra_all_roll_truncated": true,
+     "extra_any_window_complete": false,
+     "first_oracle_row": "2022-12-14T01:10:00+00:00",
+     "legacy_atr_defined_from": "2022-12-14T01:10:00+00:00",
+     "first_oracle_equals_atr_seed": true,
+     "extra_are_exactly_minutes_before_atr_seed": true,
+     "oracle_rows_missing_after_seed": 0
+    }
+   ],
+   "2023dev": [
+    {
+     "roll": "2023-03-15T00:00:00+00:00",
+     "horizon": 360,
+     "extra": 40,
+     "extra_first": "2023-03-15T00:30:00+00:00",
+     "extra_last": "2023-03-15T01:09:00+00:00",
+     "extra_window_minutes": [
+      30,
+      69
+     ],
+     "extra_all_roll_truncated": true,
+     "extra_any_window_complete": false,
+     "first_oracle_row": "2023-03-15T01:10:00+00:00",
+     "legacy_atr_defined_from": "2023-03-15T01:10:00+00:00",
+     "first_oracle_equals_atr_seed": true,
+     "extra_are_exactly_minutes_before_atr_seed": true,
+     "oracle_rows_missing_after_seed": 0
+    },
+    {
+     "roll": "2023-03-15T00:00:00+00:00",
+     "horizon": 1380,
+     "extra": 40,
+     "extra_first": "2023-03-15T00:30:00+00:00",
+     "extra_last": "2023-03-15T01:09:00+00:00",
+     "extra_window_minutes": [
+      30,
+      69
+     ],
+     "extra_all_roll_truncated": true,
+     "extra_any_window_complete": false,
+     "first_oracle_row": "2023-03-15T01:10:00+00:00",
+     "legacy_atr_defined_from": "2023-03-15T01:10:00+00:00",
+     "first_oracle_equals_atr_seed": true,
+     "extra_are_exactly_minutes_before_atr_seed": true,
+     "oracle_rows_missing_after_seed": 0
+    },
+    {
+     "roll": "2023-06-14T00:00:00+00:00",
+     "horizon": 360,
+     "extra": 40,
+     "extra_first": "2023-06-14T00:30:00+00:00",
+     "extra_last": "2023-06-14T01:09:00+00:00",
+     "extra_window_minutes": [
+      30,
+      69
+     ],
+     "extra_all_roll_truncated": true,
+     "extra_any_window_complete": false,
+     "first_oracle_row": "2023-06-14T01:10:00+00:00",
+     "legacy_atr_defined_from": "2023-06-14T01:10:00+00:00",
+     "first_oracle_equals_atr_seed": true,
+     "extra_are_exactly_minutes_before_atr_seed": true,
+     "oracle_rows_missing_after_seed": 0
+    },
+    {
+     "roll": "2023-06-14T00:00:00+00:00",
+     "horizon": 1380,
+     "extra": 40,
+     "extra_first": "2023-06-14T00:30:00+00:00",
+     "extra_last": "2023-06-14T01:09:00+00:00",
+     "extra_window_minutes": [
+      30,
+      69
+     ],
+     "extra_all_roll_truncated": true,
+     "extra_any_window_complete": false,
+     "first_oracle_row": "2023-06-14T01:10:00+00:00",
+     "legacy_atr_defined_from": "2023-06-14T01:10:00+00:00",
+     "first_oracle_equals_atr_seed": true,
+     "extra_are_exactly_minutes_before_atr_seed": true,
+     "oracle_rows_missing_after_seed": 0
+    },
+    {
+     "roll": "2023-09-13T00:00:00+00:00",
+     "horizon": 360,
+     "extra": 40,
+     "extra_first": "2023-09-13T00:30:00+00:00",
+     "extra_last": "2023-09-13T01:09:00+00:00",
+     "extra_window_minutes": [
+      30,
+      69
+     ],
+     "extra_all_roll_truncated": true,
+     "extra_any_window_complete": false,
+     "first_oracle_row": "2023-09-13T01:10:00+00:00",
+     "legacy_atr_defined_from": "2023-09-13T01:10:00+00:00",
+     "first_oracle_equals_atr_seed": true,
+     "extra_are_exactly_minutes_before_atr_seed": true,
+     "oracle_rows_missing_after_seed": 0
+    },
+    {
+     "roll": "2023-09-13T00:00:00+00:00",
+     "horizon": 1380,
+     "extra": 40,
+     "extra_first": "2023-09-13T00:30:00+00:00",
+     "extra_last": "2023-09-13T01:09:00+00:00",
+     "extra_window_minutes": [
+      30,
+      69
+     ],
+     "extra_all_roll_truncated": true,
+     "extra_any_window_complete": false,
+     "first_oracle_row": "2023-09-13T01:10:00+00:00",
+     "legacy_atr_defined_from": "2023-09-13T01:10:00+00:00",
+     "first_oracle_equals_atr_seed": true,
+     "extra_are_exactly_minutes_before_atr_seed": true,
+     "oracle_rows_missing_after_seed": 0
+    }
+   ]
+  },
+  "any_window_complete": false,
+  "oracle_rows_missing_after_atr_seed": 0,
+  "matches_full_parity_run_eligible_without_oracle": {
+   "2022/360": 160,
+   "2022/1380": 160,
+   "2023dev/360": 120,
+   "2023dev/1380": 120
+  },
+  "window_complete_contract": "consistent: all 560 rows (280 timestamps x 2 horizons) are roll_truncated with window_complete=false; the primary window_complete==true population is unaffected; at 120 the legacy ledger is full-window only and there are 0 extra rows"
+ },
+ "legacy_float_tie_divergence": {
+  "classification": "LEGACY_FLOAT_TIE_DIVERGENCE",
+  "rule": "no numerical epsilon: a VAH/VAL difference is accepted only where an independent exact-rational re-walk (fractions.Fraction from the bars) equals the capability, differs from the oracle, and contains an exact pair tie or an exact 70% stop tie",
+  "n": 35,
+  "by_horizon_class": {
+   "120/PAIR_TIE": 29,
+   "120/STOP_TIE": 2,
+   "360/STOP_TIE": 4
+  },
+  "cases": [
+   {
+    "block": "2022",
+    "horizon": 120,
+    "ts": 1643598540000000000,
+    "utc": "2022-01-31T03:09:00+00:00",
+    "poc": 14444.0,
+    "vah_capability_oracle_exact": [
+     14464.0,
+     14463.5,
+     14464.0
+    ],
+    "val_capability_oracle_exact": [
+     14391.5,
+     14391.5,
+     14391.5
+    ],
+    "exact_pair_ties_in_walk": 1,
+    "min_stop_rel": 0.0007590517537854718,
+    "classification": "PAIR_TIE",
+    "capability_equals_exact": true,
+    "oracle_equals_exact": false
+   },
+   {
+    "block": "2022",
+    "horizon": 120,
+    "ts": 1643598600000000000,
+    "utc": "2022-01-31T03:10:00+00:00",
+    "poc": 14444.0,
+    "vah_capability_oracle_exact": [
+     14464.0,
+     14463.5,
+     14464.0
+    ],
+    "val_capability_oracle_exact": [
+     14391.0,
+     14391.0,
+     14391.0
+    ],
+    "exact_pair_ties_in_walk": 1,
+    "min_stop_rel": 0.001482542161194619,
+    "classification": "PAIR_TIE",
+    "capability_equals_exact": true,
+    "oracle_equals_exact": false
+   },
+   {
+    "block": "2022",
+    "horizon": 120,
+    "ts": 1643775480000000000,
+    "utc": "2022-02-02T04:18:00+00:00",
+    "poc": 15136.75,
+    "vah_capability_oracle_exact": [
+     15142.75,
+     15142.25,
+     15142.75
+    ],
+    "val_capability_oracle_exact": [
+     15132.25,
+     15132.25,
+     15132.25
+    ],
+    "exact_pair_ties_in_walk": 1,
+    "min_stop_rel": 0.020968332418085257,
+    "classification": "PAIR_TIE",
+    "capability_equals_exact": true,
+    "oracle_equals_exact": false
+   },
+   {
+    "block": "2022",
+    "horizon": 120,
+    "ts": 1646978340000000000,
+    "utc": "2022-03-11T05:59:00+00:00",
+    "poc": 13497.5,
+    "vah_capability_oracle_exact": [
+     13522.5,
+     13523.0,
+     13522.5
+    ],
+    "val_capability_oracle_exact": [
+     13480.0,
+     13480.0,
+     13480.0
+    ],
+    "exact_pair_ties_in_walk": 0,
+    "min_stop_rel": 4.4408920985006264e-17,
+    "classification": "STOP_TIE",
+    "capability_equals_exact": true,
+    "oracle_equals_exact": false
+   },
+   {
+    "block": "2022",
+    "horizon": 120,
+    "ts": 1649137500000000000,
+    "utc": "2022-04-05T05:45:00+00:00",
+    "poc": 15155.5,
+    "vah_capability_oracle_exact": [
+     15157.5,
+     15158.0,
+     15157.5
+    ],
+    "val_capability_oracle_exact": [
+     15150.0,
+     15150.0,
+     15150.0
+    ],
+    "exact_pair_ties_in_walk": 1,
+    "min_stop_rel": 0.02406319910514546,
+    "classification": "PAIR_TIE",
+    "capability_equals_exact": true,
+    "oracle_equals_exact": false
+   },
+   {
+    "block": "2022",
+    "horizon": 120,
+    "ts": 1650326400000000000,
+    "utc": "2022-04-19T00:00:00+00:00",
+    "poc": 13974.25,
+    "vah_capability_oracle_exact": [
+     13996.25,
+     13996.25,
+     13996.25
+    ],
+    "val_capability_oracle_exact": [
+     13961.25,
+     13961.75,
+     13961.25
+    ],
+    "exact_pair_ties_in_walk": 1,
+    "min_stop_rel": 0.00224721351686985,
+    "classification": "PAIR_TIE",
+    "capability_equals_exact": true,
+    "oracle_equals_exact": false
+   },
+   {
+    "block": "2022",
+    "horizon": 120,
+    "ts": 1658188860000000000,
+    "utc": "2022-07-19T00:01:00+00:00",
+    "poc": 11916.75,
+    "vah_capability_oracle_exact": [
+     11932.75,
+     11933.25,
+     11932.75
+    ],
+    "val_capability_oracle_exact": [
+     11902.75,
+     11904.25,
+     11902.75
+    ],
+    "exact_pair_ties_in_walk": 1,
+    "min_stop_rel": 0.00011021365704654447,
+    "classification": "PAIR_TIE",
+    "capability_equals_exact": true,
+    "oracle_equals_exact": false
+   },
+   {
+    "block": "2022",
+    "horizon": 120,
+    "ts": 1667457240000000000,
+    "utc": "2022-11-03T06:34:00+00:00",
+    "poc": 10975.75,
+    "vah_capability_oracle_exact": [
+     10995.75,
+     10995.25,
+     10995.75
+    ],
+    "val_capability_oracle_exact": [
+     10961.75,
+     10961.75,
+     10961.75
+    ],
+    "exact_pair_ties_in_walk": 1,
+    "min_stop_rel": 0.0007326745983732835,
+    "classification": "PAIR_TIE",
+    "capability_equals_exact": true,
+    "oracle_equals_exact": false
+   },
+   {
+    "block": "2022",
+    "horizon": 360,
+    "ts": 1655892540000000000,
+    "utc": "2022-06-22T10:09:00+00:00",
+    "poc": 11350.0,
+    "vah_capability_oracle_exact": [
+     11405.5,
+     11406.0,
+     11405.5
+    ],
+    "val_capability_oracle_exact": [
+     11321.0,
+     11321.0,
+     11321.0
+    ],
+    "exact_pair_ties_in_walk": 0,
+    "min_stop_rel": 4.4408920985006264e-17,
+    "classification": "STOP_TIE",
+    "capability_equals_exact": true,
+    "oracle_equals_exact": false
+   },
+   {
+    "block": "2022",
+    "horizon": 360,
+    "ts": 1661469840000000000,
+    "utc": "2022-08-25T23:24:00+00:00",
+    "poc": 13079.75,
+    "vah_capability_oracle_exact": [
+     13105.75,
+     13105.75,
+     13105.75
+    ],
+    "val_capability_oracle_exact": [
+     13004.25,
+     13003.75,
+     13004.25
+    ],
+    "exact_pair_ties_in_walk": 0,
+    "min_stop_rel": 4.4408920985006264e-17,
+    "classification": "STOP_TIE",
+    "capability_equals_exact": true,
+    "oracle_equals_exact": false
+   },
+   {
+    "block": "2022",
+    "horizon": 360,
+    "ts": 1663661520000000000,
+    "utc": "2022-09-20T08:12:00+00:00",
+    "poc": 12047.25,
+    "vah_capability_oracle_exact": [
+     12086.25,
+     12086.75,
+     12086.25
+    ],
+    "val_capability_oracle_exact": [
+     12039.75,
+     12039.75,
+     12039.75
+    ],
+    "exact_pair_ties_in_walk": 0,
+    "min_stop_rel": 4.4408920985006264e-17,
+    "classification": "STOP_TIE",
+    "capability_equals_exact": true,
+    "oracle_equals_exact": false
+   },
+   {
+    "block": "2022",
+    "horizon": 360,
+    "ts": 1668519600000000000,
+    "utc": "2022-11-15T13:40:00+00:00",
+    "poc": 11870.0,
+    "vah_capability_oracle_exact": [
+     11981.0,
+     11981.5,
+     11981.0
+    ],
+    "val_capability_oracle_exact": [
+     11824.0,
+     11824.0,
+     11824.0
+    ],
+    "exact_pair_ties_in_walk": 0,
+    "min_stop_rel": 4.4408920985006264e-17,
+    "classification": "STOP_TIE",
+    "capability_equals_exact": true,
+    "oracle_equals_exact": false
+   },
+   {
+    "block": "2023dev",
+    "horizon": 120,
+    "ts": 1674182580000000000,
+    "utc": "2023-01-20T02:43:00+00:00",
+    "poc": 11400.25,
+    "vah_capability_oracle_exact": [
+     11405.25,
+     11404.75,
+     11405.25
+    ],
+    "val_capability_oracle_exact": [
+     11394.75,
+     11394.75,
+     11394.75
+    ],
+    "exact_pair_ties_in_walk": 1,
+    "min_stop_rel": 0.012250656167978958,
+    "classification": "PAIR_TIE",
+    "capability_equals_exact": true,
+    "oracle_equals_exact": false
+   },
+   {
+    "block": "2023dev",
+    "horizon": 120,
+    "ts": 1682483160000000000,
+    "utc": "2023-04-26T04:26:00+00:00",
+    "poc": 12986.0,
+    "vah_capability_oracle_exact": [
+     12993.5,
+     12993.5,
+     12993.5
+    ],
+    "val_capability_oracle_exact": [
+     12973.0,
+     12972.5,
+     12973.0
+    ],
+    "exact_pair_ties_in_walk": 0,
+    "min_stop_rel": 4.4408920985006264e-17,
+    "classification": "STOP_TIE",
+    "capability_equals_exact": true,
+    "oracle_equals_exact": false
+   },
+   {
+    "block": "2023dev",
+    "horizon": 120,
+    "ts": 1686553860000000000,
+    "utc": "2023-06-12T07:11:00+00:00",
+    "poc": 14611.5,
+    "vah_capability_oracle_exact": [
+     14617.5,
+     14617.0,
+     14617.5
+    ],
+    "val_capability_oracle_exact": [
+     14597.0,
+     14597.0,
+     14597.0
+    ],
+    "exact_pair_ties_in_walk": 1,
+    "min_stop_rel": 0.004824351398006584,
+    "classification": "PAIR_TIE",
+    "capability_equals_exact": true,
+    "oracle_equals_exact": false
+   },
+   {
+    "block": "2023dev",
+    "horizon": 120,
+    "ts": 1686553920000000000,
+    "utc": "2023-06-12T07:12:00+00:00",
+    "poc": 14611.5,
+    "vah_capability_oracle_exact": [
+     14617.5,
+     14617.0,
+     14617.5
+    ],
+    "val_capability_oracle_exact": [
+     14597.5,
+     14597.5,
+     14597.5
+    ],
+    "exact_pair_ties_in_walk": 1,
+    "min_stop_rel": 0.008402546891663051,
+    "classification": "PAIR_TIE",
+    "capability_equals_exact": true,
+    "oracle_equals_exact": false
+   },
+   {
+    "block": "2023dev",
+    "horizon": 120,
+    "ts": 1686553980000000000,
+    "utc": "2023-06-12T07:13:00+00:00",
+    "poc": 14611.5,
+    "vah_capability_oracle_exact": [
+     14617.5,
+     14617.0,
+     14617.5
+    ],
+    "val_capability_oracle_exact": [
+     14597.5,
+     14597.5,
+     14597.5
+    ],
+    "exact_pair_ties_in_walk": 1,
+    "min_stop_rel": 0.0038211168520301975,
+    "classification": "PAIR_TIE",
+    "capability_equals_exact": true,
+    "oracle_equals_exact": false
+   },
+   {
+    "block": "2023dev",
+    "horizon": 120,
+    "ts": 1686554040000000000,
+    "utc": "2023-06-12T07:14:00+00:00",
+    "poc": 14608.5,
+    "vah_capability_oracle_exact": [
+     14617.5,
+     14617.0,
+     14617.5
+    ],
+    "val_capability_oracle_exact": [
+     14598.0,
+     14598.0,
+     14598.0
+    ],
+    "exact_pair_ties_in_walk": 1,
+    "min_stop_rel": 0.005556096531801333,
+    "classification": "PAIR_TIE",
+    "capability_equals_exact": true,
+    "oracle_equals_exact": false
+   },
+   {
+    "block": "2023dev",
+    "horizon": 120,
+    "ts": 1686554100000000000,
+    "utc": "2023-06-12T07:15:00+00:00",
+    "poc": 14608.5,
+    "vah_capability_oracle_exact": [
+     14617.5,
+     14617.0,
+     14617.5
+    ],
+    "val_capability_oracle_exact": [
+     14598.0,
+     14598.0,
+     14598.0
+    ],
+    "exact_pair_ties_in_walk": 1,
+    "min_stop_rel": 0.00913407371640114,
+    "classification": "PAIR_TIE",
+    "capability_equals_exact": true,
+    "oracle_equals_exact": false
+   },
+   {
+    "block": "2023dev",
+    "horizon": 120,
+    "ts": 1686554160000000000,
+    "utc": "2023-06-12T07:16:00+00:00",
+    "poc": 14608.5,
+    "vah_capability_oracle_exact": [
+     14617.5,
+     14617.0,
+     14617.5
+    ],
+    "val_capability_oracle_exact": [
+     14598.0,
+     14598.0,
+     14598.0
+    ],
+    "exact_pair_ties_in_walk": 1,
+    "min_stop_rel": 0.008443633044271977,
+    "classification": "PAIR_TIE",
+    "capability_equals_exact": true,
+    "oracle_equals_exact": false
+   },
+   {
+    "block": "2023dev",
+    "horizon": 120,
+    "ts": 1686554220000000000,
+    "utc": "2023-06-12T07:17:00+00:00",
+    "poc": 14608.5,
+    "vah_capability_oracle_exact": [
+     14617.5,
+     14617.0,
+     14617.5
+    ],
+    "val_capability_oracle_exact": [
+     14598.0,
+     14598.0,
+     14598.0
+    ],
+    "exact_pair_ties_in_walk": 1,
+    "min_stop_rel": 0.00015934441156380716,
+    "classification": "PAIR_TIE",
+    "capability_equals_exact": true,
+    "oracle_equals_exact": false
+   },
+   {
+    "block": "2023dev",
+    "horizon": 120,
+    "ts": 1686554340000000000,
+    "utc": "2023-06-12T07:19:00+00:00",
+    "poc": 14608.5,
+    "vah_capability_oracle_exact": [
+     14617.5,
+     14617.0,
+     14617.5
+    ],
+    "val_capability_oracle_exact": [
+     14599.5,
+     14599.5,
+     14599.5
+    ],
+    "exact_pair_ties_in_walk": 1,
+    "min_stop_rel": 0.002396706366710822,
+    "classification": "PAIR_TIE",
+    "capability_equals_exact": true,
+    "oracle_equals_exact": false
+   },
+   {
+    "block": "2023dev",
+    "horizon": 120,
+    "ts": 1686554400000000000,
+    "utc": "2023-06-12T07:20:00+00:00",
+    "poc": 14608.5,
+    "vah_capability_oracle_exact": [
+     14617.5,
+     14617.0,
+     14617.5
+    ],
+    "val_capability_oracle_exact": [
+     14599.5,
+     14599.5,
+     14599.5
+    ],
+    "exact_pair_ties_in_walk": 1,
+    "min_stop_rel": 0.0014727325750947353,
+    "classification": "PAIR_TIE",
+    "capability_equals_exact": true,
+    "oracle_equals_exact": false
+   },
+   {
+    "block": "2023dev",
+    "horizon": 120,
+    "ts": 1687231200000000000,
+    "utc": "2023-06-20T03:20:00+00:00",
+    "poc": 15234.25,
+    "vah_capability_oracle_exact": [
+     15239.25,
+     15238.75,
+     15239.25
+    ],
+    "val_capability_oracle_exact": [
+     15226.75,
+     15226.75,
+     15226.75
+    ],
+    "exact_pair_ties_in_walk": 1,
+    "min_stop_rel": 0.006009839117138634,
+    "classification": "PAIR_TIE",
+    "capability_equals_exact": true,
+    "oracle_equals_exact": false
+   },
+   {
+    "block": "2023dev",
+    "horizon": 120,
+    "ts": 1687231260000000000,
+    "utc": "2023-06-20T03:21:00+00:00",
+    "poc": 15234.25,
+    "vah_capability_oracle_exact": [
+     15239.25,
+     15238.75,
+     15239.25
+    ],
+    "val_capability_oracle_exact": [
+     15226.75,
+     15226.75,
+     15226.75
+    ],
+    "exact_pair_ties_in_walk": 1,
+    "min_stop_rel": 0.0032056397978185245,
+    "classification": "PAIR_TIE",
+    "capability_equals_exact": true,
+    "oracle_equals_exact": false
+   },
+   {
+    "block": "2023dev",
+    "horizon": 120,
+    "ts": 1687764480000000000,
+    "utc": "2023-06-26T07:28:00+00:00",
+    "poc": 15070.5,
+    "vah_capability_oracle_exact": [
+     15092.5,
+     15092.0,
+     15092.5
+    ],
+    "val_capability_oracle_exact": [
+     15046.5,
+     15046.5,
+     15046.5
+    ],
+    "exact_pair_ties_in_walk": 1,
+    "min_stop_rel": 0.0007371573370190756,
+    "classification": "PAIR_TIE",
+    "capability_equals_exact": true,
+    "oracle_equals_exact": false
+   },
+   {
+    "block": "2023dev",
+    "horizon": 120,
+    "ts": 1690526100000000000,
+    "utc": "2023-07-28T06:35:00+00:00",
+    "poc": 15643.0,
+    "vah_capability_oracle_exact": [
+     15652.0,
+     15651.0,
+     15652.0
+    ],
+    "val_capability_oracle_exact": [
+     15620.0,
+     15620.0,
+     15620.0
+    ],
+    "exact_pair_ties_in_walk": 1,
+    "min_stop_rel": 0.00798111878123902,
+    "classification": "PAIR_TIE",
+    "capability_equals_exact": true,
+    "oracle_equals_exact": false
+   },
+   {
+    "block": "2023dev",
+    "horizon": 120,
+    "ts": 1690526400000000000,
+    "utc": "2023-07-28T06:40:00+00:00",
+    "poc": 15643.0,
+    "vah_capability_oracle_exact": [
+     15652.0,
+     15651.0,
+     15652.0
+    ],
+    "val_capability_oracle_exact": [
+     15622.0,
+     15622.0,
+     15622.0
+    ],
+    "exact_pair_ties_in_walk": 1,
+    "min_stop_rel": 0.007163394845466677,
+    "classification": "PAIR_TIE",
+    "capability_equals_exact": true,
+    "oracle_equals_exact": false
+   },
+   {
+    "block": "2023dev",
+    "horizon": 120,
+    "ts": 1690526460000000000,
+    "utc": "2023-07-28T06:41:00+00:00",
+    "poc": 15643.0,
+    "vah_capability_oracle_exact": [
+     15652.0,
+     15651.0,
+     15652.0
+    ],
+    "val_capability_oracle_exact": [
+     15622.5,
+     15622.5,
+     15622.5
+    ],
+    "exact_pair_ties_in_walk": 1,
+    "min_stop_rel": 0.003711383870718776,
+    "classification": "PAIR_TIE",
+    "capability_equals_exact": true,
+    "oracle_equals_exact": false
+   },
+   {
+    "block": "2023dev",
+    "horizon": 120,
+    "ts": 1690526520000000000,
+    "utc": "2023-07-28T06:42:00+00:00",
+    "poc": 15643.0,
+    "vah_capability_oracle_exact": [
+     15652.0,
+     15651.0,
+     15652.0
+    ],
+    "val_capability_oracle_exact": [
+     15623.5,
+     15623.0,
+     15623.5
+    ],
+    "exact_pair_ties_in_walk": 1,
+    "min_stop_rel": 0.00023945374574532133,
+    "classification": "PAIR_TIE",
+    "capability_equals_exact": true,
+    "oracle_equals_exact": false
+   },
+   {
+    "block": "2023dev",
+    "horizon": 120,
+    "ts": 1690526940000000000,
+    "utc": "2023-07-28T06:49:00+00:00",
+    "poc": 15643.0,
+    "vah_capability_oracle_exact": [
+     15652.0,
+     15651.0,
+     15652.0
+    ],
+    "val_capability_oracle_exact": [
+     15626.5,
+     15626.0,
+     15626.5
+    ],
+    "exact_pair_ties_in_walk": 1,
+    "min_stop_rel": 2.96452253036679e-05,
+    "classification": "PAIR_TIE",
+    "capability_equals_exact": true,
+    "oracle_equals_exact": false
+   },
+   {
+    "block": "2023dev",
+    "horizon": 120,
+    "ts": 1690527000000000000,
+    "utc": "2023-07-28T06:50:00+00:00",
+    "poc": 15643.0,
+    "vah_capability_oracle_exact": [
+     15652.0,
+     15651.0,
+     15652.0
+    ],
+    "val_capability_oracle_exact": [
+     15627.5,
+     15627.0,
+     15627.5
+    ],
+    "exact_pair_ties_in_walk": 1,
+    "min_stop_rel": 0.0012120106977874586,
+    "classification": "PAIR_TIE",
+    "capability_equals_exact": true,
+    "oracle_equals_exact": false
+   },
+   {
+    "block": "2023dev",
+    "horizon": 120,
+    "ts": 1690527060000000000,
+    "utc": "2023-07-28T06:51:00+00:00",
+    "poc": 15643.0,
+    "vah_capability_oracle_exact": [
+     15652.0,
+     15651.0,
+     15652.0
+    ],
+    "val_capability_oracle_exact": [
+     15628.5,
+     15627.5,
+     15628.5
+    ],
+    "exact_pair_ties_in_walk": 1,
+    "min_stop_rel": 0.0011121645274211926,
+    "classification": "PAIR_TIE",
+    "capability_equals_exact": true,
+    "oracle_equals_exact": false
+   },
+   {
+    "block": "2023dev",
+    "horizon": 120,
+    "ts": 1695108480000000000,
+    "utc": "2023-09-19T07:28:00+00:00",
+    "poc": 15390.25,
+    "vah_capability_oracle_exact": [
+     15398.75,
+     15398.75,
+     15398.75
+    ],
+    "val_capability_oracle_exact": [
+     15380.25,
+     15380.75,
+     15380.25
+    ],
+    "exact_pair_ties_in_walk": 1,
+    "min_stop_rel": 0.00014444225592537087,
+    "classification": "PAIR_TIE",
+    "capability_equals_exact": true,
+    "oracle_equals_exact": false
+   },
+   {
+    "block": "2023dev",
+    "horizon": 120,
+    "ts": 1695109080000000000,
+    "utc": "2023-09-19T07:38:00+00:00",
+    "poc": 15389.25,
+    "vah_capability_oracle_exact": [
+     15404.75,
+     15404.75,
+     15404.75
+    ],
+    "val_capability_oracle_exact": [
+     15380.25,
+     15380.75,
+     15380.25
+    ],
+    "exact_pair_ties_in_walk": 1,
+    "min_stop_rel": 0.0021391106145652013,
+    "classification": "PAIR_TIE",
+    "capability_equals_exact": true,
+    "oracle_equals_exact": false
+   }
+  ]
+ }
+}
