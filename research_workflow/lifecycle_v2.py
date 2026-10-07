@@ -461,9 +461,14 @@ class V2Lifecycle:
         outcomes["PLAN_BOUND_TO_SPEC"] = "PASSED" if plan.get("spec_sha256") == spec_sha256(self.study) else "FAILED"
         frozen = _read(self.audit / "frozen_execution_manifest.json").get("frozen_execution_composite_sha256")
         outcomes["EXECUTION_MANIFEST"] = "PASSED" if frozen and frozen == self.current_composite() else "FAILED"
-        from research_workflow.entry_references import resolve_entry_reference
-        _, problem = resolve_entry_reference(plan["outcome"]["entry_reference"], plan["outcome"]["contract"])
-        outcomes["ENTRY_REFERENCE_EXECUTABLE"] = "PASSED" if problem is None or plan["outcome"]["kernel"] == "flip" else "FAILED"
+        if plan["outcome"]["kernel"] == "none":
+            # Descriptive (outcome: none) study: no entry reference to resolve -- it declares no
+            # outcome contract at all.
+            outcomes["ENTRY_REFERENCE_EXECUTABLE"] = "PASSED"
+        else:
+            from research_workflow.entry_references import resolve_entry_reference
+            _, problem = resolve_entry_reference(plan["outcome"]["entry_reference"], plan["outcome"]["contract"])
+            outcomes["ENTRY_REFERENCE_EXECUTABLE"] = "PASSED" if problem is None or plan["outcome"]["kernel"] == "flip" else "FAILED"
         from research_workflow.forward_outcomes.guard import find_outcome_columns
         leaked = find_outcome_columns(list(plan["columns"]["features"]) + [m["column"] for m in plan["columns"]["metadata"]])
         outcomes["FORWARD_OUTCOME_GUARD"] = "PASSED" if not leaked else "FAILED"

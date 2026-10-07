@@ -393,6 +393,17 @@ metric, stop when the selected configuration's fold spread exceeds its gain over
 
 ## J. Adding a new outcome / target
 
+`outcome: none` is a first-class DESCRIPTIVE (observational) study: no label, no barrier/event,
+no direction requirement, no model. It is legal only with `model: none`, with no `triggers.entry`
+(execution/policy semantics need a declared outcome contract to resolve against) and with
+`chronology.dev: []` (dev/OOS years exist to evaluate a fitted model, which a descriptive study
+does not have). The host emits one observation row per candidate carrying only the identity
+columns (`observation_ts`, `regime_start_ns`, `checkpoint_index`) -- no outcome/label column is
+ever emitted -- and a declared `analysis:` (source: train) reads the candidate surface
+(features/metadata) directly. Omitting `outcome` entirely remains an error: descriptive mode must
+be declared, never defaulted. `stage: collect` composes with `outcome: none` unchanged (a frame
+makes no claim regardless).
+
 `outcome.kind: label` compiles to a `LabelOutcomeContract` executed by
 `research_workflow/host/outcomes.py` (`LabelOutcomeKernel`) and cross-checked by the independent oracle
 `research_workflow/target_replay_oracle.py`. `kind: trade` compiles to a typed
