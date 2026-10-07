@@ -1,0 +1,18 @@
+{
+ "capability": "tracker.volume_profile.rolling",
+ "oracle": "study-local R0 ledgers PROFILE/MP_VP6H/MP_VP24H (2022, 2023dev)",
+ "report": "artifacts/parity/VOLUME_PROFILE_ROLLING_PARITY.md",
+ "criterion": "every oracle row reproduced; POC exact; every VAH/VAL difference equals the exact-rational walk and contains an exact pair or stop tie broken by the oracle float arithmetic; probe: incremental == scratch bit for bit",
+ "r0_2022_passed": true,
+ "r0_2023dev_passed": true,
+ "probe_passed": true,
+ "sha256": {
+  "artifacts/parity/volume_profile_rolling_r0_2022.json": "bd389f076b56fcf82018ece336b5e037f9389b58b7fb33c8e6ab49ac749a2297",
+  "artifacts/parity/volume_profile_rolling_r0_2023dev.json": "58d512a85c54b5637ee0cc7f470c72de3385772e6cc3972dc7db4a1175d931a5",
+  "artifacts/parity/volume_profile_rolling_probe.json": "8d53a6d5daea14fee19f566fed6d143faad98cf0a54269619e01bb00101f77da",
+  "features/trackers/volume_profile_rolling.py": "a5831ed0aa330048c1cb172a353028c7cbb3ce69ac996ae09486a50ec6a6b2a9",
+  "scripts/parity_volume_profile_rolling.py": "260f5f19d7b0697d791a16982983cf6c761fe782a767e891361ecc57a854d3fe",
+  "scripts/probe_volume_profile_rolling.py": "7ff676f11aa19f898fbc0db28c49a8ebb772b7dae47663d678fd0cacf2cd124a"
+ },
+ "passed": true
+}

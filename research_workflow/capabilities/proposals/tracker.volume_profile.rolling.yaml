@@ -1,0 +1,117 @@
+kind: tracker
+name: tracker.volume_profile.rolling
+semantics: 'Rolling volume-at-price profile over completed 1-second bars, snapshotted
+  once per completed OPEN-market minute. The window is the trailing `horizon_open_minutes`
+  open minutes of the dataset''s Globex `sessions` reference table (closed time, weekends
+  and the daily maintenance break hold no minutes, so Friday -> Sunday is continuous
+  in open-minute time; empty open minutes count), truncated at the latest contract
+  roll of the `rolls` reference table. Bins are one tick. `allocation` decides how
+  a 1s bar''s volume is placed on the ticks of its [low, high] range: range_uniform
+  = volume / n on each of the n covered ticks (volume conserving; the canonical R0
+  of the auction-map / VP studies); full_per_tick = the full volume on every covered
+  tick (NOT volume conserving: a traversal-weighted participation-intensity profile,
+  never literal executed volume); close = the full volume on the close tick (volume
+  conserving). Smoothing is along the PRICE axis only (Gaussian, sigma = sigma_a x
+  A, A = mean 1-minute true range over the trailing a_window open minutes with at
+  least one 1s bar); no temporal smoothing. POC = argmax of the smoothed profile (first
+  max = lowest price); value area = two-tick-pair expansion on the raw profile from
+  the POC tick (larger pair added, tie adds both) until >= va_frac of the profile''s
+  OWN total weight. raw_poc / raw_vah / raw_val repeat the value area from the raw
+  argmax (diagnostic). HVN / LVN extraction = the frozen VP V1 node rules (prominence
+  >= 0.20 of the POC density, separation >= 1 A, extent at half prominence clipped
+  at valleys).
+
+  '
+availability_rule: 'The snapshot of open minute T uses exactly the 1s bars with ts_init
+  in (T - 60 s, T] of the window''s minutes (ts_init <= T). It becomes readable when
+  the minute is known complete: on the bar with ts_init == T, else on the first later
+  bar. snapshot_ts names the minute. Nothing after T is ever read.
+
+  '
+parameters:
+  horizon_open_minutes: REQUIRED
+  allocation: range_uniform
+  dataset: REQUIRED
+  tick: 0.25
+  sigma_a: 0.5
+  a_window: 390
+  a_min_live: 30
+  min_window: 30
+  va_frac: 0.7
+inputs:
+  bars: stream
+fields:
+- snapshot_ts
+- window_minutes
+- window_complete
+- roll_truncated
+- A
+- sigma_ticks
+- win_lo
+- win_hi
+- profile_width
+- total_source_volume
+- total_weight
+- n_occupied_bins
+- poc
+- vah
+- val
+- va_width
+- va_weight_fraction
+- raw_poc
+- raw_vah
+- raw_val
+- n_hvn
+- n_lvn
+- hvns_json
+- lvns_json
+- dropped_bars
+events:
+- minute_closed
+update_cadence: per_source_bar
+dependencies:
+- stream.completed_1s
+serves_studies:
+- nq_vp_representation
+- nq_value_rotation_model_a
+- nq_value_representation_review
+- nq_vp120_edge_fade
+closest_existing:
+  id: none
+  why_not: '`research.py cap search "volume profile"` and "price histogram" return
+    0 entries. The only implementation is study-local (studies/nq_auction_map_1s/auction_map.py
+    channel `vr` + nq_poc_node_edge_rejection/poc_node.curve + vp_v1.value_area /
+    profile on study branches that never merge); it is the parity oracle, not a dependency.
+
+    '
+composition_attempted:
+  spec_fragment: 'vp: {tracker: volume_profile.rolling, bars: 1s, horizon_open_minutes:
+    360, allocation: range_uniform, dataset: NQ_1S_V2_GLOBEX}'
+  compiler_gap: MISSING_CAPABILITY tracker.volume_profile.rolling (pre-execution report,
+    VP representation study, 2026-10-07)
+reset_policy: 'No session, day or weekend reset. The window is truncated at a contract
+  roll: a minute whose end is after a roll timestamp belongs to the new contract and
+  never shares a window with earlier minutes (A is truncated the same way). roll_truncated
+  = true while the truncation shortens the window.
+
+  '
+null_policy: 'All profile fields are null until the window holds >= min_window open
+  minutes AND A is defined (>= a_min_live live minutes). window_complete = (window_minutes
+  == horizon_open_minutes); a profile is exposed during warm-up / after a roll with
+  window_complete = false. Never 0 as a stand-in.
+
+  '
+gap_policy: 'Open minutes without any 1s bar are real (empty) minutes: they count
+  toward the horizon, add no weight, carry the last close as their price (as in the
+  oracle) and are not live for A. Bars whose minute is not an open minute of the sessions
+  table are dropped and counted in dropped_bars. No synthetic bars, no forward-filled
+  volume.
+
+  '
+proposal_sha256: d7142555eac75f5e61c7a632b100320be23cdccbb8faade5709db7cb01668ba5
+status: promoted
+proposed_at_utc: '2026-10-07T17:22:25.980851+00:00'
+scaffold:
+  module: features/trackers/volume_profile_rolling.py
+  test: features/tests/test_volume_profile_rolling.py
+  class: VolumeProfileRollingBinding
