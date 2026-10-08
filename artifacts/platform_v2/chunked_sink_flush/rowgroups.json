@@ -1,0 +1,17 @@
+{
+ "run": "1_month_2022_01_10_to_02_09_production_default_batch_bytes",
+ "batch_bytes_setting": 268435456,
+ "num_row_groups": 71,
+ "num_leaf_columns": 246,
+ "mean_row_group_bytes": 4381399.0,
+ "mean_rows_per_row_group": 145.56338028169014,
+ "footer_serialized_bytes": 2226114,
+ "file_bytes": 175010400,
+ "rows": 10335,
+ "comparison_to_8mib_stress_setting": "diag2/DIAGNOSIS.md measured 2,127 row groups at batch_bytes=8MiB for a similar-sized (10,335-row) 1-month partition (~5 rows/row-group, ~0.24 MB/row-group footer growth -> projected ~5-6 GiB/year at that stress setting). At the PRODUCTION DEFAULT (256 MiB), this run produced only 71 row groups for 10,335 rows (~146 rows/row-group), footer_serialized_bytes=2.2 MB -- about a 30x reduction in row-group count at the setting the packet asked to evaluate.",
+ "full_year_projection": {
+  "measured_rows_per_replayed_day": 333.38709677419354,
+  "note": "linear extrapolation only; a full 2022 year at this per-day row rate projects to roughly 12x this run's row-group count (~850) and file size (~2.1 GB) -- well inside an 8 GiB budget. Not independently re-measured at full-year scale."
+ },
+ "verdict_row_group_feasibility": "PASS: production default batch_bytes does not approach the 8 GiB budget via row-group metadata growth; no row-group coalescing implemented (not needed per the packet -- only required if the default setting demonstrably violated the budget)."
+}

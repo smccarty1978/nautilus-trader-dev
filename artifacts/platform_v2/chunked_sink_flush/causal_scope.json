@@ -1,0 +1,31 @@
+{
+ "this_run": {
+  "requested_window": [
+   "2022-01-10",
+   "2022-02-09"
+  ],
+  "replayed_bar_range": {
+   "first_bar_iso": "2022-01-05T00:00:00+00:00",
+   "last_bar_iso": "2022-02-09T23:59:00+00:00",
+   "PASS": true
+  },
+  "rule": "first_bar >= 2022-01-01T00:00:00Z and last_bar <= 2022-12-31T23:59:59Z, asserted from the REPLAY itself (HostCore._epoch's own T), not the requested --start/--end",
+  "PASS": true
+ },
+ "prior_runs_marked_invalid_for_2022_only_scope": {
+  "rss_curve.json": [
+   "1_day.*",
+   "1_week.*",
+   "1_month.chunked_with_profile",
+   "1_month.chunked_no_profile"
+  ],
+  "equivalence.json": [
+   "block_start_2022-01-03_05"
+  ],
+  "downstream_memory.json": [
+   "stand_in_years.2022 (block_start_2022-01-03_05_chunked_997)"
+  ],
+  "reason": "run_plan_on_catalog defaults to warmup_days=5; every one of those runs/windows started within 5 days of 2022-01-01, so their replay touched 2021-12-2x warmup bars even though requested dates and output rows are all 2022-dated. Marked additively (INVALID_FOR_2022_ONLY_SCOPE), no existing recorded value changed."
+ },
+ "verdict": "PASS for this session's run (warmup chosen so first replayed bar is 2022-01-05, last is 2022-02-09, both inside 2022); prior-session runs are retrospectively flagged, not re-run."
+}

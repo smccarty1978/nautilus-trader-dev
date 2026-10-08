@@ -24,9 +24,57 @@ class HostPlanError(RuntimeError):
     pass
 
 
+def plan_output_columns(plan: Mapping[str, Any]) -> Tuple[List[str], List[str]]:
+    """(candidate_columns, observation_columns) for a compiled plan, with no replay and no
+    session table -- used by callers (lifecycle_v2's chunked partition path) that need the
+    output schema's column NAMES before any bar is ingested, to construct the
+    ChunkedParquetWriter instances a replay will stream rows into. Mirrors HostCore.__init__'s
+    own column construction exactly; keep the two in sync if either changes."""
+    identity_columns = list(plan["columns"]["identity"])
+    metadata_columns = [(m["column"], m["ref"]) for m in plan["columns"].get("metadata") or []]
+    feature_columns = list(plan["columns"].get("features") or [])
+    derived_columns = list(plan["columns"].get("derived") or [])
+    candidate_columns = identity_columns + [c for c, _ in metadata_columns if c not in identity_columns] + feature_columns + derived_columns
+    if plan["outcome"].get("contract") == "none":
+        observation_columns = list(identity_columns)
+    else:
+        contract = compile_outcome_contract(plan["outcome"])
+        observation_columns = LabelOutcomeKernel(contract, None).observation_columns
+    return candidate_columns, observation_columns
+
+
 def _load(dotted: str) -> Any:
     module, _, attr = dotted.rpartition(".")
     return getattr(importlib.import_module(module), attr)
+
+
+def declared_metadata_types(plan: Mapping[str, Any]) -> Dict[str, Any]:
+    """{metadata column -> pyarrow type} for every ``features.metadata`` column whose source
+    tracker declares that field's shape via ``BaseBinding.FIELD_TYPES`` (struct/list fields --
+    e.g. the volume-profile rolling tracker's ``profile`` struct). A metadata column with no
+    declaring tracker, or a field the tracker does not list in ``FIELD_TYPES``, is left out --
+    the caller (``lifecycle_v2._chunked_writers_for``) falls back to probe-based inference for
+    it, exactly as before this existed. This is the generic fix for a real schema-correctness
+    risk: a struct/list field that is null for every row of a batch-rows-sized probe (e.g. the
+    first ~1440 minutes after a block start, before a rolling tracker's first complete window)
+    would otherwise default to float64 and then fail (or silently misrepresent) once a real
+    struct value arrives."""
+    from research_workflow.host.chunked_writer import field_types_to_arrow
+    trackers_by_id = {t["id"]: t for t in (plan.get("trackers") or [])}
+    out: Dict[str, Any] = {}
+    for m in plan["columns"].get("metadata") or []:
+        column, ref = m["column"], m["ref"]
+        root, _, field = str(ref).partition(".")
+        t = trackers_by_id.get(root)
+        if t is None:
+            continue
+        cls = _load(t["implementation"])
+        field_types = getattr(cls, "FIELD_TYPES", {}) or {}
+        spec = field_types.get(field)
+        if spec is None:
+            continue
+        out[column] = field_types_to_arrow(spec)
+    return out
 
 
 class HostCore:
@@ -34,7 +82,15 @@ class HostCore:
 
     def __init__(self, plan: Mapping[str, Any], *, session_table: Any, primary_interval: Optional[Tuple[int, int]] = None,
                  ledger: Optional[List[Dict[str, Any]]] = None, progress_path: Optional[str] = None,
-                 progress_every_bars: int = 0, studies_root: Optional[str] = None) -> None:
+                 progress_every_bars: int = 0, studies_root: Optional[str] = None,
+                 chunked_writers: Optional[Tuple[Any, Any]] = None, chunked_flush_every: int = 0,
+                 chunked_flush_bytes: int = 0) -> None:
+        # chunked_writers=(candidate_writer, observation_writer): opt-in bounded-memory sink
+        # (research_workflow.host.chunked_writer.ChunkedParquetWriter). None (the default)
+        # preserves the exact pre-existing in-memory-frame behaviour for every caller that
+        # does not pass it -- smoke, the pure-python/bar_source test path, and every existing
+        # test keep materializing full candidate/observation DataFrames exactly as before.
+        self._chunked_writers = chunked_writers
         self.plan = dict(plan)
         self.studies_root = studies_root
         self.session_table = session_table
@@ -147,8 +203,11 @@ class HostCore:
         # sink
         candidate_columns = self.identity_columns + [c for c, _ in self.metadata_columns if c not in self.identity_columns] + self.feature_columns + self.derived_columns
         observation_columns = list(self.identity_columns) if self.descriptive else self.kernel.observation_columns
+        cand_writer, obs_writer = (self._chunked_writers or (None, None))
         self.sink = CollectionSink(candidate_columns, observation_columns, ledger=ledger,
-                                   primary_interval=(self.primary_start, self.primary_end))
+                                   primary_interval=(self.primary_start, self.primary_end),
+                                   candidate_writer=cand_writer, observation_writer=obs_writer,
+                                   flush_every=chunked_flush_every, flush_bytes=chunked_flush_bytes)
         self.candidates_emitted = 0
         self.epochs_evaluated = 0
         self.last_ts_seen: Optional[int] = None
@@ -368,6 +427,15 @@ class HostCore:
             for r in self.kernel.drain_rows():
                 self.sink.add_observation(r)
         self._heartbeat(final=True)
+        if self.sink.chunked():
+            # Bounded-memory path: rows already streamed to disk as they were produced; this
+            # call only flushes whatever is still buffered below the flush threshold -- it does
+            # NOT close/rename the writer, because a windowed partition reuses the SAME writer
+            # across several HostCore instances (one per window) and only the owner (the code
+            # that constructed the writer) knows when the last window has run. The owner calls
+            # writer.finalize() itself to get the manifest (row count, logical/physical hash).
+            self.sink.flush_writers()
+            return None, None
         return self.sink.frames()
 
     def _heartbeat(self, final: bool = False) -> None:
@@ -425,7 +493,13 @@ if Strategy is not object:
     class GovernedHostStrategy(Strategy):
         """NT face of the host: subscribes to the plan's external streams, forwards bars."""
 
-        def __init__(self, config: GovernedHostStrategyConfig) -> None:
+        def __init__(self, config: GovernedHostStrategyConfig, *, chunked_writers: Optional[Tuple[Any, Any]] = None,
+                     chunked_flush_every: int = 0, chunked_flush_bytes: int = 0) -> None:
+            # chunked_writers/chunked_flush_every/chunked_flush_bytes are NOT part of
+            # GovernedHostStrategyConfig on purpose: a ChunkedParquetWriter is a live Python
+            # object (an open file handle), not msgspec-serializable state, and this strategy is
+            # always constructed directly in this process (research_workflow.host_runner), never
+            # reconstructed from config alone.
             super().__init__(config)
             from research_workflow.sessions import build_session_table
             plan = json.loads(config.plan_json)
@@ -436,7 +510,9 @@ if Strategy is not object:
             self.ledger: Optional[List[Dict[str, Any]]] = [] if config.ledger_enabled else None
             self.core = HostCore(plan, session_table=table, primary_interval=interval, ledger=self.ledger,
                                  progress_path=(config.progress_path or None), progress_every_bars=config.progress_every_bars,
-                                 studies_root=(config.studies_root or None))
+                                 studies_root=(config.studies_root or None),
+                                 chunked_writers=chunked_writers, chunked_flush_every=chunked_flush_every,
+                                 chunked_flush_bytes=chunked_flush_bytes)
             self._bar_types: Dict[Any, str] = {}
             for s in plan["streams"]:
                 if s.get("bar_type"):
@@ -469,15 +545,22 @@ if Strategy is not object:
         def get_candidates_dataframe(self):
             if self._frames is None:
                 self._frames = self.core.finalize()
+            if self.core.sink.chunked():
+                raise RuntimeError("CHUNKED_RUN_HAS_NO_FRAME: the chunked_writers passed to this strategy own "
+                                   "the output; call writer.finalize() on them yourself for the manifest")
             return self._frames[0]
 
         def get_observations_dataframe(self):
             if self._frames is None:
                 self._frames = self.core.finalize()
+            if self.core.sink.chunked():
+                raise RuntimeError("CHUNKED_RUN_HAS_NO_FRAME: the chunked_writers passed to this strategy own "
+                                   "the output; call writer.finalize() on them yourself for the manifest")
             return self._frames[1]
 else:  # pragma: no cover
     GovernedHostStrategyConfig = None  # type: ignore
     GovernedHostStrategy = None  # type: ignore
 
 
-__all__ = ["HostCore", "GovernedHostStrategy", "GovernedHostStrategyConfig", "HostPlanError"]
+__all__ = ["HostCore", "GovernedHostStrategy", "GovernedHostStrategyConfig", "HostPlanError", "plan_output_columns",
+           "declared_metadata_types"]

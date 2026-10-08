@@ -1,0 +1,14 @@
+{
+ "task": "A -- bytes-bounded streaming logical-hash recompute",
+ "synthetic_tests": "research_workflow/tests/test_chunked_writer.py (see commit e111d077): oracle-vs-new-implementation parity across read batch_size in {1,2,7,64,997,whole-file} on VP-struct-shaped (9 profile structs, ~200-element int64 lists), nullable, mixed-int/float, and all-null-first-batch synthetic data; a multi-flush case proving >1 read batch (34/34 passed).",
+ "real_partition_check": {
+  "source": "this session's 1-month real-tape run (candidates.parquet, 10,335 rows, 246 leaf columns, 71 row groups, 175,010,400 bytes)",
+  "matches_manifest": true,
+  "manifest_sha256": "c1423dc80405da8e6c302917f4094613f50cd7f3edf8bf4ebf06cb7a92c0d642",
+  "recomputed_sha256": "c1423dc80405da8e6c302917f4094613f50cd7f3edf8bf4ebf06cb7a92c0d642",
+  "verify_peak_rss_bytes": 556179456,
+  "verify_elapsed_s": 72.13993830000982,
+  "process": "verify.py, its OWN subprocess (watchdog peak RSS reported separately in rss_curve_v2.json['verify_watchdog_peak_rss_bytes']), never inside the collection-sampled window"
+ },
+ "verdict": "PASS: identical hash recomputed in a bytes-bounded streaming fashion from a real, multi-row-group, multi-flush partition, at 0.52 GiB peak RSS in its own process (vs. the pre-fix default which would have materialized the whole 175 MB file's nested columns as Python objects in one batch)."
+}

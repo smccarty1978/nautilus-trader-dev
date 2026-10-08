@@ -57,8 +57,23 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+_SHA_CHUNK_BYTES = 4 * 1024 * 1024  # streaming hash chunk size: bounds peak RSS of _sha()
+# regardless of file size -- a full-year G2 partition can be several GB; Path.read_bytes()
+# would spike peak RSS by that whole size at every finalize/verify call site that uses this.
+
+
 def _sha(path: Path) -> Optional[str]:
-    return hashlib.sha256(Path(path).read_bytes()).hexdigest() if Path(path).is_file() else None
+    p = Path(path)
+    if not p.is_file():
+        return None
+    h = hashlib.sha256()
+    with open(p, "rb") as f:
+        while True:
+            chunk = f.read(_SHA_CHUNK_BYTES)
+            if not chunk:
+                break
+            h.update(chunk)
+    return h.hexdigest()
 
 
 def _read(path: Path) -> Dict[str, Any]:
@@ -298,6 +313,23 @@ class V2Options:
     max_runtime: float = 6 * 3600
     progress_every_bars: int = 200_000
     in_process_partitions: bool = False
+    # Bounded-memory collection: 0 (default) preserves the exact pre-existing behaviour --
+    # a partition's candidates/observations are held fully in memory and written with one
+    # to_parquet() call at partition end. A positive value switches `collection` (run_partition)
+    # to the chunked sink path (research_workflow.host.chunked_writer): rows are flushed to disk
+    # every `chunked_batch_rows` rows during the replay instead of accumulating for the whole
+    # partition. Smoke and the pure bar_source test path are unaffected by this option; only
+    # run_partition reads it. See artifacts/platform_v2/chunked_sink_flush/README.md.
+    chunked_batch_rows: int = 0
+    # Secondary, byte-estimate flush trigger -- INERT unless chunking is already enabled via
+    # chunked_batch_rows > 0 above (does not itself turn chunking on, so the "0 is a no-op"
+    # guarantee for every study that never opts in is unaffected). Once chunking is on, a row
+    # threshold alone is unsafe for a wide row (e.g. several struct/list tracker fields per
+    # row can be ~380 KB/row as Python objects -- see the README); the sink/writer flush on
+    # whichever of chunked_batch_rows or chunked_batch_bytes is reached first. Defaults to the
+    # module's DEFAULT_BATCH_BYTES (256 MiB) so an operator who sets only chunked_batch_rows
+    # still gets byte-bounded memory for an unexpectedly wide row shape.
+    chunked_batch_bytes: int = 256 * 1024 * 1024
     # W-5: when set, every model-store call this lifecycle makes (fit/score/authenticate)
     # writes to and reads from THIS root instead of the operator's real durable store
     # (research_workflow.roots.resolve_model_root()). None preserves the configured root --
@@ -542,21 +574,26 @@ class V2Lifecycle:
         return {"status": "PASS", "outputs": [str(path)]}
 
     # -- execution ----------------------------------------------------------------------------
-    def _run_window(self, plan: Dict[str, Any], start: str, end: str, primary: tuple, *, progress: Optional[Path], ledger: bool = False) -> Dict[str, Any]:
+    def _run_window(self, plan: Dict[str, Any], start: str, end: str, primary: tuple, *, progress: Optional[Path], ledger: bool = False,
+                    chunked_writers: Optional[Any] = None) -> Dict[str, Any]:
+        flush_every = self.opts.chunked_batch_rows if chunked_writers is not None else 0
+        flush_bytes = self.opts.chunked_batch_bytes if chunked_writers is not None else 0
         if self.opts.bar_source is not None:
             from research_workflow.host_runner import run_plan_on_bars
             from research_workflow.sessions import build_session_table, resolve_calendar_session_spec
             bars = self.opts.bar_source(start, end)
             table = build_session_table(resolve_calendar_session_spec(dict(self.opts.session_table_spec or plan["session"]), self.repo_root))
             ledger_rows: List[Dict[str, Any]] = [] if ledger else None
-            run = run_plan_on_bars(plan, bars, session_table=table, primary_interval=primary, ledger=ledger_rows)
+            run = run_plan_on_bars(plan, bars, session_table=table, primary_interval=primary, ledger=ledger_rows,
+                                   chunked_writers=chunked_writers, chunked_flush_every=flush_every, chunked_flush_bytes=flush_bytes)
             run["dataset"] = {"dataset_id": "synthetic", "logical_digest": None, "bytes_verification": "SYNTHETIC"}
             run["ledger"] = ledger_rows
             return run
         from research_workflow.host_runner import run_plan_on_catalog
         return run_plan_on_catalog(plan, start_date=start, end_date=end, repo_root=self.repo_root, primary_interval=primary,
                                    warmup_days=self.opts.warmup_days, progress_path=progress, progress_every_bars=self.opts.progress_every_bars,
-                                   session_table_spec=self.opts.session_table_spec, studies_root=self.opts.studies_root or (self.repo_root / "studies"), ledger=ledger)
+                                   session_table_spec=self.opts.session_table_spec, studies_root=self.opts.studies_root or (self.repo_root / "studies"), ledger=ledger,
+                                   chunked_writers=chunked_writers, chunked_flush_every=flush_every, chunked_flush_bytes=flush_bytes)
 
     @staticmethod
     def _persist(run: Dict[str, Any], out_dir: Path, extra: Mapping[str, Any]) -> Dict[str, Any]:
@@ -569,6 +606,52 @@ class V2Lifecycle:
                     "stats": run["stats"], "elapsed_s": run["elapsed_s"], "dataset": run.get("dataset"), "written_at_utc": _now()}
         _write(out_dir / "manifest.json", manifest)
         return manifest
+
+    @staticmethod
+    def _persist_chunked(stats: Mapping[str, Any], elapsed_s: float, dataset: Optional[Mapping[str, Any]],
+                         writer_manifests: Mapping[str, Dict[str, Any]], out_dir: Path, extra: Mapping[str, Any]) -> Dict[str, Any]:
+        """Bounded-memory counterpart of ``_persist``: the candidates/observations parquet
+        files were already written incrementally (ChunkedParquetWriter.finalize() has already
+        performed the atomic temp->final rename for each). The physical file's own sha256
+        (``*_sha256`` below) is preserved for existing consumers that key off it (reconcile,
+        replay_closure partition reuse, receipts); ``*_logical_content_sha256`` is the new,
+        row-group-layout-independent identity, present alongside it, never instead of it."""
+        c, o = out_dir / "candidates.parquet", out_dir / "observations.parquet"
+        cand_m, obs_m = writer_manifests["candidates"], writer_manifests["observations"]
+        assert _sha(c) == cand_m["physical_sha256"] and _sha(o) == obs_m["physical_sha256"], "CHUNKED_WRITER_FINALIZE_HASH_MISMATCH"
+        manifest = {**extra, "status": "PASS", "candidates_sha256": cand_m["physical_sha256"], "observations_sha256": obs_m["physical_sha256"],
+                    "candidates_logical_content_sha256": cand_m["logical_content_sha256"],
+                    "observations_logical_content_sha256": obs_m["logical_content_sha256"],
+                    "rows": {"candidates": int(cand_m["rows"]), "observations": int(obs_m["rows"])},
+                    "chunked": {"candidates": {k: v for k, v in cand_m.items() if k != "path"},
+                               "observations": {k: v for k, v in obs_m.items() if k != "path"}},
+                    "stats": stats, "elapsed_s": elapsed_s, "dataset": dataset, "written_at_utc": _now()}
+        _write(out_dir / "manifest.json", manifest)
+        return manifest
+
+    def _chunked_writers_for(self, plan: Dict[str, Any], out_dir: Path) -> Any:
+        from research_workflow.host.chunked_writer import ChunkedParquetWriter
+        from research_workflow.host.strategy import plan_output_columns, declared_metadata_types
+        import pyarrow as pa
+        cand_cols, obs_cols = plan_output_columns(plan)
+        identity_cols = set(plan["columns"]["identity"])
+        # Metadata columns whose tracker declares a struct/list shape (BaseBinding.FIELD_TYPES)
+        # get that declared type outright, same as identity/feature columns -- never left to
+        # probe-based inference, which would lock in float64 for a column that is all-null for
+        # the whole probe (e.g. a rolling tracker's profile struct before its first complete
+        # window). See declared_metadata_types's docstring.
+        declared_meta = declared_metadata_types(plan)
+        declared_cand = ({c: pa.int64() for c in identity_cols} | declared_meta
+                         | {c: pa.float64() for c in (plan["columns"].get("features") or []) if c not in declared_meta})
+        declared_obs = {c: pa.int64() for c in identity_cols if c in obs_cols} | {c: t for c, t in declared_meta.items() if c in obs_cols}
+        out_dir.mkdir(parents=True, exist_ok=True)
+        batch_rows = self.opts.chunked_batch_rows
+        batch_bytes = self.opts.chunked_batch_bytes
+        cand_w = ChunkedParquetWriter(out_dir / "candidates.parquet", cand_cols, declared_types=declared_cand,
+                                      batch_rows=batch_rows, batch_bytes=batch_bytes)
+        obs_w = ChunkedParquetWriter(out_dir / "observations.parquet", obs_cols, declared_types=declared_obs,
+                                     batch_rows=batch_rows, batch_bytes=batch_bytes)
+        return cand_w, obs_w
 
     def smoke(self, study: Path | None = None) -> Dict[str, Any]:
         self._require_execute("smoke")
@@ -749,8 +832,22 @@ class V2Lifecycle:
         if not self._partition_valid(shadow, plan["plan_sha256"], ids["composite_seal_hash"]):
             self._run_partition_child(plan, ids, int(year), period, shadow)
         sm, rm = _read(shadow / "manifest.json"), _read(served / "manifest.json")
-        cmp = {"candidates": {"served": rm.get("candidates_sha256"), "shadow": sm.get("candidates_sha256")},
-               "observations": {"served": rm.get("observations_sha256"), "shadow": sm.get("observations_sha256")}}
+        # Identity for this comparison, per output: the LOGICAL content hash
+        # (candidates_logical_content_sha256 / observations_logical_content_sha256) when BOTH the
+        # served and the recomputed-shadow manifest carry it (i.e. both were written chunked) --
+        # row-group/batch-boundary layout is not part of what "the same data" means, and the served
+        # partition's batch_rows need not equal the CURRENT run's chunked_batch_rows (an opt-in
+        # V2Options value, not plan/seal identity) for them to be the same logical partition.
+        # Falls back to the physical file hash (candidates_sha256 / observations_sha256) whenever
+        # either side lacks a logical hash (the unchunked path, where none exists) -- unchanged
+        # behaviour for every study that never opts into chunking.
+        def _identity_pair(logical_key: str, physical_key: str) -> Dict[str, Any]:
+            sl, rl = sm.get(logical_key), rm.get(logical_key)
+            if sl and rl:
+                return {"served": rl, "shadow": sl, "basis": "logical_content"}
+            return {"served": rm.get(physical_key), "shadow": sm.get(physical_key), "basis": "physical"}
+        cmp = {"candidates": _identity_pair("candidates_logical_content_sha256", "candidates_sha256"),
+               "observations": _identity_pair("observations_logical_content_sha256", "observations_sha256")}
         identical = all(v["served"] and v["served"] == v["shadow"] for v in cmp.values())
         record.update({"status": "IDENTICAL" if identical else "MISMATCH", "comparison": cmp, "shadow_dir": str(shadow),
                        "shadow_elapsed_s": sm.get("elapsed_s"), "generated_at_utc": _now()})
@@ -771,6 +868,13 @@ class V2Lifecycle:
                 cmd += ["--studies-root", str(self.opts.studies_root)]
             if self.opts.windows:
                 cmd += ["--windows", ",".join(self.opts.windows)]
+            if self.opts.chunked_batch_rows > 0:
+                # Bounded-memory collection is a runtime option (V2Options.chunked_batch_rows),
+                # not plan/seal identity -- it must cross the subprocess boundary explicitly
+                # here, the same as every other opts field this child command already forwards,
+                # or a governed run that opts in would silently collect unchunked in the child.
+                cmd += ["--chunked-batch-rows", str(self.opts.chunked_batch_rows)]
+                cmd += ["--chunked-batch-bytes", str(self.opts.chunked_batch_bytes)]
             out_dir.mkdir(parents=True, exist_ok=True)
             with open(out_dir / "child.log", "w", encoding="utf-8") as log:
                 r = subprocess.run(cmd, cwd=str(self.repo_root), stdout=log, stderr=subprocess.STDOUT, timeout=self.opts.max_runtime)
@@ -843,13 +947,16 @@ class V2Lifecycle:
         # The reuse binding is derived BEFORE the replay so that its own (shell) imports never enter the
         # replay import trace below.
         from research_workflow.replay_closure import ImportTrace, collection_closure, repo_files_for_modules
+        chunked = self.opts.chunked_batch_rows > 0
+        chunked_writers = self._chunked_writers_for(plan, out_dir) if chunked else None
         if not declared_for_year:
             b = self._partition_bounds(plan, year, period)
             bare = {k: v for k, v in b.items() if k != "primary_ns"}
             extra = {"kind": "partition", **bare, "windows": [], "plan_sha256": plan["plan_sha256"], **ids,
                      "replay_closure": self._replay_binding(plan, {**bare, "windows": []})}
             with ImportTrace() as trace:
-                run = self._run_window(plan, b["primary_start"], b["run_end"], b["primary_ns"], progress=progress)
+                run = self._run_window(plan, b["primary_start"], b["run_end"], b["primary_ns"], progress=progress,
+                                       chunked_writers=chunked_writers)
         else:
             bounds = [{k: v for k, v in self._window_bounds(plan, w, period).items()} for w in windows]
             interval = {"id": f"{period}-{year}", "year": int(year), "period": period,
@@ -863,22 +970,31 @@ class V2Lifecycle:
             runs = []
             with ImportTrace() as trace:
                 for b in bounds:
-                    r = self._run_window(plan, b["primary_start"], b["run_end"], b["primary_ns"], progress=progress)
+                    # The SAME chunked_writers pair (if any) is reused across every window in this
+                    # partition and finalized exactly once, after the loop: a windowed year's rows
+                    # stream into one continuous parquet file, never a per-window frame concatenated
+                    # in memory.
+                    r = self._run_window(plan, b["primary_start"], b["run_end"], b["primary_ns"], progress=progress,
+                                         chunked_writers=chunked_writers)
                     pending = int((r.get("stats") or {}).get("pending_at_end") or 0)
                     if pending:
                         raise LifecycleV2Error(
                             f"WINDOW_OUTCOME_UNRESOLVED: {b['id']} left {pending} candidate(s) unresolved at the window "
                             f"boundary; the declared window cannot resolve the declared outcome")
                     runs.append(r)
-            run = {"candidates": pd.concat([r["candidates"] for r in runs], ignore_index=True),
-                   "observations": pd.concat([r["observations"] for r in runs], ignore_index=True),
-                   "stats": _merge_window_stats([r.get("stats") or {} for r in runs]),
-                   "elapsed_s": sum(float(r.get("elapsed_s") or 0.0) for r in runs),
-                   "dataset": runs[0].get("dataset")}
+            if chunked:
+                run = {"stats": _merge_window_stats([r.get("stats") or {} for r in runs]),
+                       "elapsed_s": sum(float(r.get("elapsed_s") or 0.0) for r in runs), "dataset": runs[0].get("dataset")}
+            else:
+                run = {"candidates": pd.concat([r["candidates"] for r in runs], ignore_index=True),
+                       "observations": pd.concat([r["observations"] for r in runs], ignore_index=True),
+                       "stats": _merge_window_stats([r.get("stats") or {} for r in runs]),
+                       "elapsed_s": sum(float(r.get("elapsed_s") or 0.0) for r in runs),
+                       "dataset": runs[0].get("dataset")}
             digests = {json.dumps(r.get("dataset") or {}, sort_keys=True) for r in runs}
             if len(digests) > 1:
                 raise LifecycleV2Error(f"WINDOW_DATASET_MISMATCH: {period}-{year} windows read different datasets")
-            extra["window_rows"] = [int(len(r["candidates"])) for r in runs]
+            extra["window_rows"] = [int((r.get("stats") or {}).get("candidates") or 0) for r in runs]
         # Cumulative replay trace (Reading 2, §3.2): every partition run records the repo modules first
         # imported during its replay; any module outside the plan's replay-stage closure is a HALT --
         # the partition is not persisted and the key is never widened.
@@ -893,6 +1009,13 @@ class V2Lifecycle:
         if escapes:
             raise LifecycleV2Error(f"REPLAY_CLOSURE_ESCAPE: {period}-{year} imported {escapes} during replay, outside the "
                                    f"{closure['stage']}-stage closure; the reuse key is wrong -- halt, every reuse since is suspect")
+        if chunked:
+            # Every window's HostCore/strategy already streamed its rows into the SAME two
+            # writer objects via chunked_writers; finalize() is only reached here, once, after
+            # every window of this partition has run.
+            cand_w, obs_w = chunked_writers
+            writer_manifests = {"candidates": cand_w.finalize(), "observations": obs_w.finalize()}
+            return self._persist_chunked(run["stats"], run["elapsed_s"], run.get("dataset"), writer_manifests, out_dir, extra)
         return self._persist(run, out_dir, extra)
 
     def _collect_period(self, period: str) -> Dict[str, Any]:
@@ -1798,10 +1921,16 @@ def main(argv: Optional[List[str]] = None) -> int:
     p.add_argument("--study", required=True); p.add_argument("--period", required=True); p.add_argument("--year", type=int, required=True)
     p.add_argument("--out-dir", required=True); p.add_argument("--progress"); p.add_argument("--repo-root"); p.add_argument("--studies-root")
     p.add_argument("--windows", help="comma-separated declared window ids/ranges this child may execute")
+    p.add_argument("--chunked-batch-rows", type=int, default=0, help="see V2Options.chunked_batch_rows")
+    p.add_argument("--chunked-batch-bytes", type=int, default=None, help="see V2Options.chunked_batch_bytes")
     ns = ap.parse_args(argv)
     if ns.cmd == "partition":
-        opts = V2Options(studies_root=Path(ns.studies_root) if ns.studies_root else None,
-                         windows=[w for w in (ns.windows or "").split(",") if w.strip()] or None)
+        child_kwargs = dict(studies_root=Path(ns.studies_root) if ns.studies_root else None,
+                            windows=[w for w in (ns.windows or "").split(",") if w.strip()] or None,
+                            chunked_batch_rows=ns.chunked_batch_rows)
+        if ns.chunked_batch_bytes is not None:
+            child_kwargs["chunked_batch_bytes"] = ns.chunked_batch_bytes
+        opts = V2Options(**child_kwargs)
         lc = V2Lifecycle(Path(ns.study), repo_root=Path(ns.repo_root) if ns.repo_root else REPO_ROOT, options=opts)
         manifest = lc.run_partition(ns.year, ns.period, Path(ns.out_dir), progress=Path(ns.progress) if ns.progress else None)
         print(json.dumps({"STATUS": "OK", "partition": manifest.get("id"), "rows": manifest.get("rows")}))
