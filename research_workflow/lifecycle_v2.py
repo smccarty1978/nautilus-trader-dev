@@ -309,7 +309,9 @@ class V2Options:
     extra_bindings: Optional[Mapping[str, Any]] = None
     bar_source: Optional[Callable[[str, str], Any]] = None      # test hook: (start_date, end_date) -> [BarView]
     session_table_spec: Optional[Mapping[str, Any]] = None      # test hook
-    warmup_days: int = 5
+    # None (default): the replay lead-in is the compiled plan's chronology.warmup.days_before_partition
+    # (spec default 5). An explicit int is an operator override (tests / diagnostics only).
+    warmup_days: Optional[int] = None
     max_runtime: float = 6 * 3600
     progress_every_bars: int = 200_000
     in_process_partitions: bool = False
@@ -574,6 +576,24 @@ class V2Lifecycle:
         return {"status": "PASS", "outputs": [str(path)]}
 
     # -- execution ----------------------------------------------------------------------------
+    def _warmup_days(self, plan: Mapping[str, Any]) -> int:
+        """Calendar days of lead-in bars replayed before a partition/window start.
+
+        The study DECLARES this (``chronology.warmup.days_before_partition``, compiled into the plan);
+        the replay must honour it. A fixed 5-day lead-in silently streamed bars the study had not
+        authorized -- e.g. a window starting 2022-01-03 read 2021-12-29.. bars although 2021 was
+        prohibited, and a declared ``days_before_partition: 0`` was ignored. ``V2Options.warmup_days``
+        stays an explicit operator override; the same value keys the replay-closure binding, so a
+        partition collected under one lead-in is never reused under another.
+        """
+        if self.opts.warmup_days is not None:
+            return int(self.opts.warmup_days)
+        days = ((plan.get("chronology") or {}).get("warmup") or {}).get("days_before_partition", 5)
+        days = int(days)
+        if days < 0:
+            raise LifecycleV2Error(f"INVALID_WARMUP_DAYS: chronology.warmup.days_before_partition={days}")
+        return days
+
     def _run_window(self, plan: Dict[str, Any], start: str, end: str, primary: tuple, *, progress: Optional[Path], ledger: bool = False,
                     chunked_writers: Optional[Any] = None) -> Dict[str, Any]:
         flush_every = self.opts.chunked_batch_rows if chunked_writers is not None else 0
@@ -591,7 +611,7 @@ class V2Lifecycle:
             return run
         from research_workflow.host_runner import run_plan_on_catalog
         return run_plan_on_catalog(plan, start_date=start, end_date=end, repo_root=self.repo_root, primary_interval=primary,
-                                   warmup_days=self.opts.warmup_days, progress_path=progress, progress_every_bars=self.opts.progress_every_bars,
+                                   warmup_days=self._warmup_days(plan), progress_path=progress, progress_every_bars=self.opts.progress_every_bars,
                                    session_table_spec=self.opts.session_table_spec, studies_root=self.opts.studies_root or (self.repo_root / "studies"), ledger=ledger,
                                    chunked_writers=chunked_writers, chunked_flush_every=flush_every, chunked_flush_bytes=flush_bytes)
 
@@ -747,7 +767,7 @@ class V2Lifecycle:
     def _replay_binding(self, plan: Dict[str, Any], partition: Mapping[str, Any]) -> Dict[str, Any]:
         from research_workflow.replay_closure import replay_closure_binding
         return replay_closure_binding(plan, dataset=self._plan_dataset(plan), partition=partition,
-                                      authorization_sha256=self._authorization_sha256(), warmup_days=self.opts.warmup_days,
+                                      authorization_sha256=self._authorization_sha256(), warmup_days=self._warmup_days(plan),
                                       repo_root=self.repo_root)
 
     def _expected_partition(self, plan: Dict[str, Any], year: int, period: str) -> Dict[str, Any]:
