@@ -804,8 +804,22 @@ class V2Lifecycle:
         if not self._partition_valid(shadow, plan["plan_sha256"], ids["composite_seal_hash"]):
             self._run_partition_child(plan, ids, int(year), period, shadow)
         sm, rm = _read(shadow / "manifest.json"), _read(served / "manifest.json")
-        cmp = {"candidates": {"served": rm.get("candidates_sha256"), "shadow": sm.get("candidates_sha256")},
-               "observations": {"served": rm.get("observations_sha256"), "shadow": sm.get("observations_sha256")}}
+        # Identity for this comparison, per output: the LOGICAL content hash
+        # (candidates_logical_content_sha256 / observations_logical_content_sha256) when BOTH the
+        # served and the recomputed-shadow manifest carry it (i.e. both were written chunked) --
+        # row-group/batch-boundary layout is not part of what "the same data" means, and the served
+        # partition's batch_rows need not equal the CURRENT run's chunked_batch_rows (an opt-in
+        # V2Options value, not plan/seal identity) for them to be the same logical partition.
+        # Falls back to the physical file hash (candidates_sha256 / observations_sha256) whenever
+        # either side lacks a logical hash (the unchunked path, where none exists) -- unchanged
+        # behaviour for every study that never opts into chunking.
+        def _identity_pair(logical_key: str, physical_key: str) -> Dict[str, Any]:
+            sl, rl = sm.get(logical_key), rm.get(logical_key)
+            if sl and rl:
+                return {"served": rl, "shadow": sl, "basis": "logical_content"}
+            return {"served": rm.get(physical_key), "shadow": sm.get(physical_key), "basis": "physical"}
+        cmp = {"candidates": _identity_pair("candidates_logical_content_sha256", "candidates_sha256"),
+               "observations": _identity_pair("observations_logical_content_sha256", "observations_sha256")}
         identical = all(v["served"] and v["served"] == v["shadow"] for v in cmp.values())
         record.update({"status": "IDENTICAL" if identical else "MISMATCH", "comparison": cmp, "shadow_dir": str(shadow),
                        "shadow_elapsed_s": sm.get("elapsed_s"), "generated_at_utc": _now()})

@@ -197,6 +197,31 @@ def test_study_text_change_reuses_both_partitions_and_shadow_is_identical(tmp_pa
     assert recon["partition_reuse"]["shadow"]["status"] == "IDENTICAL"
 
 
+def test_shadow_verification_tolerates_a_different_batch_rows_than_the_served_partition(tmp_path, synthetic_bars):
+    """Req B: V2Options.chunked_batch_rows is a runtime option, not plan/seal identity -- a
+    partition served under one batch size and a shadow recomputed under a DIFFERENT one are
+    still the same logical partition and must compare IDENTICAL (on the logical content hash),
+    never MISMATCH on physical-byte row-group layout alone."""
+    study = _spec_path(tmp_path)
+    lc = _lifecycle(study, synthetic_bars, chunked_batch_rows=3)
+    _prepare_and_seal(lc, "a")
+    lc.collection()
+    before = _shas(study)
+    served_manifest = json.loads((study / "_work" / "controller" / "partitions" / "train" / "2029" / "manifest.json").read_text(encoding="utf-8"))
+    assert served_manifest["chunked"]["candidates"]["batch_rows"] == 3, "fixture did not take the chunked path"
+
+    _spec_path(tmp_path, question="rephrased after the collection finished")
+    _prepare_and_seal(lc, "b")
+    lc.opts.chunked_batch_rows = 11  # different batch size for the shadow recompute than what served has
+    r = lc.collection()
+    assert r["partition_reuse"]["reused"] == ["train-2029", "train-2030"]
+    assert _shas(study) == before, "reused partitions are served byte-for-byte, manifests untouched"
+    shadow = json.loads((study / "_work" / "controller" / "partition_reuse_shadow.json").read_text(encoding="utf-8"))
+    assert shadow["status"] == "IDENTICAL", shadow
+    assert shadow["comparison"]["candidates"]["basis"] == "logical_content"
+    assert shadow["comparison"]["observations"]["basis"] == "logical_content"
+
+
 def test_audit_stage_module_change_reuses_but_replay_module_change_refuses(tmp_path, synthetic_bars, monkeypatch):
     """V1 / V2 at the derivation layer: the compiler re-hashes every closure file; a changed hash of a file
     OUTSIDE the collection stage keeps the key, a changed hash of a bound replay module changes it."""

@@ -109,6 +109,73 @@ to these modules would stale it -- this is not special to chunking. `V2Options.
 chunked_batch_rows` defaults to `0` (disabled) so a study that re-seals against this branch
 with no option change gets byte-identical collection output to before.
 
+## Phase 2 (session 2)
+
+### A. Schema risk -- declared struct/list metadata types, fail-closed type mismatch
+A metadata column whose source tracker declares its shape via `BaseBinding.FIELD_TYPES`
+(e.g. the volume-profile rolling tracker's `profile` struct -- null for the first ~1440 open
+minutes after a block start or a 1440-horizon roll) now gets that DECLARED Arrow type, never
+probe-based inference, which would otherwise default an all-null probe to `float64` and then
+either silently misrepresent or crash once a real struct/list value arrived later in the
+partition.
+- `research_workflow/host/chunked_writer.py`: `dtype_tag_to_arrow` (one dtype tag ->
+  `pa.DataType`) and `field_types_to_arrow` (one `FIELD_TYPES[field]` declaration -> `pa.DataType`,
+  generic over `kind` -- `"struct"` today, extensible). `_emit_batch` now builds every column's
+  array before writing any of them and raises a named `CHUNKED_WRITER_TYPE_MISMATCH TypeError`
+  (never a silent coercion, never a partial write) if a later batch's value is incompatible
+  with the already-fixed column type.
+- `research_workflow/host/strategy.py`: `declared_metadata_types(plan)` -- for every
+  `features.metadata` column, resolves `ref`'s root tracker id in `plan["trackers"]`, loads its
+  `implementation` class, reads `getattr(cls, "FIELD_TYPES", {})` (so it works whether or not
+  chore/vp_profile_snapshot's G2 has landed), and maps the declared field spec to an Arrow type.
+  A column with no declaring tracker, or a field the tracker does not list, falls back to
+  probe-based inference exactly as before -- unaffected.
+- `research_workflow/lifecycle_v2.py`'s `_chunked_writers_for` folds `declared_metadata_types`
+  into both writers' `declared_types` ahead of the identity/feature defaults.
+- Probe memory stays bounded: unaffected (the probe already accumulates only up to
+  `batch_rows` before the schema is fixed, with or without a declared type).
+
+### B. Activation + identity
+Decision: activation stays `V2Options.chunked_batch_rows: int = 0` (opt-in, unchanged from
+session 1) -- `0` is byte-for-byte the pre-existing behaviour everywhere, and flipping the
+default needs the real-VP-data (D) and RSS-curve (E) evidence this session gathers before it
+is safe to make the default path for every study.
+- Audited every partition-manifest/hash consumer named in the packet
+  (`_partition_valid`, `_partition_reusable`/`verify_reusable`, reconcile's
+  `_reattest_partition_reuse`, `merge`, `frame_store.register_frame`). All of them either (a)
+  compare a file's physical bytes against ITS OWN manifest's recorded physical hash (tamper
+  detection -- batch size never enters, since both sides are the same file at the same path at
+  different times) or (b) re-serialize fresh from the partition parquet files with pandas
+  (`merge`, which rewrites `merged/candidates.parquet`/`observations.parquet` from scratch via
+  `pd.concat` + `to_parquet`, independent of how the source partitions were written) -- none of
+  these needed a change.
+- The one real cross-batch-size comparison is `_shadow_verify`: it recomputes ONE reused
+  partition into a shadow directory under the CURRENT run's `V2Options.chunked_batch_rows` and
+  requires byte-identity with the SERVED partition, which may have been written under a
+  DIFFERENT `chunked_batch_rows` (it is a runtime option, not plan/seal identity, and is not
+  required to match between the run that collected a partition and a later run that reuses and
+  shadow-verifies it). Comparing the PHYSICAL hash in that case is a false
+  `PARTITION_REUSE_SHADOW_MISMATCH` for two logically-identical partitions whose row-group
+  layout merely differs. Fixed: `_shadow_verify` now compares the LOGICAL content hash
+  (`candidates_logical_content_sha256` / `observations_logical_content_sha256`) whenever BOTH
+  the served and the recomputed-shadow manifest carry it (both chunked), and falls back to the
+  physical hash only when either side lacks a logical hash (the unchunked path, where neither
+  manifest has the field) -- unchanged behaviour for every study that never opts into chunking.
+  `batch_rows` remains recorded (in `manifest.json["chunked"]["candidates"/"observations"]["batch_rows"]`)
+  for audit, just not used as reuse/shadow identity -- the smallest correct option, per the
+  packet.
+- Test: `research_workflow/tests/test_replay_closure.py::test_shadow_verification_tolerates_a_different_batch_rows_than_the_served_partition`
+  -- collects under `chunked_batch_rows=3`, reuses+shadow-recomputes under `chunked_batch_rows=11`;
+  fails with `PARTITION_REUSE_SHADOW_MISMATCH` before the fix, passes (`status == "IDENTICAL"`,
+  `basis == "logical_content"`) after.
+
+### C. Dead code removal
+Removed `HostCore.writer_manifests` (`research_workflow/host/strategy.py`, always `None` under
+the final ownership model -- `lifecycle_v2.run_partition` owns and finalizes the writers, not
+`HostCore`) and the two dead `out["writer_manifests"] = ...` lines that read it
+(`research_workflow/host_runner.py`, `run_plan_on_bars` and `run_plan_with_engine`). No
+behaviour change; nothing else read this key.
+
 ## Remaining work (NOT done this session -- say so, don't fabricate)
 
 - Req 7 (second half): the disposable cross-branch VP integration worktree (merge
@@ -117,18 +184,13 @@ with no option change gets byte-identical collection output to before.
 - Req 8: real RSS measurement curves (1 day / 1 week / 1 month / 3 months of 2022, chunked
   vs. unchunked) and the downstream-stage (reconcile/merge/analyze frame load) memory
   finding. Not attempted -- needs real catalog data and run time well beyond this session.
-- `_chunked_writers_for`'s `declared_cand`/`declared_obs` cover identity + feature columns
-  only; metadata/derived/observation columns rely on the probe-based inference. This was
-  exercised correctly on the golden fixture's label/barrier and descriptive observation
-  columns (including the int/float-mixed `horizon_end_ts` case) but not yet against a
-  struct/list-valued REAL tracker field (chore/vp_profile_snapshot is unmerged); only the
-  synthetic unit test proves that path.
+- `_chunked_writers_for`'s `declared_cand`/`declared_obs` now also cover metadata columns whose
+  tracker declares `FIELD_TYPES` (phase 2, task A, above). Derived/observation columns still
+  rely on probe-based inference. Exercised on the golden fixture's label/barrier and
+  descriptive observation columns (including the int/float-mixed `horizon_end_ts` case) and on
+  a synthetic struct/list-typed metadata column (`declared_metadata_types` unit test); NOT yet
+  against a struct/list-valued REAL tracker field end-to-end (chore/vp_profile_snapshot is
+  unmerged here) -- that is req 7 (D, below).
 - `V2Options.chunked_batch_rows` defaults to `0` (opt-in). Flipping the default to always-on
-  for `run_partition` is a one-line follow-up once req 7/8 validate it against real VP data
-  and real memory curves -- deliberately not done yet in this session so every existing
-  caller/test keeps its exact current behaviour unless it opts in.
-- `research_workflow/host/strategy.py`'s `self.writer_manifests` attribute and
-  `host_runner.py`'s two `out["writer_manifests"] = ...` lines are now dead (always `None`)
-  under the final ownership model (the writers' OWNER -- `run_partition` -- finalizes them,
-  not `HostCore`); left in place rather than removed for lack of remaining turns, flagged
-  here as a small follow-up cleanup, not a correctness risk.
+  for `run_partition` is a one-line follow-up once req 7/8 (D/E, below) validate it against
+  real VP data and real memory curves -- deliberately not done yet.
