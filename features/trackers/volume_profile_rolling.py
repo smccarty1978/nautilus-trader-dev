@@ -277,6 +277,55 @@ class VolumeProfileSnapshot:
         d["exact_triplets"] = tuple(tuple(t) for t in d["exact_triplets"]) if d.get("exact_triplets") is not None else None
         return cls(**d)
 
+    def to_struct(self) -> Dict[str, Any]:
+        """The compact typed transport (``VolumeProfileRollingBinding.FIELD_TYPES["profile"]``):
+        every scalar field as-is, ``weights_fp`` / ``contributions`` as plain ``int`` lists
+        (``list<int64>`` once flushed through a parquet-typed sink), and ``exact_triplets`` -- rare,
+        non-``None`` only on the snapshot where the live kernel's own walk took the exact
+        re-decision path -- as three parallel flat ``int`` lists (``triplet_tick`` /
+        ``triplet_n`` / ``triplet_volume``) rather than a nested list of 3-tuples, so a typed
+        column sink needs only flat ``list<int64>`` columns, never ``list<struct<...>>``.
+        No JSON text anywhere in this representation."""
+        d = dict(self.__dict__)
+        d["weights_fp"] = list(self.weights_fp)
+        d["contributions"] = list(self.contributions)
+        if self.exact_triplets is None:
+            d["triplet_tick"], d["triplet_n"], d["triplet_volume"] = None, None, None
+        else:
+            d["triplet_tick"] = [t[0] for t in self.exact_triplets]
+            d["triplet_n"] = [t[1] for t in self.exact_triplets]
+            d["triplet_volume"] = [t[2] for t in self.exact_triplets]
+        del d["exact_triplets"]
+        return d
+
+    _INT_FIELDS = ("snapshot_ts", "segment_start_ts", "horizon_open_minutes", "window_minutes", "window_start_ts",
+                   "window_end_ts", "lo_tick", "n_bins", "win_lo_tick", "win_hi_tick", "weight_scale", "total_weight_fp")
+    _BOOL_FIELDS = ("window_complete", "roll_truncated", "volume_conserving")
+    _FLOAT_FIELDS = ("tick", "total_source_volume", "sigma_a", "sigma_ticks")
+
+    @classmethod
+    def from_struct(cls, d: Mapping[str, Any]) -> "VolumeProfileSnapshot":
+        """Inverse of :meth:`to_struct`. A typed sink (pandas/pyarrow struct column) upcasts
+        integer struct SCALAR fields (never ``list<int64>`` children) to Python ``float`` in its
+        own dict materialization whenever the column holds ANY null struct value elsewhere in the
+        same frame (observed: a column with no null rows keeps ``lo_tick`` as ``int``; the same
+        column WITH a null row elsewhere hands back ``59445.0``) -- a float64 round-trips every
+        int64 value used here exactly (all well under 2**53), but the Python ``type`` and this
+        object's own ``content_hash`` (JSON text of the payload) are NOT bit-identical unless every
+        field is re-cast to its declared type here, not merely passed through."""
+        d = dict(d)
+        tick, n, vol = d.pop("triplet_tick"), d.pop("triplet_n"), d.pop("triplet_volume")
+        d["weights_fp"] = tuple(int(x) for x in d["weights_fp"])
+        d["contributions"] = tuple(int(x) for x in d["contributions"])
+        d["exact_triplets"] = None if tick is None else tuple(zip((int(x) for x in tick), (int(x) for x in n), (int(x) for x in vol)))
+        for f in cls._INT_FIELDS:
+            d[f] = int(d[f])
+        for f in cls._BOOL_FIELDS:
+            d[f] = bool(d[f])
+        for f in cls._FLOAT_FIELDS:
+            d[f] = float(d[f])
+        return cls(**d)
+
     def _exact_fractions(self, a: int, n: int) -> list:
         """Exact per-tick rational weights on absolute tick range ``[a, a + n - 1]`` (the live
         kernel's own padded array extent, NOT the occupied-weight range)."""
@@ -667,13 +716,25 @@ class VolumeProfileRollingBinding(BaseBinding):
     INPUTS = {"bars": "stream"}
     FIELDS = ('snapshot_ts', 'window_minutes', 'window_complete', 'roll_truncated', 'A', 'sigma_ticks', 'win_lo', 'win_hi', 'profile_width',
               'total_source_volume', 'total_weight', 'n_occupied_bins', 'poc', 'vah', 'val', 'va_width', 'va_weight_fraction', 'raw_poc',
-              'raw_vah', 'raw_val', 'n_hvn', 'n_lvn', 'hvns_json', 'lvns_json', 'dropped_bars', 'profile_json', 'profile_hash')
+              'raw_vah', 'raw_val', 'n_hvn', 'n_lvn', 'hvns_json', 'lvns_json', 'dropped_bars', 'profile', 'profile_hash')
+    # ``profile`` is a typed struct field (compact transport, D2b): its runtime value is the
+    # plain dict VolumeProfileSnapshot.to_struct() produces (int lists, never a JSON string), so a
+    # typed host sink carries it through to parquet as a struct / flat list<int64> columns rather
+    # than one opaque string column. research cap describe surfaces the declared schema.
+    FIELD_TYPES = {"profile": {"kind": "struct", "schema": {
+        "snapshot_ts": "int64", "segment_start_ts": "int64", "horizon_open_minutes": "int64", "allocation": "str",
+        "window_minutes": "int64", "window_complete": "bool", "roll_truncated": "bool", "window_start_ts": "int64",
+        "window_end_ts": "int64", "tick": "float64", "lo_tick": "int64", "n_bins": "int64",
+        "win_lo_tick": "int64", "win_hi_tick": "int64", "weights_fp": "int64[]", "contributions": "int64[]",
+        "weight_scale": "int64", "total_weight_fp": "int64", "total_source_volume": "float64",
+        "volume_conserving": "bool", "sigma_a": "float64", "sigma_ticks": "float64",
+        "triplet_tick": "int64[]?", "triplet_n": "int64[]?", "triplet_volume": "int64[]?", "content_hash": "str"}}}
     # Fields that are declared but only ever populated (never silently null at compile time
     # because a study forgot a parameter) when the named parameter holds the given value: a
     # study that references one of these without the parameter gets a typed compile gap
     # (research_workflow/grammar/compiler.py's _validate_ref / _compile_predicate), not a
     # runtime null.
-    FIELD_REQUIRES_PARAM = {"profile_json": ("emit_profile", True), "profile_hash": ("emit_profile", True)}
+    FIELD_REQUIRES_PARAM = {"profile": ("emit_profile", True), "profile_hash": ("emit_profile", True)}
     EPOCH_FIELDS = ()
     EVENTS = ('minute_closed',)
     SUBSCRIBES = ()
@@ -701,10 +762,10 @@ class VolumeProfileRollingBinding(BaseBinding):
             setattr(self, f, snap.get(f))
         if self.emit_profile:
             obj = self.kernel.profile_snapshot(snap)
-            self.profile_json = obj.to_json() if obj is not None else None
+            self.profile = obj.to_struct() if obj is not None else None
             self.profile_hash = obj.content_hash if obj is not None else None
         else:
-            self.profile_json = None
+            self.profile = None
             self.profile_hash = None
         for p in closed:
             self.emit("minute_closed", {"snapshot_ts": int(self.kernel.om[p])})

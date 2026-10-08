@@ -312,7 +312,7 @@ def test_profile_object_reconstructs_close_allocation_whose_occupied_range_is_na
 
 def test_emit_profile_false_leaves_every_existing_output_byte_identical(monkeypatch):
     monkeypatch.setattr(VPR, "load_calendar", lambda ds: (OM, np.array([], np.int64)))
-    scalar_fields = [f for f in VolumeProfileRollingBinding.FIELDS if f not in ("profile_json", "profile_hash")]
+    scalar_fields = [f for f in VolumeProfileRollingBinding.FIELDS if f not in ("profile", "profile_hash")]
     bars = _bars(11)
     off = VolumeProfileRollingBinding({"dataset": "X", "horizon_open_minutes": H, **SMALL}, {"bars": "s"})
     on = VolumeProfileRollingBinding({"dataset": "X", "horizon_open_minutes": H, "emit_profile": True, **SMALL}, {"bars": "s"})
@@ -321,15 +321,15 @@ def test_emit_profile_false_leaves_every_existing_output_byte_identical(monkeypa
         on.on_bar("bars", BarView("s", ts - NS, ts, c, h, l, c, v))
     for f in scalar_fields:
         assert getattr(off, f) == getattr(on, f), f
-    assert off.profile_json is None and off.profile_hash is None
+    assert off.profile is None and off.profile_hash is None
 
 
 def test_profile_hash_is_deterministic_and_matches_an_identical_rebuild():
     bars = _bars(12, per_minute=4)
     _, _, obj1 = _run_capture(bars, 20)
     _, _, obj2 = _run_capture(bars, 20)
-    assert obj1.content_hash == obj2.content_hash == VolumeProfileSnapshot.from_json(obj1.to_json()).content_hash
-    assert obj1.to_json() == obj2.to_json()
+    assert obj1.content_hash == obj2.content_hash == VolumeProfileSnapshot.from_struct(obj1.to_struct()).content_hash
+    assert obj1.to_struct() == obj2.to_struct()
 
 
 def test_profile_object_is_causal_to_later_bars():
@@ -368,9 +368,11 @@ def test_profile_object_states_conservation_by_allocation():
 def test_binding_declares_emit_profile_param_and_profile_fields():
     assert "emit_profile" in VolumeProfileRollingBinding.PARAMS
     assert VolumeProfileRollingBinding.PARAMS["emit_profile"] is False
-    assert "profile_json" in VolumeProfileRollingBinding.FIELDS and "profile_hash" in VolumeProfileRollingBinding.FIELDS
-    assert VolumeProfileRollingBinding.FIELD_REQUIRES_PARAM["profile_json"] == ("emit_profile", True)
+    assert "profile" in VolumeProfileRollingBinding.FIELDS and "profile_hash" in VolumeProfileRollingBinding.FIELDS
+    assert VolumeProfileRollingBinding.FIELD_REQUIRES_PARAM["profile"] == ("emit_profile", True)
     assert VolumeProfileRollingBinding.FIELD_REQUIRES_PARAM["profile_hash"] == ("emit_profile", True)
+    assert VolumeProfileRollingBinding.FIELD_TYPES["profile"]["kind"] == "struct"
+    assert "weights_fp" in VolumeProfileRollingBinding.FIELD_TYPES["profile"]["schema"]
 
 
 def test_referencing_profile_field_without_emit_profile_is_a_compile_gap():
@@ -385,13 +387,34 @@ def test_referencing_profile_field_without_emit_profile_is_a_compile_gap():
             self.gaps_seen.append((kind, where, msg))
 
     off = _StubCtx({"emit_profile": False})
-    assert _check_field_requires_param(off, VolumeProfileRollingBinding, "vp", "profile_json", "context.vp.profile_json") is False
+    assert _check_field_requires_param(off, VolumeProfileRollingBinding, "vp", "profile", "context.vp.profile") is False
     assert off.gaps_seen and "requires parameter emit_profile" in off.gaps_seen[0][2]
 
     on = _StubCtx({"emit_profile": True})
-    assert _check_field_requires_param(on, VolumeProfileRollingBinding, "vp", "profile_json", "context.vp.profile_json") is True
+    assert _check_field_requires_param(on, VolumeProfileRollingBinding, "vp", "profile", "context.vp.profile") is True
     assert not on.gaps_seen
 
     unrelated = _StubCtx({"emit_profile": False})
     assert _check_field_requires_param(unrelated, VolumeProfileRollingBinding, "vp", "poc", "context.vp.poc") is True
     assert not unrelated.gaps_seen
+
+
+def test_referencing_profile_field_inside_a_predicate_is_a_compile_gap():
+    """D2b: ``profile`` is a typed struct field (FIELD_TYPES); it can be a persisted output
+    column but can never be compared inside a predicate expression."""
+    from research_workflow.grammar.compiler import _check_field_not_struct
+
+    class _StubCtx:
+        def __init__(self):
+            self.gaps_seen = []
+
+        def gap(self, kind, where, msg, **kw):
+            self.gaps_seen.append((kind, where, msg))
+
+    ctx = _StubCtx()
+    assert _check_field_not_struct(ctx, VolumeProfileRollingBinding, "vp", "profile", "triggers.armed.when", predicate="vp.profile") is False
+    assert ctx.gaps_seen and "typed struct field" in ctx.gaps_seen[0][2]
+
+    ctx2 = _StubCtx()
+    assert _check_field_not_struct(ctx2, VolumeProfileRollingBinding, "vp", "poc", "triggers.armed.when", predicate="vp.poc > 0") is True
+    assert not ctx2.gaps_seen

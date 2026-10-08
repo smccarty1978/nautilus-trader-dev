@@ -713,6 +713,24 @@ def _check_field_requires_param(ctx: "_Ctx", cls: Any, root: str, field: str, wh
     return True
 
 
+def _check_field_not_struct(ctx: "_Ctx", cls: Any, root: str, field: str, where: str, *, predicate: Optional[str] = None) -> bool:
+    """A binding may declare ``FIELD_TYPES = {field: {"kind": "struct", ...}}`` for a field whose
+    runtime value is a typed non-scalar object (e.g. a volume-profile weight vector), never a
+    plain scalar. Such a field is a valid persisted OUTPUT column (the host sink and parquet
+    writer carry it as a typed Arrow struct/list column), but it can never be compared, added or
+    otherwise evaluated inside a predicate expression -- there is no defined scalar meaning. A
+    predicate referencing one gets a typed INVALID_PARAMETERIZATION compile gap here, never a
+    silent runtime TypeError deep in predicate evaluation."""
+    decl = getattr(cls, "FIELD_TYPES", {}).get(field)
+    if decl is None or decl.get("kind") != "struct":
+        return True
+    kwargs = {"predicate": predicate} if predicate else {}
+    ctx.gap(GapKind.INVALID_PARAMETERIZATION, where,
+            f"{root} ({cls.CAPABILITY}) field {field!r} is a typed struct field (FIELD_TYPES) and cannot be used in a "
+            f"predicate expression -- reference it only as a persisted output column", **kwargs)
+    return False
+
+
 def _validate_ref(ctx: _Ctx, ref: Any, where: str, *, allow_epoch: bool = True) -> bool:
     if not isinstance(ref, str) or not ref:
         ctx.gap(GapKind.INVALID_PARAMETERIZATION, where, f"expected a reference string, got {ref!r}")
@@ -786,6 +804,8 @@ def _compile_predicate(ctx: _Ctx, text: Optional[str], where: str, *, allow_even
                         predicate=text, closest=_closest(attr, list(cls.FIELDS) + list(cls.EPOCH_FIELDS)))
                 ok = False
             elif not _check_field_requires_param(ctx, cls, root, attr, where, predicate=text):
+                ok = False
+            elif not _check_field_not_struct(ctx, cls, root, attr, where, predicate=text):
                 ok = False
     if not ok:
         return None
