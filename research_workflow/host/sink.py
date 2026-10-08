@@ -4,33 +4,43 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
+from research_workflow.host.chunked_writer import estimate_value_bytes
+
 
 class ColumnarBuffer:
     """Rows land as per-column lists and become a frame only at flush -- UNLESS a
     ``writer`` (``research_workflow.host.chunked_writer.ChunkedParquetWriter``) is attached,
-    in which case rows are forwarded to it in ``flush_every``-row batches and dropped from
-    this buffer immediately, so the one-partition replay never holds more than
-    ``flush_every`` rows of this column in Python memory at once. ``writer=None`` (the
-    default) is byte-for-byte the pre-existing behaviour."""
+    in which case rows are forwarded to it as soon as EITHER ``flush_every`` rows OR (if set)
+    an estimated ``flush_bytes`` worth of buffered values have accumulated -- whichever comes
+    first -- and dropped from this buffer immediately, so the one-partition replay never holds
+    more than that many rows (or that many estimated bytes) of this column in Python memory at
+    once. A wide row (e.g. several struct/list tracker fields) can reach ``flush_bytes`` long
+    before ``flush_every`` rows have accumulated; ``flush_bytes`` exists for exactly that case.
+    ``writer=None`` (the default) is byte-for-byte the pre-existing behaviour."""
 
-    def __init__(self, columns: Sequence[str], *, writer: Any = None, flush_every: int = 0) -> None:
+    def __init__(self, columns: Sequence[str], *, writer: Any = None, flush_every: int = 0, flush_bytes: int = 0) -> None:
         self.columns: List[str] = list(columns)
         self._cols: Dict[str, List[Any]] = {c: [] for c in self.columns}
         self.n = 0
         self.writer = writer
         self.flush_every = int(flush_every)
+        self.flush_bytes = int(flush_bytes)
         self._pending_rows = 0  # rows currently buffered in self._cols, not yet forwarded
+        self._pending_bytes = 0  # estimated bytes of those same buffered rows
 
     def _maybe_flush(self) -> None:
-        if self.writer is None or self.flush_every <= 0:
+        if self.writer is None:
             return
-        if self._pending_rows < self.flush_every:
+        row_trigger = self.flush_every > 0 and self._pending_rows >= self.flush_every
+        byte_trigger = self.flush_bytes > 0 and self._pending_bytes >= self.flush_bytes
+        if not (row_trigger or byte_trigger):
             return
         rows = [{c: self._cols[c][i] for c in self.columns} for i in range(self._pending_rows)]
         self.writer.write_rows(rows)
         for c in self.columns:
             del self._cols[c][:self._pending_rows]
         self._pending_rows = 0
+        self._pending_bytes = 0
 
     def append(self, row: Mapping[str, Any]) -> None:
         cols = self._cols
@@ -38,6 +48,8 @@ class ColumnarBuffer:
             cols[c].append(row.get(c))
         self.n += 1
         self._pending_rows += 1
+        if self.flush_bytes:
+            self._pending_bytes += sum(estimate_value_bytes(row.get(c)) for c in self.columns)
         self._maybe_flush()
 
     def append_values(self, values: Sequence[Any]) -> None:
@@ -45,6 +57,8 @@ class ColumnarBuffer:
             self._cols[c].append(v)
         self.n += 1
         self._pending_rows += 1
+        if self.flush_bytes:
+            self._pending_bytes += sum(estimate_value_bytes(v) for v in values)
         self._maybe_flush()
 
     def __len__(self) -> int:
@@ -70,12 +84,14 @@ class ColumnarBuffer:
         for c in self.columns:
             del self._cols[c][:self._pending_rows]
         self._pending_rows = 0
+        self._pending_bytes = 0
 
     def clear(self) -> None:
         for c in self.columns:
             self._cols[c] = []
         self.n = 0
         self._pending_rows = 0
+        self._pending_bytes = 0
 
 
 class CollectionSink:
@@ -89,9 +105,9 @@ class CollectionSink:
 
     def __init__(self, candidate_columns: Sequence[str], observation_columns: Sequence[str], *, ledger: Optional[List[Dict[str, Any]]] = None,
                  primary_interval: Optional[Tuple[Optional[int], Optional[int]]] = None,
-                 candidate_writer: Any = None, observation_writer: Any = None, flush_every: int = 0) -> None:
-        self.candidates = ColumnarBuffer(candidate_columns, writer=candidate_writer, flush_every=flush_every)
-        self.observations = ColumnarBuffer(observation_columns, writer=observation_writer, flush_every=flush_every)
+                 candidate_writer: Any = None, observation_writer: Any = None, flush_every: int = 0, flush_bytes: int = 0) -> None:
+        self.candidates = ColumnarBuffer(candidate_columns, writer=candidate_writer, flush_every=flush_every, flush_bytes=flush_bytes)
+        self.observations = ColumnarBuffer(observation_columns, writer=observation_writer, flush_every=flush_every, flush_bytes=flush_bytes)
         self.ledger = ledger
         self.primary_start, self.primary_end = (primary_interval if primary_interval else (None, None))
         self.dropped_candidates = 0

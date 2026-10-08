@@ -38,20 +38,25 @@ def _plan(spec_text: str, repo_root: Path):
     return json.loads(tmp.read_text(encoding="utf-8"))
 
 
-def _run(plan, bars, session, chunked_batch_rows, tmp_path, tag):
+def _run(plan, bars, session, chunked_batch_rows, tmp_path, tag, chunked_batch_bytes=0):
     from research_workflow.host_runner import run_plan_on_bars
     from research_workflow.sessions import build_session_table
     table = build_session_table(session)
-    if chunked_batch_rows <= 0:
+    if chunked_batch_rows <= 0 and chunked_batch_bytes <= 0:
         run = run_plan_on_bars(plan, bars, session_table=table)
         return run["candidates"], run["observations"], run["stats"]
     from research_workflow.host.chunked_writer import ChunkedParquetWriter
     from research_workflow.host.strategy import plan_output_columns
     cand_cols, obs_cols = plan_output_columns(plan)
     out_dir = tmp_path / tag
-    cand_w = ChunkedParquetWriter(out_dir / "candidates.parquet", cand_cols, batch_rows=chunked_batch_rows)
-    obs_w = ChunkedParquetWriter(out_dir / "observations.parquet", obs_cols, batch_rows=chunked_batch_rows)
-    run = run_plan_on_bars(plan, bars, session_table=table, chunked_writers=(cand_w, obs_w), chunked_flush_every=chunked_batch_rows)
+    # batch_rows=1 means "every row is its own physical batch unless bytes govern instead" --
+    # a big row-threshold combined with a small byte-threshold exercises the BYTES trigger
+    # specifically (test_barrier_study_chunked_matches_unchunked_byte_threshold below).
+    writer_batch_rows = chunked_batch_rows if chunked_batch_rows > 0 else 1_000_000
+    cand_w = ChunkedParquetWriter(out_dir / "candidates.parquet", cand_cols, batch_rows=writer_batch_rows, batch_bytes=chunked_batch_bytes)
+    obs_w = ChunkedParquetWriter(out_dir / "observations.parquet", obs_cols, batch_rows=writer_batch_rows, batch_bytes=chunked_batch_bytes)
+    run = run_plan_on_bars(plan, bars, session_table=table, chunked_writers=(cand_w, obs_w),
+                           chunked_flush_every=writer_batch_rows, chunked_flush_bytes=chunked_batch_bytes)
     cand_m, obs_m = cand_w.finalize(), obs_w.finalize()
     import pandas as pd
     cands = pd.read_parquet(out_dir / "candidates.parquet")
@@ -83,6 +88,23 @@ def test_barrier_study_chunked_matches_unchunked(tmp_path, synthetic_bars, batch
     assert unch_stats["candidates"] == ch_stats["candidates"]
     assert unch_stats["observations"] == ch_stats["observations"]
     assert unch_stats["pending_at_end"] == ch_stats["pending_at_end"] == 0
+
+
+def test_barrier_study_chunked_matches_unchunked_byte_threshold(tmp_path, synthetic_bars):
+    """Req 1 (byte threshold): flush governed by estimated BYTES, not row count, end-to-end
+    through run_plan_on_bars -> HostCore -> CollectionSink -> ColumnarBuffer -> writer -- the
+    full population must still match the unchunked run exactly."""
+    bars, expected = synthetic_bars
+    session = {"kind": "calendar", "session": "RTH", "rows": [[a * NS, b * NS] for a, b in expected["sessions"]]}
+    spec_text = (GOLDEN / "study_barrier.yaml").read_text(encoding="utf-8")
+    plan = _plan(spec_text, ROOT)
+    unch_c, unch_o, unch_stats = _run(plan, bars, session, 0, tmp_path, "unchunked_bytes")
+    ch_c, ch_o, ch_stats = _run(plan, bars, session, 0, tmp_path, "chunked_bytes", chunked_batch_bytes=256)
+    assert len(unch_c) > 0 and len(unch_o) > 0
+    _assert_frames_equal(unch_c, ch_c, "candidates")
+    _assert_frames_equal(unch_o, ch_o, "observations")
+    assert unch_stats["candidates"] == ch_stats["candidates"]
+    assert unch_stats["observations"] == ch_stats["observations"]
 
 
 def _plan_from_spec_dict(spec: dict, repo_root: Path):

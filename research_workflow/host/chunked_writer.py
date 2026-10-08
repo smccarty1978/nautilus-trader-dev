@@ -37,6 +37,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import sys
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Sequence
 
@@ -49,6 +50,54 @@ import pyarrow.parquet as pq
 # -- candidates and observations -- plus headroom still clears an 8 GiB budget. Callers with
 # a heavier row (e.g. multiple struct/list tracker fields per row) should pass a smaller value).
 DEFAULT_BATCH_ROWS = 50_000  # host-constant: default flush threshold, see module docstring
+
+# A wide row (e.g. a struct column carrying several multi-hundred-element lists, measured at
+# ~380 KB/row as Python objects for the volume-profile rolling tracker's 9-instance case --
+# see artifacts/platform_v2/chunked_sink_flush/README.md) makes DEFAULT_BATCH_ROWS alone unsafe:
+# 50_000 such rows would buffer ~19 GiB before the first physical flush. DEFAULT_BATCH_BYTES is
+# a second, independent flush trigger -- the probe/batch is cut on whichever threshold (rows or
+# estimated bytes) is reached first -- so a caller that only ever configures the row threshold
+# still gets a bounded-memory probe for an unexpectedly wide row shape. 256 MiB is chosen so
+# even a single buffer's worst-case batch stays a small fraction of an 8 GiB process budget with
+# two buffers (candidates + observations) held at once, plus engine/catalog baseline headroom.
+DEFAULT_BATCH_BYTES = 256 * 1024 * 1024  # host-constant: default byte flush threshold
+
+
+def estimate_value_bytes(value: Any) -> int:
+    """Cheap, deterministic estimate of one value's in-memory footprint. Used ONLY to decide
+    WHEN a buffered batch should flush -- never to decide correctness or written content.
+
+    Calibrated against ``tracemalloc`` on realistic (non-cached-small-int) nested
+    struct/list rows shaped like the real volume-profile tracker's ``profile`` column (9
+    struct columns, each with several ~200-element ``int64``/``float64`` list children):
+    this recursive ``sys.getsizeof``-based estimate came within ~7% of the tracemalloc-
+    measured actual allocation for that fixture (measured was the larger of the two --
+    i.e. this estimator is very slightly OPTIMISTIC, not pessimistic, so a flush threshold
+    sized off it is not over-conservative but is also not unsafely loose). A naive
+    fixed-8-bytes-per-scalar estimate (the previous draft of this function) was ~20x too
+    SMALL for the same fixture, because CPython ints/floats/containers carry real per-object
+    header overhead that a fixed constant misses entirely -- ``sys.getsizeof`` captures that
+    overhead directly and cheaply (a C-level call, no serialization). Determinism (same
+    value -> same estimate, every time, within one Python build) is what keeps the flush/
+    batch boundary reproducible; the LOGICAL content hash is independent of batch boundaries
+    regardless (see ``test_logical_hash_independent_of_batch_boundaries``), so this estimate
+    never needs to be exact or cross-platform-identical to be correct -- only cheap, non-zero,
+    and roughly proportional to real memory use."""
+    if value is None:
+        return sys.getsizeof(None)
+    if isinstance(value, (bool, int, float, str)):
+        return sys.getsizeof(value)
+    if isinstance(value, Mapping):
+        return sys.getsizeof(value) + sum(sys.getsizeof(k) + estimate_value_bytes(v) for k, v in value.items())
+    if isinstance(value, (list, tuple)):
+        return sys.getsizeof(value) + sum(estimate_value_bytes(v) for v in value)
+    return sys.getsizeof(value)  # unknown type: still a real, non-zero, cheap estimate
+
+
+def estimate_row_bytes(row: Mapping[str, Any], columns: Sequence[str]) -> int:
+    """Sum of ``estimate_value_bytes`` over one row's declared columns only (ignores any key
+    the row carries that is not in ``columns``, matching what is actually written/buffered)."""
+    return sum(estimate_value_bytes(row.get(c)) for c in columns)
 
 
 def _canonical_json(value: Any) -> str:
@@ -144,15 +193,29 @@ class ChunkedParquetWriter:
     windows); ``finalize()`` is called exactly once, after the last row of the partition."""
 
     def __init__(self, path: Path, columns: Sequence[str], *, declared_types: Optional[Mapping[str, pa.DataType]] = None,
-                 batch_rows: int = DEFAULT_BATCH_ROWS) -> None:
+                 batch_rows: int = DEFAULT_BATCH_ROWS, batch_bytes: int = DEFAULT_BATCH_BYTES,
+                 on_flush: Optional[Any] = None) -> None:
         if batch_rows < 1:
             raise ValueError(f"CHUNKED_WRITER_BAD_BATCH_ROWS: {batch_rows}")
+        if batch_bytes < 0:
+            raise ValueError(f"CHUNKED_WRITER_BAD_BATCH_BYTES: {batch_bytes}")
         self.path = Path(path)
         self.tmp_path = self.path.with_suffix(self.path.suffix + ".inprogress")
         self.columns = list(columns)
         self.declared_types = dict(declared_types or {})
         self.batch_rows = int(batch_rows)
+        self.batch_bytes = int(batch_bytes)  # 0 disables the byte trigger; rows-only, as before
+        # Generic, OFF-BY-DEFAULT observer hook: on_flush(event, info) is called at three
+        # points around each physical batch write -- "pre_emit" (batch about to be built/
+        # written, info={"rows": N}), "post_conversion" (Arrow arrays built, about to call
+        # write_table, info={"rows": N}), "post_emit" (write_table has returned, info=
+        # {"rows": N, "batches_written": N}). No feature/measurement logic lives here -- the
+        # hook itself decides what to sample (e.g. RSS) and where to record it; this writer
+        # never measures memory on its own. A raising observer is NOT caught: the caller's
+        # own instrumentation bug must surface, never be silently swallowed mid-write.
+        self.on_flush = on_flush
         self._probe: List[Dict[str, Any]] = []
+        self._probe_bytes = 0
         self.schema: Optional[pa.Schema] = None
         self._field_types: Dict[str, pa.DataType] = {}
         self._writer: Optional[pq.ParquetWriter] = None
@@ -181,6 +244,8 @@ class ChunkedParquetWriter:
     def _emit_batch(self, rows: Sequence[Mapping[str, Any]]) -> None:
         if not rows:
             return
+        if self.on_flush is not None:
+            self.on_flush("pre_emit", {"rows": len(rows), "batches_written": self.batches_written})
         # Build every column's array before writing anything: a later batch carrying a value
         # incompatible with the column's already-fixed type (e.g. a struct landing in a
         # column the probe locked to float64) must fail CLOSED -- named, typed, before any
@@ -194,6 +259,8 @@ class ChunkedParquetWriter:
                 raise TypeError(
                     f"CHUNKED_WRITER_TYPE_MISMATCH: column {c!r} fixed as {self._field_types[c]!s}; "
                     f"a later batch carries a value incompatible with that type ({exc})") from exc
+        if self.on_flush is not None:
+            self.on_flush("post_conversion", {"rows": len(rows), "batches_written": self.batches_written})
         table = pa.Table.from_arrays(arrays, schema=self.schema)
         self._writer.write_table(table)
         for r in rows:
@@ -201,6 +268,28 @@ class ChunkedParquetWriter:
             self._hasher.update(b"\n")
         self.rows_written += len(rows)
         self.batches_written += 1
+        if self.on_flush is not None:
+            self.on_flush("post_emit", {"rows": len(rows), "batches_written": self.batches_written})
+
+    def _iter_batches(self, rows: Sequence[Mapping[str, Any]]):
+        """Split ``rows`` (ALREADY in emission order) into sub-batches, cutting a batch as
+        soon as EITHER ``batch_rows`` is reached OR (if ``batch_bytes`` is set) the running
+        estimated byte size of the current batch would exceed ``batch_bytes`` -- whichever
+        comes first. Row order and row content are untouched; only where a batch boundary
+        falls changes, which does not affect the logical content hash
+        (``test_logical_hash_independent_of_batch_boundaries``)."""
+        batch: List[Mapping[str, Any]] = []
+        batch_bytes = 0
+        for r in rows:
+            rb = estimate_row_bytes(r, self.columns) if self.batch_bytes else 0
+            if batch and (len(batch) >= self.batch_rows or (self.batch_bytes and batch_bytes + rb > self.batch_bytes)):
+                yield batch
+                batch = []
+                batch_bytes = 0
+            batch.append(r)
+            batch_bytes += rb
+        if batch:
+            yield batch
 
     def write_rows(self, rows: Sequence[Mapping[str, Any]]) -> None:
         if self._finalized:
@@ -209,24 +298,29 @@ class ChunkedParquetWriter:
             return
         if self.schema is None:
             self._probe.extend(rows)
-            if len(self._probe) >= self.batch_rows:
+            if self.batch_bytes:
+                self._probe_bytes += sum(estimate_row_bytes(r, self.columns) for r in rows)
+            if len(self._probe) >= self.batch_rows or (self.batch_bytes and self._probe_bytes >= self.batch_bytes):
                 self._fix_schema(self._probe)
                 probe, self._probe = self._probe, []
-                for i in range(0, len(probe), self.batch_rows):
-                    self._emit_batch(probe[i:i + self.batch_rows])
+                self._probe_bytes = 0
+                for b in self._iter_batches(probe):
+                    self._emit_batch(b)
             return
-        self._emit_batch(list(rows))
+        for b in self._iter_batches(list(rows)):
+            self._emit_batch(b)
 
     def flush(self) -> None:
         """Force any buffered probe rows to disk as a real batch (fixing the schema first if
-        this partition never reached ``batch_rows`` rows in total)."""
+        this partition never reached ``batch_rows``/``batch_bytes`` in total)."""
         if self._finalized or not self._probe:
             return
         if self.schema is None:
             self._fix_schema(self._probe)
         probe, self._probe = self._probe, []
-        for i in range(0, len(probe), self.batch_rows):
-            self._emit_batch(probe[i:i + self.batch_rows])
+        self._probe_bytes = 0
+        for b in self._iter_batches(probe):
+            self._emit_batch(b)
 
     def finalize(self) -> Dict[str, Any]:
         """Flush, close, atomically rename into place, and return the manifest the caller
@@ -250,8 +344,10 @@ class ChunkedParquetWriter:
             "logical_content_sha256": self._hasher.hexdigest(),
             "physical_sha256": physical_sha256,
             "batch_rows": self.batch_rows,
+            "batch_bytes": self.batch_bytes,
             "path": str(self.path),
         }
 
 
-__all__ = ["ChunkedParquetWriter", "infer_arrow_type", "dtype_tag_to_arrow", "field_types_to_arrow", "DEFAULT_BATCH_ROWS"]
+__all__ = ["ChunkedParquetWriter", "infer_arrow_type", "dtype_tag_to_arrow", "field_types_to_arrow",
+           "DEFAULT_BATCH_ROWS", "DEFAULT_BATCH_BYTES", "estimate_value_bytes", "estimate_row_bytes"]

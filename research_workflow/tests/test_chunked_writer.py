@@ -16,6 +16,7 @@ import pytest
 
 from research_workflow.host.chunked_writer import (
     ChunkedParquetWriter, infer_arrow_type, dtype_tag_to_arrow, field_types_to_arrow,
+    estimate_row_bytes, estimate_value_bytes,
 )
 
 
@@ -279,3 +280,127 @@ def test_type_mismatch_fails_closed_before_writing(tmp_path):
         w.write_rows([{"a": {"unexpected": "struct"}}])
     assert w.rows_written == 2  # the bad batch never landed
     w._writer.close()
+
+
+def _wide_row(i, n_lists=9, list_len=200):
+    """A row shaped like the real volume-profile case: several list<int64> fields."""
+    return {"a": i, "b": float(i), "c": "x",
+            **{f"lst{k}": list(range(i, i + list_len)) for k in range(n_lists)}}
+
+
+def test_wide_rows_flush_on_bytes_before_batch_rows(tmp_path):
+    """A wide row makes the ROW threshold alone unsafe (see module docstring); the BYTE
+    threshold must cut a batch well before batch_rows is reached."""
+    out = tmp_path / "wide.parquet"
+    cols = ["a", "b", "c"] + [f"lst{k}" for k in range(9)]
+    # Each row's estimated size is large; batch_rows is deliberately huge so only the byte
+    # threshold can be the thing that triggers a flush.
+    w = ChunkedParquetWriter(out, cols, batch_rows=1_000_000, batch_bytes=50_000)
+    for i in range(50):
+        w.write_rows([_wide_row(i)])
+    assert w.batches_written >= 2  # byte threshold forced more than one physical batch
+    manifest = w.finalize()
+    assert manifest["rows"] == 50
+    assert manifest["batch_bytes"] == 50_000
+    table = pq.read_table(out)
+    assert table.num_rows == 50
+
+
+def test_byte_threshold_logical_output_identical_to_unchunked(tmp_path):
+    """Byte-threshold chunking must not change row content, order, or count -- only where
+    physical batch boundaries fall."""
+    cols = ["a", "b", "c"] + [f"lst{k}" for k in range(9)]
+    rows = [_wide_row(i) for i in range(37)]
+
+    out_bytes = tmp_path / "by_bytes.parquet"
+    w1 = ChunkedParquetWriter(out_bytes, cols, batch_rows=1_000_000, batch_bytes=20_000)
+    for r in rows:
+        w1.write_rows([r])
+    m1 = w1.finalize()
+
+    out_unchunked = tmp_path / "unchunked.parquet"
+    w2 = ChunkedParquetWriter(out_unchunked, cols, batch_rows=1_000_000, batch_bytes=0)
+    w2.write_rows(rows)
+    m2 = w2.finalize()
+
+    assert m1["logical_content_sha256"] == m2["logical_content_sha256"]
+    t1, t2 = pq.read_table(out_bytes), pq.read_table(out_unchunked)
+    assert t1.to_pylist() == t2.to_pylist()
+
+
+def test_byte_threshold_deterministic_across_repeated_runs(tmp_path):
+    cols = ["a", "b", "c"] + [f"lst{k}" for k in range(9)]
+    rows = [_wide_row(i) for i in range(23)]
+    hashes = []
+    for attempt in range(2):
+        out = tmp_path / f"det_{attempt}.parquet"
+        w = ChunkedParquetWriter(out, cols, batch_rows=1_000_000, batch_bytes=15_000)
+        for r in rows:
+            w.write_rows([r])
+        hashes.append(w.finalize()["logical_content_sha256"])
+    assert hashes[0] == hashes[1]
+
+
+def test_estimate_value_bytes_recurses_struct_and_list():
+    scalar = estimate_value_bytes(5)
+    assert scalar > 0
+    nested = estimate_value_bytes({"weights_fp": list(range(100)), "poc": 1.5})
+    assert nested > 100 * estimate_value_bytes(1)  # dominated by the nested list
+
+
+def test_estimate_row_bytes_only_counts_declared_columns():
+    row = {"a": 1, "b": 2.0, "ignored": "x" * 1000}
+    assert estimate_row_bytes(row, ["a", "b"]) == estimate_value_bytes(1) + estimate_value_bytes(2.0)
+
+
+def test_estimate_bytes_calibrated_against_tracemalloc_on_vp_shaped_rows():
+    """Calibration check (not a tight bound -- tracemalloc/CPython allocator behaviour is not
+    guaranteed bit-identical across builds): on rows shaped like the real volume-profile
+    rolling tracker's output (9 struct columns, each with several ~200-element int/float list
+    children, UNIQUE large values so CPython's small-int cache cannot mask real allocation),
+    this module's estimator must land within a generous order-of-magnitude band of the
+    tracemalloc-measured real allocation -- proving it is not off by 20x the way a naive
+    fixed-per-scalar-byte-count estimate was (see estimate_value_bytes's docstring)."""
+    import random
+    import tracemalloc
+
+    def vp_row(i):
+        rnd = random.Random(i)
+        row = {"regime_start_ns": 1_700_000_000_000_000_000 + i, "observation_ts": 1_700_000_000_000_000_000 + i}
+        for k in range(9):
+            row[f"profile_{k}"] = {
+                "price_levels": [rnd.random() * 20_000 for _ in range(200)],
+                "weights_fp": [rnd.randint(10_000, 99_999_999) for _ in range(200)],
+            }
+            row[f"poc_{k}"] = rnd.random() * 20_000
+        return row
+
+    rows_for_measurement = []
+    tracemalloc.start()
+    snap0 = tracemalloc.take_snapshot()
+    for i in range(50):
+        rows_for_measurement.append(vp_row(i))
+    snap1 = tracemalloc.take_snapshot()
+    measured = sum(s.size_diff for s in snap1.compare_to(snap0, "lineno") if s.size_diff > 0)
+    tracemalloc.stop()
+
+    cols = list(rows_for_measurement[0].keys())
+    estimated = sum(estimate_row_bytes(r, cols) for r in rows_for_measurement)
+    ratio = measured / estimated
+    # Generous band: a correctly-order-of-magnitude estimator, not an exact one.
+    assert 0.2 <= ratio <= 5.0, f"estimator is off by more than 5x from measured allocation (ratio={ratio!r})"
+
+
+def test_on_flush_observer_called_at_each_stage(tmp_path):
+    out = tmp_path / "observed.parquet"
+    events = []
+    w = ChunkedParquetWriter(out, ["a"], batch_rows=2, on_flush=lambda ev, info: events.append((ev, info["rows"])))
+    for r in _rows(4):
+        w.write_rows([r])
+    w.finalize()
+    assert events.count(("pre_emit", 2)) >= 1
+    assert events.count(("post_conversion", 2)) >= 1
+    assert events.count(("post_emit", 2)) >= 1
+    # observer fires in the documented order for at least one batch
+    first_triplet = events[:3]
+    assert [e[0] for e in first_triplet] == ["pre_emit", "post_conversion", "post_emit"]

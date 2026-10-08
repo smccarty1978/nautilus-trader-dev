@@ -83,7 +83,8 @@ class HostCore:
     def __init__(self, plan: Mapping[str, Any], *, session_table: Any, primary_interval: Optional[Tuple[int, int]] = None,
                  ledger: Optional[List[Dict[str, Any]]] = None, progress_path: Optional[str] = None,
                  progress_every_bars: int = 0, studies_root: Optional[str] = None,
-                 chunked_writers: Optional[Tuple[Any, Any]] = None, chunked_flush_every: int = 0) -> None:
+                 chunked_writers: Optional[Tuple[Any, Any]] = None, chunked_flush_every: int = 0,
+                 chunked_flush_bytes: int = 0) -> None:
         # chunked_writers=(candidate_writer, observation_writer): opt-in bounded-memory sink
         # (research_workflow.host.chunked_writer.ChunkedParquetWriter). None (the default)
         # preserves the exact pre-existing in-memory-frame behaviour for every caller that
@@ -206,7 +207,7 @@ class HostCore:
         self.sink = CollectionSink(candidate_columns, observation_columns, ledger=ledger,
                                    primary_interval=(self.primary_start, self.primary_end),
                                    candidate_writer=cand_writer, observation_writer=obs_writer,
-                                   flush_every=chunked_flush_every)
+                                   flush_every=chunked_flush_every, flush_bytes=chunked_flush_bytes)
         self.candidates_emitted = 0
         self.epochs_evaluated = 0
         self.last_ts_seen: Optional[int] = None
@@ -493,11 +494,12 @@ if Strategy is not object:
         """NT face of the host: subscribes to the plan's external streams, forwards bars."""
 
         def __init__(self, config: GovernedHostStrategyConfig, *, chunked_writers: Optional[Tuple[Any, Any]] = None,
-                     chunked_flush_every: int = 0) -> None:
-            # chunked_writers/chunked_flush_every are NOT part of GovernedHostStrategyConfig on
-            # purpose: a ChunkedParquetWriter is a live Python object (an open file handle), not
-            # msgspec-serializable state, and this strategy is always constructed directly in this
-            # process (research_workflow.host_runner), never reconstructed from config alone.
+                     chunked_flush_every: int = 0, chunked_flush_bytes: int = 0) -> None:
+            # chunked_writers/chunked_flush_every/chunked_flush_bytes are NOT part of
+            # GovernedHostStrategyConfig on purpose: a ChunkedParquetWriter is a live Python
+            # object (an open file handle), not msgspec-serializable state, and this strategy is
+            # always constructed directly in this process (research_workflow.host_runner), never
+            # reconstructed from config alone.
             super().__init__(config)
             from research_workflow.sessions import build_session_table
             plan = json.loads(config.plan_json)
@@ -509,7 +511,8 @@ if Strategy is not object:
             self.core = HostCore(plan, session_table=table, primary_interval=interval, ledger=self.ledger,
                                  progress_path=(config.progress_path or None), progress_every_bars=config.progress_every_bars,
                                  studies_root=(config.studies_root or None),
-                                 chunked_writers=chunked_writers, chunked_flush_every=chunked_flush_every)
+                                 chunked_writers=chunked_writers, chunked_flush_every=chunked_flush_every,
+                                 chunked_flush_bytes=chunked_flush_bytes)
             self._bar_types: Dict[Any, str] = {}
             for s in plan["streams"]:
                 if s.get("bar_type"):

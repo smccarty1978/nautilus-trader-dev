@@ -306,6 +306,15 @@ class V2Options:
     # partition. Smoke and the pure bar_source test path are unaffected by this option; only
     # run_partition reads it. See artifacts/platform_v2/chunked_sink_flush/README.md.
     chunked_batch_rows: int = 0
+    # Secondary, byte-estimate flush trigger -- INERT unless chunking is already enabled via
+    # chunked_batch_rows > 0 above (does not itself turn chunking on, so the "0 is a no-op"
+    # guarantee for every study that never opts in is unaffected). Once chunking is on, a row
+    # threshold alone is unsafe for a wide row (e.g. several struct/list tracker fields per
+    # row can be ~380 KB/row as Python objects -- see the README); the sink/writer flush on
+    # whichever of chunked_batch_rows or chunked_batch_bytes is reached first. Defaults to the
+    # module's DEFAULT_BATCH_BYTES (256 MiB) so an operator who sets only chunked_batch_rows
+    # still gets byte-bounded memory for an unexpectedly wide row shape.
+    chunked_batch_bytes: int = 256 * 1024 * 1024
     # W-5: when set, every model-store call this lifecycle makes (fit/score/authenticate)
     # writes to and reads from THIS root instead of the operator's real durable store
     # (research_workflow.roots.resolve_model_root()). None preserves the configured root --
@@ -553,6 +562,7 @@ class V2Lifecycle:
     def _run_window(self, plan: Dict[str, Any], start: str, end: str, primary: tuple, *, progress: Optional[Path], ledger: bool = False,
                     chunked_writers: Optional[Any] = None) -> Dict[str, Any]:
         flush_every = self.opts.chunked_batch_rows if chunked_writers is not None else 0
+        flush_bytes = self.opts.chunked_batch_bytes if chunked_writers is not None else 0
         if self.opts.bar_source is not None:
             from research_workflow.host_runner import run_plan_on_bars
             from research_workflow.sessions import build_session_table, resolve_calendar_session_spec
@@ -560,7 +570,7 @@ class V2Lifecycle:
             table = build_session_table(resolve_calendar_session_spec(dict(self.opts.session_table_spec or plan["session"]), self.repo_root))
             ledger_rows: List[Dict[str, Any]] = [] if ledger else None
             run = run_plan_on_bars(plan, bars, session_table=table, primary_interval=primary, ledger=ledger_rows,
-                                   chunked_writers=chunked_writers, chunked_flush_every=flush_every)
+                                   chunked_writers=chunked_writers, chunked_flush_every=flush_every, chunked_flush_bytes=flush_bytes)
             run["dataset"] = {"dataset_id": "synthetic", "logical_digest": None, "bytes_verification": "SYNTHETIC"}
             run["ledger"] = ledger_rows
             return run
@@ -568,7 +578,7 @@ class V2Lifecycle:
         return run_plan_on_catalog(plan, start_date=start, end_date=end, repo_root=self.repo_root, primary_interval=primary,
                                    warmup_days=self.opts.warmup_days, progress_path=progress, progress_every_bars=self.opts.progress_every_bars,
                                    session_table_spec=self.opts.session_table_spec, studies_root=self.opts.studies_root or (self.repo_root / "studies"), ledger=ledger,
-                                   chunked_writers=chunked_writers, chunked_flush_every=flush_every)
+                                   chunked_writers=chunked_writers, chunked_flush_every=flush_every, chunked_flush_bytes=flush_bytes)
 
     @staticmethod
     def _persist(run: Dict[str, Any], out_dir: Path, extra: Mapping[str, Any]) -> Dict[str, Any]:
@@ -621,8 +631,11 @@ class V2Lifecycle:
         declared_obs = {c: pa.int64() for c in identity_cols if c in obs_cols} | {c: t for c, t in declared_meta.items() if c in obs_cols}
         out_dir.mkdir(parents=True, exist_ok=True)
         batch_rows = self.opts.chunked_batch_rows
-        cand_w = ChunkedParquetWriter(out_dir / "candidates.parquet", cand_cols, declared_types=declared_cand, batch_rows=batch_rows)
-        obs_w = ChunkedParquetWriter(out_dir / "observations.parquet", obs_cols, declared_types=declared_obs, batch_rows=batch_rows)
+        batch_bytes = self.opts.chunked_batch_bytes
+        cand_w = ChunkedParquetWriter(out_dir / "candidates.parquet", cand_cols, declared_types=declared_cand,
+                                      batch_rows=batch_rows, batch_bytes=batch_bytes)
+        obs_w = ChunkedParquetWriter(out_dir / "observations.parquet", obs_cols, declared_types=declared_obs,
+                                     batch_rows=batch_rows, batch_bytes=batch_bytes)
         return cand_w, obs_w
 
     def smoke(self, study: Path | None = None) -> Dict[str, Any]:
@@ -840,6 +853,13 @@ class V2Lifecycle:
                 cmd += ["--studies-root", str(self.opts.studies_root)]
             if self.opts.windows:
                 cmd += ["--windows", ",".join(self.opts.windows)]
+            if self.opts.chunked_batch_rows > 0:
+                # Bounded-memory collection is a runtime option (V2Options.chunked_batch_rows),
+                # not plan/seal identity -- it must cross the subprocess boundary explicitly
+                # here, the same as every other opts field this child command already forwards,
+                # or a governed run that opts in would silently collect unchunked in the child.
+                cmd += ["--chunked-batch-rows", str(self.opts.chunked_batch_rows)]
+                cmd += ["--chunked-batch-bytes", str(self.opts.chunked_batch_bytes)]
             out_dir.mkdir(parents=True, exist_ok=True)
             with open(out_dir / "child.log", "w", encoding="utf-8") as log:
                 r = subprocess.run(cmd, cwd=str(self.repo_root), stdout=log, stderr=subprocess.STDOUT, timeout=self.opts.max_runtime)
@@ -1886,10 +1906,16 @@ def main(argv: Optional[List[str]] = None) -> int:
     p.add_argument("--study", required=True); p.add_argument("--period", required=True); p.add_argument("--year", type=int, required=True)
     p.add_argument("--out-dir", required=True); p.add_argument("--progress"); p.add_argument("--repo-root"); p.add_argument("--studies-root")
     p.add_argument("--windows", help="comma-separated declared window ids/ranges this child may execute")
+    p.add_argument("--chunked-batch-rows", type=int, default=0, help="see V2Options.chunked_batch_rows")
+    p.add_argument("--chunked-batch-bytes", type=int, default=None, help="see V2Options.chunked_batch_bytes")
     ns = ap.parse_args(argv)
     if ns.cmd == "partition":
-        opts = V2Options(studies_root=Path(ns.studies_root) if ns.studies_root else None,
-                         windows=[w for w in (ns.windows or "").split(",") if w.strip()] or None)
+        child_kwargs = dict(studies_root=Path(ns.studies_root) if ns.studies_root else None,
+                            windows=[w for w in (ns.windows or "").split(",") if w.strip()] or None,
+                            chunked_batch_rows=ns.chunked_batch_rows)
+        if ns.chunked_batch_bytes is not None:
+            child_kwargs["chunked_batch_bytes"] = ns.chunked_batch_bytes
+        opts = V2Options(**child_kwargs)
         lc = V2Lifecycle(Path(ns.study), repo_root=Path(ns.repo_root) if ns.repo_root else REPO_ROOT, options=opts)
         manifest = lc.run_partition(ns.year, ns.period, Path(ns.out_dir), progress=Path(ns.progress) if ns.progress else None)
         print(json.dumps({"STATUS": "OK", "partition": manifest.get("id"), "rows": manifest.get("rows")}))

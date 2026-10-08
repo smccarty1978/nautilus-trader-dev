@@ -20,10 +20,12 @@ def sort_bars_causal(bars: Iterable[BarView], durations: Mapping[str, int]) -> L
 
 def run_plan_on_bars(plan: Mapping[str, Any], bars: Iterable[BarView], *, session_table: Any,
                      primary_interval: Optional[Tuple[int, int]] = None, ledger: Optional[List[Dict[str, Any]]] = None,
-                     chunked_writers: Optional[Tuple[Any, Any]] = None, chunked_flush_every: int = 0) -> Dict[str, Any]:
+                     chunked_writers: Optional[Tuple[Any, Any]] = None, chunked_flush_every: int = 0,
+                     chunked_flush_bytes: int = 0) -> Dict[str, Any]:
     durations = {s["key"]: int(s["duration_ns"]) for s in plan["streams"]}
     core = HostCore(plan, session_table=session_table, primary_interval=primary_interval, ledger=ledger,
-                    chunked_writers=chunked_writers, chunked_flush_every=chunked_flush_every)
+                    chunked_writers=chunked_writers, chunked_flush_every=chunked_flush_every,
+                    chunked_flush_bytes=chunked_flush_bytes)
     t0 = time.perf_counter()
     for bar in sort_bars_causal(bars, durations):
         core.ingest(bar)
@@ -149,7 +151,8 @@ def run_plan_on_catalog(plan: Mapping[str, Any], *, start_date: str, end_date: s
                         primary_interval: Optional[Tuple[int, int]] = None, warmup_days: int = 5, log_level: str = "ERROR",
                         session_table_spec: Optional[Mapping[str, Any]] = None, progress_path: Optional[Path] = None,
                         progress_every_bars: int = 200_000, ledger: bool = False, studies_root: Optional[Path] = None,
-                        chunked_writers: Optional[Tuple[Any, Any]] = None, chunked_flush_every: int = 0) -> Dict[str, Any]:
+                        chunked_writers: Optional[Tuple[Any, Any]] = None, chunked_flush_every: int = 0,
+                        chunked_flush_bytes: int = 0) -> Dict[str, Any]:
     """Governed-catalog run for the plan's execution instrument (single instrument this phase)."""
     from backtests.nt_runtime.data_plan import resolve_catalog_plan, verify_launch_dataset_bytes
     from backtests.nt_runtime.engine_builder import build_engine
@@ -175,7 +178,8 @@ def run_plan_on_catalog(plan: Mapping[str, Any], *, start_date: str, end_date: s
                                      primary_end_ts=(primary_interval[1] if primary_interval else None),
                                      progress_path=str(progress_path) if progress_path else "", progress_every_bars=progress_every_bars,
                                      ledger_enabled=ledger, studies_root=str(studies_root or (repo_root / "studies")))
-    strategy = GovernedHostStrategy(cfg, chunked_writers=chunked_writers, chunked_flush_every=chunked_flush_every)
+    strategy = GovernedHostStrategy(cfg, chunked_writers=chunked_writers, chunked_flush_every=chunked_flush_every,
+                                    chunked_flush_bytes=chunked_flush_bytes)
     engine.add_strategy(strategy)
     t0 = time.perf_counter()
     engine.run()
