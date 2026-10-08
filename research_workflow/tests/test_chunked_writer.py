@@ -444,3 +444,140 @@ def test_on_flush_observer_called_at_each_stage(tmp_path):
     # observer fires in the documented order for at least one batch
     first_triplet = events[:3]
     assert [e[0] for e in first_triplet] == ["pre_emit", "post_conversion", "post_emit"]
+
+
+# -- Task A: bounded-streaming recompute, exact parity with the pre-fix whole-batch oracle --
+
+def _oracle_recompute_logical_content_sha256_WHOLE_BATCH(path: Path, columns, batch_size: int = 50_000) -> str:
+    """Byte-for-byte the REMOVED pre-fix implementation (defect: a fixed row-count batch_size
+    bigger than the partition materializes the whole file's nested columns as Python objects
+    at once via whole-column ``to_pylist()``). Kept here ONLY as a test oracle so the new
+    bytes-bounded streaming implementation is proven to produce the IDENTICAL hash, never
+    trusted to be self-consistent with itself."""
+    import hashlib as _hashlib
+    hasher = _hashlib.sha256()
+    pf = pq.ParquetFile(str(path))
+    for batch in pf.iter_batches(batch_size=batch_size, columns=list(columns)):
+        tbl = pa.Table.from_batches([batch])
+        cols_pylist = {c: tbl.column(c).to_pylist() for c in columns}
+        n = tbl.num_rows
+        for i in range(n):
+            row = {c: cols_pylist[c][i] for c in columns}
+            hasher.update(json.dumps(row, sort_keys=True, default=str, separators=(",", ":")).encode("utf-8"))
+            hasher.update(b"\n")
+    return hasher.hexdigest()
+
+
+def _vp_shaped_rows(n: int, *, null_first_batch_rows: int = 0, levels_len: int = 200) -> list:
+    """Rows shaped like the real VP tracker's 9 profile-struct columns (per
+    BaseBinding.FIELD_TYPES), plus a mixed int/float column and a plain-nullable column --
+    the shapes most likely to make a bytes-bounded streaming recompute diverge from a
+    whole-batch one. ``levels_len`` defaults to ~200 elements/list, matching the real
+    tracker's measured profile shape (see diag2/DIAGNOSIS.md) -- NOT a handful of ints, which
+    would understate the real Python-object materialization cost this fix exists for. The
+    first ``null_first_batch_rows`` rows have every profile struct and the nullable column
+    set to None (all-null-first-batch case)."""
+    rows = []
+    for i in range(n):
+        all_null = i < null_first_batch_rows
+        row = {
+            "a_mixed_int_float": i if i % 2 == 0 else float(i) + 0.5,  # int in some rows, float in others
+            "b_nullable": None if (all_null or i % 5 == 0) else f"v{i}",
+        }
+        for k in range(9):  # 9 profile instances, as in the real VP binding
+            key = f"profile_{k}"
+            if all_null:
+                row[key] = None
+            else:
+                row[key] = {"poc": float(i * 10 + k), "levels": [(i + k + j) for j in range(levels_len)] if i % 3 else []}
+        rows.append(row)
+    return rows
+
+
+def _vp_shaped_declared_types():
+    cols = ["a_mixed_int_float", "b_nullable"] + [f"profile_{k}" for k in range(9)]
+    # b_nullable is declared explicitly (not probe-inferred): an all-null-first-batch test
+    # deliberately makes early probe rows entirely null, which would otherwise lock a
+    # probe-inferred column to the wrong (float64-default) type before a real string value
+    # ever arrives -- a real, separate defect (see test_declared_type_locks_struct_even_when_
+    # probe_is_all_null above) this Task A test is not re-exercising here.
+    declared = {"a_mixed_int_float": pa.float64(), "b_nullable": pa.string()}
+    for k in range(9):
+        declared[f"profile_{k}"] = field_types_to_arrow({"kind": "struct", "schema": {"poc": "float64", "levels": "int64[]"}})
+    return cols, declared
+
+
+@pytest.mark.parametrize("write_batch_rows,n_rows,null_first_batch_rows", [
+    (3, 37, 0),            # plain nested/null case
+    (2, 50, 6),            # all-null-first-batch (first batch(es) entirely null structs)
+    (997, 1200, 0),        # a write batch size that is itself large
+])
+def test_recompute_matches_whole_batch_oracle_across_read_batch_sizes(tmp_path, write_batch_rows, n_rows, null_first_batch_rows):
+    """The new bytes-bounded streaming recompute must produce the IDENTICAL hash to the
+    removed whole-batch implementation (the oracle above), for every one of the required read
+    batch sizes {1, 2, 7, 64, 997, whole-file}, on VP-struct-shaped (9 nested profile columns),
+    nullable, and mixed int/float data -- including an all-null first batch."""
+    out = tmp_path / f"vp_{write_batch_rows}_{n_rows}_{null_first_batch_rows}.parquet"
+    cols, declared = _vp_shaped_declared_types()
+    w = ChunkedParquetWriter(out, cols, declared_types=declared, batch_rows=write_batch_rows)
+    rows = _vp_shaped_rows(n_rows, null_first_batch_rows=null_first_batch_rows)
+    for r in rows:
+        w.write_rows([r])
+    manifest = w.finalize()
+
+    oracle = _oracle_recompute_logical_content_sha256_WHOLE_BATCH(out, cols)
+    assert oracle == manifest["logical_content_sha256"], "oracle itself must match the write-time hash"
+
+    for read_batch_size in (1, 2, 7, 64, 997, n_rows):  # n_rows == "whole file in one batch"
+        got = recompute_logical_content_sha256(out, cols, batch_size=read_batch_size)
+        assert got == oracle, (
+            f"streaming recompute at read batch_size={read_batch_size} diverged from the "
+            f"whole-batch oracle for write_batch_rows={write_batch_rows}, n_rows={n_rows}, "
+            f"null_first_batch_rows={null_first_batch_rows}")
+
+    # Default (byte-derived) batch_size path must ALSO match -- this is what every real caller
+    # actually exercises (batch_size left unset).
+    assert recompute_logical_content_sha256(out, cols) == oracle
+
+
+def test_recompute_default_batch_size_is_bytes_derived_and_small_for_wide_rows(tmp_path):
+    """The byte-derived default must pick a SMALL row count for a file whose rows are wide
+    (9 profile structs), proving the fix: the OLD fixed default (50_000) would have collapsed
+    a file this size into a single whole-file batch; the new default must not."""
+    out = tmp_path / "wide.parquet"
+    cols, declared = _vp_shaped_declared_types()
+    n_rows = 500
+    w = ChunkedParquetWriter(out, cols, declared_types=declared, batch_rows=50)
+    for r in _vp_shaped_rows(n_rows):
+        w.write_rows([r])
+    w.finalize()
+
+    from research_workflow.host.chunked_writer import _bytes_bounded_batch_rows
+    pf = pq.ParquetFile(str(out))
+    derived = _bytes_bounded_batch_rows(pf, cols, 4 * 1024 * 1024)
+    assert 1 <= derived < n_rows, (
+        f"byte-derived batch size ({derived}) must be well below the whole file ({n_rows} rows) "
+        f"for a wide-row (9 profile-struct) partition")
+
+
+def test_recompute_batch_count_exceeds_one_on_a_multi_flush_real_shaped_partition(tmp_path):
+    """Proves the streaming recompute actually processes MANY batches (not one whole-file
+    batch) on a partition large enough to flush multiple times at the module's own default
+    write-side batch_rows -- the exact scenario the defect (whole-file read-back) hid at
+    small/medium measured partition sizes."""
+    out = tmp_path / "multi_flush.parquet"
+    cols, declared = _vp_shaped_declared_types()
+    n_rows = 5000
+    w = ChunkedParquetWriter(out, cols, declared_types=declared, batch_rows=200)
+    for r in _vp_shaped_rows(n_rows):
+        w.write_rows([r])
+    manifest = w.finalize()
+    assert manifest["batches"] > 1
+
+    pf = pq.ParquetFile(str(out))
+    from research_workflow.host.chunked_writer import _bytes_bounded_batch_rows, DEFAULT_RECOMPUTE_TARGET_BATCH_BYTES
+    derived = _bytes_bounded_batch_rows(pf, cols, DEFAULT_RECOMPUTE_TARGET_BATCH_BYTES)
+    read_batch_count = sum(1 for _ in pf.iter_batches(batch_size=derived, columns=cols))
+    assert read_batch_count > 1, f"expected multiple read batches, got {read_batch_count} (derived batch_size={derived})"
+
+    assert recompute_logical_content_sha256(out, cols) == manifest["logical_content_sha256"]

@@ -135,23 +135,84 @@ def _rows_canonical_from_table(table: pa.Table, columns: Sequence[str]) -> List[
     return [{c: cols_pylist[c][i] for c in columns} for i in range(n)]
 
 
-def recompute_logical_content_sha256(path: Path, columns: Sequence[str],
-                                     batch_size: int = 50_000) -> str:  # host-constant: read batch size, matches DEFAULT_BATCH_ROWS
+# Defect (see artifacts/platform_v2/chunked_sink_flush/README.md, diag2): the former fixed
+# ``batch_size=50_000`` default was larger than every measured real partition (1,620 / 3,240
+# / 9,930 rows), so ``pf.iter_batches`` handed back the WHOLE FILE as one batch and
+# ``_rows_canonical_from_table`` materialized every row's nested profile structs as Python
+# objects at once (observed: process RSS peaks of 2.4 / 4.1 / 12.0 GiB recomputing a 1-day /
+# 1-week / 1-month partition, scaling almost exactly linearly with rows -- NOT with batch
+# count). A wide row here (9 profile structs) is ~1 MB as Python objects, so even a small
+# FIXED row count is not safe across schemas with fewer/smaller columns vs. more/wider ones --
+# the bound has to be on the Python-object materialization BYTES this recompute itself will
+# produce, derived per-file, not a row count guessed once for one shape and not parquet's own
+# on-disk footer size (which badly UNDERESTIMATES a nested struct/list column's Python-object
+# cost: parquet's compact binary encoding vs. one PyObject per scalar plus container overhead
+# once ``to_pylist()`` actually runs).
+DEFAULT_RECOMPUTE_TARGET_BATCH_BYTES = 4 * 1024 * 1024  # host-constant: target Python-object
+# materialization bytes per recompute batch, deliberately small relative to the 8 GiB process
+# budget since several batches' worth of allocator retention (fragmentation, not live objects
+# -- see diag2) accumulates across a whole-file recompute regardless of per-batch size.
+_RECOMPUTE_SAMPLE_ROWS = 32  # host-constant: rows sampled (bounded, read once) to estimate this
+# file's OWN Python-object bytes/row via the SAME calibrated estimator the writer's flush
+# trigger already uses (``estimate_row_bytes`` -- within ~7% of tracemalloc-measured allocation
+# on VP-struct-shaped rows per the writer's own calibration test), rather than inventing a
+# second, uncalibrated estimate here.
+
+
+def _bytes_bounded_batch_rows(pf: pq.ParquetFile, columns: Sequence[str], target_batch_bytes: int) -> int:
+    """Sample up to ``_RECOMPUTE_SAMPLE_ROWS`` rows (one small, bounded read -- never the
+    whole file) and use the calibrated ``estimate_row_bytes`` to find THIS file's own
+    Python-object bytes/row, then return a row count such that one batch's estimated
+    materialization footprint is near ``target_batch_bytes``. An empty file, or a sample that
+    estimates to zero bytes/row (should not happen for any real column set), falls back to
+    1 row/batch rather than guessing a possibly-unsafe larger default."""
+    total_rows = pf.metadata.num_rows
+    if total_rows == 0:
+        return 1
+    sample_n = min(_RECOMPUTE_SAMPLE_ROWS, total_rows)
+    sample_batch = next(pf.iter_batches(batch_size=sample_n, columns=list(columns)))
+    sample_tbl = pa.Table.from_batches([sample_batch])
+    sample_rows = _rows_canonical_from_table(sample_tbl, columns)
+    total_est = sum(estimate_row_bytes(r, columns) for r in sample_rows)
+    bytes_per_row = total_est / max(1, len(sample_rows))
+    if bytes_per_row <= 0:
+        return max(1, total_rows)
+    return max(1, int(target_batch_bytes / bytes_per_row))
+
+
+def recompute_logical_content_sha256(path: Path, columns: Sequence[str], *,
+                                      target_batch_bytes: int = DEFAULT_RECOMPUTE_TARGET_BATCH_BYTES,
+                                      batch_size: Optional[int] = None) -> str:
     """Recompute the logical-content hash directly from a FINALIZED parquet file, streaming
-    it row-group/batch at a time (never materializing the whole file), using the identical
-    canonical-row derivation (``_rows_canonical_from_table``) and hash update order
-    (row-major, in file order; the file's own row order IS emission order since this writer
-    never reorders) that ``ChunkedParquetWriter.finalize()`` used when it first computed
-    ``logical_content_sha256``. A caller that wants to verify a partition's manifest against
-    the bytes actually on disk (rather than trusting the writer's own in-process hash) calls
-    this; it does not require the writer object at all, only the file and its column list."""
+    it in small, BYTE-bounded batches (never materializing the whole file as Python objects
+    at once), using the identical canonical-row derivation (``_rows_canonical_from_table``)
+    and hash update order (row-major, in file order; the file's own row order IS emission
+    order since this writer never reorders) that ``ChunkedParquetWriter.finalize()`` used when
+    it first computed ``logical_content_sha256``. A caller that wants to verify a partition's
+    manifest against the bytes actually on disk (rather than trusting the writer's own
+    in-process hash) calls this; it does not require the writer object at all, only the file
+    and its column list.
+
+    ``batch_size`` (rows), if given, overrides the byte-derived default outright -- e.g. for a
+    test that wants to exercise an exact batch count regardless of row width. Left ``None``
+    (the normal path), the row count is derived from this file's OWN sampled Python-object
+    bytes/row (``_bytes_bounded_batch_rows``) so a wide-row partition (many/large nested struct
+    columns) gets a correspondingly small batch and a narrow one does not pay for batches far
+    smaller than it needs."""
     hasher = hashlib.sha256()
     pf = pq.ParquetFile(str(path))
-    for batch in pf.iter_batches(batch_size=batch_size, columns=list(columns)):
-        tbl = pa.Table.from_batches([batch])
-        for row in _rows_canonical_from_table(tbl, columns):
-            hasher.update(_canonical_json(row).encode("utf-8"))
-            hasher.update(b"\n")
+    rows_per_batch = batch_size if batch_size is not None else _bytes_bounded_batch_rows(pf, columns, target_batch_bytes)
+    for arrow_batch in pf.iter_batches(batch_size=rows_per_batch, columns=list(columns)):
+        # Defensive re-slice: iter_batches is expected to honor batch_size, but this makes the
+        # bound on the to_pylist conversion below (the actual memory-hungry step) independent
+        # of that pyarrow guarantee -- a batch bigger than requested still gets converted in
+        # rows_per_batch-sized slices, never all at once.
+        n = arrow_batch.num_rows
+        for start in range(0, n, rows_per_batch):
+            tbl = pa.Table.from_batches([arrow_batch.slice(start, rows_per_batch)])
+            for row in _rows_canonical_from_table(tbl, columns):
+                hasher.update(_canonical_json(row).encode("utf-8"))
+                hasher.update(b"\n")
     return hasher.hexdigest()
 
 
@@ -406,4 +467,4 @@ class ChunkedParquetWriter:
 
 __all__ = ["ChunkedParquetWriter", "infer_arrow_type", "dtype_tag_to_arrow", "field_types_to_arrow",
            "DEFAULT_BATCH_ROWS", "DEFAULT_BATCH_BYTES", "estimate_value_bytes", "estimate_row_bytes",
-           "sha256_file", "recompute_logical_content_sha256"]
+           "sha256_file", "recompute_logical_content_sha256", "DEFAULT_RECOMPUTE_TARGET_BATCH_BYTES"]
