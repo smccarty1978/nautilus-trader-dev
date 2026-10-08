@@ -60,7 +60,7 @@ ACL_PATTERNS = [
     (r"\bSet-Acl\b", "Set-Acl"),
     (r"\btakeown\b", "takeown"),
     (r"\battrib\b" + SEG + r"\s-[rRhHsS]\b", "attrib clear"),
-    (r"protect_live_data\.py\b" + SEG + r"\b(remove|unprotect)\b", "protect_live_data remove (human-only)"),
+    (r"protect_live_data\.py\b" + SEG + r"\b(remove|unprotect|restore)\b", "protect_live_data remove/restore (human-only)"),
 ]
 
 MUTATE_VERBS = (r"\b(Remove-Item|ri|rm|del|erase|rmdir|rd|mv|Move-Item|move|ren|Rename-Item|Set-Content|Add-Content|"
@@ -119,20 +119,27 @@ def _touches_protected(text: str) -> bool:
 
 
 def _referenced_scripts(command: str, cwd: str) -> List[Path]:
+    """Script files a command would execute, resolved against the session cwd AND every directory the command
+    itself changes into (`cd`, `pushd`, `Set-Location`, `sl`) -- incident line 248 ran `cd <dir> && cmd //c x.cmd`."""
+    bases = [Path(cwd or os.getcwd())]
+    for m in re.finditer(r"\b(?:cd|pushd|Set-Location|sl|chdir)\s+(?:-(?:Path|LiteralPath)\s+)?(?:\"([^\"]+)\"|'([^']+)'|(\S+))",
+                         command, I):
+        d = next(g for g in m.groups() if g)
+        dp = Path(d) if Path(d).is_absolute() else bases[0] / d
+        bases.append(dp)
     toks = re.findall(r"\"([^\"]+)\"|'([^']+)'|(\S+)", command)
     out = []
     for groups in toks:
         t = next(g for g in groups if g)
         if not t.lower().endswith(SCRIPT_EXT):
             continue
-        p = Path(t)
-        if not p.is_absolute():
-            p = Path(cwd or os.getcwd()) / p
-        try:
-            if p.is_file() and p.stat().st_size < 2_000_000:
-                out.append(p)
-        except OSError:
-            continue
+        cands = [Path(t)] if Path(t).is_absolute() else [b / t for b in bases]
+        for p in cands:
+            try:
+                if p.is_file() and p.stat().st_size < 2_000_000:
+                    out.append(p)
+            except OSError:
+                continue
     return out
 
 
@@ -174,7 +181,8 @@ def check_file_write(path: str, content: str) -> Optional[str]:
             any(n.startswith(r + "/") for r in _catalog_roots()):
         return ("DATA_GUARD_PROTECTED_PATH_BLOCKED: writes to live data or committed DatasetSpecs are human-only "
                 f"({path}).")
-    if content and not _is_self_allowed(path):
+    executable = n.endswith(SCRIPT_EXT) or "." not in Path(n).name
+    if content and executable and not _is_self_allowed(path):  # data/docs (.json/.md) cannot run
         lab = _match(LINK_PATTERNS, content)
         if lab:
             return f"DATA_GUARD_LINK_CREATION_BLOCKED ({lab} written into {path}). Link creation is not allowed."

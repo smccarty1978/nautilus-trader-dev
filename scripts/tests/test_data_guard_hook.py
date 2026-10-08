@@ -76,6 +76,16 @@ def test_link_creation_hidden_in_an_executed_script_is_blocked(tmp_path):
     assert "LINK" in G.check_command(f'python "{py}"')
 
 
+def test_script_run_after_cd_inside_the_command_is_scanned(tmp_path):
+    """Incident transcript line 248 (agent abe81ff04c927af66), verbatim shape: `cd "<dir>" && cmd //c mklinks.cmd`.
+    The relative script resolves against the `cd` target, not the session cwd."""
+    d = tmp_path / "diag"
+    d.mkdir()
+    (d / "mklinks.cmd").write_text(f'mklink /J "C:\\x\\NQ_1S_V2" "{LIVE}\\NQ_1S_V2\\data"\r\n')
+    assert "LINK" in G.check_command(f'cd "{d}" && cmd //c mklinks.cmd', cwd="C:\\Windows")
+    assert "LINK" in G.check_command(f"Set-Location -LiteralPath '{d}'; cmd /c mklinks.cmd", cwd="C:\\Windows")
+
+
 def test_writing_a_link_script_is_blocked():
     r = G.evaluate({"tool_name": "Write", "tool_input": {"file_path": "C:/scratch/mklinks.cmd",
                                                           "content": "mklink /J a b"}})
@@ -87,6 +97,13 @@ def test_writes_to_live_data_and_dataset_specs_are_blocked():
               "C:/Users/x/Projects/Nautilus Trader-wt/research/datasets/NQ_1S_V2_GLOBEX.yaml"):
         for tool in ("Write", "Edit"):
             assert G.evaluate({"tool_name": tool, "tool_input": {"file_path": p, "content": "x", "new_string": "x"}})
+
+
+def test_documenting_link_commands_in_data_or_docs_is_allowed():
+    for p in ("C:/r/artifacts/incidents/x/hook_live_probes.json", "C:/r/artifacts/incidents/x/INCIDENT.md"):
+        assert G.evaluate({"tool_name": "Write", "tool_input": {"file_path": p, "content": "mklink /J a b"}}) is None
+    for p in ("C:/s/mklinks.cmd", "C:/s/x.ps1", "C:/s/run.sh", "C:/s/noext"):
+        assert G.evaluate({"tool_name": "Write", "tool_input": {"file_path": p, "content": "mklink /J a b"}}), p
 
 
 def test_guard_files_may_contain_link_code():

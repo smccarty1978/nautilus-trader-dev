@@ -44,7 +44,7 @@ transcripts themselves are kept outside the repo, because of size and full sessi
 4. **Unnecessary in V2:** worktrees already resolve catalogs through `~/.nt_research/config.yaml` `catalog_roots`.
    No link was ever needed.
 
-## Recovery (staged, verified, NOT yet promoted)
+## Recovery
 
 The shadow copies are readable without elevation through `\\?\GLOBALROOT\Device\HarddiskVolumeShadowCopyN\`. Nothing
 was mounted or linked. Shadow copies 18–23 all hold identical copies of both catalogs: same counts, bytes and mtimes,
@@ -71,7 +71,37 @@ Verification uses platform code on `main`. `verify_against_specs.py` checks agai
 
 No DatasetSpec was changed and no raw file was modified. No `build_dataset_v2` rebuild was needed.
 
-**Promotion into `data/catalog/` waits for explicit owner authorization.**
+**Promotion (owner-authorized 2026-10-08).** The scope was the two emptied directories only.
+- `promotion_preflight.json`: re-hashed staging and confirmed both targets empty, giving `READY_TO_PROMOTE`.
+- `promote_staged.py`: exclusive-create copy and re-hash; 28/28 files, 0 mismatches (`promotion_copy_result.json`).
+
+**Recovery verdict: `RECOVERED_VERIFIED`** (`recovery_verdict.json`, `live_spec_verification.json`):
+- the live files match staging file for file;
+- the canonical logical digest, reference digest, builder hash, dataset manifest and raw sources all match the
+  committed specs on the live catalogs.
+
+## Activation (owner-authorized after the pilot)
+
+- **Pilot** (`acl_pilot.py` → `acl_pilot.json`): `PILOT_PASS`, 29/29 checks, on a disposable copy of the real
+  catalog and raw files. It covered:
+  - platform reads (digest, reference tables, `resolve_dataset`, NautilusTrader bar query);
+  - every denied mutation, and the incident sequence;
+  - new-dataset build, rename and cleanup, and adding new raw files;
+  - preservation of unrelated ACEs;
+  - rollback by `restore` and by owner `remove`.
+
+  The rollback leaves only the `AI` DACL control flag different; every ACE and the protected flag are identical.
+  Elevated-admin recovery was not exercised, because the session is not elevated. The owner path needs no elevation.
+- **Live** (`live_protection_plan.json`): 59 items (the catalog root, 12 catalogs, the raw dir and 45 raw files).
+  - The original descriptors were saved first to `~/.nt_research/acl_backups/live_20261008/`. A copy of the manifest
+    is in `live_acl_backup_manifest.json`.
+  - Validation (`live_protection_validation.json`) gave **`PROTECTION_ACTIVE_VERIFIED`**: unrelated ACEs preserved,
+    all 7 spec-backed catalogs read and match, both recovered catalogs resolve through the real config, and
+    write-open probes are denied.
+- **User-level hook** (`hook_live_probes.json`, `hook_replay.json`):
+  - the installed hook blocks 12/12 incident tool calls;
+  - live calls in a running session and from a subagent are blocked;
+  - the settings were backed up and unrelated keys preserved.
 
 ## Permanent prevention (this chore, `chore/data_safety_guard`)
 

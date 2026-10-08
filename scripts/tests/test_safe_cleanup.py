@@ -266,6 +266,18 @@ def test_safe_delete_deletes_an_ordinary_tree(workspace):
     assert not (root / "work").exists()
 
 
+def test_safe_delete_handles_read_only_files_like_git_objects(workspace):
+    import stat as _stat
+    from scripts.safe_cleanup import safe_delete
+
+    root, _ = workspace
+    ro = root / "work" / "nested" / "obj"
+    ro.write_bytes(b"x")
+    os.chmod(ro, _stat.S_IREAD)
+    safe_delete(root / "work", root)
+    assert not (root / "work").exists()
+
+
 def test_live_data_is_protected_from_every_deletion_path():
     from scripts.safe_cleanup import assert_not_protected, protected_roots
 

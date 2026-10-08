@@ -27,9 +27,21 @@ def live(tmp_path: Path):
     raw.mkdir()
     (raw / "NQ_v0_1s_2022.parquet").write_bytes(b"raw\n")
     args = ["--catalog-root", str(cat_root), "--raw-dir", str(raw), "--state", str(tmp_path / "state.json")]
-    assert P.main(["apply", *args]) == 0
+    assert P.main(["apply", *args, "--backup-dir", str(tmp_path / "acl_backup")]) == 0
     yield cat_root, raw, args
     P.main(["remove", *args])
+
+
+def _norm(tree: dict) -> dict:
+    """Exact ACE lists and the protected (P) flag; ignores only the AI (auto-inherited) DACL control flag, which
+    Windows sets on any DACL write and which has no effect on access."""
+    return {k: P.normalize_sddl(v) for k, v in tree.items()}
+
+
+def _tree_sddl(root: Path, tmp: Path, tag: str) -> dict:
+    f = tmp / f"sddl_{tag}.acl"
+    subprocess.run(["icacls", str(root), "/save", str(f), "/T"], capture_output=True, check=True)
+    return {name: sddl for name, sddl in P._read_save(f)}
 
 
 def _junction(link: Path, target: Path) -> None:
@@ -142,13 +154,47 @@ def test_remove_lifts_protection(tmp_path):
     (root / "DS").mkdir(parents=True)
     (root / "DS" / "f").write_bytes(b"x")
     args = ["--catalog-root", str(root), "--state", str(tmp_path / "s.json")]
-    assert P.main(["apply", *args]) == 0
+    assert P.main(["apply", *args, "--backup-dir", str(tmp_path / "b")]) == 0
     assert P.main(["remove", *args]) == 0
     shutil.rmtree(root / "DS")
     assert not (root / "DS").exists()
 
 
-def test_apply_is_idempotent(live):
+def test_apply_is_idempotent(live, tmp_path):
     _, _, args = live
-    assert P.main(["apply", *args]) == 0
+    assert P.main(["apply", *args, "--backup-dir", str(tmp_path / "second_backup")]) == 0
     assert P.main(["verify", *args]) == 0
+
+
+def test_unrelated_aces_survive_and_restore_reinstates_exact_descriptors(tmp_path):
+    base = tmp_path / "live"
+    root = base / "catalog"
+    (root / "DS" / "data").mkdir(parents=True)
+    (root / "DS" / "data" / "p.parquet").write_bytes(b"x")
+    # an unrelated explicit ACE that must be preserved (Guests: read)
+    subprocess.run(["icacls", str(root / "DS"), "/grant", "*S-1-5-32-546:(OI)(CI)(R)"], capture_output=True, check=True)
+    before = _tree_sddl(root, tmp_path, "before")
+    args = ["--catalog-root", str(root), "--state", str(tmp_path / "s.json")]
+    assert P.main(["apply", *args, "--backup-dir", str(tmp_path / "bk")]) == 0
+    during = _tree_sddl(root, tmp_path, "during")
+    assert during != before
+    import re
+    for name, sddl in before.items():  # every original ACE is still there, unchanged
+        orig = set(re.findall(r"\([^)]*\)", sddl.split("D:", 1)[1]))
+        now = set(re.findall(r"\([^)]*\)", during[name].split("D:", 1)[1]))
+        assert orig and orig <= now, (name, orig - now)
+    assert P.main(["restore", "--backup-dir", str(tmp_path / "bk")]) == 0
+    assert _norm(_tree_sddl(root, tmp_path, "restored")) == _norm(before)
+    assert P.main(["apply", *args, "--backup-dir", str(tmp_path / "bk2")]) == 0
+    assert P.main(["remove", *args]) == 0
+    assert _norm(_tree_sddl(root, tmp_path, "removed")) == _norm(before)
+    shutil.rmtree(root / "DS")
+
+
+def test_apply_refuses_to_overwrite_an_existing_backup(tmp_path):
+    root = tmp_path / "c"
+    (root / "DS").mkdir(parents=True)
+    (tmp_path / "bk").mkdir()
+    with pytest.raises(FileExistsError):
+        P.main(["apply", "--catalog-root", str(root), "--state", str(tmp_path / "s.json"), "--backup-dir", str(tmp_path / "bk")])
+    assert P.main(["verify", "--catalog-root", str(root), "--state", str(tmp_path / "s.json")]) == 1  # untouched

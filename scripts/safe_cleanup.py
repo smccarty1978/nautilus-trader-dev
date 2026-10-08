@@ -173,7 +173,15 @@ def safe_delete(target: Path, disposable_root: Path) -> None:
     if links:
         raise UnsafeDeletionError(f"UNSAFE_DELETION_CONTAINS_REPARSE_POINT: {len(links)} under {target}: "
                                   f"{'; '.join(links[:10])}. Remove each link non-recursively first (rmdir <link>).")
-    shutil.rmtree(target)
+    def _clear_readonly_and_retry(func, path, _exc):
+        # git marks object files read-only; the tree was proven link-free and unprotected above.
+        if _is_reparse_point(Path(path)):
+            raise UnsafeDeletionError(f"UNSAFE_DELETION_CONTAINS_REPARSE_POINT: appeared during deletion: {path}")
+        os.chmod(path, stat.S_IWRITE)
+        func(path)
+
+    shutil.rmtree(target, onexc=_clear_readonly_and_retry) if sys.version_info >= (3, 12) else \
+        shutil.rmtree(target, onerror=_clear_readonly_and_retry)
 
 
 def _git_worktrees(repo: Path) -> List[Path]:

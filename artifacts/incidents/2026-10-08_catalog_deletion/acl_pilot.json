@@ -1,0 +1,113 @@
+{
+ "started_utc": "2026-10-08T13:07:04.726278+00:00",
+ "pilot": "C:\\Users\\Scott McCarty\\Projects\\nt_recovery_staging\\acl_pilot",
+ "checks": {
+  "setup_digest_matches_spec": {
+   "pass": true
+  },
+  "apply": {
+   "pass": true
+  },
+  "verify": {
+   "pass": true
+  },
+  "backup_records_original_descriptors": {
+   "pass": true,
+   "entries": 5
+  },
+  "unrelated_aces_preserved": {
+   "pass": true,
+   "missing": {}
+  },
+  "read_logical_digest_under_protection": {
+   "pass": true
+  },
+  "read_reference_tables_with_digest": {
+   "pass": true,
+   "rows": {
+    "holidays": 17,
+    "maintenance": 2007,
+    "out_of_calendar": 4,
+    "rolls": 25,
+    "sessions": 1636
+   }
+  },
+  "resolve_dataset_via_catalog_roots_with_digest": {
+   "pass": true,
+   "resolved": "ResolvedDataset(dataset_id='NQ_1S_V2_GLOBEX', catalog_path=WindowsPath('C:/Users/Scott McCarty/Projects/nt_recovery_staging/acl_pilot/catalog/NQ_1S_V2_GLOBEX'), logical_digest='9e7aecb7a2910b4402a6cb4f34cc2f6deb5df19d0e889b2c696cf4f844292c64', resolution='configured_root', root=WindowsPath('C:/Users"
+  },
+  "nautilus_catalog_bar_read": {
+   "pass": true,
+   "n_bars": 3601
+  },
+  "raw_parquet_read": {
+   "pass": true
+  },
+  "deny_delete_file": {
+   "pass": true
+  },
+  "deny_overwrite_file": {
+   "pass": true
+  },
+  "deny_create_file_in_catalog": {
+   "pass": true
+  },
+  "deny_rename_catalog": {
+   "pass": true
+  },
+  "deny_rmtree_catalog": {
+   "pass": true
+  },
+  "deny_delete_raw": {
+   "pass": true
+  },
+  "deny_overwrite_raw": {
+   "pass": true
+  },
+  "catalog_intact_after_denials": {
+   "pass": true
+  },
+  "incident_sequence_loses_nothing": {
+   "pass": true,
+   "junction_rc": 0,
+   "git_rc": 255,
+   "git_stderr": "error: failed to delete 'C:/Users/Scott McCarty/Projects/nt_recovery_staging/acl_pilot/gitrepo-tmp_worktree': Invalid argument"
+  },
+  "new_dataset_build_rename_cleanup_and_new_raw_allowed": {
+   "pass": true
+  },
+  "protect_new_dataset_afterwards": {
+   "pass": true
+  },
+  "restore_bk2": {
+   "pass": true
+  },
+  "restore_bk1": {
+   "pass": true
+  },
+  "restore_reinstates_original_descriptors": {
+   "pass": true,
+   "differing": {},
+   "ai_flag_only_differences": 0,
+   "compared": 35
+  },
+  "unprotected_after_restore": {
+   "pass": true
+  },
+  "reapply": {
+   "pass": true
+  },
+  "owner_remove": {
+   "pass": true
+  },
+  "remove_reinstates_original_descriptors": {
+   "pass": true,
+   "differing": []
+  },
+  "owner_can_modify_after_lifting": {
+   "pass": true
+  }
+ },
+ "finished_utc": "2026-10-08T13:07:15.355012+00:00",
+ "verdict": "PILOT_PASS"
+}
