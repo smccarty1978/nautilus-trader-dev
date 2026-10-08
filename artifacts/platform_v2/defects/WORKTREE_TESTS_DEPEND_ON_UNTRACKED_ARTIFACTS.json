@@ -1,0 +1,30 @@
+{
+ "id": "WORKTREE_TESTS_DEPEND_ON_UNTRACKED_ARTIFACTS",
+ "kind": "portability / reproducibility defect",
+ "status": "OPEN",
+ "recorded_utc": "2026-10-08",
+ "found_by": "broad test_delta of chore/data_safety_guard (artifacts/incidents/2026-10-08_catalog_deletion/broad_test_delta.json)",
+ "summary": "Six tests pass only in the main checkout because they read gitignored, untracked research artifacts or raw data through repo-relative paths. In any fresh worktree (which by policy holds no data/ and no study _work/ or model artifacts) they fail, and test_delta classifies them NEW_FAILURE instead of ENVIRONMENTAL_MISSING_ARTIFACT.",
+ "tests": {
+  "research_workflow/tests/test_external_model_scoring.py::test_external_scorer_matches_repaired_model_c_for_deterministic_parent_row": "studies/clean_maturity_flip_model_rolling_productivity/artifacts/train_fitted_models.joblib",
+  "research_workflow/tests/test_stage3_integration.py::test_stage3_model_c_long_short_routing": "studies/clean_maturity_flip_model_rolling_productivity/artifacts/train_fitted_models.joblib",
+  "research_workflow/tests/test_runtime_bindings.py::test_episode_study_is_provider_host_mode_and_all_features_bind": "same joblib (DERIVED_INPUT_SCORER_UNBOUND model_c_score_at_candidate)",
+  "tests/test_catalog_materializer.py::test_materialization_required_when_catalog_absent": "data/raw/YM_v0_1s_2024.parquet (resolved under the checkout, not via catalog_roots)",
+  "tests/test_pre_flip_reliability_contracts.py::test_long_candidates_prevailing_regime_direction": "studies/long_rth_mirrored_surface_top100_training/_work/prepared_long_2024.parquet",
+  "tests/test_pre_flip_reliability_contracts.py::test_short_candidates_prevailing_regime_direction": "studies/short_rth_enriched_volume_level_retrain/_work/prepared_2024.parquet"
+ },
+ "evidence": "each passes on main f2b748c4 (where the gitignored file exists) and fails in the chore worktree (where it does not); the chore touched none of their code paths",
+ "two_defects": [
+  "the tests hard-depend on untracked artifacts without a skip/explicit environmental classification",
+  "scripts/test_delta.py ENVIRONMENTAL_MISSING_ARTIFACT did not recognise these FileNotFoundError / model-artifact-missing / RAW_DATA_MISSING failures (counted 0)"
+ ],
+ "prohibited_workaround": "copying or linking gitignored research artifacts or raw data into a worktree to make these pass (undocumented, and links are blocked by scripts/hooks/data_guard.py)",
+ "fix_direction_not_implemented": "a bounded chore: either mark each test to skip with an explicit environmental reason when its artifact is absent (as test_runtime_bindings already does for compiled_study.json), or resolve data through the configured catalog/artifact roots; and teach test_delta to classify the missing-artifact signatures as ENVIRONMENTAL_MISSING_ARTIFACT",
+ "related_pre_existing_clean_main_failures_not_part_of_this_defect": [
+  "research_workflow/tests/test_redteam_pass1_acceptance.py::test_acc12_canaries_green",
+  "scripts/tests/test_direction_qualified_freeze_binding.py::test_aggregate_freeze_opens_the_real_oos_gate",
+  "scripts/tests/test_generic_contract_audit.py::test_no_hardcoded_feature_count_in_generic_workflow",
+  "scripts/tests/test_rt_final_blockers.py::test_rt2b2_editing_a_governance_authority_moves_the_composite[scripts/check_feature_promotion.py]",
+  "scripts/tests/test_rt_final_blockers.py::test_rt2b2_editing_a_governance_authority_moves_the_composite[scripts/select_required_tests.py]"
+ ]
+}
