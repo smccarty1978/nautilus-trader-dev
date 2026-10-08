@@ -250,6 +250,16 @@
     "note": "unchunked/parity not run for 1_month (scope: packet only requires parity re-check on 1_day/1_week); 3_months not measured this session (time-bounded, see README remaining work)"
   },
   "generated_at_utc": "2026-10-08T07:56:52.978696+00:00",
+  "causal_scope_audit": {
+    "rule": "run_plan_on_catalog defaults to warmup_days=5; a window whose --start is within 5 days of 2022-01-01 replays warmup bars from 2021.",
+    "invalid_runs": {
+      "1_day.*": {"start": "2022-01-03", "warmup_start_approx": "2021-12-29", "status": "INVALID_FOR_2022_ONLY_SCOPE"},
+      "1_week.*": {"start": "2022-01-03", "warmup_start_approx": "2021-12-29", "status": "INVALID_FOR_2022_ONLY_SCOPE"},
+      "1_month.chunked_with_profile": {"start": "2022-01-01", "warmup_start_approx": "2021-12-27", "status": "INVALID_FOR_2022_ONLY_SCOPE"},
+      "1_month.chunked_no_profile": {"start": "2022-01-01", "warmup_start_approx": "2021-12-27", "status": "INVALID_FOR_2022_ONLY_SCOPE"}
+    },
+    "note": "Every run in this file started within 5 days of 2022-01-01, so EVERY run's replay touched 2021-12-2x bars even though the requested --start/--end and the resulting candidate/observation ROWS are all dated 2022. Not re-run here (time-bounded); see rss_curve_v2.json for a 2022-only-scope-clean replacement measurement (warmup fully inside 2022, replayed bar range recorded and asserted)."
+  },
   "finding_sink_layer_bounded": {
     "verdict": "SUPPORTED",
     "evidence": "post_emit RSS sampled AT each flush cycle grows only ~550 MB over 2045 flush cycles in the 1-month-with-profile run (921.6 MB at batch 1 -> 1464.8 MB at batch 2045, ~0.27 MB/flush, ~0.055 MB/row) -- i.e. the chunked writer/sink's OWN observable footprint at each flush boundary does not blow up with total row count the way an unbounded in-memory buffer would (pre-fix, the writer's internal probe alone could buffer 50,000 wide rows ~19 GiB before any flush; it now flushes every ~5 rows at this byte threshold)."

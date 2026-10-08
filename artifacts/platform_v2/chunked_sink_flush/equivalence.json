@@ -78,5 +78,12 @@
   }
  },
  "generated_at_utc": "2026-10-08T06:25:49Z",
- "passed": true
+ "passed": true,
+ "causal_scope_audit": {
+  "rule": "run_plan_on_catalog defaults to warmup_days=5; a window whose --start is within 5 days of 2022-01-01 replays warmup bars from 2021.",
+  "invalid_windows": {
+   "block_start_2022-01-03_05": {"start": "2022-01-03", "warmup_start_approx": "2021-12-29", "status": "INVALID_FOR_2022_ONLY_SCOPE"}
+  },
+  "note": "roll_week_2022-03-14_18 is unaffected (start 2022-03-14, warmup ~2022-03-09, inside 2022). block_start_2022-01-03_05's logical-equivalence result (0 diffs, both batch sizes) is NOT invalidated by this -- equivalence is a property of the writer/sink, independent of which calendar days were replayed -- but this window's RESULT ROWS are not valid evidence for any 2022-only-scope claim (e.g. causal/memory projection) because its replay touched 2021 tape. Not re-run here (time-bounded); see rss_curve_v2.json for a 2022-only-scope-clean replacement run."
+ }
 }

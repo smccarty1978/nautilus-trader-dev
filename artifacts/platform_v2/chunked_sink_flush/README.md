@@ -1,6 +1,32 @@
-# chunked_sink_flush -- bounded-memory collection (checkpoint, session 3)
+# chunked_sink_flush -- bounded-memory collection (checkpoint, session 4)
 
-## Session 3 verdict: PARTIAL PASS -- sink/writer layer bounded; NEW non-sink blocker found
+## Session 4 verdict: the session-3 "non-sink blocker" was the measurement harness itself
+
+**Retraction of session 3's `finding_process_peak_rss_not_bounded_1month_with_profile`.** The
+2.59 / 4.38 / 12.83 GiB "process peak RSS" figures in `rss_curve.json` were produced by
+session 3's own harness calling `recompute_logical_content_sha256` right after `finalize()`,
+**inside** the sampled RSS window, with a default `batch_size=50_000` larger than every
+measured partition -- so the "peak" was a whole-file Python-object read-back, not collection.
+See `rss_curve_SUPERSEDED.md` for the exact mechanism and `artifacts/platform_v2/chunked_sink_flush/harness/`
+(`collect.py`/`verify.py`/`run_watched.py`) for the phase-separated replacement harness
+(verification always runs in its own separate process, never inside the collection-sampled
+window, by construction). `research_workflow/host/chunked_writer.py`'s
+`recompute_logical_content_sha256` is fixed (Task A, commit `e111d077`): its batch size is now
+derived per-file from a small bounded sample via the writer's own calibrated
+`estimate_row_bytes`, instead of a fixed `50_000`-row default.
+
+**Causal data scope correction.** Every run recorded in `rss_curve.json`/`equivalence.json`/
+`downstream_memory.json` started within 5 days of 2022-01-01 (`run_plan_on_catalog`'s default
+`warmup_days=5`), so every one of those collection replays touched 2021-12-2x warmup bars even
+though the requested windows and resulting rows are all dated 2022. Each file now carries an
+additive `causal_scope_audit` block naming the affected run/window and marking it
+`INVALID_FOR_2022_ONLY_SCOPE`; no previously recorded value was changed or removed. A
+2022-only-scope-clean replacement measurement is `rss_curve_v2.json` (see below).
+
+See `rss_curve_v2.json` and `causal_scope.json` for the session-4 real-tape measurement and
+its verdicts.
+
+## Session 3 verdict: PARTIAL PASS -- sink/writer layer bounded; NEW non-sink blocker found (SUPERSEDED, see above)
 
 **The capability this chore owns (the chunked writer + sink flush trigger) is PROVEN
 bounded.** A separate, LARGER memory-growth source was found during measurement, outside

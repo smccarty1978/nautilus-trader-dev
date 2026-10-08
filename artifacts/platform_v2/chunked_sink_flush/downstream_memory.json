@@ -35,5 +35,12 @@
   "projected_merge_peak_gib": 104.68056233723958,
   "note": "Linear extrapolation over a ~37x row-count scale-up from this measurement (5265 -> 196560 rows); treat as an ORDER-OF-MAGNITUDE signal, not a precise forecast. reconcile's ratio is per-SINGLE-partition (its loop never holds more than one year's frames at once); merge's ratio is for ALL years held simultaneously (its own list-comprehension-then-concat). Both ratios already exceed what an 8 GiB budget can absorb at full-year x 2-block scale for a 9-VP-instance study with profile structs on every row -- this is the next real memory blocker the packet asked to detect, not fix."
  },
- "generated_at_utc": "2026-10-08T06:44:10Z"
+ "generated_at_utc": "2026-10-08T06:44:10Z",
+ "causal_scope_audit": {
+  "rule": "run_plan_on_catalog defaults to warmup_days=5; a window whose --start is within 5 days of 2022-01-01 replays warmup bars from 2021.",
+  "invalid_source_partitions": {
+   "stand_in_years.2022 (block_start_2022-01-03_05_chunked_997)": {"start": "2022-01-03", "warmup_start_approx": "2021-12-29", "status": "INVALID_FOR_2022_ONLY_SCOPE"}
+  },
+  "note": "The '2022' stand-in partition's COLLECTION replay touched 2021-12-29..31 warmup bars (its 2025 output rows are still all dated 2022; the downstream reconcile/merge/analyze measurement here reads only those already-materialized rows, not raw tape, so the reconcile/merge/analyze peak-RSS figures above are not re-derived from 2021 data). Flagged for completeness; the '2023' stand-in (roll_week_2022-03-14_18) is unaffected. Not re-run here (time-bounded)."
+ }
 }
