@@ -347,3 +347,75 @@ def test_first_bar_at_or_after_never_crosses_the_session_close():
                                                                      "ordered_barriers": [{"id": "b", "favorable_atr": 1.0, "adverse_atr": 1.0, "horizon_seconds": 10, "horizon_expiry_policy": "censor", "horizon_end_rule": "first_bar_at_or_after"}]}]}
     o = replay(c, {"observation_ts": T, "atr": 1.0, "direction": 1, "session_close_ts": close}, tape)
     assert (o["disposition"], o["censor_reason"]) == ("CENSORED", "SESSION_END")
+
+
+# ------------------------------------------------------------------------------- typed struct fields (D2b)
+def test_columnar_sink_round_trips_a_typed_struct_field_through_flush_and_parquet(tmp_path):
+    """tracker.volume_profile.rolling's ``profile`` FIELD_TYPES struct field (compact int/bool/float
+    transport, never JSON text) must survive ColumnarBuffer.append -> to_frame -> parquet -> read
+    bit-exact: the sink and the parquet writer need no bespoke code for a declared struct field --
+    pandas/pyarrow infer a typed Arrow struct (with flat list<int64> children) from a plain dict
+    value, exactly as they do for any other object column."""
+    import numpy as np
+    import pandas as pd
+
+    from features.trackers.volume_profile_rolling import FP, VolumeProfileKernel, VolumeProfileSnapshot
+    from research_workflow.host.sink import ColumnarBuffer
+
+    om = (np.arange(1, 41, dtype=np.int64)) * 60 * NS
+    k = VolumeProfileKernel(om, np.array([], np.int64), 10, "range_uniform", a_window=20, a_min_live=3, min_window=3)
+    rng = np.random.default_rng(0)
+    objs = []
+
+    def cb(p, k=k):
+        snap = k.snapshot()
+        if snap is None or snap.get("poc") is None:
+            return
+        ps = k.profile_snapshot(snap)
+        if ps is not None:
+            objs.append(ps)
+
+    k.on_close = cb
+    for i, T in enumerate(om):
+        for off in (40 * NS, 20 * NS):
+            lo = 4000 + int(rng.integers(0, 40))
+            k.push(int(T - off), (lo + int(rng.integers(0, 6))) * 0.25, lo * 0.25, (lo + int(rng.integers(0, 3))) * 0.25, float(rng.integers(1, 50)))
+    k.close_through(int(om[-1]))
+    assert len(objs) >= 5
+
+    # A real run's observation column mixes rows with no profile yet (window < min_window, or
+    # emit_profile windows that haven't warmed up) with rows that do -- interleave a None row so
+    # this test exercises pandas/pyarrow's null-struct reconstruction path, not just the
+    # no-nulls-in-the-column path (which keeps every scalar an int on its own).
+    buf = ColumnarBuffer(["observation_ts", "profile", "profile_hash"])
+    buf.append({"observation_ts": 0, "profile": None, "profile_hash": None})
+    for ps in objs:
+        buf.append({"observation_ts": ps.snapshot_ts, "profile": ps.to_struct(), "profile_hash": ps.content_hash})
+    buf.append({"observation_ts": -1, "profile": None, "profile_hash": None})
+    df = buf.to_frame()
+    assert df["profile"].iloc[0] is None and df["profile"].iloc[-1] is None
+    assert df["profile"].iloc[1:-1].map(lambda d: isinstance(d, dict)).all()
+
+    p = tmp_path / "observations.parquet"
+    df.to_parquet(p, index=False)
+    import pyarrow.parquet as pq
+    schema = pq.read_schema(p)
+    profile_type = schema.field("profile").type
+    assert profile_type.num_fields > 0, "profile did not persist as a typed Arrow struct column"
+    assert any(str(profile_type[i].type).startswith("list<") for i in range(profile_type.num_fields) if profile_type[i].name == "weights_fp")
+    lo_tick_field = next(profile_type[i] for i in range(profile_type.num_fields) if profile_type[i].name == "lo_tick")
+    assert str(lo_tick_field.type) == "int64", "the ON-DISK Arrow type must stay int64 regardless of pandas' own null-struct dict materialization"
+
+    df2 = pd.read_parquet(p)
+    assert len(df2) == len(df)
+    assert df2["profile"].iloc[0] is None and df2["profile"].iloc[-1] is None
+    for i, ps in enumerate(objs):
+        raw = df2["profile"].iloc[i + 1]
+        assert isinstance(raw["lo_tick"], float), "fixture assumption: pandas upcasts struct int scalars to float when the column holds a null elsewhere"
+        got = VolumeProfileSnapshot.from_struct(raw)
+        assert isinstance(got.lo_tick, int) and not isinstance(got.lo_tick, bool)
+        assert got.content_hash == ps.content_hash, "from_struct must re-cast every typed field, not merely pass pandas' float-upcast values through"
+        assert got.weights_fp == ps.weights_fp
+        assert got.contributions == ps.contributions
+        assert got.exact_triplets == ps.exact_triplets
+        assert df2["profile_hash"].iloc[i + 1] == ps.content_hash

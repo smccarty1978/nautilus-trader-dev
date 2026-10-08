@@ -160,6 +160,7 @@ def _host_bindings(repo_root: Path) -> Dict[str, List[Dict[str, Any]]]:
                           "description": (cls.__doc__ or "").strip().splitlines()[0] if cls.__doc__ else "",
                           "parameters": [k for k in cls.PARAMS], "required_parameters": [k for k, v in cls.PARAMS.items() if v is REQUIRED],
                           "inputs": dict(cls.INPUTS), "fields": list(cls.FIELDS), "epoch_fields": list(getattr(cls, "EPOCH_FIELDS", ())),
+                          "field_types": dict(getattr(cls, "FIELD_TYPES", {})),
                           "events": list(cls.EVENTS), "subscribes": list(getattr(cls, "SUBSCRIBES", ())), "dependencies": [],
                           "update_cadence": cls.CADENCE, "cost_class": COST_CLASS_BY_CADENCE.get(cls.CADENCE, "per_source_event"),
                           "warmup_bars": int(getattr(cls, "WARMUP_BARS", 0)), "status": "verified", "implementation": impl,
@@ -246,7 +247,7 @@ def build_registry(repo_root: Path = REPO_ROOT) -> Dict[str, Any]:
         have = {r["id"]: r for r in rows}
         for r in hosted.get(kind, []):
             if r["id"] in have:
-                have[r["id"]].update({k: v for k, v in r.items() if k in ("fields", "epoch_fields", "events", "inputs", "required_parameters", "executable", "contracts", "platform")})
+                have[r["id"]].update({k: v for k, v in r.items() if k in ("fields", "field_types", "epoch_fields", "events", "inputs", "required_parameters", "executable", "contracts", "platform")})
                 have[r["id"]]["host_binding"] = r["implementation"]
             else:
                 rows.append(r)

@@ -17,6 +17,16 @@ class BaseBinding:
     PARAMS: Mapping[str, Any] = {}
     INPUTS: Mapping[str, str] = {}
     FIELDS: tuple = ()
+    # A binding may declare FIELD_TYPES = {field: {"kind": "struct", "schema": {...}}} for any
+    # FIELDS entry whose runtime value is NOT a plain scalar (int / float / bool / str / None):
+    # the declared schema (subfield name -> dtype tag, e.g. "int64[]", "int64", "float64", "str",
+    # "bool") is read by capabilities introspection (research cap describe) and the compiler so a
+    # study author and the grammar both know the field's shape at compile time, without the
+    # binding inventing its own ad hoc serialization convention. An undeclared FIELDS entry is a
+    # plain scalar by default; emitting a dict / list / tuple from a field with no FIELD_TYPES
+    # entry is refused the same way any other undeclared-shape output is refused today (the
+    # columnar sink and the merged-stats / predicate-evaluation paths assume a scalar).
+    FIELD_TYPES: Mapping[str, Mapping[str, Any]] = {}
     EPOCH_FIELDS: tuple = ()
     EVENTS: tuple = ()
     SUBSCRIBES: tuple = ()

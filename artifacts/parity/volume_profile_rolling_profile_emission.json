@@ -1,0 +1,242 @@
+{
+ "capability": "tracker.volume_profile.rolling",
+ "change": "G2 repair: D1 -- fixed reconstruct_poc_va_nodes() padding from the occupied-weight range instead of the window's bar range (win_lo_tick/win_hi_tick), which silently shifted vah/val for allocation=close. D2a -- exact_triplets persisted only on the rare snapshot where the live kernel's own walk took the exact re-decision path. D2b -- profile_json (JSON text) replaced by profile: a typed struct field (BaseBinding.FIELD_TYPES, a generic platform mechanism), carried through the host sink/parquet as a typed Arrow struct with flat list<int64> children, never JSON text.",
+ "oracle": "the kernel's own live scalar snapshot (poc, vah, val, va_weight_fraction, raw_poc, raw_vah, raw_val, n_hvn, n_lvn, hvns_json, lvns_json); VolumeProfileSnapshot.reconstruct_poc_va_nodes must reproduce it bit for bit from weights_fp/contributions/exact_triplets (via from_struct()) alone, AFTER a real ColumnarBuffer -> to_frame -> to_parquet -> read_parquet round trip (not merely an in-process JSON round trip).",
+ "method": "real tape, two 4-day windows picked by raw bar volume (never by outcomes): 2022-02-01..04 (baseline) and 2022-10-11..14 (2022-10-13, the September CPI print release day, is the 3rd highest single-day bar-volume day of 2022). Every closed-minute snapshot (not sampled) for all 3 allocations x {120, 360, 1440} horizons is flushed through research_workflow.host.sink.ColumnarBuffer, written to parquet, read back, and reconstructed. scripts/parity_volume_profile_rolling_profile_emission.py.",
+ "criterion": "zero mismatches on poc/vah/val/raw_poc/raw_vah/raw_val/n_hvn/n_lvn/hvns_json/lvns_json, bit-exact weights_fp/contributions, and a matching content_hash, across every one of 98,838 checked snapshots (2 windows x 3 allocations x 3 horizons x 5491 snapshots each).",
+ "windows": {
+  "2022-02-01_04_baseline": {
+   "range_uniform/120": {
+    "n_checked": 5491,
+    "n_mismatch": 0,
+    "n_exact_tie_replay": 1,
+    "on_disk_bytes_total": 8227188,
+    "on_disk_bytes_mean": 1498.304134037516,
+    "sample_mismatch": [],
+    "redundancy": {
+     "mean_unchanged_frac": 0.8181648697768147,
+     "mean_delta_bytes": 1224.4692167577414,
+     "mean_full_bytes": 3741.5577413479054,
+     "delta_vs_full_ratio": 0.3272618789832235
+    }
+   },
+   "range_uniform/360": {
+    "n_checked": 5491,
+    "n_mismatch": 0,
+    "n_exact_tie_replay": 0,
+    "on_disk_bytes_total": 12552920,
+    "on_disk_bytes_mean": 2286.089965397924,
+    "sample_mismatch": [],
+    "redundancy": {
+     "mean_unchanged_frac": 0.8984851285910173,
+     "mean_delta_bytes": 1196.9894353369764,
+     "mean_full_bytes": 6624.23606557377,
+     "delta_vs_full_ratio": 0.18069848711427178
+    }
+   },
+   "range_uniform/1440": {
+    "n_checked": 5491,
+    "n_mismatch": 0,
+    "n_exact_tie_replay": 0,
+    "on_disk_bytes_total": 25588798,
+    "on_disk_bytes_mean": 4660.134401748315,
+    "sample_mismatch": [],
+    "redundancy": {
+     "mean_unchanged_frac": 0.9519122237658083,
+     "mean_delta_bytes": 1078.6768670309655,
+     "mean_full_bytes": 12561.20218579235,
+     "delta_vs_full_ratio": 0.08587369672713563
+    }
+   },
+   "full_per_tick/120": {
+    "n_checked": 5491,
+    "n_mismatch": 0,
+    "n_exact_tie_replay": 0,
+    "on_disk_bytes_total": 3491397,
+    "on_disk_bytes_mean": 635.8399198688763,
+    "sample_mismatch": [],
+    "redundancy": {
+     "mean_unchanged_frac": 0.8181860883890376,
+     "mean_delta_bytes": 1224.3526411657558,
+     "mean_full_bytes": 3741.5577413479054,
+     "delta_vs_full_ratio": 0.32723072201598036
+    }
+   },
+   "full_per_tick/360": {
+    "n_checked": 5491,
+    "n_mismatch": 0,
+    "n_exact_tie_replay": 0,
+    "on_disk_bytes_total": 4187871,
+    "on_disk_bytes_mean": 762.6791112729921,
+    "sample_mismatch": [],
+    "redundancy": {
+     "mean_unchanged_frac": 0.8985003126438494,
+     "mean_delta_bytes": 1196.8990892531876,
+     "mean_full_bytes": 6624.23606557377,
+     "delta_vs_full_ratio": 0.18068484839685678
+    }
+   },
+   "full_per_tick/1440": {
+    "n_checked": 5491,
+    "n_mismatch": 0,
+    "n_exact_tie_replay": 0,
+    "on_disk_bytes_total": 6692951,
+    "on_disk_bytes_mean": 1218.8947368421052,
+    "sample_mismatch": [],
+    "redundancy": {
+     "mean_unchanged_frac": 0.9519127620398238,
+     "mean_delta_bytes": 1078.6622950819672,
+     "mean_full_bytes": 12561.20218579235,
+     "delta_vs_full_ratio": 0.08587253665115065
+    }
+   },
+   "close/120": {
+    "n_checked": 5491,
+    "n_mismatch": 0,
+    "n_exact_tie_replay": 0,
+    "on_disk_bytes_total": 2779858,
+    "on_disk_bytes_mean": 506.25714806046255,
+    "sample_mismatch": [],
+    "redundancy": {
+     "mean_unchanged_frac": 0.8912052734706832,
+     "mean_delta_bytes": 656.1428051001822,
+     "mean_full_bytes": 3689.5213114754097,
+     "delta_vs_full_ratio": 0.17783954874021204
+    }
+   },
+   "close/360": {
+    "n_checked": 5491,
+    "n_mismatch": 0,
+    "n_exact_tie_replay": 0,
+    "on_disk_bytes_total": 4517000,
+    "on_disk_bytes_mean": 822.6188308140594,
+    "sample_mismatch": [],
+    "redundancy": {
+     "mean_unchanged_frac": 0.9415404581313559,
+     "mean_delta_bytes": 637.8579234972677,
+     "mean_full_bytes": 6560.145719489982,
+     "delta_vs_full_ratio": 0.09723227970412492
+    }
+   },
+   "close/1440": {
+    "n_checked": 5491,
+    "n_mismatch": 0,
+    "n_exact_tie_replay": 0,
+    "on_disk_bytes_total": 7431187,
+    "on_disk_bytes_mean": 1353.339464578401,
+    "sample_mismatch": [],
+    "redundancy": {
+     "mean_unchanged_frac": 0.9734032504915837,
+     "mean_delta_bytes": 575.8688524590164,
+     "mean_full_bytes": 12491.236429872495,
+     "delta_vs_full_ratio": 0.0461018295260059
+    }
+   }
+  },
+  "2022-10-11_14_cpi_high_activity": {
+   "range_uniform/120": {
+    "n_checked": 5491,
+    "n_mismatch": 0,
+    "n_exact_tie_replay": 0,
+    "on_disk_bytes_total": 7851604,
+    "on_disk_bytes_mean": 1429.904206883992,
+    "sample_mismatch": []
+   },
+   "range_uniform/360": {
+    "n_checked": 5491,
+    "n_mismatch": 0,
+    "n_exact_tie_replay": 0,
+    "on_disk_bytes_total": 12831943,
+    "on_disk_bytes_mean": 2336.904571116372,
+    "sample_mismatch": []
+   },
+   "range_uniform/1440": {
+    "n_checked": 5491,
+    "n_mismatch": 0,
+    "n_exact_tie_replay": 0,
+    "on_disk_bytes_total": 24836495,
+    "on_disk_bytes_mean": 4523.127845565471,
+    "sample_mismatch": []
+   },
+   "full_per_tick/120": {
+    "n_checked": 5491,
+    "n_mismatch": 0,
+    "n_exact_tie_replay": 0,
+    "on_disk_bytes_total": 3099989,
+    "on_disk_bytes_mean": 564.5581861227463,
+    "sample_mismatch": []
+   },
+   "full_per_tick/360": {
+    "n_checked": 5491,
+    "n_mismatch": 0,
+    "n_exact_tie_replay": 0,
+    "on_disk_bytes_total": 4862228,
+    "on_disk_bytes_mean": 885.4904389000183,
+    "sample_mismatch": []
+   },
+   "full_per_tick/1440": {
+    "n_checked": 5491,
+    "n_mismatch": 0,
+    "n_exact_tie_replay": 0,
+    "on_disk_bytes_total": 6492228,
+    "on_disk_bytes_mean": 1182.3398288107812,
+    "sample_mismatch": []
+   },
+   "close/120": {
+    "n_checked": 5491,
+    "n_mismatch": 0,
+    "n_exact_tie_replay": 0,
+    "on_disk_bytes_total": 2586724,
+    "on_disk_bytes_mean": 471.0843197960299,
+    "sample_mismatch": []
+   },
+   "close/360": {
+    "n_checked": 5491,
+    "n_mismatch": 0,
+    "n_exact_tie_replay": 0,
+    "on_disk_bytes_total": 2652151,
+    "on_disk_bytes_mean": 482.99963576761974,
+    "sample_mismatch": []
+   },
+   "close/1440": {
+    "n_checked": 5491,
+    "n_mismatch": 0,
+    "n_exact_tie_replay": 0,
+    "on_disk_bytes_total": 3461753,
+    "on_disk_bytes_mean": 630.4412675286833,
+    "sample_mismatch": []
+   }
+  }
+ },
+ "rss_measurement": {
+  "total_rows": 49419,
+  "delta_accumulate_bytes": 2096570368,
+  "bytes_per_row_rss_accumulate": 42424.37863979441,
+  "total_parquet_bytes": 75469170,
+  "bytes_per_row_parquet": 1527.1286347356279
+ },
+ "full_year_extrapolation": {
+  "open_minutes_2022": 354135,
+  "n_kernels": 9,
+  "rows_per_year_9_kernels": 3187215,
+  "projected_peak_in_memory_bytes": 135215615966.43236,
+  "projected_peak_in_memory_gib": 125.92935559007559,
+  "projected_on_disk_bytes": 4867287291.558914,
+  "projected_on_disk_gib": 4.533014531767847,
+  "infeasible_in_memory_budget_gib": 8,
+  "note": "lifecycle_v2.run_partition holds the WHOLE partition's candidate/observation rows as plain Python objects (ColumnarBuffer lists of dicts, no numpy/arrow backing) until a SINGLE to_parquet() flush at partition end -- no incremental/chunked flush exists today. The on-disk (parquet, typed Arrow) footprint is comfortably within the 8 GiB budget; the in-memory PRE-FLUSH Python-object footprint is not, because of CPython per-object overhead on the profile struct's weights_fp/contributions int lists, not because of the serialized representation itself."
+ },
+ "redundancy_note": "mean fraction of weight-vector bins UNCHANGED minute-to-minute ranges ~0.82 (120 min horizon) to ~0.97 (1440 min horizon) across allocations (see windows.<baseline>.<alloc>/<h>.redundancy); a delta encoding (changed-bin index + value, 16 bytes/changed bin) would be roughly 5-33% of the full vector's raw byte size depending on horizon/allocation -- analysis only, not implemented (would require a normalized/immutable-profile-reference or delta-chain representation, a platform capability decision, not a bug repair).",
+ "passed": true,
+ "seconds": 193.2,
+ "sha256": {
+  "features/trackers/volume_profile_rolling.py": "ef61894ce49a3695eaa41db72f1d668aed0325485c661fcb77fab5d3dda0e839",
+  "features/tests/test_volume_profile_rolling.py": "6fc72d47690fc780b2955afceb8c5e1c1f314e93c84c10915beabd7c282ebcbb",
+  "features/trackers/base.py": "1b18b4c92aeb0047974e05de817a3c9063e7059f9b211bde95be097a0e1733d3",
+  "research_workflow/capabilities.py": "7fa82c199945b1bec5411cfd709b6304a403f71a0415e4d1000ffaaa443755bd",
+  "research_workflow/grammar/compiler.py": "4d88cfaee259eaa06d8aa188d31dac16df820278876acb31d434dab68fd12567",
+  "research_workflow/tests/test_host_core.py": "aac492f94925fc22733c60c9caf26ef5d748750d8e0c5f05baeadd8784e347ba",
+  "scripts/parity_volume_profile_rolling_profile_emission.py": "fd5eef97daa5f012816061f6753e01d4194323367551021931f6e379d5a95825"
+ },
+ "not_done": "D2(5) redundancy analysis is numbers-only, not implemented (a delta/normalized-reference representation is a platform capability decision). The full-year in-memory peak (~126 GiB projected for 9 kernels over 354,135 open minutes) exceeds the ~8 GiB per-partition budget even after D1/D2a/D2b: the blocker is lifecycle_v2.run_partition's own buffering (the WHOLE partition's rows held as plain Python objects, no numpy/arrow backing, until a single to_parquet() flush at partition end -- there is no incremental/chunked flush today), not the representation (on-disk projected size is ~4.5 GiB/year, comfortably inside budget). Resolving the in-memory blocker needs an incremental-flush change to the host/lifecycle collection path, which is a platform/study-design decision outside this bounded repair."
+}
