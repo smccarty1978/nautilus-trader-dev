@@ -195,6 +195,17 @@ class VolumeProfileSnapshot:
     range of the window (``[min occupied tick, max occupied tick]``), not the padded smoothing
     grid the kernel uses internally to search for the POC.
 
+    ``win_lo_tick`` / ``win_hi_tick`` are the window's BAR range (round(win_lo / tick),
+    round(win_hi / tick)) -- the boundary the live kernel pads by ``ceil(4 * sigma_ticks) + 2``
+    on each side to build its search array (``VolumeProfileKernel.snapshot``'s ``lo_t, hi_t``).
+    For ``range_uniform`` / ``full_per_tick`` this equals the occupied-weight range (every tick
+    of the bar gets weight), but for ``close`` (weight only on the close tick) the occupied range
+    can be strictly narrower than the bar range: a bar's close need not be its high or low. The
+    value-area walk's stopping rule is bounded by array length (``lo > 0 or hi < n - 1``), so
+    reconstruction MUST rebuild the same array extent as the live kernel -- padding from the
+    occupied range alone would clamp the walk at a different (nearer) boundary than the live
+    kernel's wider bar-range array and silently shift ``vah`` / ``val``.
+
     ``contributions[i]`` is the rounded bar-tick contribution count at bin i (``range_uniform``
     only; always 0 for ``full_per_tick`` / ``close``, whose weights are already exact integers --
     no division, no rounding). It lets :meth:`reconstruct_poc_va_nodes` detect the SAME
@@ -221,6 +232,8 @@ class VolumeProfileSnapshot:
     tick: float
     lo_tick: int                            # integer price origin: bin 0 price == lo_tick * tick
     n_bins: int
+    win_lo_tick: int                        # round(win_lo / tick): the live kernel's pre-pad array lower bound
+    win_hi_tick: int                        # round(win_hi / tick): the live kernel's pre-pad array upper bound
     weights_fp: Tuple[int, ...]             # raw int64 fixed-point weights, ascending price
     contributions: Tuple[int, ...]          # per-tick rounded bar-tick contribution counts
     weight_scale: int                       # fixed-point scale (2 ** 32)
@@ -260,15 +273,18 @@ class VolumeProfileSnapshot:
         d["exact_triplets"] = tuple(tuple(t) for t in d["exact_triplets"]) if d.get("exact_triplets") is not None else None
         return cls(**d)
 
-    def _exact_fractions(self, pad: int = 0) -> list:
-        """Exact per-tick rational weights, zero-padded by ``pad`` on each side so the index
-        space matches a Gaussian-smoothing-padded weight array of the same ``pad``."""
-        n = self.n_bins + 2 * pad
+    def _exact_fractions(self, a: int, n: int) -> list:
+        """Exact per-tick rational weights on absolute tick range ``[a, a + n - 1]`` (the live
+        kernel's own padded array extent, NOT the occupied-weight range)."""
         if self.exact_triplets is None:
-            return [Fraction(0)] * pad + [Fraction(int(x)) for x in self.weights_fp] + [Fraction(0)] * pad
+            E = [Fraction(0)] * n
+            off = self.lo_tick - a
+            for i, x in enumerate(self.weights_fp):
+                E[off + i] = Fraction(int(x))
+            return E
         E = [Fraction(0)] * n
         for t, n_, vol in self.exact_triplets:
-            idx = t - self.lo_tick + pad
+            idx = t - a
             if 0 <= idx < n and vol:
                 E[idx] += Fraction(vol, n_)
         return E
@@ -279,35 +295,42 @@ class VolumeProfileSnapshot:
         scalar fields bit for bit (the reconstruction-equality regression test's oracle).
 
         ``weights_fp`` is trimmed to the OCCUPIED tick range (the persisted, minimal source of
-        truth); the kernel's own node search instead runs on that range padded by
-        ``ceil(4 * sigma_ticks) + 2`` ticks of smoothing margin on each side (the same formula
-        ``VolumeProfileKernel.snapshot`` uses) so ``find_peaks`` / ``peak_widths`` see the curve
-        decay toward zero before hitting an array edge -- the padding is re-derived here (zeros,
-        exactly reproducible from ``sigma_ticks`` alone), never persisted.
+        truth), but the search/value-area array MUST be rebuilt to the live kernel's own extent:
+        ``[win_lo_tick, win_hi_tick]`` (the window's bar range, not the occupied-weight range)
+        padded by ``ceil(4 * sigma_ticks) + 2`` ticks of smoothing margin on each side (the same
+        formula ``VolumeProfileKernel.snapshot`` uses). For ``range_uniform`` / ``full_per_tick``
+        the two ranges coincide; for ``close`` the occupied range can be strictly narrower, and
+        the value-area walk's array-boundary stop rule (``lo > 0 or hi < n - 1``) is sensitive to
+        the array's actual length -- a narrower array clamps the walk sooner and silently shifts
+        ``vah`` / ``val``. The extra bins between the occupied range and the bar range are zero
+        (no weight there) and are re-derived here, never persisted.
         """
-        Xi0 = np.asarray(self.weights_fp, np.int64)
-        Ci0 = np.asarray(self.contributions, np.int64)
         pad = int(np.ceil(4 * self.sigma_ticks)) + 2
-        z = np.zeros(pad, np.int64)
-        Xi = np.concatenate([z, Xi0, z])
-        Ci = np.concatenate([z, Ci0, z])
+        a, b = self.win_lo_tick - pad, self.win_hi_tick + pad
+        n = b - a + 1
+        off = self.lo_tick - a
+        Xi = np.zeros(n, np.int64)
+        Ci = np.zeros(n, np.int64)
+        if len(self.weights_fp):
+            Xi[off:off + self.n_bins] = np.asarray(self.weights_fp, np.int64)
+            Ci[off:off + self.n_bins] = np.asarray(self.contributions, np.int64)
         X = Xi.astype(np.float64) / self.weight_scale
         S = np.maximum(gaussian_filter1d(X, self.sigma_ticks, mode="constant"), 0.0)
-        px = (self.lo_tick - pad + np.arange(len(Xi))) * self.tick
+        px = (a + np.arange(n)) * self.tick
         ip = int(np.argmax(S))
         ir = int(np.argmax(Xi))
         exact = None
         if Ci.any():
             cand = np.flatnonzero(Xi + 0.5 * Ci >= Xi[ir] - 0.5 * Ci[ir])
             if len(cand) > 1:
-                exact = self._exact_fractions(pad)
+                exact = self._exact_fractions(a, n)
                 vals = [exact[c] for c in cand]
                 ir = int(cand[vals.index(max(vals))])
         walks = []
         for i0 in (ip, ir):
             lo_i, hi_i, acc, amb = value_area_int(Xi, Ci, i0, va_frac, float(Xi.sum()), float(Ci.sum()))
             if amb:
-                exact = exact if exact is not None else self._exact_fractions(pad)
+                exact = exact if exact is not None else self._exact_fractions(a, n)
                 lo_i, hi_i, fr = value_area_exact(exact, i0, va_frac)
             else:
                 fr = float(acc) / float(Xi.sum())
@@ -549,11 +572,14 @@ class VolumeProfileKernel:
         lo_tick, X_occ, C_occ = raw
         a, b = int(lo_tick), int(lo_tick) + len(X_occ) - 1
         trips = self.exact_triplets(a, b)
+        win_lo_tick = int(round(snap["win_lo"] / self.tick))
+        win_hi_tick = int(round(snap["win_hi"] / self.tick))
         return VolumeProfileSnapshot.build(
             snapshot_ts=int(self.om[p]), segment_start_ts=int(self.om[rp]), horizon_open_minutes=self.h_min,
             allocation=self.alloc, window_minutes=int(snap["window_minutes"]), window_complete=bool(snap["window_complete"]),
             roll_truncated=bool(snap["roll_truncated"]), window_start_ts=int(self.om[start]), window_end_ts=int(self.om[p]),
             tick=self.tick, lo_tick=int(lo_tick), n_bins=int(len(X_occ)),
+            win_lo_tick=win_lo_tick, win_hi_tick=win_hi_tick,
             weights_fp=tuple(int(x) for x in X_occ.tolist()), contributions=tuple(int(x) for x in C_occ.tolist()),
             weight_scale=int(FP), total_weight_fp=int(X_occ.sum()), total_source_volume=float(self.vol_in_win),
             volume_conserving=self.alloc in ("range_uniform", "close"), sigma_a=self.sigma_a,

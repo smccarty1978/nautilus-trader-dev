@@ -249,11 +249,36 @@ def test_profile_object_reconstructs_scalar_outputs_through_an_exact_value_area_
     obj = VolumeProfileSnapshot.build(
         snapshot_ts=0, segment_start_ts=0, horizon_open_minutes=H, allocation="range_uniform",
         window_minutes=H, window_complete=True, roll_truncated=False, window_start_ts=0, window_end_ts=0,
-        tick=1.0, lo_tick=0, n_bins=5, weights_fp=X, contributions=C, weight_scale=int(FP),
+        tick=1.0, lo_tick=0, n_bins=5, win_lo_tick=0, win_hi_tick=4, weights_fp=X, contributions=C, weight_scale=int(FP),
         total_weight_fp=int(sum(X)), total_source_volume=0.0, volume_conserving=True, sigma_a=0.0,
         sigma_ticks=1e-9, exact_triplets=trips)
     rec = obj.reconstruct_poc_va_nodes(va_frac=0.70)
     assert rec["val"] == 0.0 and rec["vah"] == 4.0
+
+
+def test_profile_object_reconstructs_close_allocation_whose_occupied_range_is_narrower_than_the_bar_range():
+    """D1 regression (real-tape minute 2022-02-01..04, allocation=close, horizon_open_minutes=120):
+    a bar's close need not be its high or low, so the CLOSE allocation's occupied-weight range
+    (``lo_tick`` / ``n_bins``) can be strictly narrower than the window's bar range (``win_lo_tick``
+    / ``win_hi_tick``). The live kernel's value-area walk array is sized from the bar range; padding
+    the reconstruction from the occupied range alone clamps the walk's array-boundary stop rule at a
+    nearer edge and silently shifts ``vah`` (observed: 15172.25 reconstructed vs 15172.75 live on one
+    real minute before this fix; the fixture below pins a second, independently captured real minute).
+    """
+    import json
+    from pathlib import Path
+
+    from features.trackers.volume_profile_rolling import VolumeProfileSnapshot
+
+    fx = json.loads((Path(__file__).parent / "golden" / "volume_profile_rolling_close_alloc_real_tape_minute.json").read_text())
+    assert fx["lo_tick"] != fx["win_lo_tick"] or fx["lo_tick"] + fx["n_bins"] - 1 != fx["win_hi_tick"], \
+        "fixture no longer exercises the narrower-occupied-range-than-bar-range case"
+    obj = VolumeProfileSnapshot.build(**{k: (tuple(v) if isinstance(v, list) and k != "exact_triplets" else
+                                            (tuple(tuple(t) for t in v) if k == "exact_triplets" and v is not None else v))
+                                          for k, v in fx.items() if k not in ("note", "expected")})
+    rec = obj.reconstruct_poc_va_nodes()
+    for key, expected in fx["expected"].items():
+        assert rec[key] == expected, (key, rec[key], expected)
 
 
 def test_emit_profile_false_leaves_every_existing_output_byte_identical(monkeypatch):
