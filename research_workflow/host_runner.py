@@ -19,15 +19,20 @@ def sort_bars_causal(bars: Iterable[BarView], durations: Mapping[str, int]) -> L
 
 
 def run_plan_on_bars(plan: Mapping[str, Any], bars: Iterable[BarView], *, session_table: Any,
-                     primary_interval: Optional[Tuple[int, int]] = None, ledger: Optional[List[Dict[str, Any]]] = None) -> Dict[str, Any]:
+                     primary_interval: Optional[Tuple[int, int]] = None, ledger: Optional[List[Dict[str, Any]]] = None,
+                     chunked_writers: Optional[Tuple[Any, Any]] = None, chunked_flush_every: int = 0) -> Dict[str, Any]:
     durations = {s["key"]: int(s["duration_ns"]) for s in plan["streams"]}
-    core = HostCore(plan, session_table=session_table, primary_interval=primary_interval, ledger=ledger)
+    core = HostCore(plan, session_table=session_table, primary_interval=primary_interval, ledger=ledger,
+                    chunked_writers=chunked_writers, chunked_flush_every=chunked_flush_every)
     t0 = time.perf_counter()
     for bar in sort_bars_causal(bars, durations):
         core.ingest(bar)
     candidates, observations = core.finalize()
-    return {"candidates": candidates, "observations": observations, "stats": core.stats(),
-            "elapsed_s": time.perf_counter() - t0, "core": core}
+    out = {"candidates": candidates, "observations": observations, "stats": core.stats(),
+           "elapsed_s": time.perf_counter() - t0, "core": core}
+    if core.sink.chunked():
+        out["writer_manifests"] = core.writer_manifests
+    return out
 
 
 # --------------------------------------------------------------------------- #
@@ -145,7 +150,8 @@ def resolve_dataset_plan(dataset_id: str, start_date: str, end_date: str, *, war
 def run_plan_on_catalog(plan: Mapping[str, Any], *, start_date: str, end_date: str, repo_root: Optional[Path] = None,
                         primary_interval: Optional[Tuple[int, int]] = None, warmup_days: int = 5, log_level: str = "ERROR",
                         session_table_spec: Optional[Mapping[str, Any]] = None, progress_path: Optional[Path] = None,
-                        progress_every_bars: int = 200_000, ledger: bool = False, studies_root: Optional[Path] = None) -> Dict[str, Any]:
+                        progress_every_bars: int = 200_000, ledger: bool = False, studies_root: Optional[Path] = None,
+                        chunked_writers: Optional[Tuple[Any, Any]] = None, chunked_flush_every: int = 0) -> Dict[str, Any]:
     """Governed-catalog run for the plan's execution instrument (single instrument this phase)."""
     from backtests.nt_runtime.data_plan import resolve_catalog_plan, verify_launch_dataset_bytes
     from backtests.nt_runtime.engine_builder import build_engine
@@ -171,20 +177,24 @@ def run_plan_on_catalog(plan: Mapping[str, Any], *, start_date: str, end_date: s
                                      primary_end_ts=(primary_interval[1] if primary_interval else None),
                                      progress_path=str(progress_path) if progress_path else "", progress_every_bars=progress_every_bars,
                                      ledger_enabled=ledger, studies_root=str(studies_root or (repo_root / "studies")))
-    strategy = GovernedHostStrategy(cfg)
+    strategy = GovernedHostStrategy(cfg, chunked_writers=chunked_writers, chunked_flush_every=chunked_flush_every)
     engine.add_strategy(strategy)
     t0 = time.perf_counter()
     engine.run()
     elapsed = time.perf_counter() - t0
-    candidates = strategy.get_candidates_dataframe()
-    observations = strategy.get_observations_dataframe()
+    chunked = strategy.core.sink.chunked()
+    candidates = None if chunked else strategy.get_candidates_dataframe()
+    observations = None if chunked else strategy.get_observations_dataframe()
     stats = strategy.core.stats()
     ledger_rows = strategy.ledger
+    out = {"candidates": candidates, "observations": observations, "stats": stats, "elapsed_s": elapsed,
+           "dataset": {"dataset_id": data_plan.dataset_id, "logical_digest": data_plan.dataset_logical_digest,
+                       "bytes_verification": bytes_check.get("status")},
+           "window": {"start": start_date, "end": end_date, "warmup_days": warmup_days}, "ledger": ledger_rows}
+    if chunked:
+        out["writer_manifests"] = strategy.core.writer_manifests
     engine.dispose()
-    return {"candidates": candidates, "observations": observations, "stats": stats, "elapsed_s": elapsed,
-            "dataset": {"dataset_id": data_plan.dataset_id, "logical_digest": data_plan.dataset_logical_digest,
-                        "bytes_verification": bytes_check.get("status")},
-            "window": {"start": start_date, "end": end_date, "warmup_days": warmup_days}, "ledger": ledger_rows}
+    return out
 
 
 __all__ = ["run_plan_on_bars", "run_plan_with_engine", "run_plan_on_catalog", "resolve_dataset_plan", "sort_bars_causal"]

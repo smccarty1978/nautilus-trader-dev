@@ -1,0 +1,216 @@
+"""Generic bounded-memory incremental parquet writer.
+
+Used by the collection sink (``research_workflow/host/sink.py``) to flush candidate /
+observation rows to disk as they are produced, instead of holding a whole year-partition
+in Python lists until one ``to_parquet()`` call at the end (the memory blow-up this module
+exists to fix: see ``artifacts/platform_v2/chunked_sink_flush/README.md``).
+
+Design points (do not relax without re-reading the packet this module was built for):
+
+* The physical schema is FIXED once, at or before the first physical batch is written to
+  disk, and never re-inferred per batch. Columns whose Arrow type is already known (the
+  caller's ``declared_types``) use that type outright. Any other column's type is inferred
+  from a PROBE buffer that may span several logical ``write_rows`` calls -- never from a
+  single batch -- so an all-null first batch does not lock in the wrong type. Once fixed,
+  every subsequent batch is cast explicitly to the fixed type (never re-inferred), so an
+  int column that is all-null in one batch and integral in the next cannot silently upcast
+  to float the way a per-batch pandas ``to_parquet`` would.
+* No branch here knows what "volume profile" or any other feature is. A column's value may
+  be a plain scalar, a dict (-> Arrow struct) or a list (-> Arrow list), recursively, with no
+  special-casing: this is what lets a future struct/list-typed tracker field (declared via
+  ``BaseBinding.FIELD_TYPES`` on chore/vp_profile_snapshot) round-trip through this writer
+  unchanged.
+* The physical parquet bytes are a function of batch/row-group layout and are NOT the
+  identity anything should compare on across a chunked vs. unchunked run. A separate
+  LOGICAL content hash (sha256 over each row's canonical JSON, in emission order) is
+  maintained instead, and is what callers should compare for equivalence. The physical
+  file's own sha256 remains available (``physical_sha256``) for any consumer that already
+  keys off "the exact file we wrote", but only this module's own completed file.
+* Writes land at a temporary path and are atomically renamed into place only in
+  ``finalize()``. No manifest is written by this module (the caller owns that, as it
+  already does for ``manifest.json``); the point is that nothing with the FINAL name
+  exists until the write is complete, so a crash mid-partition leaves no file any stage
+  will mistake for a finished partition.
+"""
+from __future__ import annotations
+
+import hashlib
+import json
+import os
+from pathlib import Path
+from typing import Any, Dict, List, Mapping, Optional, Sequence
+
+import pyarrow as pa
+import pyarrow.parquet as pq
+
+# Default probe/batch size: flush every this many buffered rows. Chosen so a single flushed
+# batch's in-memory footprint stays small relative to the 8 GiB process budget even for a
+# ~42 KB/row typed-list field (50_000 * 42 KB ~= 2 GiB worst case per buffer; two buffers
+# -- candidates and observations -- plus headroom still clears an 8 GiB budget. Callers with
+# a heavier row (e.g. multiple struct/list tracker fields per row) should pass a smaller value).
+DEFAULT_BATCH_ROWS = 50_000  # host-constant: default flush threshold, see module docstring
+
+
+def _canonical_json(value: Any) -> str:
+    return json.dumps(value, sort_keys=True, default=str, separators=(",", ":"))
+
+
+def _infer_scalar_type(value: Any) -> pa.DataType:
+    if isinstance(value, bool):
+        return pa.bool_()
+    if isinstance(value, int):
+        return pa.int64()
+    if isinstance(value, float):
+        return pa.float64()
+    if isinstance(value, str):
+        return pa.string()
+    raise TypeError(f"CHUNKED_WRITER_UNSUPPORTED_SCALAR: {type(value)!r}")
+
+
+def infer_arrow_type(samples: Sequence[Any]) -> pa.DataType:
+    """Infer one Arrow type from a sequence of observed (non-schema-fixed) values for one
+    column, recursively for dict (-> struct) and list (-> list) values. ``None`` entries are
+    skipped when looking for a representative sample; an all-``None`` sequence (never a
+    representative value observed) defaults to ``float64`` -- the same default a fully-empty
+    numeric feature column already gets today via pandas/parquet, preserved here rather than
+    invented."""
+    for v in samples:
+        if v is None:
+            continue
+        if isinstance(v, Mapping):
+            fields = []
+            keys = sorted(v.keys())
+            for k in keys:
+                # one representative value per key, pooled from every sample that has it
+                sub_samples = [s.get(k) for s in samples if isinstance(s, Mapping) and k in s]
+                fields.append(pa.field(k, infer_arrow_type(sub_samples)))
+            return pa.struct(fields)
+        if isinstance(v, (list, tuple)):
+            elems = [e for item in samples if isinstance(item, (list, tuple)) for e in item]
+            elem_type = infer_arrow_type(elems) if elems else pa.int64()
+            return pa.list_(elem_type)
+        return _infer_scalar_type(v)
+    return pa.float64()
+
+
+def _build_array(values: Sequence[Any], arrow_type: pa.DataType) -> pa.Array:
+    """Build one Arrow array of EXACTLY ``arrow_type``, never re-inferring. A column whose
+    runtime values mix ``int`` and ``float`` (e.g. ``horizon_end_ts`` computed as an exact
+    int in one row and a float in another) already gets ONE float64 dtype for the WHOLE
+    column today via pandas/to_parquet, silently losing integer precision on the int-valued
+    rows -- pandas never raises on that, so this writer pre-casts an int value to ``float``
+    in Python BEFORE handing it to pyarrow when the fixed column type is floating, matching
+    that existing silent-precision-loss contract instead of pyarrow's (stricter) default
+    sequence-to-array range check. A genuine SHAPE conflict (e.g. a string landing in a fixed
+    int64 column) still raises -- this only relaxes the float-precision case."""
+    if pa.types.is_floating(arrow_type):
+        values = [None if v is None else float(v) for v in values]
+    return pa.array(list(values), type=arrow_type)
+
+
+class ChunkedParquetWriter:
+    """Incremental, schema-stable parquet writer for one columnar output (candidates or
+    observations). One instance is owned by the caller across however many logical
+    ``write_rows`` calls make up ONE partition replay (potentially several declared
+    windows); ``finalize()`` is called exactly once, after the last row of the partition."""
+
+    def __init__(self, path: Path, columns: Sequence[str], *, declared_types: Optional[Mapping[str, pa.DataType]] = None,
+                 batch_rows: int = DEFAULT_BATCH_ROWS) -> None:
+        if batch_rows < 1:
+            raise ValueError(f"CHUNKED_WRITER_BAD_BATCH_ROWS: {batch_rows}")
+        self.path = Path(path)
+        self.tmp_path = self.path.with_suffix(self.path.suffix + ".inprogress")
+        self.columns = list(columns)
+        self.declared_types = dict(declared_types or {})
+        self.batch_rows = int(batch_rows)
+        self._probe: List[Dict[str, Any]] = []
+        self.schema: Optional[pa.Schema] = None
+        self._field_types: Dict[str, pa.DataType] = {}
+        self._writer: Optional[pq.ParquetWriter] = None
+        self.rows_written = 0
+        self.batches_written = 0
+        self._hasher = hashlib.sha256()
+        self._finalized = False
+        self.tmp_path.parent.mkdir(parents=True, exist_ok=True)
+        if self.tmp_path.is_file():
+            self.tmp_path.unlink()  # a stale .inprogress from a previous crashed attempt
+
+    # -- schema -------------------------------------------------------------------------
+    def _fix_schema(self, probe_rows: Sequence[Mapping[str, Any]]) -> None:
+        fields = []
+        for col in self.columns:
+            if col in self.declared_types:
+                t = self.declared_types[col]
+            else:
+                t = infer_arrow_type([r.get(col) for r in probe_rows])
+            self._field_types[col] = t
+            fields.append(pa.field(col, t))
+        self.schema = pa.schema(fields)
+        self._writer = pq.ParquetWriter(str(self.tmp_path), self.schema)
+
+    # -- write --------------------------------------------------------------------------
+    def _emit_batch(self, rows: Sequence[Mapping[str, Any]]) -> None:
+        if not rows:
+            return
+        arrays = [_build_array([r.get(c) for r in rows], self._field_types[c]) for c in self.columns]
+        table = pa.Table.from_arrays(arrays, schema=self.schema)
+        self._writer.write_table(table)
+        for r in rows:
+            self._hasher.update(_canonical_json({c: r.get(c) for c in self.columns}).encode("utf-8"))
+            self._hasher.update(b"\n")
+        self.rows_written += len(rows)
+        self.batches_written += 1
+
+    def write_rows(self, rows: Sequence[Mapping[str, Any]]) -> None:
+        if self._finalized:
+            raise RuntimeError("CHUNKED_WRITER_CLOSED: write_rows() after finalize()")
+        if not rows:
+            return
+        if self.schema is None:
+            self._probe.extend(rows)
+            if len(self._probe) >= self.batch_rows:
+                self._fix_schema(self._probe)
+                probe, self._probe = self._probe, []
+                for i in range(0, len(probe), self.batch_rows):
+                    self._emit_batch(probe[i:i + self.batch_rows])
+            return
+        self._emit_batch(list(rows))
+
+    def flush(self) -> None:
+        """Force any buffered probe rows to disk as a real batch (fixing the schema first if
+        this partition never reached ``batch_rows`` rows in total)."""
+        if self._finalized or not self._probe:
+            return
+        if self.schema is None:
+            self._fix_schema(self._probe)
+        probe, self._probe = self._probe, []
+        for i in range(0, len(probe), self.batch_rows):
+            self._emit_batch(probe[i:i + self.batch_rows])
+
+    def finalize(self) -> Dict[str, Any]:
+        """Flush, close, atomically rename into place, and return the manifest the caller
+        folds into its own ``manifest.json``. Idempotent-safe to call at most once."""
+        if self._finalized:
+            raise RuntimeError("CHUNKED_WRITER_ALREADY_FINALIZED")
+        self.flush()
+        if self.schema is None:
+            # Never wrote a single row (empty partition): still fix an (all-default) schema
+            # so an empty-but-valid, correctly-typed parquet file is produced.
+            self._fix_schema([])
+        self._writer.close()
+        physical_sha256 = hashlib.sha256(self.tmp_path.read_bytes()).hexdigest()
+        os.replace(self.tmp_path, self.path)  # atomic finalize: no file at the final name until now
+        self._finalized = True
+        return {
+            "rows": self.rows_written,
+            "batches": self.batches_written,
+            "columns": list(self.columns),
+            "schema": {c: str(self._field_types[c]) for c in self.columns},
+            "logical_content_sha256": self._hasher.hexdigest(),
+            "physical_sha256": physical_sha256,
+            "batch_rows": self.batch_rows,
+            "path": str(self.path),
+        }
+
+
+__all__ = ["ChunkedParquetWriter", "infer_arrow_type", "DEFAULT_BATCH_ROWS"]
