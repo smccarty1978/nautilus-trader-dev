@@ -163,6 +163,21 @@ do not delete "the safe part". Use `scripts/safe_cleanup.py::assert_safe_to_dele
 **Never junction live `data/` into a disposable worktree.**
 **Never silently substitute a dataset.** If the authorized source is unavailable, fail closed.
 
+This rule was broken again on 2026-10-08 by an agent that had read it (two NQ catalogs lost;
+`artifacts/incidents/2026-10-08_catalog_deletion/INCIDENT.md`). It is now **enforced**, not advisory:
+
+- `scripts/hooks/data_guard.py` (PreToolUse, `.claude/settings.json`) blocks every link creation,
+  every recursive/forced tree deletion including `git worktree remove`, writes to `data/raw`,
+  `data/catalog`, `research/datasets`, and ACL changes. There is no agent override.
+- Delete only with `python scripts/safe_cleanup.py delete --target <dir> --disposable-root <root>`
+  or `python scripts/safe_cleanup.py worktree-remove <path>`.
+- Worktrees reach catalogs through `~/.nt_research/config.yaml` `catalog_roots` (or
+  `NT_RESEARCH_CONFIG`); no link is ever needed.
+- Live catalogs and raw files are read-only at the NTFS level
+  (`python scripts/protect_live_data.py verify`); lifting that is human-only.
+- An orchestrator brief that creates a worktree must restate these rules and must never instruct
+  `--force` removal.
+
 ---
 
 ## 8. Testing policy

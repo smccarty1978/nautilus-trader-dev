@@ -191,6 +191,92 @@ def test_internal_junction_is_not_an_escape(workspace):
     assert_safe_to_delete(root / "work", root)
 
 
+# ---------------------------------------------------------------------------
+# Sanctioned deletion paths (incident 2026-10-08: `git worktree remove --force` through catalog junctions).
+# ---------------------------------------------------------------------------
+
+def _git_repo_with_worktree(tmp_path: Path):
+    import subprocess
+
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    run = lambda *a: subprocess.run(["git", *a], cwd=repo, capture_output=True, text=True)  # noqa: E731
+    run("init", "-q")
+    (repo / "f.txt").write_text("x")
+    run("add", "f.txt")
+    run("-c", "user.email=t@t", "-c", "user.name=t", "commit", "-qm", "init")
+    wt = tmp_path / "repo-wt"
+    assert run("worktree", "add", "--detach", str(wt)).returncode == 0
+    return repo, wt
+
+
+def test_worktree_remove_refuses_a_worktree_holding_a_junction_and_deletes_nothing(workspace, tmp_path):
+    from scripts.safe_cleanup import safe_worktree_remove
+
+    _root, outside = workspace
+    repo, wt = _git_repo_with_worktree(tmp_path)
+    (wt / "data" / "catalog").mkdir(parents=True)
+    link = wt / "data" / "catalog" / "NQ"
+    if not _try_junction(link, outside):
+        pytest.skip("junction creation unavailable")
+    with pytest.raises(UnsafeDeletionError, match="UNSAFE_WORKTREE_CONTAINS_REPARSE_POINT"):
+        safe_worktree_remove(wt, repo)
+    assert (outside / "precious.parquet").exists()
+    assert (wt / "f.txt").exists(), "a refused removal touched the worktree"
+    os.rmdir(link)
+
+
+def test_worktree_remove_removes_a_clean_worktree(tmp_path):
+    from scripts.safe_cleanup import safe_worktree_remove
+
+    repo, wt = _git_repo_with_worktree(tmp_path)
+    (wt / "untracked_scratch").mkdir()
+    safe_worktree_remove(wt, repo)
+    assert not wt.exists()
+
+
+def test_worktree_remove_refuses_main_and_unregistered(tmp_path):
+    from scripts.safe_cleanup import safe_worktree_remove
+
+    repo, _wt = _git_repo_with_worktree(tmp_path)
+    with pytest.raises(UnsafeDeletionError, match="UNSAFE_WORKTREE_IS_MAIN"):
+        safe_worktree_remove(repo, repo)
+    with pytest.raises(UnsafeDeletionError, match="UNSAFE_WORKTREE_NOT_REGISTERED"):
+        safe_worktree_remove(tmp_path / "nowhere", repo)
+    assert (repo / "f.txt").exists()
+
+
+def test_safe_delete_refuses_any_reparse_point_even_internal(workspace):
+    from scripts.safe_cleanup import safe_delete
+
+    root, _outside = workspace
+    link = root / "work" / "inner_junction"
+    if not _try_junction(link, root / "work" / "nested"):
+        pytest.skip("junction creation unavailable")
+    with pytest.raises(UnsafeDeletionError, match="UNSAFE_DELETION_CONTAINS_REPARSE_POINT"):
+        safe_delete(root / "work", root)
+    assert (root / "work" / "a.txt").exists()
+
+
+def test_safe_delete_deletes_an_ordinary_tree(workspace):
+    from scripts.safe_cleanup import safe_delete
+
+    root, _ = workspace
+    safe_delete(root / "work", root)
+    assert not (root / "work").exists()
+
+
+def test_live_data_is_protected_from_every_deletion_path():
+    from scripts.safe_cleanup import assert_not_protected, protected_roots
+
+    roots = protected_roots()
+    assert any(r.name == "data" for r in roots)
+    with pytest.raises(UnsafeDeletionError, match="UNSAFE_DELETION_PROTECTED_DATA"):
+        assert_not_protected(roots[0] / "catalog" / "NQ_1S_V2_GLOBEX")
+    with pytest.raises(UnsafeDeletionError, match="UNSAFE_DELETION_PROTECTED_DATA"):
+        assert_not_protected(roots[0].parent)  # a tree that CONTAINS live data
+
+
 def test_agents_documents_the_rule():
     repo_root = Path(__file__).resolve().parents[2]
     agents = (repo_root / "AGENTS.md").read_text(encoding="utf-8")
