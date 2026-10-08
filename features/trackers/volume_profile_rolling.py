@@ -211,9 +211,13 @@ class VolumeProfileSnapshot:
     no division, no rounding). It lets :meth:`reconstruct_poc_va_nodes` detect the SAME
     rounding-bounded tie ambiguity the live kernel detects (``value_area_int``). Resolving a
     flagged ambiguity exactly needs the pre-rounding rational volume per tick, which the rounded
-    weight vector alone cannot recover; ``exact_triplets`` (``(tick, n, volume)``, ``range_uniform``
-    only, ``None`` for the other two allocations where no tie can ever occur) carries exactly the
-    data the kernel's own ``_exact`` walk uses, so reconstruction is bit-exact even through a tie.
+    weight vector alone cannot recover; ``exact_triplets`` (``(tick, n, volume)``) carries exactly
+    the data the kernel's own ``_exact`` walk uses, so reconstruction is bit-exact even through a
+    tie. It is persisted (non-``None``) ONLY on the rare snapshot where the LIVE kernel itself took
+    the exact re-decision path (``snapshot()``'s ``exact_resolved``) -- every other snapshot's
+    rounded ``weights_fp`` is already unambiguous (or, for ``full_per_tick`` / ``close``, already
+    exact with no rounding at all), so persisting triplets there would be pure size with no
+    reconstruction value: ``exact_triplets`` dominated per-snapshot size (D2a) before this.
 
     ``content_hash`` is sha256 over the canonical (sorted-key, no-whitespace) JSON of every field
     except itself; two snapshots with identical data hash identically regardless of how the
@@ -571,7 +575,12 @@ class VolumeProfileKernel:
             return None
         lo_tick, X_occ, C_occ = raw
         a, b = int(lo_tick), int(lo_tick) + len(X_occ) - 1
-        trips = self.exact_triplets(a, b)
+        # exact_triplets dominates persisted size (D2a); the live kernel only ever needed the
+        # pre-rounding rational weights when its OWN walk flagged a rounding-bounded ambiguity
+        # (snap["exact_resolved"]) -- persist them ONLY for that rare case. Every other snapshot's
+        # weights_fp is already exact (no rounding, allocation != range_uniform) or unambiguous
+        # (range_uniform with no tie in range), so reconstruction needs nothing more.
+        trips = self.exact_triplets(a, b) if snap.get("exact_resolved") else None
         win_lo_tick = int(round(snap["win_lo"] / self.tick))
         win_hi_tick = int(round(snap["win_hi"] / self.tick))
         return VolumeProfileSnapshot.build(
@@ -644,7 +653,8 @@ class VolumeProfileKernel:
         row.update(A=A, sigma_ticks=sig_t, win_lo=wl, win_hi=wh, profile_width=wh - wl, total_source_volume=self.vol_in_win,
                    total_weight=float(Xi.sum()) / FP, n_occupied_bins=int((Xi > 0).sum()), poc=poc, vah=vah, val=val, va_width=vah - val,
                    va_weight_fraction=float(frac), raw_poc=float(px[ir]), raw_vah=float(px[hr]), raw_val=float(px[lr]),
-                   n_hvn=len(hv), n_lvn=len(lv), hvns_json=json.dumps(hv, separators=(",", ":")), lvns_json=json.dumps(lv, separators=(",", ":")))
+                   n_hvn=len(hv), n_lvn=len(lv), hvns_json=json.dumps(hv, separators=(",", ":")), lvns_json=json.dumps(lv, separators=(",", ":")),
+                   exact_resolved=exact is not None)
         if full:
             row.update(px=px, X=X, S=S)
         return row

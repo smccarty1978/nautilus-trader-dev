@@ -234,6 +234,35 @@ def test_profile_object_reconstructs_scalar_outputs_exactly(alloc):
     rec = obj.reconstruct_poc_va_nodes(va_frac=k.va_frac)
     for key in ("poc", "vah", "val", "va_weight_fraction", "raw_poc", "raw_vah", "raw_val", "n_hvn", "n_lvn", "hvns_json", "lvns_json"):
         assert rec[key] == snap[key], (alloc, key)
+    assert obj.exact_triplets is None, "D2a: an ordinary (non-tied) window must not persist exact_triplets"
+
+
+def test_profile_object_omits_exact_triplets_unless_the_live_kernel_itself_took_the_exact_path():
+    """D2a size regression: exact_triplets dominated per-snapshot size (range_uniform/1440 mean
+    ~535 KB on a real 4-day tape before this) even though the live kernel almost never actually
+    needed the pre-rounding rational weights to resolve its own walk. Persist them ONLY on the
+    snapshot where ``snapshot()``'s own ``exact`` resolution path fired."""
+    from features.trackers.volume_profile_rolling import VolumeProfileKernel
+
+    k = VolumeProfileKernel(OM, np.array([], np.int64), H, "range_uniform", **SMALL)
+    out = {}
+
+    def cb(p, k=k):
+        snap = k.snapshot()
+        if snap is None or snap.get("poc") is None:
+            return
+        ps = k.profile_snapshot(snap)
+        if ps is None:
+            return
+        out[p] = (bool(snap["exact_resolved"]), ps.exact_triplets is not None)
+
+    k.on_close = cb
+    for b in _bars(11, per_minute=5):
+        k.push(*b)
+    k.close_through(int(OM[-1]))
+    assert out, "no snapshots captured"
+    for p, (exact_resolved, has_triplets) in out.items():
+        assert has_triplets == exact_resolved, (p, exact_resolved, has_triplets)
 
 
 def test_profile_object_reconstructs_scalar_outputs_through_an_exact_value_area_tie():
