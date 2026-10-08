@@ -1,0 +1,266 @@
+{
+ "verdict": "RECOVERED_VERIFIED",
+ "verified_at_utc": "2026-10-08T13:02:05.588280+00:00",
+ "source": "VSS HarddiskVolumeShadowCopy23 (~2026-10-08T07:12Z) -> staging sc23_copy -> live",
+ "scope": [
+  "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\catalog\\NQ_1S_V2_GLOBEX",
+  "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\catalog\\NQ_v0_2020_2026"
+ ],
+ "canonical_checks_on_live": {
+  "live_NQ_1S_V2_GLOBEX": {
+   "logical_digest_match": true,
+   "logical_digest": "9e7aecb7a2910b4402a6cb4f34cc2f6deb5df19d0e889b2c696cf4f844292c64",
+   "dataset_manifest_match": true,
+   "reference_digest_match": true,
+   "builder_sha256_match": true,
+   "raw_sources_match": true
+  },
+  "live_NQ_v0_2020_2026": {
+   "logical_digest_match": true,
+   "logical_digest": "1a0d41d8da979136b922c256b7488d1c7c50009d0961281f1b43e88ea2c0de0f",
+   "dataset_manifest_match": true
+  }
+ },
+ "inventory": {
+  "NQ_1S_V2_GLOBEX": {
+   "file_count": 23,
+   "total_bytes": 2171821796,
+   "unexpected_files": [],
+   "all_match_staging": true,
+   "files": [
+    {
+     "rel": "build_manifest.json",
+     "size": 9559,
+     "sha256": "f01fac1ca09c12d91a07635bd247825c9015d40729dbbb8a07c051fcca4f22f9",
+     "mtime_ns": 1788533123732879200,
+     "matches_staging": true,
+     "mtime_preserved": true
+    },
+    {
+     "rel": "dataset_manifest.json",
+     "size": 4173,
+     "sha256": "e49c8c66b9003f4bf8e68366a845d656d44f4c19abdaa48ff535410fecdc009b",
+     "mtime_ns": 1788533125482128300,
+     "matches_staging": true,
+     "mtime_preserved": true
+    },
+    {
+     "rel": "data/bar/NQ.XCME-1-MINUTE-LAST-EXTERNAL/2020-01-01T23-01-00-000000000Z_2020-12-31T00-00-00-000000000Z.parquet",
+     "size": 11573188,
+     "sha256": "824d3cc52d06c84350918aee76550326903397fb5ad59ac49847ca020f919cdf",
+     "mtime_ns": 1788532788843406000,
+     "matches_staging": true,
+     "mtime_preserved": true
+    },
+    {
+     "rel": "data/bar/NQ.XCME-1-MINUTE-LAST-EXTERNAL/2021-01-03T23-01-00-000000000Z_2021-12-31T00-00-00-000000000Z.parquet",
+     "size": 11463349,
+     "sha256": "6b7863a713cfd7521cc8b80d5d309f0175532437421dc4bd5ff408a991825616",
+     "mtime_ns": 1788532842143530700,
+     "matches_staging": true,
+     "mtime_preserved": true
+    },
+    {
+     "rel": "data/bar/NQ.XCME-1-MINUTE-LAST-EXTERNAL/2022-01-02T23-01-00-000000000Z_2022-12-30T22-00-00-000000000Z.parquet",
+     "size": 12648804,
+     "sha256": "2a161f90beffc221c4f1b618c8c7ce976500ae3427a018bd9844073e4b64e88c",
+     "mtime_ns": 1788532901002620200,
+     "matches_staging": true,
+     "mtime_preserved": true
+    },
+    {
+     "rel": "data/bar/NQ.XCME-1-MINUTE-LAST-EXTERNAL/2023-01-02T23-01-00-000000000Z_2023-12-29T22-00-00-000000000Z.parquet",
+     "size": 11524705,
+     "sha256": "929a122cfef8e73170e4c5860cab611eb60c12067d9370091d6051828cfb0e65",
+     "mtime_ns": 1788532954993282400,
+     "matches_staging": true,
+     "mtime_preserved": true
+    },
+    {
+     "rel": "data/bar/NQ.XCME-1-MINUTE-LAST-EXTERNAL/2024-01-01T23-01-00-000000000Z_2024-12-31T00-00-00-000000000Z.parquet",
+     "size": 12028204,
+     "sha256": "bf8a57dfb074c951b1d9b4dc764b30d25ff8dfce60b70945e2b037b6225d5467",
+     "mtime_ns": 1788533007966733100,
+     "matches_staging": true,
+     "mtime_preserved": true
+    },
+    {
+     "rel": "data/bar/NQ.XCME-1-MINUTE-LAST-EXTERNAL/2025-01-01T23-01-00-000000000Z_2025-12-31T00-00-00-000000000Z.parquet",
+     "size": 12499747,
+     "sha256": "8f77d527d1e23d2cc33b0244653cefa348a8efd1645f1952d5d0267cf8a51008",
+     "mtime_ns": 1788533061168977500,
+     "matches_staging": true,
+     "mtime_preserved": true
+    },
+    {
+     "rel": "data/bar/NQ.XCME-1-MINUTE-LAST-EXTERNAL/2026-01-01T23-01-00-000000000Z_2026-04-30T00-00-00-000000000Z.parquet",
+     "size": 4277761,
+     "sha256": "4fe8c705a7c1cb1476475d2b5a19b3b9a32b1349afe98698c04d844e818c18f5",
+     "mtime_ns": 1788533079825171900,
+     "matches_staging": true,
+     "mtime_preserved": true
+    },
+    {
+     "rel": "data/bar/NQ.XCME-1-SECOND-LAST-EXTERNAL/2020-01-01T23-00-01-000000000Z_2020-12-30T23-59-56-000000000Z.parquet",
+     "size": 294359273,
+     "sha256": "7e6ef1fc96e2cef46ad2c723b6554baa46a76e03ccc4495df6eaa78e6c17055d",
+     "mtime_ns": 1788532785550678700,
+     "matches_staging": true,
+     "mtime_preserved": true
+    },
+    {
+     "rel": "data/bar/NQ.XCME-1-SECOND-LAST-EXTERNAL/2021-01-03T23-00-01-000000000Z_2021-12-30T23-59-58-000000000Z.parquet",
+     "size": 272257567,
+     "sha256": "d87db0bb4dac1519a3f71183540e4b1f73ed679d5e472719ab0f4c5f653b615c",
+     "mtime_ns": 1788532839226709600,
+     "matches_staging": true,
+     "mtime_preserved": true
+    },
+    {
+     "rel": "data/bar/NQ.XCME-1-SECOND-LAST-EXTERNAL/2022-01-02T23-00-01-000000000Z_2022-12-30T22-00-00-000000000Z.parquet",
+     "size": 316123667,
+     "sha256": "08ba21b87cf753e5066172666920f56a59c0ffb51d80f0a1399500b2a411b0a2",
+     "mtime_ns": 1788532897878383800,
+     "matches_staging": true,
+     "mtime_preserved": true
+    },
+    {
+     "rel": "data/bar/NQ.XCME-1-SECOND-LAST-EXTERNAL/2023-01-02T23-00-01-000000000Z_2023-12-29T21-59-59-000000000Z.parquet",
+     "size": 278972575,
+     "sha256": "2842af944d627a625722e7d3c16b05c9fd4e40c1370cd0f93eb2d52a7156e297",
+     "mtime_ns": 1788532952040286400,
+     "matches_staging": true,
+     "mtime_preserved": true
+    },
+    {
+     "rel": "data/bar/NQ.XCME-1-SECOND-LAST-EXTERNAL/2024-01-01T23-00-01-000000000Z_2024-12-31T00-00-00-000000000Z.parquet",
+     "size": 280758990,
+     "sha256": "60b9c92fdd114ee936a07cf13917c422769533eca2ea9166d89db5d9187ca622",
+     "mtime_ns": 1788533005060963800,
+     "matches_staging": true,
+     "mtime_preserved": true
+    },
+    {
+     "rel": "data/bar/NQ.XCME-1-SECOND-LAST-EXTERNAL/2025-01-01T23-00-01-000000000Z_2025-12-30T23-59-53-000000000Z.parquet",
+     "size": 291467264,
+     "sha256": "591c94dcd77660a48c2990a2210c6ef93780bc62d5308e217feb0f835be5323f",
+     "mtime_ns": 1788533058270754700,
+     "matches_staging": true,
+     "mtime_preserved": true
+    },
+    {
+     "rel": "data/bar/NQ.XCME-1-SECOND-LAST-EXTERNAL/2026-01-01T23-00-01-000000000Z_2026-04-30T00-00-00-000000000Z.parquet",
+     "size": 104146533,
+     "sha256": "7097c3dcf8e5f262353c4bd212dc9c225bc9bf6add12422df3e80151732c5af3",
+     "mtime_ns": 1788533078834390700,
+     "matches_staging": true,
+     "mtime_preserved": true
+    },
+    {
+     "rel": "data/futures_contract/NQ.XCME/2020-01-01T00-00-00-000000000Z_2020-01-01T00-00-00-000000000Z.parquet",
+     "size": 5948,
+     "sha256": "df4a1587c7ad2bf070f57a55983221dfce8df5af52845519c0fb9875326ba330",
+     "mtime_ns": 1788532730476189700,
+     "matches_staging": true,
+     "mtime_preserved": true
+    },
+    {
+     "rel": "reference/gaps.parquet",
+     "size": 257554273,
+     "sha256": "add2d4907f06836f1aa644e51fe8cc5b42ef14ce3ed9ce47b01e99cfdddc1bf9",
+     "mtime_ns": 1788533123466981900,
+     "matches_staging": true,
+     "mtime_preserved": true
+    },
+    {
+     "rel": "reference/holidays.parquet",
+     "size": 2348,
+     "sha256": "2839bd3cc9fda1cb191816a85b58dea0eda8e5bad79ba291cbca6f4cb2ba9af0",
+     "mtime_ns": 1788533121149357100,
+     "matches_staging": true,
+     "mtime_preserved": true
+    },
+    {
+     "rel": "reference/maintenance.parquet",
+     "size": 42784,
+     "sha256": "b4f4a540cd22a98cc89adf398a9c38599b12fd529fd5bdbbae5e01b6792ef647",
+     "mtime_ns": 1788533121165972900,
+     "matches_staging": true,
+     "mtime_preserved": true
+    },
+    {
+     "rel": "reference/out_of_calendar.parquet",
+     "size": 1243,
+     "sha256": "760f27960d20f92e0a23cdb7c1b395d0b44df1c1835a385310846983750a5eed",
+     "mtime_ns": 1788533123701446300,
+     "matches_staging": true,
+     "mtime_preserved": true
+    },
+    {
+     "rel": "reference/rolls.parquet",
+     "size": 3546,
+     "sha256": "19b0ccf20b9b15058de8518dfa2622becfe699bc2efdd7536d7504e60cc5e948",
+     "mtime_ns": 1788533121179849200,
+     "matches_staging": true,
+     "mtime_preserved": true
+    },
+    {
+     "rel": "reference/sessions.parquet",
+     "size": 96295,
+     "sha256": "d44e7436605b984f98665ca94861580ee7dcb9c2030964488c0a0b62d531c79c",
+     "mtime_ns": 1788533121134436800,
+     "matches_staging": true,
+     "mtime_preserved": true
+    }
+   ]
+  },
+  "NQ_v0_2020_2026": {
+   "file_count": 5,
+   "total_bytes": 1932603040,
+   "unexpected_files": [],
+   "all_match_staging": true,
+   "files": [
+    {
+     "rel": "dataset_manifest.json",
+     "size": 1396,
+     "sha256": "3462c542d6a00199cdd3eaa7cf874fea54734569cae698c1ae42e6951fa088f5",
+     "mtime_ns": 1788329421691518900,
+     "matches_staging": true,
+     "mtime_preserved": true
+    },
+    {
+     "rel": "data/bar/NQ.XCME-1-MINUTE-LAST-EXTERNAL/2020-01-01T23-01-00-000000000Z_2026-04-30T00-00-00-000000000Z.parquet",
+     "size": 75891497,
+     "sha256": "42c22aa2dd677652e99e2e3bf6b7a9ec9d1c6b372c62933f64c5affb99b5822c",
+     "mtime_ns": 1778181374349477700,
+     "matches_staging": true,
+     "mtime_preserved": true
+    },
+    {
+     "rel": "data/bar/NQ.XCME-1-SECOND-LAST-EXTERNAL/2020-01-01T23-00-01-000000000Z_2026-04-30T00-00-00-000000000Z.parquet",
+     "size": 1837841186,
+     "sha256": "55c36ad6bc5c6045d71405aa919769f6b503f501ea0375827cb947469ce16057",
+     "mtime_ns": 1778181282185588300,
+     "matches_staging": true,
+     "mtime_preserved": true
+    },
+    {
+     "rel": "data/bar/NQ.XCME-5-MINUTE-LAST-EXTERNAL/2020-01-01T23-05-00-000000000Z_2026-04-30T00-00-00-000000000Z.parquet",
+     "size": 18863024,
+     "sha256": "cf8f3769d934a0d86835a335acd371b68570186a560fe6ac0ba8701942aa432c",
+     "mtime_ns": 1778181401473899900,
+     "matches_staging": true,
+     "mtime_preserved": true
+    },
+    {
+     "rel": "data/futures_contract/NQ.XCME/2020-01-01T00-00-00-000000000Z_2020-01-01T00-00-00-000000000Z.parquet",
+     "size": 5937,
+     "sha256": "fb4c710813a7d9e3530795d3851f548c8fca9c7c0100e558bfc74bb989c22aed",
+     "mtime_ns": 1778180351214349600,
+     "matches_staging": true,
+     "mtime_preserved": true
+    }
+   ]
+  }
+ }
+}

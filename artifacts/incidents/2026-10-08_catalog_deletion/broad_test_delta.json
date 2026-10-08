@@ -1,0 +1,30 @@
+{
+ "command": "python scripts/test_delta.py research_workflow/tests scripts/tests features/tests tests --json --baseline-reference c480d8af0068c69d19669497c53747efa187b5dd",
+ "head": "e6750f7b",
+ "worktree": "C:/Users/Scott McCarty/Projects/Nautilus Trader-data_safety_guard",
+ "wall_seconds": 6808,
+ "ran": 2711, "passed": 2615, "failed": 69,
+ "test_delta_counts": {"NEW_FAILURE": 11, "KNOWN_BASELINE_FAILURE": 58, "BASELINE_FAILURE_NOW_FIXED": 1, "NEW_FAILURE_OUTSIDE_BASELINE_SCOPE": 0, "ENVIRONMENTAL_MISSING_ARTIFACT": 0},
+ "acl_protection_related_failures": 0,
+ "classification_of_NEW_FAILURE": {
+  "method": "every NEW_FAILURE node id re-run on clean main f2b748c4 (sequential, no concurrent run); chore diff touches only .claude/settings.json, AGENTS.md, docs/REGRESSION_CORPUS.json, scripts/hooks/data_guard.py, scripts/protect_live_data.py, scripts/safe_cleanup.py and their tests -- nothing in any failing test's code path",
+  "PRE_EXISTING_ON_CLEAN_MAIN": [
+   "research_workflow/tests/test_redteam_pass1_acceptance.py::test_acc12_canaries_green",
+   "scripts/tests/test_direction_qualified_freeze_binding.py::test_aggregate_freeze_opens_the_real_oos_gate",
+   "scripts/tests/test_generic_contract_audit.py::test_no_hardcoded_feature_count_in_generic_workflow",
+   "scripts/tests/test_rt_final_blockers.py::test_rt2b2_editing_a_governance_authority_moves_the_composite[scripts/check_feature_promotion.py]",
+   "scripts/tests/test_rt_final_blockers.py::test_rt2b2_editing_a_governance_authority_moves_the_composite[scripts/select_required_tests.py]"
+  ],
+  "WORKTREE_ENVIRONMENT_UNTRACKED_ARTIFACT_ABSENT (pass on main, which holds the gitignored file)": {
+   "research_workflow/tests/test_external_model_scoring.py::test_external_scorer_matches_repaired_model_c_for_deterministic_parent_row": "studies/clean_maturity_flip_model_rolling_productivity/artifacts/train_fitted_models.joblib",
+   "research_workflow/tests/test_stage3_integration.py::test_stage3_model_c_long_short_routing": "same joblib",
+   "research_workflow/tests/test_runtime_bindings.py::test_episode_study_is_provider_host_mode_and_all_features_bind": "same joblib (DERIVED_INPUT_SCORER_UNBOUND model_c_score_at_candidate)",
+   "tests/test_catalog_materializer.py::test_materialization_required_when_catalog_absent": "data/raw/YM_v0_1s_2024.parquet (worktree has no data/ by design -- never linked)",
+   "tests/test_pre_flip_reliability_contracts.py::test_long_candidates_prevailing_regime_direction": "studies/long_rth_mirrored_surface_top100_training/_work/prepared_long_2024.parquet",
+   "tests/test_pre_flip_reliability_contracts.py::test_short_candidates_prevailing_regime_direction": "studies/short_rth_enriched_volume_level_retrain/_work/prepared_2024.parquet"
+  },
+  "CAUSED_BY_CHORE": []
+ },
+ "note": "the 5 clean-main failures are not in the c480d8af baseline (baseline drift); per standing rule they are reported, not fixed",
+ "verdict": "NO_REGRESSION_ATTRIBUTABLE_TO_CHORE"
+}

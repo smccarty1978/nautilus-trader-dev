@@ -1,0 +1,382 @@
+{
+ "repo_head": "ref: refs/heads/main",
+ "checks": {
+  "staged_NQ_1S_V2_GLOBEX": {
+   "dataset_id": "NQ_1S_V2_GLOBEX",
+   "catalog_dir": "C:\\Users\\Scott McCarty\\Projects\\nt_recovery_staging\\sc23_copy\\NQ_1S_V2_GLOBEX",
+   "logical_digest": {
+    "computed": "9e7aecb7a2910b4402a6cb4f34cc2f6deb5df19d0e889b2c696cf4f844292c64",
+    "spec": "9e7aecb7a2910b4402a6cb4f34cc2f6deb5df19d0e889b2c696cf4f844292c64",
+    "match": true,
+    "file_count": 15,
+    "total_bytes": 1914107575
+   },
+   "dataset_manifest": {
+    "logical_digest": "9e7aecb7a2910b4402a6cb4f34cc2f6deb5df19d0e889b2c696cf4f844292c64",
+    "match": true
+   },
+   "reference_digest": {
+    "spec": "e577a36165abd690f70221041c4e2b6c7302b876b81d63e7a1f4076b46514514",
+    "match": true,
+    "tables": {
+     "gaps": 19186323,
+     "holidays": 17,
+     "maintenance": 2007,
+     "out_of_calendar": 4,
+     "rolls": 25,
+     "sessions": 1636
+    }
+   },
+   "builder_sha256": {
+    "spec": "37db627736b9e60b24dbdd8950a8d04a9a6aee1100bc63d32602bf1f23c32f06",
+    "manifest": "37db627736b9e60b24dbdd8950a8d04a9a6aee1100bc63d32602bf1f23c32f06",
+    "match": true
+   },
+   "build_manifest_reference_digest_match": true,
+   "raw_sources": {
+    "2020": {
+     "spec": "cd5d30892770720b392488e4e26b31a02456701a61fdfc6a1917cdda1f0a91e5",
+     "raw_file": "NQ_v0_1s_2020.parquet",
+     "raw_sha256": "cd5d30892770720b392488e4e26b31a02456701a61fdfc6a1917cdda1f0a91e5",
+     "match": true
+    },
+    "2021": {
+     "spec": "8453e7d884d9d51150bf01a72ad2b7e66fe7c56a21fa9d43be00b3ea8e3fcb40",
+     "raw_file": "NQ_v0_1s_2021.parquet",
+     "raw_sha256": "8453e7d884d9d51150bf01a72ad2b7e66fe7c56a21fa9d43be00b3ea8e3fcb40",
+     "match": true
+    },
+    "2022": {
+     "spec": "7720dc763ed485c63b83eb4fb65a3bc6b9e821b7e7c1b381e8f4389b72f721d4",
+     "raw_file": "NQ_v0_1s_2022.parquet",
+     "raw_sha256": "7720dc763ed485c63b83eb4fb65a3bc6b9e821b7e7c1b381e8f4389b72f721d4",
+     "match": true
+    },
+    "2023": {
+     "spec": "1f6d667dc4e7e99847ff9fa296eccd6d15b1295736a9269b7cb42be96c22e153",
+     "raw_file": "NQ_v0_1s_2023.parquet",
+     "raw_sha256": "1f6d667dc4e7e99847ff9fa296eccd6d15b1295736a9269b7cb42be96c22e153",
+     "match": true
+    },
+    "2024": {
+     "spec": "387303eccf03893a5ba34f93c6ddec79893542289503147960533b1655daa954",
+     "raw_file": "NQ_v0_1s_2024.parquet",
+     "raw_sha256": "387303eccf03893a5ba34f93c6ddec79893542289503147960533b1655daa954",
+     "match": true
+    },
+    "2025": {
+     "spec": "c4d498e77da916fd372b1faf455c68513dac38fdf45eced028b9fb99345d1e2d",
+     "raw_file": "NQ_v0_1s_2025.parquet",
+     "raw_sha256": "c4d498e77da916fd372b1faf455c68513dac38fdf45eced028b9fb99345d1e2d",
+     "match": true
+    },
+    "2026_ytd": {
+     "spec": "573523c556e9907652e2a2923c704daec6ee5ba7cb9fc3b2d579b5898ceb8b89",
+     "raw_file": "NQ_v0_1s_2026_ytd.parquet",
+     "raw_sha256": "573523c556e9907652e2a2923c704daec6ee5ba7cb9fc3b2d579b5898ceb8b89",
+     "match": true
+    }
+   },
+   "build_manifest_sources_raw": [
+    {
+     "year": "2020",
+     "path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\raw\\NQ_v0_1s_2020.parquet",
+     "sha256": "cd5d30892770720b392488e4e26b31a02456701a61fdfc6a1917cdda1f0a91e5",
+     "rows": 12791391,
+     "first_ns": 1577919600000000000,
+     "last_ns": 1609372795000000000,
+     "instrument_ids": [
+      10204,
+      16908,
+      14028,
+      16337,
+      4378
+     ]
+    },
+    {
+     "year": "2021",
+     "path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\raw\\NQ_v0_1s_2021.parquet",
+     "sha256": "8453e7d884d9d51150bf01a72ad2b7e66fe7c56a21fa9d43be00b3ea8e3fcb40",
+     "rows": 11908368,
+     "first_ns": 1609714800000000000,
+     "last_ns": 1640908797000000000,
+     "instrument_ids": [
+      4378,
+      2786,
+      828,
+      2770,
+      3541
+     ]
+    },
+    {
+     "year": "2022",
+     "path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\raw\\NQ_v0_1s_2022.parquet",
+     "sha256": "7720dc763ed485c63b83eb4fb65a3bc6b9e821b7e7c1b381e8f4389b72f721d4",
+     "rows": 13312875,
+     "first_ns": 1641164400000000000,
+     "last_ns": 1672437599000000000,
+     "instrument_ids": [
+      3541,
+      2895,
+      10391,
+      13613,
+      20631
+     ]
+    },
+    {
+     "year": "2023",
+     "path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\raw\\NQ_v0_1s_2023.parquet",
+     "sha256": "1f6d667dc4e7e99847ff9fa296eccd6d15b1295736a9269b7cb42be96c22e153",
+     "rows": 12217236,
+     "first_ns": 1672700400000000000,
+     "last_ns": 1703887198000000000,
+     "instrument_ids": [
+      20631,
+      3522,
+      2130,
+      260937,
+      750
+     ]
+    },
+    {
+     "year": "2024",
+     "path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\raw\\NQ_v0_1s_2024.parquet",
+     "sha256": "387303eccf03893a5ba34f93c6ddec79893542289503147960533b1655daa954",
+     "rows": 12021665,
+     "first_ns": 1704150000000000000,
+     "last_ns": 1735603199000000000,
+     "instrument_ids": [
+      750,
+      13743,
+      4358,
+      106364,
+      42288528
+     ]
+    },
+    {
+     "year": "2025",
+     "path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\raw\\NQ_v0_1s_2025.parquet",
+     "sha256": "c4d498e77da916fd372b1faf455c68513dac38fdf45eced028b9fb99345d1e2d",
+     "rows": 12083801,
+     "first_ns": 1735772400000000000,
+     "last_ns": 1767139192000000000,
+     "instrument_ids": [
+      42288528,
+      42005804,
+      42008487,
+      158704,
+      42002475
+     ]
+    },
+    {
+     "year": "2026_ytd",
+     "path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\raw\\NQ_v0_1s_2026_ytd.parquet",
+     "sha256": "573523c556e9907652e2a2923c704daec6ee5ba7cb9fc3b2d579b5898ceb8b89",
+     "rows": 4255466,
+     "first_ns": 1767308400000000000,
+     "last_ns": 1777507199000000000,
+     "instrument_ids": [
+      42002475,
+      42004058
+     ]
+    }
+   ]
+  },
+  "staged_NQ_v0_2020_2026": {
+   "dataset_id": "NQ_v0_2020_2026",
+   "catalog_dir": "C:\\Users\\Scott McCarty\\Projects\\nt_recovery_staging\\sc23_copy\\NQ_v0_2020_2026",
+   "logical_digest": {
+    "computed": "1a0d41d8da979136b922c256b7488d1c7c50009d0961281f1b43e88ea2c0de0f",
+    "spec": "1a0d41d8da979136b922c256b7488d1c7c50009d0961281f1b43e88ea2c0de0f",
+    "match": true,
+    "file_count": 4,
+    "total_bytes": 1932601644
+   },
+   "dataset_manifest": {
+    "logical_digest": "1a0d41d8da979136b922c256b7488d1c7c50009d0961281f1b43e88ea2c0de0f",
+    "match": true
+   }
+  },
+  "live_NQ_1S_V2": {
+   "dataset_id": "NQ_1S_V2",
+   "catalog_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\catalog\\NQ_1S_V2",
+   "logical_digest": {
+    "computed": "9e7aecb7a2910b4402a6cb4f34cc2f6deb5df19d0e889b2c696cf4f844292c64",
+    "spec": "9e7aecb7a2910b4402a6cb4f34cc2f6deb5df19d0e889b2c696cf4f844292c64",
+    "match": true,
+    "file_count": 15,
+    "total_bytes": 1914107575
+   },
+   "dataset_manifest": {
+    "logical_digest": "9e7aecb7a2910b4402a6cb4f34cc2f6deb5df19d0e889b2c696cf4f844292c64",
+    "match": true
+   },
+   "reference_digest": {
+    "spec": "0db1f14bfe0fc5b6cdf72fc4cdb0de981325c6489c67b2a264465316ade7a80c",
+    "match": true,
+    "tables": {
+     "gaps": 19174204,
+     "holidays": 16,
+     "maintenance": 2008,
+     "out_of_calendar": 29385,
+     "rolls": 25,
+     "sessions": 1637
+    }
+   },
+   "builder_sha256": {
+    "spec": "96df4872426d8d09d21973e339577209214db6e12288bd0ee2199fa6a7c5ceb3",
+    "manifest": "96df4872426d8d09d21973e339577209214db6e12288bd0ee2199fa6a7c5ceb3",
+    "match": true
+   },
+   "build_manifest_reference_digest_match": true,
+   "raw_sources": {
+    "2020": {
+     "spec": "cd5d30892770720b392488e4e26b31a02456701a61fdfc6a1917cdda1f0a91e5",
+     "raw_file": "NQ_v0_1s_2020.parquet",
+     "raw_sha256": "cd5d30892770720b392488e4e26b31a02456701a61fdfc6a1917cdda1f0a91e5",
+     "match": true
+    },
+    "2021": {
+     "spec": "8453e7d884d9d51150bf01a72ad2b7e66fe7c56a21fa9d43be00b3ea8e3fcb40",
+     "raw_file": "NQ_v0_1s_2021.parquet",
+     "raw_sha256": "8453e7d884d9d51150bf01a72ad2b7e66fe7c56a21fa9d43be00b3ea8e3fcb40",
+     "match": true
+    },
+    "2022": {
+     "spec": "7720dc763ed485c63b83eb4fb65a3bc6b9e821b7e7c1b381e8f4389b72f721d4",
+     "raw_file": "NQ_v0_1s_2022.parquet",
+     "raw_sha256": "7720dc763ed485c63b83eb4fb65a3bc6b9e821b7e7c1b381e8f4389b72f721d4",
+     "match": true
+    },
+    "2023": {
+     "spec": "1f6d667dc4e7e99847ff9fa296eccd6d15b1295736a9269b7cb42be96c22e153",
+     "raw_file": "NQ_v0_1s_2023.parquet",
+     "raw_sha256": "1f6d667dc4e7e99847ff9fa296eccd6d15b1295736a9269b7cb42be96c22e153",
+     "match": true
+    },
+    "2024": {
+     "spec": "387303eccf03893a5ba34f93c6ddec79893542289503147960533b1655daa954",
+     "raw_file": "NQ_v0_1s_2024.parquet",
+     "raw_sha256": "387303eccf03893a5ba34f93c6ddec79893542289503147960533b1655daa954",
+     "match": true
+    },
+    "2025": {
+     "spec": "c4d498e77da916fd372b1faf455c68513dac38fdf45eced028b9fb99345d1e2d",
+     "raw_file": "NQ_v0_1s_2025.parquet",
+     "raw_sha256": "c4d498e77da916fd372b1faf455c68513dac38fdf45eced028b9fb99345d1e2d",
+     "match": true
+    },
+    "2026_ytd": {
+     "spec": "573523c556e9907652e2a2923c704daec6ee5ba7cb9fc3b2d579b5898ceb8b89",
+     "raw_file": "NQ_v0_1s_2026_ytd.parquet",
+     "raw_sha256": "573523c556e9907652e2a2923c704daec6ee5ba7cb9fc3b2d579b5898ceb8b89",
+     "match": true
+    }
+   },
+   "build_manifest_sources_raw": [
+    {
+     "year": "2020",
+     "path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\raw\\NQ_v0_1s_2020.parquet",
+     "sha256": "cd5d30892770720b392488e4e26b31a02456701a61fdfc6a1917cdda1f0a91e5",
+     "rows": 12791391,
+     "first_ns": 1577919600000000000,
+     "last_ns": 1609372795000000000,
+     "instrument_ids": [
+      10204,
+      16908,
+      14028,
+      16337,
+      4378
+     ]
+    },
+    {
+     "year": "2021",
+     "path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\raw\\NQ_v0_1s_2021.parquet",
+     "sha256": "8453e7d884d9d51150bf01a72ad2b7e66fe7c56a21fa9d43be00b3ea8e3fcb40",
+     "rows": 11908368,
+     "first_ns": 1609714800000000000,
+     "last_ns": 1640908797000000000,
+     "instrument_ids": [
+      4378,
+      2786,
+      828,
+      2770,
+      3541
+     ]
+    },
+    {
+     "year": "2022",
+     "path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\raw\\NQ_v0_1s_2022.parquet",
+     "sha256": "7720dc763ed485c63b83eb4fb65a3bc6b9e821b7e7c1b381e8f4389b72f721d4",
+     "rows": 13312875,
+     "first_ns": 1641164400000000000,
+     "last_ns": 1672437599000000000,
+     "instrument_ids": [
+      3541,
+      2895,
+      10391,
+      13613,
+      20631
+     ]
+    },
+    {
+     "year": "2023",
+     "path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\raw\\NQ_v0_1s_2023.parquet",
+     "sha256": "1f6d667dc4e7e99847ff9fa296eccd6d15b1295736a9269b7cb42be96c22e153",
+     "rows": 12217236,
+     "first_ns": 1672700400000000000,
+     "last_ns": 1703887198000000000,
+     "instrument_ids": [
+      20631,
+      3522,
+      2130,
+      260937,
+      750
+     ]
+    },
+    {
+     "year": "2024",
+     "path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\raw\\NQ_v0_1s_2024.parquet",
+     "sha256": "387303eccf03893a5ba34f93c6ddec79893542289503147960533b1655daa954",
+     "rows": 12021665,
+     "first_ns": 1704150000000000000,
+     "last_ns": 1735603199000000000,
+     "instrument_ids": [
+      750,
+      13743,
+      4358,
+      106364,
+      42288528
+     ]
+    },
+    {
+     "year": "2025",
+     "path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\raw\\NQ_v0_1s_2025.parquet",
+     "sha256": "c4d498e77da916fd372b1faf455c68513dac38fdf45eced028b9fb99345d1e2d",
+     "rows": 12083801,
+     "first_ns": 1735772400000000000,
+     "last_ns": 1767139192000000000,
+     "instrument_ids": [
+      42288528,
+      42005804,
+      42008487,
+      158704,
+      42002475
+     ]
+    },
+    {
+     "year": "2026_ytd",
+     "path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\raw\\NQ_v0_1s_2026_ytd.parquet",
+     "sha256": "573523c556e9907652e2a2923c704daec6ee5ba7cb9fc3b2d579b5898ceb8b89",
+     "rows": 4255466,
+     "first_ns": 1767308400000000000,
+     "last_ns": 1777507199000000000,
+     "instrument_ids": [
+      42002475,
+      42004058
+     ]
+    }
+   ]
+  }
+ }
+}

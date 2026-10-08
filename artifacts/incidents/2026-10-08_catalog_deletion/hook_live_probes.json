@@ -1,0 +1,20 @@
+{
+ "recorded_at_utc": "2026-10-08",
+ "hook": "user-level ~/.claude/settings.json -> python \"C:/Users/Scott McCarty/.claude/hooks/nt_data_guard.py\" (copy of scripts/hooks/data_guard.py, sha256 b04c248180e4e76bd13b8a8f6919003492a2f51c13d522e7ae08bd05575678ca)",
+ "settings_backup": "C:/Users/Scott McCarty/.claude/settings.json.bak_20261008_pre_data_guard (sha256 de1bbcb9aefb0c0880dec18ad362edcab7d1c2c2fa6ca61bb772d15358ca7daa); unrelated keys preserved",
+ "live_tool_calls_in_running_session": [
+  {"tool": "Bash", "command": "git -C \"/c/Users/Scott McCarty/Projects/Nautilus Trader\" worktree remove \"C:/nt_guard_probe_nonexistent_worktree\"", "result": "BLOCKED DATA_GUARD_RECURSIVE_DELETE_BLOCKED"},
+  {"tool": "Bash", "source": "transcript agent a58d76274cd73c891 line 744 (verbatim)", "result": "BLOCKED DATA_GUARD_RECURSIVE_DELETE_BLOCKED"},
+  {"tool": "Bash", "source": "transcript agent a58d76274cd73c891 line 641 (verbatim)", "result": "BLOCKED DATA_GUARD_LINK_CREATION_BLOCKED (New-Item link)"}
+ ],
+ "subagent_probe": {"agent_model": "haiku", "command": "git -C \"C:/Users/Scott McCarty/Projects/Nautilus Trader\" worktree remove \"C:/nt_guard_probe_subagent_nonexistent\"", "result": "BLOCKED DATA_GUARD_RECURSIVE_DELETE_BLOCKED"},
+ "offline_replay": "hook_replay.json: 12/12 incident tool calls blocked through the installed hook command (re-run after the final hook revision)",
+ "hook_revisions_during_validation": [
+  "relative script names are resolved against cd/pushd/Set-Location targets inside the command (transcript line 248 had been ALLOWED: 11/12 -> 12/12)",
+  "write-time content scan limited to executable script types; .json/.md evidence documenting link commands is allowed"
+ ],
+ "known_false_positive_classes": [
+  "a read-only command whose TEXT contains a link keyword (e.g. python -c filtering on that keyword)",
+  "a read-only command that merely NAMES an existing script file containing link code (e.g. Test-Path <x.cmd>)"
+ ]
+}

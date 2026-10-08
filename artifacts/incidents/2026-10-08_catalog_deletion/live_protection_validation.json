@@ -1,0 +1,50 @@
+{
+ "validated_at_utc": "2026-10-08T13:08:04.455235+00:00",
+ "backup_dir": "C:\\Users\\Scott McCarty\\.nt_research\\acl_backups\\live_20261008",
+ "checks": {
+  "unrelated_aces_preserved_live": {
+   "pass": true,
+   "compared": 395,
+   "missing": {}
+  },
+  "all_spec_backed_catalogs_read_and_match": {
+   "pass": true,
+   "catalogs": {
+    "ES_1S_V2": true,
+    "ES_1S_V2_GLOBEX": true,
+    "ES_v0_2020_2026": true,
+    "NQ_1S_V2": true,
+    "NQ_1S_V2_GLOBEX": true,
+    "NQ_v0_2020_2026": true,
+    "YM_v0_2024": true
+   }
+  },
+  "resolve_dataset_live_NQ_1S_V2_GLOBEX": {
+   "pass": true,
+   "path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\catalog\\NQ_1S_V2_GLOBEX"
+  },
+  "resolve_dataset_live_NQ_v0_2020_2026": {
+   "pass": true,
+   "path": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\catalog\\NQ_v0_2020_2026"
+  },
+  "reference_tables_live": {
+   "pass": true
+  },
+  "nautilus_bar_read_live": {
+   "pass": true,
+   "n": 3601
+  },
+  "write_open_denied_live": {
+   "pass": true,
+   "probe": {
+    "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\catalog\\NQ_1S_V2_GLOBEX\\data\\bar\\NQ.XCME-1-MINUTE-LAST-EXTERNAL\\2020-01-01T23-01-00-000000000Z_2020-12-31T00-00-00-000000000Z.parquet": true,
+    "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\raw\\NQ_v0_1s_2022.parquet": true,
+    "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\\data\\catalog\\legacy\\README.md": true
+   }
+  },
+  "verify_reports_protected": {
+   "pass": true
+  }
+ },
+ "verdict": "PROTECTION_ACTIVE_VERIFIED"
+}

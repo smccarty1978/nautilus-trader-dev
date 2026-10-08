@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "last_updated": "2026-08-14",
+  "last_updated": "2026-10-08",
   "defects": [
     {
       "id": "H4_TRIGGER_PRICE_FILL",
@@ -171,6 +171,16 @@
       "invariant": "Feature vectors must match model.feature_names_in_ exactly by name and sequence.",
       "detection": "scripts/check_model_binding.py",
       "regression_test": "scripts/tests/test_model_binding.py::test_feature_count_mismatch"
+    },
+    {
+      "id": "LIVE_DATA_DELETED_THROUGH_WORKTREE_LINK",
+      "rule_id": "DATA_SAFETY",
+      "severity": "CRITICAL",
+      "name": "Live data deleted through a junction/symlink by a forced or recursive worktree cleanup",
+      "root_cause": "An agent junctioned live data into a disposable worktree, then `git worktree remove --force` / `rm -rf` deleted through the reparse point. Occurred 2026-08-17 (179 GB) and 2026-10-08 (NQ_1S_V2_GLOBEX, NQ_v0_2020_2026); the prose rule in AGENTS.md section 7 did not stop the second. Record: artifacts/incidents/2026-10-08_catalog_deletion/INCIDENT.md",
+      "invariant": "No agent tool call may create a link, recursively delete a tree, or mutate live data/DatasetSpecs; deletion goes only through scripts/safe_cleanup.py (fails closed on any reparse point or protected path); live catalogs and raw files carry deny-Everyone delete/write ACEs.",
+      "detection": "scripts/hooks/data_guard.py (PreToolUse, .claude/settings.json); scripts/protect_live_data.py verify; scripts/safe_cleanup.py",
+      "regression_test": "scripts/tests/test_protect_live_data.py::test_incident_reproduction_forced_worktree_removal_through_junction_loses_nothing"
     }
   ]
 }
