@@ -17,6 +17,18 @@ GOLDEN = ROOT / "fixtures" / "golden"
 NS = 1_000_000_000
 
 
+def test_sha_helper_streams_and_matches_whole_file_digest(tmp_path):
+    """Defect fix: lifecycle_v2._sha must stream (bounded-memory for a multi-GB partition)
+    and still produce the identical digest a whole-file hashlib.sha256(read_bytes()) would."""
+    import hashlib
+    from research_workflow.lifecycle_v2 import _sha
+    p = tmp_path / "f.bin"
+    data = bytes(range(256)) * 20_000  # several MB, several chunk-sizes either way
+    p.write_bytes(data)
+    assert _sha(p) == hashlib.sha256(data).hexdigest()
+    assert _sha(tmp_path / "missing.bin") is None
+
+
 def _expand_braces(rel: str) -> list[str]:
     import re as _re
     m = _re.search(r"\{([^}]+)\}", rel)

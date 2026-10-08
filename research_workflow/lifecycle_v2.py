@@ -57,8 +57,23 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+_SHA_CHUNK_BYTES = 4 * 1024 * 1024  # streaming hash chunk size: bounds peak RSS of _sha()
+# regardless of file size -- a full-year G2 partition can be several GB; Path.read_bytes()
+# would spike peak RSS by that whole size at every finalize/verify call site that uses this.
+
+
 def _sha(path: Path) -> Optional[str]:
-    return hashlib.sha256(Path(path).read_bytes()).hexdigest() if Path(path).is_file() else None
+    p = Path(path)
+    if not p.is_file():
+        return None
+    h = hashlib.sha256()
+    with open(p, "rb") as f:
+        while True:
+            chunk = f.read(_SHA_CHUNK_BYTES)
+            if not chunk:
+                break
+            h.update(chunk)
+    return h.hexdigest()
 
 
 def _read(path: Path) -> Dict[str, Any]:

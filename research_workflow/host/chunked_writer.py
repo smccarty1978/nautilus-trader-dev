@@ -104,6 +104,57 @@ def _canonical_json(value: Any) -> str:
     return json.dumps(value, sort_keys=True, default=str, separators=(",", ":"))
 
 
+_SHA_CHUNK_BYTES = 4 * 1024 * 1024  # host-constant: streaming hash chunk size, bounds peak RSS
+# regardless of file size (a full-year partition can be several GB; Path.read_bytes() would
+# spike peak RSS by that whole size).
+
+
+def sha256_file(path: Path) -> str:
+    """Streaming sha256 of a file on disk -- never materializes the whole file in memory."""
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        while True:
+            chunk = f.read(_SHA_CHUNK_BYTES)
+            if not chunk:
+                break
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def _rows_canonical_from_table(table: pa.Table, columns: Sequence[str]) -> List[Dict[str, Any]]:
+    """Per-row canonical Python values AS ACTUALLY WRITTEN (post-cast: a mixed int/float
+    column that was fixed to float64 reads back every row as a Python float, never the
+    original int), via Arrow's own ``Array.to_pylist()`` (nested struct -> dict, nested
+    list -> list, null -> None, recursively) -- never the caller's pre-conversion input.
+    This is the SAME canonical form the logical-content hash must use whether computed at
+    write time (from the in-memory ``pa.Table`` about to be written) or recomputed later by
+    streaming the finalized parquet file (``recompute_logical_content_sha256`` below) --
+    the two call sites share this one function so they cannot drift apart."""
+    cols_pylist = {c: table.column(c).to_pylist() for c in columns}
+    n = table.num_rows
+    return [{c: cols_pylist[c][i] for c in columns} for i in range(n)]
+
+
+def recompute_logical_content_sha256(path: Path, columns: Sequence[str],
+                                     batch_size: int = 50_000) -> str:  # host-constant: read batch size, matches DEFAULT_BATCH_ROWS
+    """Recompute the logical-content hash directly from a FINALIZED parquet file, streaming
+    it row-group/batch at a time (never materializing the whole file), using the identical
+    canonical-row derivation (``_rows_canonical_from_table``) and hash update order
+    (row-major, in file order; the file's own row order IS emission order since this writer
+    never reorders) that ``ChunkedParquetWriter.finalize()`` used when it first computed
+    ``logical_content_sha256``. A caller that wants to verify a partition's manifest against
+    the bytes actually on disk (rather than trusting the writer's own in-process hash) calls
+    this; it does not require the writer object at all, only the file and its column list."""
+    hasher = hashlib.sha256()
+    pf = pq.ParquetFile(str(path))
+    for batch in pf.iter_batches(batch_size=batch_size, columns=list(columns)):
+        tbl = pa.Table.from_batches([batch])
+        for row in _rows_canonical_from_table(tbl, columns):
+            hasher.update(_canonical_json(row).encode("utf-8"))
+            hasher.update(b"\n")
+    return hasher.hexdigest()
+
+
 def _infer_scalar_type(value: Any) -> pa.DataType:
     if isinstance(value, bool):
         return pa.bool_()
@@ -263,8 +314,12 @@ class ChunkedParquetWriter:
             self.on_flush("post_conversion", {"rows": len(rows), "batches_written": self.batches_written})
         table = pa.Table.from_arrays(arrays, schema=self.schema)
         self._writer.write_table(table)
-        for r in rows:
-            self._hasher.update(_canonical_json({c: r.get(c) for c in self.columns}).encode("utf-8"))
+        # Hash the CONVERTED values (what Arrow/parquet actually wrote), not the caller's raw
+        # pre-cast input -- a mixed int/float column fixed to float64 writes every row as a
+        # float, and the hash must agree with what a later recompute from the finalized file
+        # (recompute_logical_content_sha256) will see, or the two would silently diverge.
+        for row in _rows_canonical_from_table(table, self.columns):
+            self._hasher.update(_canonical_json(row).encode("utf-8"))
             self._hasher.update(b"\n")
         self.rows_written += len(rows)
         self.batches_written += 1
@@ -333,7 +388,7 @@ class ChunkedParquetWriter:
             # so an empty-but-valid, correctly-typed parquet file is produced.
             self._fix_schema([])
         self._writer.close()
-        physical_sha256 = hashlib.sha256(self.tmp_path.read_bytes()).hexdigest()
+        physical_sha256 = sha256_file(self.tmp_path)  # streamed: never materializes the whole file
         os.replace(self.tmp_path, self.path)  # atomic finalize: no file at the final name until now
         self._finalized = True
         return {
@@ -350,4 +405,5 @@ class ChunkedParquetWriter:
 
 
 __all__ = ["ChunkedParquetWriter", "infer_arrow_type", "dtype_tag_to_arrow", "field_types_to_arrow",
-           "DEFAULT_BATCH_ROWS", "DEFAULT_BATCH_BYTES", "estimate_value_bytes", "estimate_row_bytes"]
+           "DEFAULT_BATCH_ROWS", "DEFAULT_BATCH_BYTES", "estimate_value_bytes", "estimate_row_bytes",
+           "sha256_file", "recompute_logical_content_sha256"]

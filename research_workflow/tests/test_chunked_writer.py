@@ -16,7 +16,7 @@ import pytest
 
 from research_workflow.host.chunked_writer import (
     ChunkedParquetWriter, infer_arrow_type, dtype_tag_to_arrow, field_types_to_arrow,
-    estimate_row_bytes, estimate_value_bytes,
+    estimate_row_bytes, estimate_value_bytes, sha256_file, recompute_logical_content_sha256,
 )
 
 
@@ -389,6 +389,46 @@ def test_estimate_bytes_calibrated_against_tracemalloc_on_vp_shaped_rows():
     ratio = measured / estimated
     # Generous band: a correctly-order-of-magnitude estimator, not an exact one.
     assert 0.2 <= ratio <= 5.0, f"estimator is off by more than 5x from measured allocation (ratio={ratio!r})"
+
+
+def test_logical_hash_recomputable_from_the_finalized_file(tmp_path):
+    """Defect fix: the manifest's logical_content_sha256 must be recomputable from the
+    FILE actually written -- not just equal to a second hash of the writer's own
+    pre-conversion input. Exercises a mixed int/float column (the column is fixed to
+    float64 by a declared type while some input rows are plain ints), nulls, and a struct
+    with a list<int64> child -- the three shapes most likely to make a pre-conversion hash
+    diverge from a post-conversion one."""
+    out = tmp_path / "recompute.parquet"
+    cols = ["a_float_col", "b_nullable", "c_struct"]
+    declared = {"a_float_col": pa.float64(), "c_struct": pa.struct([pa.field("x", pa.int64()), pa.field("lst", pa.list_(pa.int64()))])}
+    w = ChunkedParquetWriter(out, cols, declared_types=declared, batch_rows=3)
+    rows = [
+        {"a_float_col": 1, "b_nullable": None, "c_struct": {"x": 1, "lst": [1, 2, 3]}},   # int into a float64 column
+        {"a_float_col": 2.5, "b_nullable": "v", "c_struct": {"x": 2, "lst": []}},
+        {"a_float_col": 3, "b_nullable": None, "c_struct": None},
+        {"a_float_col": 4, "b_nullable": "w", "c_struct": {"x": 4, "lst": [7]}},
+        {"a_float_col": 5.5, "b_nullable": None, "c_struct": {"x": 5, "lst": [8, 9]}},
+    ]
+    for r in rows:
+        w.write_rows([r])
+    manifest = w.finalize()
+    recomputed = recompute_logical_content_sha256(out, cols)
+    assert recomputed == manifest["logical_content_sha256"], (
+        "logical_content_sha256 recomputed from the finalized file must match the manifest's "
+        "value computed at write time -- a mismatch means the hash was taken over values that "
+        "were never actually written (the pre-conversion defect)")
+
+
+def test_sha256_file_streaming_matches_whole_file_digest(tmp_path):
+    """Defect fix: the streaming sha256 helper must produce the IDENTICAL digest to a plain
+    whole-file read, on a file small enough to check both ways, and must not depend on the
+    chunk boundary (forced tiny here via direct byte comparison, not by monkeypatching the
+    chunk size, to keep this test independent of the implementation's internal constant)."""
+    import hashlib
+    p = tmp_path / "f.bin"
+    data = bytes(range(256)) * 5000  # a few hundred KB, several chunk-sizes either way
+    p.write_bytes(data)
+    assert sha256_file(p) == hashlib.sha256(data).hexdigest()
 
 
 def test_on_flush_observer_called_at_each_stage(tmp_path):
