@@ -98,9 +98,9 @@ class HostCore:
         self.progress_path = progress_path
         self.progress_every_bars = int(progress_every_bars)
         self._bars_processed = 0
-        # Observed replay bounds per stream: [first ts_event, first ts_init, last ts_event, last ts_init]
-        # of every bar actually ingested (warmup included) -- evidence of the data scope a run read.
-        self._bar_range: Dict[str, List[int]] = {}
+        # Observed replay bounds per stream: first/last ts_event and ts_init of every bar actually
+        # ingested (warmup included) -- evidence of the data scope a run read.
+        self._bar_range: Dict[str, Dict[str, int]] = {}
         self._started = time.perf_counter()
 
         # streams / mux
@@ -252,9 +252,9 @@ class HostCore:
         self._bars_processed += 1
         r = self._bar_range.get(bar.stream)
         if r is None:
-            self._bar_range[bar.stream] = [bar.ts_event, bar.ts_init, bar.ts_event, bar.ts_init]
-        else:
-            r[2] = bar.ts_event; r[3] = bar.ts_init
+            r = self._bar_range[bar.stream] = {"first_ts_event": bar.ts_event, "first_ts_init": bar.ts_init}
+        r["last_ts_event"] = bar.ts_event
+        r["last_ts_init"] = bar.ts_init
         if self.progress_every_bars and self._bars_processed % self.progress_every_bars == 0:
             self._heartbeat()
 
@@ -463,8 +463,7 @@ class HostCore:
                "observations": len(self.sink.observations), "epochs": self.epochs_evaluated,
                "pending_at_end": len(self.kernel.pending) if self.kernel is not None else 0,
                "dropped_outside_primary": {"candidates": self.sink.dropped_candidates, "observations": self.sink.dropped_observations},
-               "bar_range": {k: {"first_ts_event": v[0], "first_ts_init": v[1], "last_ts_event": v[2], "last_ts_init": v[3]}
-                             for k, v in sorted(self._bar_range.items())}}
+               "bar_range": {k: dict(v) for k, v in sorted(self._bar_range.items())}}
         empty = self.mux.empty_windows_published()
         if empty:                                    # closed-window plans only: a sealed complete_bucket plan's stats are unchanged
             out["empty_windows_published"] = empty
