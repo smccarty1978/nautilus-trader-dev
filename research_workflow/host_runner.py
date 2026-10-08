@@ -30,8 +30,6 @@ def run_plan_on_bars(plan: Mapping[str, Any], bars: Iterable[BarView], *, sessio
     candidates, observations = core.finalize()
     out = {"candidates": candidates, "observations": observations, "stats": core.stats(),
            "elapsed_s": time.perf_counter() - t0, "core": core}
-    if core.sink.chunked():
-        out["writer_manifests"] = core.writer_manifests
     return out
 
 
@@ -191,8 +189,6 @@ def run_plan_on_catalog(plan: Mapping[str, Any], *, start_date: str, end_date: s
            "dataset": {"dataset_id": data_plan.dataset_id, "logical_digest": data_plan.dataset_logical_digest,
                        "bytes_verification": bytes_check.get("status")},
            "window": {"start": start_date, "end": end_date, "warmup_days": warmup_days}, "ledger": ledger_rows}
-    if chunked:
-        out["writer_manifests"] = strategy.core.writer_manifests
     engine.dispose()
     return out
 

@@ -606,12 +606,19 @@ class V2Lifecycle:
 
     def _chunked_writers_for(self, plan: Dict[str, Any], out_dir: Path) -> Any:
         from research_workflow.host.chunked_writer import ChunkedParquetWriter
-        from research_workflow.host.strategy import plan_output_columns
+        from research_workflow.host.strategy import plan_output_columns, declared_metadata_types
         import pyarrow as pa
         cand_cols, obs_cols = plan_output_columns(plan)
         identity_cols = set(plan["columns"]["identity"])
-        declared_cand = {c: pa.int64() for c in identity_cols} | {c: pa.float64() for c in (plan["columns"].get("features") or [])}
-        declared_obs = {c: pa.int64() for c in identity_cols if c in obs_cols}
+        # Metadata columns whose tracker declares a struct/list shape (BaseBinding.FIELD_TYPES)
+        # get that declared type outright, same as identity/feature columns -- never left to
+        # probe-based inference, which would lock in float64 for a column that is all-null for
+        # the whole probe (e.g. a rolling tracker's profile struct before its first complete
+        # window). See declared_metadata_types's docstring.
+        declared_meta = declared_metadata_types(plan)
+        declared_cand = ({c: pa.int64() for c in identity_cols} | declared_meta
+                         | {c: pa.float64() for c in (plan["columns"].get("features") or []) if c not in declared_meta})
+        declared_obs = {c: pa.int64() for c in identity_cols if c in obs_cols} | {c: t for c, t in declared_meta.items() if c in obs_cols}
         out_dir.mkdir(parents=True, exist_ok=True)
         batch_rows = self.opts.chunked_batch_rows
         cand_w = ChunkedParquetWriter(out_dir / "candidates.parquet", cand_cols, declared_types=declared_cand, batch_rows=batch_rows)

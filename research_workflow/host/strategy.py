@@ -48,6 +48,35 @@ def _load(dotted: str) -> Any:
     return getattr(importlib.import_module(module), attr)
 
 
+def declared_metadata_types(plan: Mapping[str, Any]) -> Dict[str, Any]:
+    """{metadata column -> pyarrow type} for every ``features.metadata`` column whose source
+    tracker declares that field's shape via ``BaseBinding.FIELD_TYPES`` (struct/list fields --
+    e.g. the volume-profile rolling tracker's ``profile`` struct). A metadata column with no
+    declaring tracker, or a field the tracker does not list in ``FIELD_TYPES``, is left out --
+    the caller (``lifecycle_v2._chunked_writers_for``) falls back to probe-based inference for
+    it, exactly as before this existed. This is the generic fix for a real schema-correctness
+    risk: a struct/list field that is null for every row of a batch-rows-sized probe (e.g. the
+    first ~1440 minutes after a block start, before a rolling tracker's first complete window)
+    would otherwise default to float64 and then fail (or silently misrepresent) once a real
+    struct value arrives."""
+    from research_workflow.host.chunked_writer import field_types_to_arrow
+    trackers_by_id = {t["id"]: t for t in (plan.get("trackers") or [])}
+    out: Dict[str, Any] = {}
+    for m in plan["columns"].get("metadata") or []:
+        column, ref = m["column"], m["ref"]
+        root, _, field = str(ref).partition(".")
+        t = trackers_by_id.get(root)
+        if t is None:
+            continue
+        cls = _load(t["implementation"])
+        field_types = getattr(cls, "FIELD_TYPES", {}) or {}
+        spec = field_types.get(field)
+        if spec is None:
+            continue
+        out[column] = field_types_to_arrow(spec)
+    return out
+
+
 class HostCore:
     """Coordinates the compiled plan's primitives over a causally ordered bar stream."""
 
@@ -61,7 +90,6 @@ class HostCore:
         # does not pass it -- smoke, the pure-python/bar_source test path, and every existing
         # test keep materializing full candidate/observation DataFrames exactly as before.
         self._chunked_writers = chunked_writers
-        self.writer_manifests: Optional[Dict[str, Any]] = None
         self.plan = dict(plan)
         self.studies_root = studies_root
         self.session_table = session_table
@@ -531,4 +559,5 @@ else:  # pragma: no cover
     GovernedHostStrategy = None  # type: ignore
 
 
-__all__ = ["HostCore", "GovernedHostStrategy", "GovernedHostStrategyConfig", "HostPlanError", "plan_output_columns"]
+__all__ = ["HostCore", "GovernedHostStrategy", "GovernedHostStrategyConfig", "HostPlanError", "plan_output_columns",
+           "declared_metadata_types"]

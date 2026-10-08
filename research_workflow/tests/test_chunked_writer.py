@@ -14,7 +14,9 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import pytest
 
-from research_workflow.host.chunked_writer import ChunkedParquetWriter, infer_arrow_type
+from research_workflow.host.chunked_writer import (
+    ChunkedParquetWriter, infer_arrow_type, dtype_tag_to_arrow, field_types_to_arrow,
+)
 
 
 def _rows(n, start=0):
@@ -197,3 +199,83 @@ def test_infer_arrow_type_helper():
     assert infer_arrow_type(["x", None]) == pa.string()
     assert infer_arrow_type([[1, 2], None]) == pa.list_(pa.int64())
     assert infer_arrow_type([[], None]) == pa.list_(pa.int64())
+
+
+def test_dtype_tag_to_arrow():
+    assert dtype_tag_to_arrow("int64") == pa.int64()
+    assert dtype_tag_to_arrow("float64") == pa.float64()
+    assert dtype_tag_to_arrow("bool") == pa.bool_()
+    assert dtype_tag_to_arrow("str") == pa.string()
+    assert dtype_tag_to_arrow("int64[]") == pa.list_(pa.int64())
+    assert dtype_tag_to_arrow("int64[]?") == pa.list_(pa.int64())  # nullable marker ignored for type
+    with pytest.raises(TypeError):
+        dtype_tag_to_arrow("bogus")
+
+
+def test_field_types_to_arrow_struct():
+    # Mirrors BaseBinding.FIELD_TYPES["profile"] shape (chore/vp_profile_snapshot), exercised
+    # here against the generic synthetic schema (no VP-specific branch in the writer).
+    spec = {"kind": "struct", "schema": {"poc": "float64", "levels": "int64[]", "label": "str"}}
+    t = field_types_to_arrow(spec)
+    assert pa.types.is_struct(t)
+    assert t.field("poc").type == pa.float64()
+    assert t.field("levels").type == pa.list_(pa.int64())
+    assert t.field("label").type == pa.string()
+    with pytest.raises(TypeError):
+        field_types_to_arrow({"kind": "unknown_kind"})
+
+
+def test_declared_type_locks_struct_even_when_probe_is_all_null(tmp_path):
+    """Req A: a struct/list column that is null for the whole probe must NOT silently
+    default to float64 when the caller declares its real type -- the real failure mode this
+    was built for (a rolling tracker's profile struct, null for the first ~1440 minutes after
+    a block start)."""
+    out = tmp_path / "declared_struct.parquet"
+    declared = {"profile": field_types_to_arrow({"kind": "struct", "schema": {"poc": "float64", "levels": "int64[]"}})}
+    w = ChunkedParquetWriter(out, ["profile"], declared_types=declared, batch_rows=2)
+    w.write_rows([{"profile": None}, {"profile": None}])  # whole probe null -- would default float64 if undeclared
+    w.write_rows([{"profile": {"poc": 101.5, "levels": [1, 2, 3]}}])
+    manifest = w.finalize()
+    assert "struct" in manifest["schema"]["profile"]
+    table = pq.read_table(out)
+    got = table.column("profile").to_pylist()
+    assert got[0] is None and got[1] is None
+    assert got[2]["poc"] == 101.5 and got[2]["levels"] == [1, 2, 3]
+
+
+def test_declared_metadata_types_reads_tracker_field_types(monkeypatch):
+    """Req A wiring: a features.metadata column whose ref resolves to a tracker field declared
+    in that tracker's BaseBinding.FIELD_TYPES gets the DECLARED Arrow type, not probe-based
+    inference -- generic over whatever class the plan's tracker.implementation names (no VP
+    branch here; a fake tracker class stands in for the real one)."""
+    from research_workflow.host import strategy as strategy_mod
+
+    class _FakeTrackerBinding:
+        FIELD_TYPES = {"profile": {"kind": "struct", "schema": {"poc": "float64", "levels": "int64[]"}}}
+
+    monkeypatch.setattr(strategy_mod, "_load", lambda dotted: _FakeTrackerBinding)
+    plan = {
+        "trackers": [{"id": "vp120", "implementation": "fake.module.FakeBinding"}],
+        "columns": {"metadata": [
+            {"column": "vp120_profile", "ref": "vp120.profile"},
+            {"column": "vp120_undeclared", "ref": "vp120.not_in_field_types"},
+            {"column": "orphan_col", "ref": "no_such_tracker.field"},
+        ]},
+    }
+    out = strategy_mod.declared_metadata_types(plan)
+    assert set(out.keys()) == {"vp120_profile"}
+    assert pa.types.is_struct(out["vp120_profile"])
+    assert out["vp120_profile"].field("poc").type == pa.float64()
+
+
+def test_type_mismatch_fails_closed_before_writing(tmp_path):
+    """A later batch carrying a value incompatible with the already-fixed type must raise a
+    named, typed error BEFORE any byte of that batch is written -- never silently coerced,
+    never partially written."""
+    out = tmp_path / "mismatch.parquet"
+    w = ChunkedParquetWriter(out, ["a"], declared_types={"a": pa.int64()}, batch_rows=2)
+    w.write_rows([{"a": 1}, {"a": 2}])  # fixes + flushes first batch fine
+    with pytest.raises(TypeError, match="CHUNKED_WRITER_TYPE_MISMATCH"):
+        w.write_rows([{"a": {"unexpected": "struct"}}])
+    assert w.rows_written == 2  # the bad batch never landed
+    w._writer.close()

@@ -93,6 +93,35 @@ def infer_arrow_type(samples: Sequence[Any]) -> pa.DataType:
     return pa.float64()
 
 
+def dtype_tag_to_arrow(tag: str) -> pa.DataType:
+    """One declarative dtype tag (as used by ``BaseBinding.FIELD_TYPES`` schemas, e.g.
+    ``"int64"``, ``"float64"``, ``"bool"``, ``"str"``, ``"int64[]"``) -> the matching Arrow
+    type. A trailing ``"?"`` (nullable-list marker, e.g. ``"int64[]?"``) does not change the
+    Arrow TYPE -- Arrow arrays are nullable regardless -- so it is stripped and ignored here."""
+    t = tag.rstrip("?")
+    is_list = t.endswith("[]")
+    if is_list:
+        t = t[:-2]
+    scalar = {"int64": pa.int64(), "float64": pa.float64(), "bool": pa.bool_(), "str": pa.string()}.get(t)
+    if scalar is None:
+        raise TypeError(f"CHUNKED_WRITER_UNKNOWN_DTYPE_TAG: {tag!r}")
+    return pa.list_(scalar) if is_list else scalar
+
+
+def field_types_to_arrow(spec: Mapping[str, Any]) -> pa.DataType:
+    """One ``BaseBinding.FIELD_TYPES[field]`` declaration (e.g.
+    ``{"kind": "struct", "schema": {"sub": "int64", ...}}``) -> the matching Arrow type.
+    Generic over whatever tracker declares it -- no feature-specific branch; a future
+    binding with a different ``kind`` only needs to extend this one mapping, not the
+    writer."""
+    kind = spec.get("kind")
+    if kind == "struct":
+        schema = spec.get("schema") or {}
+        fields = [pa.field(k, dtype_tag_to_arrow(v)) for k, v in schema.items()]
+        return pa.struct(fields)
+    raise TypeError(f"CHUNKED_WRITER_UNKNOWN_FIELD_TYPES_KIND: {kind!r}")
+
+
 def _build_array(values: Sequence[Any], arrow_type: pa.DataType) -> pa.Array:
     """Build one Arrow array of EXACTLY ``arrow_type``, never re-inferring. A column whose
     runtime values mix ``int`` and ``float`` (e.g. ``horizon_end_ts`` computed as an exact
@@ -152,7 +181,19 @@ class ChunkedParquetWriter:
     def _emit_batch(self, rows: Sequence[Mapping[str, Any]]) -> None:
         if not rows:
             return
-        arrays = [_build_array([r.get(c) for r in rows], self._field_types[c]) for c in self.columns]
+        # Build every column's array before writing anything: a later batch carrying a value
+        # incompatible with the column's already-fixed type (e.g. a struct landing in a
+        # column the probe locked to float64) must fail CLOSED -- named, typed, before any
+        # byte of this batch reaches disk -- never silently coerced and never partially
+        # written.
+        arrays = []
+        for c in self.columns:
+            try:
+                arrays.append(_build_array([r.get(c) for r in rows], self._field_types[c]))
+            except (pa.ArrowInvalid, pa.ArrowTypeError, pa.ArrowNotImplementedError, TypeError, ValueError) as exc:
+                raise TypeError(
+                    f"CHUNKED_WRITER_TYPE_MISMATCH: column {c!r} fixed as {self._field_types[c]!s}; "
+                    f"a later batch carries a value incompatible with that type ({exc})") from exc
         table = pa.Table.from_arrays(arrays, schema=self.schema)
         self._writer.write_table(table)
         for r in rows:
@@ -213,4 +254,4 @@ class ChunkedParquetWriter:
         }
 
 
-__all__ = ["ChunkedParquetWriter", "infer_arrow_type", "DEFAULT_BATCH_ROWS"]
+__all__ = ["ChunkedParquetWriter", "infer_arrow_type", "dtype_tag_to_arrow", "field_types_to_arrow", "DEFAULT_BATCH_ROWS"]
