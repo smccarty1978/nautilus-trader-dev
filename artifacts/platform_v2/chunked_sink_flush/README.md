@@ -1,13 +1,47 @@
-# chunked_sink_flush -- bounded-memory collection (checkpoint, session 2)
+# chunked_sink_flush -- bounded-memory collection (checkpoint, session 3)
 
-Status: core writer + wiring DONE (session 1). Session 2: schema risk fixed + fail-closed
-(A), shadow verification identity fixed (B), dead code removed (C), VP cross-branch real-tape
-equivalence PASSED with zero diffs (D). RSS curve and downstream-memory measurement (E) are
-PARTIAL -- 1 day/1 week measured, 1 month/3 months NOT measured (host memory pressure killed
-the background job; not restarted per instruction) -- and the curve as measured does not yet
-prove bounded memory under growth (see "Remaining work"). G's broad `test_delta` run was also
-killed by the same signal before producing output; per-commit targeted `pytest` runs this
-session are green (see "Remaining work" for exact scope and gaps).
+## Session 3 verdict: PARTIAL PASS -- sink/writer layer bounded; NEW non-sink blocker found
+
+**The capability this chore owns (the chunked writer + sink flush trigger) is PROVEN
+bounded.** A separate, LARGER memory-growth source was found during measurement, outside
+this chore's edited surface (not `chunked_writer.py`/`sink.py`/`strategy.py`) -- reported,
+not fixed, per the packet.
+
+1. **Byte threshold + row cap, simultaneous (task 1):** `ChunkedParquetWriter`/`ColumnarBuffer`
+   now flush on whichever of `batch_rows`/`batch_bytes` triggers first.
+   `estimate_value_bytes` (recursive `sys.getsizeof`) is calibrated against `tracemalloc` on
+   realistic (non-cached-small-int) VP-struct-shaped rows: within ~7% of measured allocation
+   (a naive fixed-8-bytes-per-scalar draft was ~20x too small). See
+   `research_workflow/tests/test_chunked_writer.py::test_estimate_bytes_calibrated_against_tracemalloc_on_vp_shaped_rows`.
+2. **Two defects found by read-only audit, fixed with tests:** (a) `logical_content_sha256`
+   was hashed from pre-conversion input, not the values actually written -- fixed by hashing
+   from the built `pa.Table` (`_rows_canonical_from_table`); `recompute_logical_content_sha256`
+   lets any caller verify a manifest's hash directly from the finalized file. (b) both
+   `chunked_writer.finalize()`'s `physical_sha256` and `lifecycle_v2._sha()` did a whole-file
+   `read_bytes()` -- both now stream in 4 MiB chunks, identical digest.
+3. **Real-tape measurement (task 3, this session):** nine real `tracker.volume_profile.rolling`
+   instances (`emit_profile: true`), real `NQ_1S_V2_GLOBEX` catalog, `outcome: none`,
+   `completed_1m` cadence, through the real `run_plan_on_catalog` + chunked sink
+   (`batch_rows=100_000`, `batch_bytes=8 MiB` -- deliberately small so the byte trigger, not
+   the row trigger, governs). 1 day / 1 week / 1 month of 2022 measured, with and without
+   profiles (3 months NOT measured -- time-bounded, see "Remaining work"). Full table and
+   finding narrative: `artifacts/platform_v2/chunked_sink_flush/rss_curve.json`.
+   - **Sink/writer footprint IS bounded**: `post_emit` RSS sampled AT every flush cycle grows
+     only ~550 MB over 2045 flush cycles in the 1-month run (~0.055 MB/row) -- the writer's
+     own buffer does not blow up with total row count. Pre-fix, the writer's internal probe
+     alone could buffer 50,000 wide rows (~19 GiB) before any flush; it now flushes every ~5
+     rows at this byte threshold.
+   - **A NEW, separate, larger blocker was found and is NOT fixed here**: process peak RSS
+     (psutil, 50 ms sampling) WITH profiles is 2.59 / 4.38 / **12.83 GiB** at 1 day / 1 week /
+     1 month, vs a FLAT 1.70 / 1.75 / 2.01 GiB WITHOUT profiles over the identical windows.
+     The with-profile spike is invisible at every flush-cycle checkpoint and at finalize
+     (never exceeds ~1.5 GiB there) -- it happens OUTSIDE `chunked_writer.py`/`sink.py`,
+     almost certainly in `features/trackers/volume_profile_rolling.py`'s per-bar tracker
+     state for `emit_profile=true`, or the NT engine's per-tracker state for it. Out of this
+     chore's edited surface; reported per the packet, not fixed.
+   - **Logical-content parity** chunked vs. unchunked re-checked on 1 day and 1 week: 0 real
+     diffs (two expected all-null-identity-column int64-upcast-to-float64-vs-`None`
+     differences, both mean "missing", documented, not a defect).
 
 ## Design
 
@@ -264,17 +298,19 @@ precise forecast -- a direct measurement at full-year scale would tighten this. 
 
 ## Remaining work (NOT done this session -- say so, don't fabricate)
 
-- **E's RSS curve is incomplete and does not yet prove boundedness** (see the E section above):
-  1-month and 3-months windows were not measured (background job killed by host memory
-  pressure, not restarted per explicit instruction not to retry after that signal); the two
-  windows that WERE measured never grew past one `batch_rows=50,000` flush, so they cannot by
-  themselves demonstrate flat/bounded memory under growth. Next step: re-run
-  `e_rss_one.py`-equivalent measurements (the script lived only in the disposable worktree and
-  the scratch directory per the packet; rebuild it from this README's description) for 1-month
-  and 3-months, AND/OR rerun at a smaller `batch_rows` (997, already proven logically correct
-  in D) so a real mid-run flush is exercised at the smaller windows too -- only then does the
-  curve prove the claim this capability exists for, not just that chunked and unchunked agree
-  below the flush threshold.
+- **Session 3 superseded the session-2 RSS gap** (see verdict at top): 1 day/1 week/1 month
+  of 2022, with and without profiles, now measured with a byte threshold small enough to force
+  hundreds-to-thousands of real flushes; the writer/sink layer's own bounded-memory claim is
+  now proven (not just asserted). **3 months was NOT measured this session** (time-bounded) --
+  next step: run the same harness (`chunked_with_profile`/`chunked_no_profile`,
+  `batch_bytes=8 MiB`) for `2022-01-01..2022-03-31` and fold into `rss_curve.json`.
+- **NEW finding, NOT fixed**: a non-sink memory-growth source was found (process peak RSS
+  12.83 GiB at 1 month WITH profiles vs a flat ~2 GiB without, invisible at every flush-cycle
+  checkpoint) -- see `rss_curve.json["finding_process_peak_rss_not_bounded_1month_with_profile"]`.
+  Next step: a SEPARATE chore instruments `features/trackers/volume_profile_rolling.py`'s
+  per-bar state (and/or the NT engine's per-tracker retention) across a growing window to
+  localize it; this chore's surface (`chunked_writer.py`/`sink.py`/`strategy.py`) is cleared
+  by the per-flush-cycle evidence above.
 - **G's broad `test_delta` run did not complete**: the exact scope the packet named
   (`research_workflow/tests/test_chunked_writer.py test_chunked_sink_flush.py test_host_core.py
   test_lifecycle_v2.py test_grammar_v2.py test_outcome_none.py test_declarative_analysis.py

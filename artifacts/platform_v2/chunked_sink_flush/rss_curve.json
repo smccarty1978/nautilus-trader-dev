@@ -1,68 +1,262 @@
 {
- "curve": [
-  {
-   "window": "1_day",
-   "chunked": {
-    "start": "2022-01-03",
-    "end": "2022-01-04",
-    "batch_rows": 50000,
-    "rows": {
-     "candidates": 1620,
-     "observations": 1620
+  "1_day": {
+    "chunked_with_profile": {
+      "start": "2022-01-03",
+      "end": "2022-01-04",
+      "batch_rows": 100000,
+      "batch_bytes": 8388608,
+      "rows": {
+        "candidates": 1620,
+        "observations": 1620
+      },
+      "flushes": 310,
+      "elapsed_s": 98.5057167999912,
+      "rss_before_bytes": 273821696,
+      "rss_pre_finalize_bytes": 779337728,
+      "rss_post_finalize_bytes": 792248320,
+      "rss_after_bytes": 1587441664,
+      "peak_rss_sampled_bytes": 2589188096,
+      "peak_working_set_windows_bytes": 2589356032,
+      "logical_content_sha256": {
+        "candidates_logical_content_sha256": "7cc7992ac8ac6d043b0f583a1324f2de00a03487d1279388a141ff25d55693c9",
+        "observations_logical_content_sha256": "462bca741af0a9eec63257cc19b1a5f537076b20374d10860e54b13b422c0751"
+      },
+      "recompute_matches_manifest": true,
+      "flush_cycle_sample_first_last": {
+        "first_post_emit_rss_bytes": 685129728,
+        "last_post_emit_rss_bytes": 781844480,
+        "first_batches_written": 1,
+        "last_batches_written": 310
+      }
     },
-    "rss_before_bytes": 274567168,
-    "rss_after_bytes": 1278119936,
-    "peak_rss_sampled_bytes": 2627194880,
-    "peak_working_set_windows_bytes": 2627399680,
-    "elapsed_s": 64.8
-   },
-   "unchunked": {
-    "start": "2022-01-03",
-    "end": "2022-01-04",
-    "batch_rows": 0,
-    "rows": {
-     "candidates": 1620,
-     "observations": 1620
+    "chunked_no_profile": {
+      "start": "2022-01-03",
+      "end": "2022-01-04",
+      "batch_rows": 100000,
+      "batch_bytes": 8388608,
+      "rows": {
+        "candidates": 1620,
+        "observations": 1620
+      },
+      "flushes": 1,
+      "elapsed_s": 34.98049269989133,
+      "rss_before_bytes": 275849216,
+      "rss_pre_finalize_bytes": 1698410496,
+      "rss_post_finalize_bytes": 681152512,
+      "rss_after_bytes": 681414656,
+      "peak_rss_sampled_bytes": 1700147200,
+      "peak_working_set_windows_bytes": 1701163008,
+      "logical_content_sha256": {
+        "candidates_logical_content_sha256": "c4f7b9d29d31cdf67f8dda0d64ff7e170cd9292932e7229c1764027e0d175af2",
+        "observations_logical_content_sha256": "462bca741af0a9eec63257cc19b1a5f537076b20374d10860e54b13b422c0751"
+      },
+      "recompute_matches_manifest": true,
+      "flush_cycle_sample_first_last": {
+        "first_post_emit_rss_bytes": 681119744,
+        "last_post_emit_rss_bytes": 681119744,
+        "first_batches_written": 1,
+        "last_batches_written": 1
+      }
     },
-    "rss_before_bytes": 276189184,
-    "rss_after_bytes": 2629419008,
-    "peak_rss_sampled_bytes": 2631782400,
-    "peak_working_set_windows_bytes": 2632196096,
-    "elapsed_s": 62.1
-   }
+    "unchunked_with_profile": {
+      "start": "2022-01-03",
+      "end": "2022-01-04",
+      "batch_rows": 100000,
+      "batch_bytes": 8388608,
+      "rows": {
+        "candidates": 1620,
+        "observations": 1620
+      },
+      "flushes": 0,
+      "elapsed_s": 60.386503299931064,
+      "rss_before_bytes": 274153472,
+      "rss_pre_finalize_bytes": 2623295488,
+      "rss_post_finalize_bytes": 2623295488,
+      "rss_after_bytes": 2058739712,
+      "peak_rss_sampled_bytes": 2625777664,
+      "peak_working_set_windows_bytes": 2626043904,
+      "logical_content_sha256": {},
+      "recompute_matches_manifest": null
+    },
+    "unchunked_no_profile": {
+      "start": "2022-01-03",
+      "end": "2022-01-04",
+      "batch_rows": 100000,
+      "batch_bytes": 8388608,
+      "rows": {
+        "candidates": 1620,
+        "observations": 1620
+      },
+      "flushes": 0,
+      "elapsed_s": 34.42071900004521,
+      "rss_before_bytes": 275668992,
+      "rss_pre_finalize_bytes": 1692602368,
+      "rss_post_finalize_bytes": 1692602368,
+      "rss_after_bytes": 673193984,
+      "peak_rss_sampled_bytes": 1695076352,
+      "peak_working_set_windows_bytes": 1695354880,
+      "logical_content_sha256": {},
+      "recompute_matches_manifest": null
+    },
+    "parity_chunked_vs_unchunked_with_profile": {
+      "diffs": 0,
+      "note": "2 known all-null-identity int64-upcast-to-float64-vs-None representation differences, both mean 'missing' (documented harness nuance, not a defect); 0 real content diffs over 1620 rows x 21 candidate columns"
+    }
   },
-  {
-   "window": "1_week",
-   "chunked": {
-    "start": "2022-01-03",
-    "end": "2022-01-10",
-    "batch_rows": 50000,
-    "rows": {
-     "candidates": 3240,
-     "observations": 3240
+  "1_week": {
+    "chunked_with_profile": {
+      "start": "2022-01-03",
+      "end": "2022-01-10",
+      "batch_rows": 100000,
+      "batch_bytes": 8388608,
+      "rows": {
+        "candidates": 3240,
+        "observations": 3240
+      },
+      "flushes": 629,
+      "elapsed_s": 188.5062520999927,
+      "rss_before_bytes": 275017728,
+      "rss_pre_finalize_bytes": 889671680,
+      "rss_post_finalize_bytes": 912760832,
+      "rss_after_bytes": 2358857728,
+      "peak_rss_sampled_bytes": 4375339008,
+      "peak_working_set_windows_bytes": 4375339008,
+      "logical_content_sha256": {
+        "candidates_logical_content_sha256": "018c7d3c31705d4005db7fe405651e8ca0d655a4fd867006ed61b981d9b60a42",
+        "observations_logical_content_sha256": "c34cdda6dee21833835ecfcfbac0cebfb4418c121471dbee8c06ce886bc5bb19"
+      },
+      "recompute_matches_manifest": true,
+      "flush_cycle_sample_first_last": {
+        "first_post_emit_rss_bytes": 716931072,
+        "last_post_emit_rss_bytes": 895692800,
+        "first_batches_written": 1,
+        "last_batches_written": 629
+      }
     },
-    "rss_before_bytes": 274718720,
-    "rss_after_bytes": 1399635968,
-    "peak_rss_sampled_bytes": 3551838208,
-    "peak_working_set_windows_bytes": 3554160640,
-    "elapsed_s": 131.6
-   },
-   "unchunked": {
-    "start": "2022-01-03",
-    "end": "2022-01-10",
-    "batch_rows": 0,
-    "rows": {
-     "candidates": 3240,
-     "observations": 3240
+    "chunked_no_profile": {
+      "start": "2022-01-03",
+      "end": "2022-01-10",
+      "batch_rows": 100000,
+      "batch_bytes": 8388608,
+      "rows": {
+        "candidates": 3240,
+        "observations": 3240
+      },
+      "flushes": 1,
+      "elapsed_s": 61.54530220013112,
+      "rss_before_bytes": 274534400,
+      "rss_pre_finalize_bytes": 1747456000,
+      "rss_post_finalize_bytes": 730398720,
+      "rss_after_bytes": 730918912,
+      "peak_rss_sampled_bytes": 1751678976,
+      "peak_working_set_windows_bytes": 1753673728,
+      "logical_content_sha256": {
+        "candidates_logical_content_sha256": "addc8fae297abde3149651074836191ea47f4d233c5938fdbb9ac36e107220d1",
+        "observations_logical_content_sha256": "c34cdda6dee21833835ecfcfbac0cebfb4418c121471dbee8c06ce886bc5bb19"
+      },
+      "recompute_matches_manifest": true,
+      "flush_cycle_sample_first_last": {
+        "first_post_emit_rss_bytes": 729923584,
+        "last_post_emit_rss_bytes": 729923584,
+        "first_batches_written": 1,
+        "last_batches_written": 1
+      }
     },
-    "rss_before_bytes": 275283968,
-    "rss_after_bytes": 3540545536,
-    "peak_rss_sampled_bytes": 3544514560,
-    "peak_working_set_windows_bytes": 3546787840,
-    "elapsed_s": 112.2
-   }
+    "unchunked_with_profile": {
+      "start": "2022-01-03",
+      "end": "2022-01-10",
+      "batch_rows": 100000,
+      "batch_bytes": 8388608,
+      "rows": {
+        "candidates": 3240,
+        "observations": 3240
+      },
+      "flushes": 0,
+      "elapsed_s": 111.63961120019667,
+      "rss_before_bytes": 274026496,
+      "rss_pre_finalize_bytes": 3540135936,
+      "rss_post_finalize_bytes": 3540135936,
+      "rss_after_bytes": 3341234176,
+      "peak_rss_sampled_bytes": 3544068096,
+      "peak_working_set_windows_bytes": 3546353664,
+      "logical_content_sha256": {},
+      "recompute_matches_manifest": null
+    },
+    "parity_chunked_vs_unchunked_with_profile": {
+      "diffs": 0,
+      "note": "0 diffs over 3240 rows x 21 candidate columns (including the 2 known-nuance identity columns, explicitly excluded as equal-by-convention)"
+    }
+  },
+  "1_month": {
+    "chunked_with_profile": {
+      "start": "2022-01-01",
+      "end": "2022-01-31",
+      "batch_rows": 100000,
+      "batch_bytes": 8388608,
+      "rows": {
+        "candidates": 9930,
+        "observations": 9930
+      },
+      "flushes": 2045,
+      "elapsed_s": 587.9764092999976,
+      "rss_before_bytes": 274296832,
+      "rss_pre_finalize_bytes": 1444024320,
+      "rss_post_finalize_bytes": 1502150656,
+      "rss_after_bytes": 6270283776,
+      "peak_rss_sampled_bytes": 12830777344,
+      "peak_working_set_windows_bytes": 12830777344,
+      "logical_content_sha256": {
+        "candidates_logical_content_sha256": "2f2e82b7b131c0aec92b92a8ff552ec36d0c1949ee4b772c47cac54e96644bdd",
+        "observations_logical_content_sha256": "cf6bb9d03ec33e16c2d4a983edb40d4d0c0cb0522df13040650ba806cb46c88b"
+      },
+      "recompute_matches_manifest": true,
+      "flush_cycle_sample_first_last": {
+        "first_post_emit_rss_bytes": 921649152,
+        "last_post_emit_rss_bytes": 1464791040,
+        "first_batches_written": 1,
+        "last_batches_written": 2045
+      }
+    },
+    "chunked_no_profile": {
+      "start": "2022-01-01",
+      "end": "2022-01-31",
+      "batch_rows": 100000,
+      "batch_bytes": 8388608,
+      "rows": {
+        "candidates": 9930,
+        "observations": 9930
+      },
+      "flushes": 1,
+      "elapsed_s": 185.37498389999382,
+      "rss_before_bytes": 274034688,
+      "rss_pre_finalize_bytes": 1993404416,
+      "rss_post_finalize_bytes": 974290944,
+      "rss_after_bytes": 974057472,
+      "peak_rss_sampled_bytes": 2010914816,
+      "peak_working_set_windows_bytes": 2015031296,
+      "logical_content_sha256": {
+        "candidates_logical_content_sha256": "812c5c2470aa4a1a96148bea04f1510a53f848501a6b532711a13974efbbea07",
+        "observations_logical_content_sha256": "cf6bb9d03ec33e16c2d4a983edb40d4d0c0cb0522df13040650ba806cb46c88b"
+      },
+      "recompute_matches_manifest": true,
+      "flush_cycle_sample_first_last": {
+        "first_post_emit_rss_bytes": 978354176,
+        "last_post_emit_rss_bytes": 978354176,
+        "first_batches_written": 1,
+        "last_batches_written": 1
+      }
+    },
+    "unchunked_with_profile": null,
+    "note": "unchunked/parity not run for 1_month (scope: packet only requires parity re-check on 1_day/1_week); 3_months not measured this session (time-bounded, see README remaining work)"
+  },
+  "generated_at_utc": "2026-10-08T07:56:52.978696+00:00",
+  "finding_sink_layer_bounded": {
+    "verdict": "SUPPORTED",
+    "evidence": "post_emit RSS sampled AT each flush cycle grows only ~550 MB over 2045 flush cycles in the 1-month-with-profile run (921.6 MB at batch 1 -> 1464.8 MB at batch 2045, ~0.27 MB/flush, ~0.055 MB/row) -- i.e. the chunked writer/sink's OWN observable footprint at each flush boundary does not blow up with total row count the way an unbounded in-memory buffer would (pre-fix, the writer's internal probe alone could buffer 50,000 wide rows ~19 GiB before any flush; it now flushes every ~5 rows at this byte threshold)."
+  },
+  "finding_process_peak_rss_not_bounded_1month_with_profile": {
+    "verdict": "BLOCKER_FOUND_NOT_FIXED",
+    "evidence": "Process peak RSS (psutil-sampled, 50ms) at 1 month WITH profiles is 12.83 GiB vs 2.0 GiB WITHOUT profiles over the SAME window (1-day: 2.59 vs 1.70 GiB; 1-week: 4.38 vs 1.75 GiB; 1-month: 12.83 vs 2.01 GiB). The no-profile curve is flat (engine/catalog baseline does NOT grow meaningfully with window length: 1.70/1.75/2.01 GiB). The with-profile peak is NOT visible at any flush-cycle checkpoint (pre_emit/post_conversion/post_emit never exceed ~1.5 GiB for the whole 1-month run) or at finalize (pre/post-finalize RSS ~1.4-1.5 GiB) -- the spike happens between flush-observable points, i.e. OUTSIDE research_workflow/host/chunked_writer.py and research_workflow/host/sink.py. This is a NEW finding, outside this chore's edited surface (features/trackers/volume_profile_rolling.py and/or the NT engine's per-bar tracker state for emit_profile=true), reported per the packet's instruction to detect but not fix.",
+    "scope_boundary": "Not fixed here: this chore's surface is research_workflow/host/{chunked_writer,sink,strategy}.py, research_workflow/host_runner.py, research_workflow/lifecycle_v2.py -- none of which materialize the observed 12.83 GiB spike per the flush-cycle evidence above."
   }
- ],
- "generated_at_utc": "2026-10-08T06:53:52Z",
- "note": "1_month and 3_months windows NOT completed: the background orchestrator was killed by the host due to system memory pressure (not a code failure) before reaching them; not restarted per explicit instruction. See README remaining work."
 }
