@@ -41,11 +41,13 @@ nq_poc_node_edge_rejection/poc_node.curve + vp_v1.value_area / profile); it is n
 """
 from __future__ import annotations
 
+import hashlib
 import json
 from collections import deque
+from dataclasses import dataclass
 from fractions import Fraction
 from functools import lru_cache
-from typing import Any, Dict, List, Mapping, Optional
+from typing import Any, Dict, List, Mapping, Optional, Tuple
 
 import numpy as np
 from numba import njit
@@ -177,6 +179,145 @@ def nodes(S, X, px, ip, val, vah, sig_t, tick):
         lvns.append(dict(id=i, center=float(px[v]), lo=lo_p, hi=hi_p, min_rel=float(s[v]),
                          depth=float(min(s[pk[i]], s[pk[i + 1]]) - s[v]), width_pts=hi_p - lo_p, hvn_below=i, hvn_above=i + 1))
     return hvns, lvns
+
+
+@dataclass(frozen=True)
+class VolumeProfileSnapshot:
+    """The typed, reconstructable profile object exposed when ``emit_profile: true`` (one per
+    tracker snapshot; null under the same reason as the scalar ``poc``). The persisted source of
+    truth is the raw int64 fixed-point weight vector ``weights_fp`` (scale ``weight_scale`` =
+    2**32); ``poc`` / ``vah`` / ``val`` / HVN / LVN are NOT stored here -- they are recomputed
+    deterministically by :meth:`reconstruct_poc_va_nodes`, which re-runs the kernel's own rule
+    (Gaussian smoothing by ``sigma_ticks``, the two-tick-pair value-area walk, the VP V1 node
+    rules) and must equal the binding's own scalar fields bit for bit.
+
+    Bin ``i`` is priced at ``(lo_tick + i) * tick``, ascending, trimmed to the OCCUPIED tick
+    range of the window (``[min occupied tick, max occupied tick]``), not the padded smoothing
+    grid the kernel uses internally to search for the POC.
+
+    ``contributions[i]`` is the rounded bar-tick contribution count at bin i (``range_uniform``
+    only; always 0 for ``full_per_tick`` / ``close``, whose weights are already exact integers --
+    no division, no rounding). It lets :meth:`reconstruct_poc_va_nodes` detect the SAME
+    rounding-bounded tie ambiguity the live kernel detects (``value_area_int``). Resolving a
+    flagged ambiguity exactly needs the pre-rounding rational volume per tick, which the rounded
+    weight vector alone cannot recover; ``exact_triplets`` (``(tick, n, volume)``, ``range_uniform``
+    only, ``None`` for the other two allocations where no tie can ever occur) carries exactly the
+    data the kernel's own ``_exact`` walk uses, so reconstruction is bit-exact even through a tie.
+
+    ``content_hash`` is sha256 over the canonical (sorted-key, no-whitespace) JSON of every field
+    except itself; two snapshots with identical data hash identically regardless of how the
+    window was assembled (incremental add/subtract vs. a scratch rebuild).
+    """
+
+    snapshot_ts: int                        # minute end (== the scalar snapshot's snapshot_ts)
+    segment_start_ts: int                   # first minute of the current roll segment (om[seg_start[p]])
+    horizon_open_minutes: int
+    allocation: str
+    window_minutes: int
+    window_complete: bool
+    roll_truncated: bool
+    window_start_ts: int
+    window_end_ts: int                      # == snapshot_ts
+    tick: float
+    lo_tick: int                            # integer price origin: bin 0 price == lo_tick * tick
+    n_bins: int
+    weights_fp: Tuple[int, ...]             # raw int64 fixed-point weights, ascending price
+    contributions: Tuple[int, ...]          # per-tick rounded bar-tick contribution counts
+    weight_scale: int                       # fixed-point scale (2 ** 32)
+    total_weight_fp: int                    # exact int64 sum of weights_fp
+    total_source_volume: float
+    volume_conserving: bool                 # False only for full_per_tick (traversal-weighted)
+    sigma_a: float
+    sigma_ticks: float
+    exact_triplets: Optional[Tuple[Tuple[int, int, int], ...]]  # (tick, n, volume); range_uniform only
+    content_hash: str
+
+    @staticmethod
+    def _payload(fields: Dict[str, Any]) -> bytes:
+        return json.dumps({k: v for k, v in fields.items() if k != "content_hash"},
+                           sort_keys=True, separators=(",", ":"), default=list).encode("utf-8")
+
+    @classmethod
+    def build(cls, **fields: Any) -> "VolumeProfileSnapshot":
+        h = hashlib.sha256(cls._payload(fields)).hexdigest()
+        return cls(**fields, content_hash=h)
+
+    def to_dict(self) -> Dict[str, Any]:
+        d = dict(self.__dict__)
+        d["weights_fp"] = list(self.weights_fp)
+        d["contributions"] = list(self.contributions)
+        d["exact_triplets"] = [list(t) for t in self.exact_triplets] if self.exact_triplets is not None else None
+        return d
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_dict(), sort_keys=True, separators=(",", ":"))
+
+    @classmethod
+    def from_json(cls, s: str) -> "VolumeProfileSnapshot":
+        d = dict(json.loads(s))
+        d["weights_fp"] = tuple(d["weights_fp"])
+        d["contributions"] = tuple(d["contributions"])
+        d["exact_triplets"] = tuple(tuple(t) for t in d["exact_triplets"]) if d.get("exact_triplets") is not None else None
+        return cls(**d)
+
+    def _exact_fractions(self, pad: int = 0) -> list:
+        """Exact per-tick rational weights, zero-padded by ``pad`` on each side so the index
+        space matches a Gaussian-smoothing-padded weight array of the same ``pad``."""
+        n = self.n_bins + 2 * pad
+        if self.exact_triplets is None:
+            return [Fraction(0)] * pad + [Fraction(int(x)) for x in self.weights_fp] + [Fraction(0)] * pad
+        E = [Fraction(0)] * n
+        for t, n_, vol in self.exact_triplets:
+            idx = t - self.lo_tick + pad
+            if 0 <= idx < n and vol:
+                E[idx] += Fraction(vol, n_)
+        return E
+
+    def reconstruct_poc_va_nodes(self, va_frac: float = 0.70) -> Dict[str, Any]:
+        """Recompute (poc, vah, val, va_weight_fraction, raw_poc, raw_vah, raw_val, hvns, lvns)
+        from ``weights_fp`` alone, by the kernel's own rule. Must equal the live snapshot's
+        scalar fields bit for bit (the reconstruction-equality regression test's oracle).
+
+        ``weights_fp`` is trimmed to the OCCUPIED tick range (the persisted, minimal source of
+        truth); the kernel's own node search instead runs on that range padded by
+        ``ceil(4 * sigma_ticks) + 2`` ticks of smoothing margin on each side (the same formula
+        ``VolumeProfileKernel.snapshot`` uses) so ``find_peaks`` / ``peak_widths`` see the curve
+        decay toward zero before hitting an array edge -- the padding is re-derived here (zeros,
+        exactly reproducible from ``sigma_ticks`` alone), never persisted.
+        """
+        Xi0 = np.asarray(self.weights_fp, np.int64)
+        Ci0 = np.asarray(self.contributions, np.int64)
+        pad = int(np.ceil(4 * self.sigma_ticks)) + 2
+        z = np.zeros(pad, np.int64)
+        Xi = np.concatenate([z, Xi0, z])
+        Ci = np.concatenate([z, Ci0, z])
+        X = Xi.astype(np.float64) / self.weight_scale
+        S = np.maximum(gaussian_filter1d(X, self.sigma_ticks, mode="constant"), 0.0)
+        px = (self.lo_tick - pad + np.arange(len(Xi))) * self.tick
+        ip = int(np.argmax(S))
+        ir = int(np.argmax(Xi))
+        exact = None
+        if Ci.any():
+            cand = np.flatnonzero(Xi + 0.5 * Ci >= Xi[ir] - 0.5 * Ci[ir])
+            if len(cand) > 1:
+                exact = self._exact_fractions(pad)
+                vals = [exact[c] for c in cand]
+                ir = int(cand[vals.index(max(vals))])
+        walks = []
+        for i0 in (ip, ir):
+            lo_i, hi_i, acc, amb = value_area_int(Xi, Ci, i0, va_frac, float(Xi.sum()), float(Ci.sum()))
+            if amb:
+                exact = exact if exact is not None else self._exact_fractions(pad)
+                lo_i, hi_i, fr = value_area_exact(exact, i0, va_frac)
+            else:
+                fr = float(acc) / float(Xi.sum())
+            walks.append((lo_i, hi_i, fr))
+        (l_, h_, frac), (lr, hr, _) = walks
+        poc, val, vah = float(px[ip]), float(px[l_]), float(px[h_])
+        hv, lv = nodes(S, X, px, ip, val, vah, self.sigma_ticks, self.tick)
+        return dict(poc=poc, vah=vah, val=val, va_weight_fraction=float(frac), raw_poc=float(px[ir]),
+                    raw_vah=float(px[hr]), raw_val=float(px[lr]), n_hvn=len(hv), n_lvn=len(lv),
+                    hvns_json=json.dumps(hv, separators=(",", ":")), lvns_json=json.dumps(lv, separators=(",", ":")))
 
 
 class _Buf:
@@ -358,6 +499,67 @@ class VolumeProfileKernel:
                 E[t - a] += Fraction(vol, n)
         return E
 
+    def raw_profile(self):
+        """Raw (lo_tick, X, C) of the CURRENT window trimmed to the occupied tick range (not the
+        padded smoothing grid); ``None`` if the window holds no weight."""
+        if self.base is None:
+            return None
+        nz = np.flatnonzero(self.X)
+        if len(nz) == 0:
+            return None
+        i0, i1 = int(nz[0]), int(nz[-1])
+        return i0 + self.base, self.X[i0:i1 + 1].copy(), self.C[i0:i1 + 1].copy()
+
+    def exact_triplets(self, a: int, b: int) -> Optional[tuple]:
+        """(tick, n, volume) triplets of the window on ticks a..b (range_uniform only; the only
+        allocation whose per-tick weight is a rounded division, hence the only one that can hide
+        an exact tie). ``None`` for the other allocations, whose weights are already exact."""
+        if self.alloc != "range_uniform":
+            return None
+        if not self.win:
+            return ()
+        keys = np.concatenate([w[5][0] for w in self.win if w[5] is not None])
+        vals = np.concatenate([w[5][1] for w in self.win if w[5] is not None])
+        if len(keys) == 0:
+            return ()
+        k, inv = np.unique(keys, return_inverse=True)
+        tv = np.zeros(len(k), np.int64)
+        np.add.at(tv, inv, vals)
+        out = []
+        for key, vol in zip(k.tolist(), tv.tolist()):
+            t, n = divmod(key, 4096)
+            if a <= t <= b and vol:
+                out.append((int(t), int(n), int(vol)))
+        return tuple(out)
+
+    def profile_snapshot(self, snap: Optional[Dict[str, Any]] = None) -> Optional["VolumeProfileSnapshot"]:
+        """The typed, reconstructable profile object of the latest closed minute; ``None`` under
+        the same null policy as the scalar ``poc`` (window < min_window or A undefined)."""
+        p = self.last_p
+        if p is None:
+            return None
+        snap = self.snapshot() if snap is None else snap
+        if snap is None or snap.get("poc") is None:
+            return None
+        rp = self.reset_pos(p)
+        start = max(p - self.h_min + 1, rp)
+        raw = self.raw_profile()
+        if raw is None:
+            return None
+        lo_tick, X_occ, C_occ = raw
+        a, b = int(lo_tick), int(lo_tick) + len(X_occ) - 1
+        trips = self.exact_triplets(a, b)
+        return VolumeProfileSnapshot.build(
+            snapshot_ts=int(self.om[p]), segment_start_ts=int(self.om[rp]), horizon_open_minutes=self.h_min,
+            allocation=self.alloc, window_minutes=int(snap["window_minutes"]), window_complete=bool(snap["window_complete"]),
+            roll_truncated=bool(snap["roll_truncated"]), window_start_ts=int(self.om[start]), window_end_ts=int(self.om[p]),
+            tick=self.tick, lo_tick=int(lo_tick), n_bins=int(len(X_occ)),
+            weights_fp=tuple(int(x) for x in X_occ.tolist()), contributions=tuple(int(x) for x in C_occ.tolist()),
+            weight_scale=int(FP), total_weight_fp=int(X_occ.sum()), total_source_volume=float(self.vol_in_win),
+            volume_conserving=self.alloc in ("range_uniform", "close"), sigma_a=self.sigma_a,
+            sigma_ticks=float(snap["sigma_ticks"]), exact_triplets=trips,
+        )
+
     # ----------------------------------------------------------------------------------------- snapshot
     def A(self, p: int) -> float:
         k = p - self.p0
@@ -425,11 +627,17 @@ class VolumeProfileKernel:
 class VolumeProfileRollingBinding(BaseBinding):
     CAPABILITY = "tracker.volume_profile.rolling"
     PARAMS = {"horizon_open_minutes": REQUIRED, "allocation": "range_uniform", "dataset": REQUIRED, "tick": 0.25, "sigma_a": 0.5,
-              "a_window": 390, "a_min_live": 30, "min_window": 30, "va_frac": 0.7}
+              "a_window": 390, "a_min_live": 30, "min_window": 30, "va_frac": 0.7, "emit_profile": False}
     INPUTS = {"bars": "stream"}
     FIELDS = ('snapshot_ts', 'window_minutes', 'window_complete', 'roll_truncated', 'A', 'sigma_ticks', 'win_lo', 'win_hi', 'profile_width',
               'total_source_volume', 'total_weight', 'n_occupied_bins', 'poc', 'vah', 'val', 'va_width', 'va_weight_fraction', 'raw_poc',
-              'raw_vah', 'raw_val', 'n_hvn', 'n_lvn', 'hvns_json', 'lvns_json', 'dropped_bars')
+              'raw_vah', 'raw_val', 'n_hvn', 'n_lvn', 'hvns_json', 'lvns_json', 'dropped_bars', 'profile_json', 'profile_hash')
+    # Fields that are declared but only ever populated (never silently null at compile time
+    # because a study forgot a parameter) when the named parameter holds the given value: a
+    # study that references one of these without the parameter gets a typed compile gap
+    # (research_workflow/grammar/compiler.py's _validate_ref / _compile_predicate), not a
+    # runtime null.
+    FIELD_REQUIRES_PARAM = {"profile_json": ("emit_profile", True), "profile_hash": ("emit_profile", True)}
     EPOCH_FIELDS = ()
     EVENTS = ('minute_closed',)
     SUBSCRIBES = ()
@@ -443,6 +651,7 @@ class VolumeProfileRollingBinding(BaseBinding):
         self.kernel = VolumeProfileKernel(om, rolls, int(pr["horizon_open_minutes"]), str(pr["allocation"]), float(pr["tick"]),
                                           float(pr["sigma_a"]), int(pr["a_window"]), int(pr["a_min_live"]), int(pr["min_window"]),
                                           float(pr["va_frac"]))
+        self.emit_profile = bool(pr["emit_profile"])
         for f in self.FIELDS:
             setattr(self, f, None)
 
@@ -454,6 +663,13 @@ class VolumeProfileRollingBinding(BaseBinding):
         snap = self.kernel.snapshot()                       # only the latest closed minute is observable now
         for f in self.FIELDS:
             setattr(self, f, snap.get(f))
+        if self.emit_profile:
+            obj = self.kernel.profile_snapshot(snap)
+            self.profile_json = obj.to_json() if obj is not None else None
+            self.profile_hash = obj.content_hash if obj is not None else None
+        else:
+            self.profile_json = None
+            self.profile_hash = None
         for p in closed:
             self.emit("minute_closed", {"snapshot_ts": int(self.kernel.om[p])})
 

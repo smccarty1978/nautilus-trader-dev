@@ -10,7 +10,8 @@ import numpy as np
 import pytest
 
 import features.trackers.volume_profile_rolling as VPR
-from features.trackers.volume_profile_rolling import FP, MIN_NS, NS, VolumeProfileKernel, VolumeProfileRollingBinding, open_minute_ends
+from features.trackers.volume_profile_rolling import (FP, MIN_NS, NS, VolumeProfileKernel, VolumeProfileRollingBinding,
+                                                       VolumeProfileSnapshot, open_minute_ends)
 from research_workflow.host.interfaces import BarView
 
 H = 10
@@ -204,3 +205,139 @@ def test_rounding_cannot_break_an_exact_value_area_tie():
     E = [Fraction(1), Fraction(0), Fraction(4), Fraction(1, 3) * 3, Fraction(0)]
     lo, hi, _ = value_area_exact(E, 2, 0.70)
     assert (lo, hi) == (0, 4)
+
+
+# ------------------------------------------------------------------------------ profile emission (G2)
+def _run_capture(bars, target_p, alloc="range_uniform", rolls=(), emit=True):
+    """Kernel run that snapshots minute ``target_p`` AT the moment it closes (never after later
+    minutes have mutated the rolling window arrays)."""
+    k = VolumeProfileKernel(OM, np.array(rolls, np.int64), H, alloc, **SMALL)
+    out: dict = {}
+
+    def cb(p):
+        if p == target_p:
+            out["snap"] = k.snapshot()
+            out["obj"] = k.profile_snapshot(out["snap"]) if emit else None
+
+    k.on_close = cb
+    for b in bars:
+        k.push(*b)
+    k.close_through(int(OM[-1]))
+    return k, out.get("snap"), out.get("obj")
+
+
+@pytest.mark.parametrize("alloc", ["range_uniform", "full_per_tick", "close"])
+def test_profile_object_reconstructs_scalar_outputs_exactly(alloc):
+    bars = _bars(10, per_minute=5)
+    k, snap, obj = _run_capture(bars, 20, alloc=alloc)
+    assert snap["poc"] is not None and obj is not None
+    rec = obj.reconstruct_poc_va_nodes(va_frac=k.va_frac)
+    for key in ("poc", "vah", "val", "va_weight_fraction", "raw_poc", "raw_vah", "raw_val", "n_hvn", "n_lvn", "hvns_json", "lvns_json"):
+        assert rec[key] == snap[key], (alloc, key)
+
+
+def test_profile_object_reconstructs_scalar_outputs_through_an_exact_value_area_tie():
+    """Object-level regression on the SAME oracle tie fixture as
+    ``test_rounding_cannot_break_an_exact_value_area_tie``: a rounded-weight vector whose bounded
+    walk is ambiguous reconstructs the full-width (0, 4) value area only because
+    ``exact_triplets`` carries the pre-rounding rational per-tick volumes."""
+    from features.trackers.volume_profile_rolling import VolumeProfileSnapshot
+    third = int(np.round(FP / 3))
+    X = (int(FP), 0, 4 * int(FP), 3 * third, 0)
+    C = (1, 0, 1, 3, 0)
+    trips = ((0, 1, 1), (2, 1, 4), (3, 3, 3))                            # -> exact fractions [1, 0, 4, 1, 0]
+    obj = VolumeProfileSnapshot.build(
+        snapshot_ts=0, segment_start_ts=0, horizon_open_minutes=H, allocation="range_uniform",
+        window_minutes=H, window_complete=True, roll_truncated=False, window_start_ts=0, window_end_ts=0,
+        tick=1.0, lo_tick=0, n_bins=5, weights_fp=X, contributions=C, weight_scale=int(FP),
+        total_weight_fp=int(sum(X)), total_source_volume=0.0, volume_conserving=True, sigma_a=0.0,
+        sigma_ticks=1e-9, exact_triplets=trips)
+    rec = obj.reconstruct_poc_va_nodes(va_frac=0.70)
+    assert rec["val"] == 0.0 and rec["vah"] == 4.0
+
+
+def test_emit_profile_false_leaves_every_existing_output_byte_identical(monkeypatch):
+    monkeypatch.setattr(VPR, "load_calendar", lambda ds: (OM, np.array([], np.int64)))
+    scalar_fields = [f for f in VolumeProfileRollingBinding.FIELDS if f not in ("profile_json", "profile_hash")]
+    bars = _bars(11)
+    off = VolumeProfileRollingBinding({"dataset": "X", "horizon_open_minutes": H, **SMALL}, {"bars": "s"})
+    on = VolumeProfileRollingBinding({"dataset": "X", "horizon_open_minutes": H, "emit_profile": True, **SMALL}, {"bars": "s"})
+    for ts, h, l, c, v in bars:
+        off.on_bar("bars", BarView("s", ts - NS, ts, c, h, l, c, v))
+        on.on_bar("bars", BarView("s", ts - NS, ts, c, h, l, c, v))
+    for f in scalar_fields:
+        assert getattr(off, f) == getattr(on, f), f
+    assert off.profile_json is None and off.profile_hash is None
+
+
+def test_profile_hash_is_deterministic_and_matches_an_identical_rebuild():
+    bars = _bars(12, per_minute=4)
+    _, _, obj1 = _run_capture(bars, 20)
+    _, _, obj2 = _run_capture(bars, 20)
+    assert obj1.content_hash == obj2.content_hash == VolumeProfileSnapshot.from_json(obj1.to_json()).content_hash
+    assert obj1.to_json() == obj2.to_json()
+
+
+def test_profile_object_is_causal_to_later_bars():
+    bars = _bars(13)
+    T = int(OM[20])
+    later = [(T + 5 * NS, 2000.0, 990.0, 1000.0, 1e6)] + [b for b in bars if b[0] > T + 5 * NS]
+    _, _, obj_a = _run_capture(bars, 20)
+    _, _, obj_b = _run_capture([x for x in bars if x[0] <= T] + later, 20)
+    assert obj_a.content_hash == obj_b.content_hash
+    _, _, obj_a21 = _run_capture(bars, 21)
+    _, _, obj_b21 = _run_capture([x for x in bars if x[0] <= T] + later, 21)
+    assert obj_a21.content_hash != obj_b21.content_hash                 # the altered minute itself does change
+
+
+def test_profile_object_null_before_min_window_and_roll_truncated_flag():
+    bars = _bars(14)
+    roll = int(OM[12])
+    _, snap13, obj13 = _run_capture(bars, 13, rolls=[roll])
+    assert snap13["poc"] is None and obj13 is None
+    _, snap15, obj15 = _run_capture(bars, 15, rolls=[roll])
+    assert obj15 is not None and obj15.roll_truncated and obj15.window_minutes == 3
+
+
+def test_profile_object_states_conservation_by_allocation():
+    bars = _bars(15, per_minute=4)
+    _, snap_ru, obj_ru = _run_capture(bars, 25, alloc="range_uniform")
+    _, snap_cl, obj_cl = _run_capture(bars, 25, alloc="close")
+    _, snap_fp, obj_fp = _run_capture(bars, 25, alloc="full_per_tick")
+    assert obj_ru.volume_conserving and obj_cl.volume_conserving and not obj_fp.volume_conserving
+    assert obj_ru.total_weight_fp / obj_ru.weight_scale == pytest.approx(snap_ru["total_weight"], rel=0, abs=1e-9)
+    assert obj_cl.total_weight_fp == int(round(snap_cl["total_weight"] * obj_cl.weight_scale))
+    assert obj_fp.total_weight_fp == int(round(snap_fp["total_weight"] * obj_fp.weight_scale))
+
+
+# --------------------------------------------------------------------- discoverability / compile gap
+def test_binding_declares_emit_profile_param_and_profile_fields():
+    assert "emit_profile" in VolumeProfileRollingBinding.PARAMS
+    assert VolumeProfileRollingBinding.PARAMS["emit_profile"] is False
+    assert "profile_json" in VolumeProfileRollingBinding.FIELDS and "profile_hash" in VolumeProfileRollingBinding.FIELDS
+    assert VolumeProfileRollingBinding.FIELD_REQUIRES_PARAM["profile_json"] == ("emit_profile", True)
+    assert VolumeProfileRollingBinding.FIELD_REQUIRES_PARAM["profile_hash"] == ("emit_profile", True)
+
+
+def test_referencing_profile_field_without_emit_profile_is_a_compile_gap():
+    from research_workflow.grammar.compiler import _check_field_requires_param
+
+    class _StubCtx:
+        def __init__(self, params):
+            self.trackers = [{"id": "vp", "params": params}]
+            self.gaps_seen = []
+
+        def gap(self, kind, where, msg, **kw):
+            self.gaps_seen.append((kind, where, msg))
+
+    off = _StubCtx({"emit_profile": False})
+    assert _check_field_requires_param(off, VolumeProfileRollingBinding, "vp", "profile_json", "context.vp.profile_json") is False
+    assert off.gaps_seen and "requires parameter emit_profile" in off.gaps_seen[0][2]
+
+    on = _StubCtx({"emit_profile": True})
+    assert _check_field_requires_param(on, VolumeProfileRollingBinding, "vp", "profile_json", "context.vp.profile_json") is True
+    assert not on.gaps_seen
+
+    unrelated = _StubCtx({"emit_profile": False})
+    assert _check_field_requires_param(unrelated, VolumeProfileRollingBinding, "vp", "poc", "context.vp.poc") is True
+    assert not unrelated.gaps_seen

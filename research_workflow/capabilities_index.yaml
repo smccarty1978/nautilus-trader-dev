@@ -52,9 +52,9 @@ trackers:
     promotion: {parity_artifact: artifacts/parity/regime_prior_level_snapshot.json, parity_sha256: 44643bd3bf86a8cf8c2d68f59974684ea92c31ea751e4b46bcab35705cb12bd6, promoted_at_utc: '2026-09-21T19:54:55.852635+00:00'}
   - id: tracker.volume_profile.rolling
     version: 1
-    description: Rolling volume-at-price profile over completed 1s bars, one snapshot per completed open minute; window = trailing horizon_open_minutes Globex open minutes (closures consume none; Friday -> Sunday continuous), roll-truncated, window_complete flag; allocation range_uniform (R0, conserving) | full_per_tick (traversal-weighted, NOT conserving) | close; price-axis Gaussian smoothing, POC, 70% two-tick-pair value area of the profile's own weight, raw-POC diagnostic, VP V1 HVN/LVN.
+    description: Rolling volume-at-price profile over completed 1s bars, one snapshot per completed open minute; window = trailing horizon_open_minutes Globex open minutes (closures consume none; Friday -> Sunday continuous), roll-truncated, window_complete flag; allocation range_uniform (R0, conserving) | full_per_tick (traversal-weighted, NOT conserving) | close; price-axis Gaussian smoothing, POC, 70% two-tick-pair value area of the profile's own weight, raw-POC diagnostic, VP V1 HVN/LVN. emit_profile (default false; byte-identical scalars when unset) additionally exposes a typed, reconstructable VolumeProfileSnapshot (profile_json/profile_hash fields) carrying the raw per-tick weight vector the scalars are derived from; referencing those two fields without setting emit_profile true is a compile-time gap, not a runtime null.
     implementation: features.trackers.volume_profile_rolling.VolumeProfileRollingBinding
-    parameters: [horizon_open_minutes, allocation, dataset, tick, sigma_a, a_window, a_min_live, min_window, va_frac]
+    parameters: [horizon_open_minutes, allocation, dataset, tick, sigma_a, a_window, a_min_live, min_window, va_frac, emit_profile]
     dependencies: [stream.completed_1s]
     update_cadence: per_source_bar
     required_tests: [features/tests/test_volume_profile_rolling.py]

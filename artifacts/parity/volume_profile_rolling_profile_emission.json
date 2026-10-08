@@ -1,0 +1,14 @@
+{
+  "capability": "tracker.volume_profile.rolling",
+  "change": "G2: optional emit_profile parameter (default false) + typed VolumeProfileSnapshot object (profile_json / profile_hash fields); scalar behaviour and the sealed R0 parity in volume_profile_rolling.json are untouched (emit_profile=false reproduces every prior output byte-identically).",
+  "oracle": "the kernel's own live scalar snapshot (poc, vah, val, va_weight_fraction, raw_poc, raw_vah, raw_val, n_hvn, n_lvn, hvns_json, lvns_json); VolumeProfileSnapshot.reconstruct_poc_va_nodes must reproduce it bit for bit from weights_fp/contributions/exact_triplets alone",
+  "method": "synthetic fixture only (features/tests/test_volume_profile_rolling.py); no tape data opened for this emission-only addition -- bounded-before-expensive, not validated against a real 2022/2023dev day before merge (see report)",
+  "criterion": "reconstruct_poc_va_nodes() == live snapshot fields for all three allocations (range_uniform, full_per_tick, close); equality preserved through the rounding-bounded exact value-area tie fixture (exact_triplets carries the pre-rounding rational data the rounded weight vector cannot); emit_profile=false leaves every pre-existing scalar FIELD byte-identical; content_hash deterministic across two independent builds of the same bars and across a to_json/from_json round trip; profile object is causal (immutable to bars after its own minute, changes only when its own minute's bars change); null under the same window/A policy as the scalar poc; roll_truncated and volume_conserving correctly stated per allocation",
+  "tests": "features/tests/test_volume_profile_rolling.py (23 passed, includes 11 new profile-emission tests) + research_workflow/tests/test_grammar_v2.py::test_referencing_profile_field_without_emit_profile style compile-gap coverage via the new _check_field_requires_param helper",
+  "passed": true,
+  "sha256": {
+    "features/trackers/volume_profile_rolling.py": "b8f597b3d9ebc2adc71a374e5ed74154807b31483972bc4d6bce9f3f2ec17dfa",
+    "features/tests/test_volume_profile_rolling.py": "67f805673409ba5ca60cdac68fbe7c175eed4f46019fd6fc6cfbd22fff5dcb9c"
+  },
+  "not_done": "no run against artifacts/parity/volume_profile_rolling_r0_2022.json / 2023dev real-tape ledgers for the NEW profile object specifically (the original R0 scalar parity in volume_profile_rolling.json is unaffected and was not re-run); recommend a scripts/parity_volume_profile_rolling.py-style real-day reconstruction check before this emission is relied on by studies/nq_vp_representation"
+}

@@ -693,6 +693,26 @@ def _resolve_features(ctx: _Ctx) -> None:
 # --------------------------------------------------------------------------- #
 # references and predicates
 # --------------------------------------------------------------------------- #
+def _check_field_requires_param(ctx: "_Ctx", cls: Any, root: str, field: str, where: str, *, predicate: Optional[str] = None) -> bool:
+    """A binding may declare ``FIELD_REQUIRES_PARAM = {field: (param_name, required_value)}`` for
+    a field that is only ever populated under one parameterization (e.g. an optional typed
+    emission gated by a boolean switch). A study referencing such a field without the matching
+    parameter gets a typed INVALID_PARAMETERIZATION compile gap here, never a silent runtime
+    null."""
+    req = getattr(cls, "FIELD_REQUIRES_PARAM", {}).get(field)
+    if req is None:
+        return True
+    pname, pvalue = req
+    inst = next((t for t in ctx.trackers if t["id"] == root), None)
+    if inst is not None and inst["params"].get(pname) != pvalue:
+        kwargs = {"predicate": predicate} if predicate else {}
+        ctx.gap(GapKind.INVALID_PARAMETERIZATION, where,
+                f"{root} ({cls.CAPABILITY}) field {field!r} requires parameter {pname}={pvalue!r} "
+                f"(got {inst['params'].get(pname)!r})", **kwargs)
+        return False
+    return True
+
+
 def _validate_ref(ctx: _Ctx, ref: Any, where: str, *, allow_epoch: bool = True) -> bool:
     if not isinstance(ref, str) or not ref:
         ctx.gap(GapKind.INVALID_PARAMETERIZATION, where, f"expected a reference string, got {ref!r}")
@@ -720,6 +740,8 @@ def _validate_ref(ctx: _Ctx, ref: Any, where: str, *, allow_epoch: bool = True) 
         if head not in cls.FIELDS and head not in cls.EPOCH_FIELDS and head not in _EVENT_ATTRS and not hasattr(cls, head):
             ctx.gap(GapKind.INVALID_PARAMETERIZATION, where, f"{root} ({cls.CAPABILITY}) has no field {head!r}",
                     closest=_closest(head, list(cls.FIELDS) + list(cls.EPOCH_FIELDS)))
+            return False
+        if not _check_field_requires_param(ctx, cls, root, head, where):
             return False
     return True
 
@@ -762,6 +784,8 @@ def _compile_predicate(ctx: _Ctx, text: Optional[str], where: str, *, allow_even
             elif attr not in cls.FIELDS and attr not in cls.EPOCH_FIELDS and not hasattr(cls, attr):
                 ctx.gap(GapKind.INVALID_PARAMETERIZATION, where, f"{root} ({cls.CAPABILITY}) has no field {attr!r}",
                         predicate=text, closest=_closest(attr, list(cls.FIELDS) + list(cls.EPOCH_FIELDS)))
+                ok = False
+            elif not _check_field_requires_param(ctx, cls, root, attr, where, predicate=text):
                 ok = False
     if not ok:
         return None
