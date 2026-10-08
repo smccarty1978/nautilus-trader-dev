@@ -251,6 +251,34 @@ def authorized_years(plan: Dict[str, Any], period: str, requested: Optional[Sequ
     return req
 
 
+def _write_merged_parquet(frame: Any, path: Path, sources: Sequence[Path], order: Any) -> None:
+    """Write one merged file. Partitions with a nested (struct/list) column are merged in Arrow.
+
+    ``frame`` is the KEY-sorted pandas concatenation of ``sources``; ``order`` is the positional
+    permutation that sorted it. A pandas round trip is lossy for a typed nested column (e.g. a
+    tracker's declared ``profile`` struct written by the chunked collection writer): pyarrow's
+    ``to_pandas`` turns an int64 struct child into Python floats in any row group where that child
+    has a null, and ``to_parquet`` then re-infers the type and fails (``ArrowInvalid ... not
+    exactly representable``) or silently writes doubles. Such partitions are therefore merged as
+    their own Arrow tables -- identical schema required -- concatenated in the same order and
+    permuted by the same ``order``, so population, ordering and values equal the pandas path's
+    while every typed field keeps its declared type. Partitions with no nested column take the
+    unchanged ``to_parquet`` path, byte for byte.
+    """
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+    schemas = [pq.read_schema(p) for p in sources]
+    if not schemas or not any(pa.types.is_nested(f.type) for f in schemas[0]):
+        frame.to_parquet(path, index=False)
+        return
+    if any(not s.remove_metadata().equals(schemas[0].remove_metadata()) for s in schemas[1:]):
+        raise LifecycleV2Error(f"MERGE_NESTED_SCHEMA_MISMATCH: partitions of {path.name} carry different Arrow schemas")
+    table = pa.concat_tables([pq.read_table(p) for p in sources])
+    if table.num_rows != len(frame) or list(table.column_names) != [str(c) for c in frame.columns]:
+        raise LifecycleV2Error(f"MERGE_NESTED_SCHEMA_MISMATCH: {path.name} Arrow table does not match the merged frame")
+    pq.write_table(table.take(pa.array(order, type=pa.int64())), path)
+
+
 def _merge_window_stats(stats: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
     """Aggregate per-window run stats into one partition-level record.
 
@@ -1156,10 +1184,15 @@ class V2Lifecycle:
         obs = pd.concat([pd.read_parquet(base / str(y) / "observations.parquet") for y in years], ignore_index=True)
         if len(cands) and cands.duplicated(list(KEY)).any():
             raise LifecycleV2Error("MERGE_DUPLICATE_KEYS")
-        cands = cands.sort_values(list(KEY), kind="mergesort").reset_index(drop=True)
-        obs = obs.sort_values(list(KEY), kind="mergesort").reset_index(drop=True)
+        # The stable KEY order, kept as positions so a nested-column merge can apply the SAME
+        # permutation to the partitions' own Arrow tables (_write_merged_parquet).
+        c_order = cands.sort_values(list(KEY), kind="mergesort").index.to_numpy()
+        o_order = obs.sort_values(list(KEY), kind="mergesort").index.to_numpy()
+        cands = cands.iloc[c_order].reset_index(drop=True)
+        obs = obs.iloc[o_order].reset_index(drop=True)
         out = self.work / "merged"; out.mkdir(parents=True, exist_ok=True)
-        cands.to_parquet(out / "candidates.parquet", index=False); obs.to_parquet(out / "observations.parquet", index=False)
+        _write_merged_parquet(cands, out / "candidates.parquet", [base / str(y) / "candidates.parquet" for y in years], c_order)
+        _write_merged_parquet(obs, out / "observations.parquet", [base / str(y) / "observations.parquet" for y in years], o_order)
         # PERSISTED-SCHEMA ASSERTION. The sink buffers from the kernel's own column list, so a
         # column the plan declares can be emitted into the row dict and then silently dropped on
         # the way to parquet -- that is exactly how a whole C1 terminal block went missing from a
