@@ -26,6 +26,38 @@ additive `causal_scope_audit` block naming the affected run/window and marking i
 See `rss_curve_v2.json` and `causal_scope.json` for the session-4 real-tape measurement and
 its verdicts.
 
+## Session 4 real-tape run (ONE representative run, collapsed Task C+D)
+
+Nine real `tracker.volume_profile.rolling` instances, `emit_profile: true`, real
+`NQ_1S_V2_GLOBEX` catalog, `outcome: none`, `completed_1m` cadence, the module's PRODUCTION
+DEFAULT `batch_bytes` (256 MiB, not the 8 MiB stress setting used in prior sessions), window
+`2022-01-10..2022-02-09` (warmup lands fully inside 2022 -- replayed bar range actually
+observed: `2022-01-05T00:00:00Z .. 2022-02-09T23:59:00Z`). Run via the new phase-separated
+harness (`harness/run_watched.py`), in the disposable worktree
+`Nautilus Trader-chunked_meas_tmp` (`main` + `chore/vp_profile_snapshot` +
+`chore/chunked_sink_flush`@`e23bcad4`, both merges clean), as a fully detached process, 8 GiB
+watchdog on both the collection and verification subprocesses.
+
+| metric | value |
+|---|---|
+| rows (candidates/observations) | 10,335 / 10,335 |
+| flushes / row groups | 71 |
+| mean rows per row group | ~146 |
+| file size | 175,010,400 bytes |
+| collect peak RSS (replay phase) | 2.02 GiB |
+| flush-cycle RSS series | ~1.2-1.5 GiB, flat, no growth trend over 71 flushes |
+| verify (separate subprocess) peak RSS | 0.52 GiB |
+| verify matches manifest | true |
+| collect watchdog peak RSS | 2.03 GiB |
+| verify watchdog peak RSS | 0.53 GiB |
+
+**HASH_STREAMING_PARITY: PASS.** **COLLECTION_MEMORY: PASS** (2.02 GiB well under the 8 GiB
+budget; the session-3 12.83 GiB figure was the read-back defect, now retracted).
+**ROW_GROUP_FEASIBILITY: PASS** (71 row groups at the production default vs. 2,127 at the
+8 MiB stress setting for a similar row count -- the default does not need coalescing).
+**CAUSAL_DATA_SCOPE: PASS** for this run. Full evidence:
+`rss_curve_v2.json`, `rowgroups.json`, `hash_streaming_parity.json`, `causal_scope.json`.
+
 ## Session 3 verdict: PARTIAL PASS -- sink/writer layer bounded; NEW non-sink blocker found (SUPERSEDED, see above)
 
 **The capability this chore owns (the chunked writer + sink flush trigger) is PROVEN

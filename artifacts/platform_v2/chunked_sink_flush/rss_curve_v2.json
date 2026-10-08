@@ -1,0 +1,399 @@
+{
+ "run": "1_month_2022_01_10_to_02_09_production_default_batch_bytes",
+ "harness": "artifacts/platform_v2/chunked_sink_flush/harness/{collect,verify,run_watched}.py",
+ "repo_state": "disposable worktree Nautilus-Trader-chunked_meas_tmp: main + chore/vp_profile_snapshot + chore/chunked_sink_flush (this branch, commit e23bcad4), both merges clean",
+ "requested_window": [
+  "2022-01-10",
+  "2022-02-09"
+ ],
+ "batch_bytes": 268435456,
+ "batch_rows": 100000,
+ "profile": true,
+ "causal_data_scope": {
+  "first_bar_iso": "2022-01-05T00:00:00+00:00",
+  "last_bar_iso": "2022-02-09T23:59:00+00:00",
+  "PASS": true
+ },
+ "rows": {
+  "candidates": 10335,
+  "observations": 10335
+ },
+ "flushes": 71,
+ "epochs": 35640,
+ "replay_s": 524.5674775999505,
+ "collect_peak_rss_bytes": 2165018624,
+ "collect_phase_peaks_bytes": {
+  "init": 300711936,
+  "setup": 300711936,
+  "replay": 2165018624,
+  "post_replay": 1347874816,
+  "finalize": 1356587008,
+  "post_finalize": 1348653056,
+  "end": 1351147520
+ },
+ "collect_watchdog_peak_rss_bytes": 2176020480,
+ "collect_wall_s": 548.2389948368073,
+ "flush_cycle_rss_series": [
+  {
+   "epochs": 2267,
+   "rss_bytes": 1293901824,
+   "batches_written": 1
+  },
+  {
+   "epochs": 2267,
+   "rss_bytes": 1221349376,
+   "batches_written": 2
+  },
+  {
+   "epochs": 2535,
+   "rss_bytes": 1336365056,
+   "batches_written": 3
+  },
+  {
+   "epochs": 2535,
+   "rss_bytes": 1245589504,
+   "batches_written": 4
+  },
+  {
+   "epochs": 3844,
+   "rss_bytes": 1346736128,
+   "batches_written": 5
+  },
+  {
+   "epochs": 3844,
+   "rss_bytes": 1278808064,
+   "batches_written": 6
+  },
+  {
+   "epochs": 5124,
+   "rss_bytes": 1366880256,
+   "batches_written": 7
+  },
+  {
+   "epochs": 5124,
+   "rss_bytes": 1296936960,
+   "batches_written": 8
+  },
+  {
+   "epochs": 5390,
+   "rss_bytes": 1372803072,
+   "batches_written": 9
+  },
+  {
+   "epochs": 5390,
+   "rss_bytes": 1299898368,
+   "batches_written": 10
+  },
+  {
+   "epochs": 6614,
+   "rss_bytes": 1388445696,
+   "batches_written": 11
+  },
+  {
+   "epochs": 6614,
+   "rss_bytes": 1303457792,
+   "batches_written": 12
+  },
+  {
+   "epochs": 7901,
+   "rss_bytes": 1389903872,
+   "batches_written": 13
+  },
+  {
+   "epochs": 7901,
+   "rss_bytes": 1315758080,
+   "batches_written": 14
+  },
+  {
+   "epochs": 9328,
+   "rss_bytes": 1392947200,
+   "batches_written": 15
+  },
+  {
+   "epochs": 9328,
+   "rss_bytes": 1323761664,
+   "batches_written": 16
+  },
+  {
+   "epochs": 10580,
+   "rss_bytes": 1401905152,
+   "batches_written": 17
+  },
+  {
+   "epochs": 10580,
+   "rss_bytes": 1313558528,
+   "batches_written": 18
+  },
+  {
+   "epochs": 10879,
+   "rss_bytes": 1412857856,
+   "batches_written": 19
+  },
+  {
+   "epochs": 10879,
+   "rss_bytes": 1319702528,
+   "batches_written": 20
+  },
+  {
+   "epochs": 13278,
+   "rss_bytes": 1403768832,
+   "batches_written": 21
+  },
+  {
+   "epochs": 13278,
+   "rss_bytes": 1331920896,
+   "batches_written": 22
+  },
+  {
+   "epochs": 14627,
+   "rss_bytes": 1409515520,
+   "batches_written": 23
+  },
+  {
+   "epochs": 14627,
+   "rss_bytes": 1350721536,
+   "batches_written": 24
+  },
+  {
+   "epochs": 15979,
+   "rss_bytes": 1435017216,
+   "batches_written": 25
+  },
+  {
+   "epochs": 15979,
+   "rss_bytes": 1362903040,
+   "batches_written": 26
+  },
+  {
+   "epochs": 17262,
+   "rss_bytes": 1442242560,
+   "batches_written": 27
+  },
+  {
+   "epochs": 17262,
+   "rss_bytes": 1343340544,
+   "batches_written": 28
+  },
+  {
+   "epochs": 17474,
+   "rss_bytes": 1449218048,
+   "batches_written": 29
+  },
+  {
+   "epochs": 17474,
+   "rss_bytes": 1372041216,
+   "batches_written": 30
+  },
+  {
+   "epochs": 18656,
+   "rss_bytes": 1443663872,
+   "batches_written": 31
+  },
+  {
+   "epochs": 18656,
+   "rss_bytes": 1373249536,
+   "batches_written": 32
+  },
+  {
+   "epochs": 18805,
+   "rss_bytes": 1450749952,
+   "batches_written": 33
+  },
+  {
+   "epochs": 18805,
+   "rss_bytes": 1371533312,
+   "batches_written": 34
+  },
+  {
+   "epochs": 18952,
+   "rss_bytes": 1429364736,
+   "batches_written": 35
+  },
+  {
+   "epochs": 18952,
+   "rss_bytes": 1354350592,
+   "batches_written": 36
+  },
+  {
+   "epochs": 20122,
+   "rss_bytes": 1454583808,
+   "batches_written": 37
+  },
+  {
+   "epochs": 20122,
+   "rss_bytes": 1386692608,
+   "batches_written": 38
+  },
+  {
+   "epochs": 21332,
+   "rss_bytes": 1464434688,
+   "batches_written": 39
+  },
+  {
+   "epochs": 21332,
+   "rss_bytes": 1385254912,
+   "batches_written": 40
+  },
+  {
+   "epochs": 21616,
+   "rss_bytes": 1448615936,
+   "batches_written": 41
+  },
+  {
+   "epochs": 21616,
+   "rss_bytes": 1374056448,
+   "batches_written": 42
+  },
+  {
+   "epochs": 22768,
+   "rss_bytes": 1459609600,
+   "batches_written": 43
+  },
+  {
+   "epochs": 22768,
+   "rss_bytes": 1386967040,
+   "batches_written": 44
+  },
+  {
+   "epochs": 22976,
+   "rss_bytes": 1463631872,
+   "batches_written": 45
+  },
+  {
+   "epochs": 22976,
+   "rss_bytes": 1390628864,
+   "batches_written": 46
+  },
+  {
+   "epochs": 24177,
+   "rss_bytes": 1453514752,
+   "batches_written": 47
+  },
+  {
+   "epochs": 24177,
+   "rss_bytes": 1379917824,
+   "batches_written": 48
+  },
+  {
+   "epochs": 24412,
+   "rss_bytes": 1460117504,
+   "batches_written": 49
+  },
+  {
+   "epochs": 24412,
+   "rss_bytes": 1380458496,
+   "batches_written": 50
+  },
+  {
+   "epochs": 25604,
+   "rss_bytes": 1461153792,
+   "batches_written": 51
+  },
+  {
+   "epochs": 25604,
+   "rss_bytes": 1381781504,
+   "batches_written": 52
+  },
+  {
+   "epochs": 25837,
+   "rss_bytes": 1447251968,
+   "batches_written": 53
+  },
+  {
+   "epochs": 25837,
+   "rss_bytes": 1372090368,
+   "batches_written": 54
+  },
+  {
+   "epochs": 27180,
+   "rss_bytes": 1453604864,
+   "batches_written": 55
+  },
+  {
+   "epochs": 27180,
+   "rss_bytes": 1384542208,
+   "batches_written": 56
+  },
+  {
+   "epochs": 28474,
+   "rss_bytes": 1465040896,
+   "batches_written": 57
+  },
+  {
+   "epochs": 28474,
+   "rss_bytes": 1392689152,
+   "batches_written": 58
+  },
+  {
+   "epochs": 29789,
+   "rss_bytes": 1460572160,
+   "batches_written": 59
+  },
+  {
+   "epochs": 29789,
+   "rss_bytes": 1394446336,
+   "batches_written": 60
+  },
+  {
+   "epochs": 31051,
+   "rss_bytes": 1464201216,
+   "batches_written": 61
+  },
+  {
+   "epochs": 31051,
+   "rss_bytes": 1379196928,
+   "batches_written": 62
+  },
+  {
+   "epochs": 31330,
+   "rss_bytes": 1465520128,
+   "batches_written": 63
+  },
+  {
+   "epochs": 31330,
+   "rss_bytes": 1376698368,
+   "batches_written": 64
+  },
+  {
+   "epochs": 32682,
+   "rss_bytes": 1456312320,
+   "batches_written": 65
+  },
+  {
+   "epochs": 32682,
+   "rss_bytes": 1392848896,
+   "batches_written": 66
+  },
+  {
+   "epochs": 34073,
+   "rss_bytes": 1471438848,
+   "batches_written": 67
+  },
+  {
+   "epochs": 34073,
+   "rss_bytes": 1403154432,
+   "batches_written": 68
+  },
+  {
+   "epochs": 35478,
+   "rss_bytes": 1493540864,
+   "batches_written": 69
+  },
+  {
+   "epochs": 35478,
+   "rss_bytes": 1424183296,
+   "batches_written": 70
+  },
+  {
+   "epochs": 35640,
+   "rss_bytes": 1372291072,
+   "batches_written": 71
+  }
+ ],
+ "verify_peak_rss_bytes": 556179456,
+ "verify_watchdog_peak_rss_bytes": 567144448,
+ "verify_matches_manifest": true,
+ "verify_elapsed_s": 72.13993830000982,
+ "verdict_collection_memory": "PASS: collect peak 2.02 GiB (replay phase), flat flush-cycle series (~1.2-1.5 GiB, no growth trend over 71 flushes), well under the 8 GiB budget, at the PRODUCTION DEFAULT batch_bytes (256 MiB) -- not the 8 MiB stress setting used in prior sessions.",
+ "superseded_by_this_run": "rss_curve.json (session 3, all runs marked INVALID_FOR_2022_ONLY_SCOPE) and its retracted finding_process_peak_rss_not_bounded_1month_with_profile (see rss_curve_SUPERSEDED.md) -- this run is the 2022-only-scope-clean, phase-separated, Task-A-fixed replacement."
+}
