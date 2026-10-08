@@ -121,20 +121,33 @@ class HostCore:
         self._turn_events: List[Tuple[str, Mapping[str, Any]]] = []
 
         # outcome
-        contract = compile_outcome_contract(self.plan["outcome"])
-        if not isinstance(contract, LabelOutcomeContract):
-            raise HostPlanError("TRADE_CONTRACT_SINK_NOT_AVAILABLE: this phase executes label contracts only")
-        self.contract = contract
-        self.kernel = LabelOutcomeKernel(contract, session_table)
-        self.outcome_stream = self.plan["outcome"].get("stream") or self.epoch_stream
-        self.flip_source = contract.flip.source if contract.flip is not None else None
-        self.atr_ref = contract.atr_ref
-        self.atr_through_ts = str(self.plan["outcome"].get("atr_availability", "at_decision_delivery")) == "through_decision_ts"
+        self.descriptive = self.plan["outcome"].get("contract") == "none"
+        if self.descriptive:
+            # outcome: none -- descriptive (observational) study: no kernel, no label, no
+            # direction-relative resolution. Every candidate's observation row is its identity
+            # alone (added synchronously in _emit_candidate); no outcome column is ever emitted.
+            self.contract = None
+            self.kernel = None
+            self.outcome_stream = None
+            self.flip_source = None
+            self.atr_ref = None
+            self.atr_through_ts = False
+        else:
+            contract = compile_outcome_contract(self.plan["outcome"])
+            if not isinstance(contract, LabelOutcomeContract):
+                raise HostPlanError("TRADE_CONTRACT_SINK_NOT_AVAILABLE: this phase executes label contracts only")
+            self.contract = contract
+            self.kernel = LabelOutcomeKernel(contract, session_table)
+            self.outcome_stream = self.plan["outcome"].get("stream") or self.epoch_stream
+            self.flip_source = contract.flip.source if contract.flip is not None else None
+            self.atr_ref = contract.atr_ref
+            self.atr_through_ts = str(self.plan["outcome"].get("atr_availability", "at_decision_delivery")) == "through_decision_ts"
         self._deferred_opens: List[Tuple[Dict[str, Any], int, int, EpochView]] = []
 
         # sink
         candidate_columns = self.identity_columns + [c for c, _ in self.metadata_columns if c not in self.identity_columns] + self.feature_columns + self.derived_columns
-        self.sink = CollectionSink(candidate_columns, self.kernel.observation_columns, ledger=ledger,
+        observation_columns = list(self.identity_columns) if self.descriptive else self.kernel.observation_columns
+        self.sink = CollectionSink(candidate_columns, observation_columns, ledger=ledger,
                                    primary_interval=(self.primary_start, self.primary_end))
         self.candidates_emitted = 0
         self.epochs_evaluated = 0
@@ -336,7 +349,10 @@ class HostCore:
         if self.sink.add_candidate(row):
             self.candidates_emitted += 1
         identity = {"observation_ts": T, "regime_start_ns": row["regime_start_ns"], "checkpoint_index": row["checkpoint_index"]}
-        if self.atr_through_ts and self.atr_ref:
+        if self.descriptive:
+            # No outcome to resolve: the observation row IS the identity, emitted synchronously.
+            self.sink.add_observation(identity)
+        elif self.atr_through_ts and self.atr_ref:
             self._deferred_opens.append((identity, T, direction, epoch))
         else:
             atr = self.resolve(self.atr_ref, epoch) if self.atr_ref else None
@@ -347,9 +363,10 @@ class HostCore:
     def finalize(self):
         self.mux.flush()
         self._flush_deferred_opens(None)
-        self.kernel.finalize(self.last_ts_seen)
-        for r in self.kernel.drain_rows():
-            self.sink.add_observation(r)
+        if self.kernel is not None:
+            self.kernel.finalize(self.last_ts_seen)
+            for r in self.kernel.drain_rows():
+                self.sink.add_observation(r)
         self._heartbeat(final=True)
         return self.sink.frames()
 
@@ -357,7 +374,7 @@ class HostCore:
         if not self.progress_path:
             return
         payload = {"bars": self._bars_processed, "candidates": self.candidates_emitted, "epochs": self.epochs_evaluated,
-                   "pending": len(self.kernel.pending), "last_ts": self.last_ts_seen,
+                   "pending": len(self.kernel.pending) if self.kernel is not None else 0, "last_ts": self.last_ts_seen,
                    "elapsed_s": round(time.perf_counter() - self._started, 3), "final": final}  # host-constant: heartbeat rounding
         try:
             with open(self.progress_path, "w", encoding="utf-8") as fh:
@@ -367,7 +384,8 @@ class HostCore:
 
     def stats(self) -> Dict[str, Any]:
         out = {"bars": self._bars_processed, "bars_by_stream": dict(self.mux.bars_seen), "candidates": self.candidates_emitted,
-               "observations": len(self.sink.observations), "epochs": self.epochs_evaluated, "pending_at_end": len(self.kernel.pending),
+               "observations": len(self.sink.observations), "epochs": self.epochs_evaluated,
+               "pending_at_end": len(self.kernel.pending) if self.kernel is not None else 0,
                "dropped_outside_primary": {"candidates": self.sink.dropped_candidates, "observations": self.sink.dropped_observations}}
         empty = self.mux.empty_windows_published()
         if empty:                                    # closed-window plans only: a sealed complete_bucket plan's stats are unchanged

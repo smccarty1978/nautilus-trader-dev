@@ -291,7 +291,10 @@ def _resolve_streams(ctx: _Ctx) -> None:
         reference_tables = inst.get("reference_tables") or []
         reference_digest = inst.get("reference_digest")
         has_calendar = "sessions" in reference_tables
-        censor = (ctx.spec.outcome.session or ctx.spec.population.session)
+        descriptive = ctx.spec.outcome == "none"
+        # outcome: none declares no outcome window at all -- there is nothing to censor, so the
+        # population session is its own censor session (never consulted: no kernel ever reads it).
+        censor = ctx.spec.population.session if descriptive else (ctx.spec.outcome.session or ctx.spec.population.session)
         ctx.session = {"kind": "calendar" if has_calendar else "legacy", "session": ctx.spec.population.session,
                        "censor_session": censor, "dataset": inst["dataset_id"],
                        "reference_tables": list(reference_tables), "reference_digest": reference_digest}
@@ -304,6 +307,8 @@ def _resolve_streams(ctx: _Ctx) -> None:
                                       ("outcome.session", censor, CENSOR_SESSION_NAMES)):
             if str(name).upper() not in admitted:
                 ctx.gap(GapKind.INVALID_PARAMETERIZATION, where, f"unknown session {name!r}; admitted: {', '.join(admitted)}", closest="RTH")
+        if descriptive:
+            return
         if str(censor).upper() == TRADING_DAY and not has_calendar:
             ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, "outcome.session",
                     f"TRADING_DAY is the calendar dataset's own session row (its trading day); dataset {inst['dataset_id']} declares no "
@@ -891,8 +896,11 @@ def _resolve_population(ctx: _Ctx) -> Dict[str, Any]:
     qualify = _compile_predicate(ctx, pop.qualify, "population.qualify", allow_events=False)
     direction = pop.direction
     if direction is None:
-        ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, "population.direction",
-                "the candidate direction reference is not declared (e.g. regime_1m.dir); the compiler will not guess it")
+        # outcome: none is descriptive-only (no label, no direction-relative resolution); a
+        # candidate direction reference is never required to read features/metadata at the epoch.
+        if ctx.spec.outcome != "none":
+            ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, "population.direction",
+                    "the candidate direction reference is not declared (e.g. regime_1m.dir); the compiler will not guess it")
     else:
         _validate_ref(ctx, direction, "population.direction", allow_epoch=False)
     anchor_identity = pop.anchor_identity or (cadence.get("anchor") if cadence["kind"] == "grid" else None)
@@ -954,10 +962,43 @@ def _resolve_triggers(ctx: _Ctx) -> Dict[str, Any]:
             "sub_epoch_sources": sources, "cadence": trig.cadence}
 
 
+def _resolve_outcome_none(ctx: _Ctx, population: Mapping[str, Any]) -> Dict[str, Any]:
+    """``outcome: none`` -- a first-class DESCRIPTIVE (observational) study: no label, no
+    barrier/event, no direction requirement, no model. The host emits candidate rows
+    (identity + metadata + features + derived) and no outcome/label column at all; `analysis:`
+    (source: train) reads that surface directly. Legal ONLY with `model: none` and an
+    `every_candidate` trigger graph (an `entry` is execution/policy semantics, which a
+    descriptive study makes no claim about); `chronology.dev` stays empty because dev/OOS years
+    exist to evaluate a fitted model, which this study does not have.
+    """
+    model = ctx.spec.model
+    if model != "none":
+        ctx.gap(GapKind.UNSUPPORTED_COMPOSITION, "outcome",
+                "outcome: none is descriptive-only: it declares no label and fits no model. "
+                "model: none is required when outcome: none; declare a barrier/event outcome if this "
+                "study fits or scores a model")
+    trig = ctx.spec.triggers
+    if trig != "every_candidate" and getattr(trig, "entry", None) is not None:
+        ctx.gap(GapKind.UNSUPPORTED_COMPOSITION, "triggers.entry",
+                "outcome: none is descriptive-only: an entry is execution/policy semantics, which needs "
+                "a declared outcome contract to resolve against")
+    if ctx.spec.chronology.dev:
+        ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, "chronology.dev",
+                "outcome: none is descriptive-only and fits no model; dev/OOS years exist to evaluate a "
+                "fitted model under protected authority, so they stay empty here (declare dev: [])")
+    return {
+        "contract": "none", "kernel": "none", "direction": None, "entry_reference": None,
+        "arms": [], "flip": None, "primary_arm": None, "label_column": None,
+        "observation_columns": [],
+    }
+
+
 # --------------------------------------------------------------------------- #
 # stage 5: outcome
 # --------------------------------------------------------------------------- #
 def _resolve_outcome(ctx: _Ctx, population: Mapping[str, Any]) -> Dict[str, Any]:
+    if ctx.spec.outcome == "none":
+        return _resolve_outcome_none(ctx, population)
     o = ctx.spec.outcome
     direction = o.direction or population.get("direction")
     if direction:

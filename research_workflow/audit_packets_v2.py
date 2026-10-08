@@ -41,6 +41,15 @@ def deliverables_for_plan(plan: Mapping[str, Any]) -> Dict[str, List[str]]:
     model = plan.get("model") or {}
     if model.get("search_space"):
         out["fit"] = list(out["fit"]) + list(FIT_TUNING_DELIVERABLES)
+    if not model:
+        # model: none (always true for outcome: none, lifecycle_v2._resolve_outcome_none)
+        # fits nothing; fit() writes an explicit NO_MODEL_DECLARED receipt instead of
+        # experiment_models.json.
+        out["fit"] = ["artifacts/fit_summary.json"]
+    if not ((plan.get("chronology") or {}).get("dev") or []):
+        # No protected OOS period: there is no dev year to open, so oos() writes an explicit
+        # NO_PROTECTED_OOS receipt instead of a frozen model's per-year OOS partitions.
+        out["oos"] = ["_work/controller/oos_no_protected_period.json"]
     return out
 
 

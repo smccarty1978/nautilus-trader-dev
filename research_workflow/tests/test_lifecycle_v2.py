@@ -17,6 +17,14 @@ GOLDEN = ROOT / "fixtures" / "golden"
 NS = 1_000_000_000
 
 
+def _expand_braces(rel: str) -> list[str]:
+    import re as _re
+    m = _re.search(r"\{([^}]+)\}", rel)
+    if not m:
+        return [rel]
+    return [rel[: m.start()] + opt + rel[m.end() :] for opt in m.group(1).split(",")]
+
+
 @pytest.fixture(scope="module")
 def synthetic_bars():
     subprocess.run([sys.executable, str(GOLDEN / "build_golden_fixture.py")], check=True, cwd=str(ROOT), capture_output=True)
@@ -123,18 +131,11 @@ def test_controller_runs_a_fresh_v2_study_end_to_end(tmp_path, synthetic_bars, m
     # F1: every DELIVERABLES_BY_STAGE path the golden run produces actually exists on disk --
     # deliverables_by_stage is built from research_workflow.lifecycle_v2.DELIVERABLES, the same
     # constant analyze()/etc use to name their own output, so this cannot silently diverge again.
-    import re as _re
     from research_workflow.audit_packets_v2 import deliverables_for_plan
     from research_workflow.lifecycle_v2 import load_plan
     plan = load_plan(study)
     deliverables = deliverables_for_plan(plan)
     years_by_stage = {"collection": (2029, 2030), "oos": (2031,)}
-
-    def _expand_braces(rel: str) -> list[str]:
-        m = _re.search(r"\{([^}]+)\}", rel)
-        if not m:
-            return [rel]
-        return [rel[: m.start()] + opt + rel[m.end() :] for opt in m.group(1).split(",")]
 
     for stage, paths in deliverables.items():
         for rel in paths:
@@ -145,6 +146,153 @@ def test_controller_runs_a_fresh_v2_study_end_to_end(tmp_path, synthetic_bars, m
             else:
                 for expanded in _expand_braces(rel):
                     assert (study / expanded).is_file(), f"deliverable missing for stage={stage}: {expanded}"
+
+
+def _descriptive_study_dir(tmp_path: Path) -> Path:
+    """model: none + outcome: none + every_candidate, with a declared analysis: block, driven
+    through the identical lifecycle stages the golden barrier study runs (fewer: no fit/freeze
+    of a real model, no protected OOS -- chronology.dev is empty, which outcome: none requires)."""
+    import yaml
+    body = yaml.safe_load((GOLDEN / "study_barrier.yaml").read_text(encoding="utf-8"))
+    body["study"]["id"] = "golden_v2_descriptive"
+    body["chronology"] = {"train": [2029, 2030], "dev": [], "prohibited": [], "authorized_dates": ["2030-01-01"]}
+    body["outcome"] = "none"
+    del body["population"]["direction"]
+    body["analysis"] = {
+        "source": "train",
+        "steps": [{"id": "summary", "op": "analysis.describe.grouped",
+                   "params": {"value_columns": ["f_close"], "group_by": ["f_dir"], "quantiles": [0.5],
+                              "cluster_column": "regime_start_ns"}}],
+        "artifacts": [{"name": "descriptive_summary.json", "source": "summary", "kind": "json"}],
+    }
+    study = tmp_path / "studies" / "golden_v2_descriptive"
+    study.mkdir(parents=True)
+    (study / "study.yaml").write_text(yaml.safe_dump(body, sort_keys=False), encoding="utf-8")
+    return study
+
+
+def test_controller_runs_a_descriptive_outcome_none_study_end_to_end(tmp_path, synthetic_bars, monkeypatch):
+    """outcome: none (model: none, every_candidate, declared analysis:) through the identical
+    governed lifecycle a labelled study runs: compile -> prepare -> readiness -> preflight ->
+    tests -> audits -> seal -> smoke -> collection -> reconcile -> merge -> fit -> freeze -> oos
+    -> analyze -> close. No label/outcome column is ever produced or read; fit/freeze/oos write
+    explicit no-model / no-protected-OOS receipts instead of a trained model and a scored
+    partition."""
+    bars, expected = synthetic_bars
+    from research_workflow.governed_controller_v2 import V2StudyController
+    from research_workflow.lifecycle_v2 import V2Options, ingest_audit_report
+    from research_workflow.tests.synthetic_primitives import SYNTHETIC_BINDINGS
+    study = _descriptive_study_dir(tmp_path)
+    session = {"kind": "calendar", "session": "RTH", "rows": [[a * NS, b * NS] for a, b in expected["sessions"]]}
+    opts = V2Options(execute=True, smoke_date="2030-01-01", datasets_dir=GOLDEN / "datasets", extra_bindings=SYNTHETIC_BINDINGS,
+                     bar_source=lambda s, e: bars, session_table_spec=session, in_process_partitions=True,
+                     closure={"outcome": "DESCRIPTIVE_FLOW_COMPLETE", "terminal_decision": "PLATFORM_V2_DESCRIPTIVE_PROVEN"},
+                     model_root=tmp_path / "model_store")
+    monkeypatch.setattr(V2StudyController, "_worktree", lambda self: {"path": str(ROOT), "branch": "test", "head": "0" * 40, "dirty_paths": [], "unsafe_dirty_paths": []})
+
+    # The outcome kernel must never be constructed for a descriptive study: force a hard failure
+    # if anything on the host path tries to.
+    import research_workflow.host.strategy as _strategy_mod
+
+    def _must_not_construct(*a, **k):
+        raise AssertionError("LabelOutcomeKernel constructed for an outcome: none study")
+
+    def _must_not_compile(*a, **k):
+        raise AssertionError("compile_outcome_contract called for an outcome: none study")
+
+    monkeypatch.setattr(_strategy_mod, "LabelOutcomeKernel", _must_not_construct)
+    monkeypatch.setattr(_strategy_mod, "compile_outcome_contract", _must_not_compile)
+
+    ctl = lambda: V2StudyController(study, options=opts, repo_root=ROOT)
+    card = ctl().run(through="tests")
+    assert card["STATUS"] == "OK" and card["actions_executed"] == ["compile", "prepare", "readiness", "preflight", "tests"], card
+    assert (study / "compiled_plan.json").is_file() and (study / "audit" / "frozen_execution_manifest.json").is_file()
+    assert json.loads((study / "audit" / "readiness.json").read_text())["overall_status"] == "PASS"
+    assert json.loads((study / "audit" / "preflight.json").read_text())["status"] == "CLEAR"
+
+    card = ctl().run(through="seal")
+    assert card["state"] == "NEEDS_CAUSAL_AUDIT" and card["artifact"] and Path(card["artifact"]).name == "audit_packet_causal.json"
+    ingest_audit_report(study, "causal", _write_audit(study, "causal", "auditor_a"))
+    card = ctl().run(through="seal")
+    assert card["state"] == "NEEDS_CONTRACT_AUDIT"
+    ingest_audit_report(study, "contract", _write_audit(study, "contract", "auditor_b"))
+    card = ctl().run(through="seal")
+    assert card["STATUS"] == "OK" and card["state"] == "READY_TO_SMOKE", card
+
+    card = ctl().run(through="merge")
+    assert card["STATUS"] == "OK" and card["state"] == "READY_TO_FIT", card
+    smoke = json.loads((study / "artifacts" / "smoke_acceptance.json").read_text())
+    assert smoke["status"] == "ACCEPTED" and smoke["candidates_count_total"] > 0
+
+    # 1. no outcome/label/target/barrier/disposition/censor column in any persisted frame.
+    import pandas as pd
+    from research_workflow.forward_outcomes.guard import find_outcome_columns
+    outcome_like = {"target_flip_within_horizon", "disposition", "censor_reason", "resolution_seconds",
+                    "observed_seconds", "flip_ts", "arm_a_label", "arm_b_label"}
+    for rel in ("_work/controller/partitions/train/2029", "_work/controller/partitions/train/2030", "_work/controller/merged"):
+        cands = pd.read_parquet(study / rel / "candidates.parquet")
+        obs = pd.read_parquet(study / rel / "observations.parquet")
+        assert not find_outcome_columns(list(cands.columns))
+        assert not find_outcome_columns(list(obs.columns))
+        assert not (outcome_like & set(cands.columns)) and not (outcome_like & set(obs.columns))
+        assert list(obs.columns) == ["observation_ts", "regime_start_ns", "checkpoint_index"]
+        assert len(obs) == len(cands) > 0   # 2. identity-only observations, row-parity
+
+    card = ctl().run(through="freeze")
+    assert card["STATUS"] == "OK" and card["state"] == "READY_TO_OOS", card
+    # 3. explicit no-model / no-protected-OOS receipts; no fit/tuning artifact at all.
+    fit_summary = json.loads((study / "artifacts" / "fit_summary.json").read_text())
+    assert fit_summary["status"] == "NO_MODEL_DECLARED"
+    assert not (study / "artifacts" / "experiment_models.json").exists()
+    freeze = json.loads((study / "artifacts" / "train_experiment_freeze.json").read_text())
+    assert freeze["status"] == "NO_PROTECTED_OOS" and freeze["protected_oos"] is False
+
+    card = ctl().run(through="analyze")
+    assert card["STATUS"] == "OK" and card["state"] == "READY_TO_CLOSE", card
+    oos_receipt = json.loads((study / "_work" / "controller" / "oos_no_protected_period.json").read_text())
+    assert oos_receipt["status"] == "NO_PROTECTED_OOS" and oos_receipt["dev_years"] == []
+    assert not (study / "_work" / "controller" / "partitions" / "oos").exists()
+    # 4. the declared analysis artifact, from the metadata columns, with no label column anywhere.
+    analysis = json.loads((study / "artifacts" / "experiment_analysis_v2.json").read_text())
+    assert analysis["contract"] == "none"
+    summary = json.loads((study / "artifacts" / "descriptive_summary.json").read_text())
+    assert summary["cells"] and {c["column"] for c in summary["cells"]} == {"f_close"}
+
+    card = ctl().run(through="close")
+    assert card["STATUS"] == "OK" and card["state"] == "STUDY_CLOSED", card
+    from research_workflow.study_closure import load_study_closure
+    assert load_study_closure(study)["outcome"] == "DESCRIPTIVE_FLOW_COMPLETE"
+
+    # 5. audit packets describe the outcome as absent, not crash or invent fields.
+    from research_workflow.lifecycle_v2 import load_plan
+    plan = load_plan(study)
+    from research_workflow.audit_packets_v2 import causal_packet, contract_packet, deliverables_for_plan
+    cp = causal_packet(plan, study_id="golden_v2_descriptive", execution_composite="x" * 64, dirty_paths=[], test_summary={})
+    assert cp["outcome"]["contract"] == "none" and cp["outcome"]["kernel"] == "none" and cp["outcome"]["arms"] == []
+    kp = contract_packet(plan, study_id="golden_v2_descriptive", execution_composite="x" * 64, dirty_paths=[], test_summary={})
+    assert kp["outcome"]["contract"] == "none" and kp["outcome"]["label_columns"] == {"primary": None}
+
+    # F1 (descriptive branch): fit/oos deliverables name the receipts these stages actually
+    # wrote, not the labelled-study defaults (experiment_models.json / per-year OOS partitions).
+    deliverables = deliverables_for_plan(plan)
+    assert deliverables["fit"] == ["artifacts/fit_summary.json"]
+    assert deliverables["oos"] == ["_work/controller/oos_no_protected_period.json"]
+    for stage, paths in deliverables.items():
+        for rel in paths:
+            if "<year>" in rel:
+                for year in (2029, 2030):
+                    for expanded in _expand_braces(rel.replace("<year>", str(year))):
+                        assert (study / expanded).is_file(), f"deliverable missing for stage={stage}: {expanded}"
+            else:
+                for expanded in _expand_braces(rel):
+                    assert (study / expanded).is_file(), f"deliverable missing for stage={stage}: {expanded}"
+
+    # 6. a stage that needs an outcome fails closed, typed, if forced: the label-reading train
+    # frame helper against identity-only observations with no label/disposition column at all.
+    from research_workflow.lifecycle_v2 import V2Lifecycle
+    lc = V2Lifecycle(study, options=opts, repo_root=ROOT)
+    with pytest.raises(KeyError):
+        lc._train_frame(plan)
 
 
 def test_controller_reports_typed_capability_gap(tmp_path, monkeypatch):

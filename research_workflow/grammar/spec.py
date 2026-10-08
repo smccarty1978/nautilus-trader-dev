@@ -436,7 +436,10 @@ class StudySpecV2(_Strict):
     context: Dict[str, ContextTrackerSpec] = Field(default_factory=dict)
     triggers: TriggersSpec = "every_candidate"
     features: FeaturesSpec = Field(default_factory=FeaturesSpec)
-    outcome: OutcomeSpec
+    # 'none' is a first-class descriptive (observational) outcome: no label, no barrier/event,
+    # no direction requirement. It is legal only with model: none (see compiler._resolve_outcome);
+    # omitting `outcome` entirely remains an error -- descriptive mode must be declared explicitly.
+    outcome: Union[Literal["none"], OutcomeSpec]
     chronology: ChronologySpec
     model: Union[Literal["none"], ModelSpec] = "none"
     analysis: Optional[AnalysisSpec] = None
