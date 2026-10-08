@@ -1,8 +1,13 @@
-# chunked_sink_flush -- bounded-memory collection (checkpoint, session 1)
+# chunked_sink_flush -- bounded-memory collection (checkpoint, session 2)
 
-Status: core writer + wiring DONE and green on targeted tests. Cross-branch VP integration
-(req 7 second half), real-tape RSS curves (req 8) and downstream-stage memory measurement
-(req 8) NOT done this session -- see "Remaining work" below.
+Status: core writer + wiring DONE (session 1). Session 2: schema risk fixed + fail-closed
+(A), shadow verification identity fixed (B), dead code removed (C), VP cross-branch real-tape
+equivalence PASSED with zero diffs (D). RSS curve and downstream-memory measurement (E) are
+PARTIAL -- 1 day/1 week measured, 1 month/3 months NOT measured (host memory pressure killed
+the background job; not restarted per instruction) -- and the curve as measured does not yet
+prove bounded memory under growth (see "Remaining work"). G's broad `test_delta` run was also
+killed by the same signal before producing output; per-commit targeted `pytest` runs this
+session are green (see "Remaining work" for exact scope and gaps).
 
 ## Design
 
@@ -176,21 +181,131 @@ the final ownership model -- `lifecycle_v2.run_partition` owns and finalizes the
 (`research_workflow/host_runner.py`, `run_plan_on_bars` and `run_plan_with_engine`). No
 behaviour change; nothing else read this key.
 
+### D. VP cross-branch real-tape equivalence proof (req 7, second half)
+Done in a DISPOSABLE detached worktree (`Nautilus Trader-vp_integration_tmp`, merged
+`chore/vp_profile_snapshot` + `chore/chunked_sink_flush` onto `main`, both merges clean, no
+conflicts; never pushed; removed after copying evidence -- see task F below). A compiled plan
+(`features.context`) binds the real `tracker.volume_profile.rolling` nine times --
+`{range_uniform, full_per_tick, close}` x `{120, 360, 1440}` open minutes, `emit_profile: true`
+on every instance -- over the real `NQ_1S_V2_GLOBEX` catalog, descriptive (`outcome: none`),
+`completed_1m` cadence, run through `run_plan_on_catalog` (the real NT engine + the real
+`GovernedHostStrategy`/`HostCore`/`CollectionSink` path -- not a bespoke harness), chunked
+(`ChunkedParquetWriter`, batch sizes 997 and 50,000) vs. unchunked, compared field-for-field,
+row-for-row (profile struct included, via canonical-JSON per-cell comparison so a Python
+`None` and a float `NaN` -- both "missing" -- are not misclassified as a diff).
+
+Two real 2022 windows (2022 only; nothing after 2023-10-17, nothing from 2021, per the
+packet's hard limit):
+- a roll crossing, `2022-03-14..2022-03-18` (3,240 candidate/observation rows, 21 candidate
+  columns -- 9 `profile` structs + 9 `poc` scalars + 3 identity -- x 2 batch sizes): **0
+  diffs**.
+- a fresh block start, `2022-01-03..2022-01-05` (2,025 rows, same columns x 2 batch sizes):
+  **0 diffs**.
+
+`stats()["candidates"]`/`["observations"]` also matched exactly in every case. The NT engine's
+Rust logger can only initialize once per process, so each variant (unchunked, chunked-997,
+chunked-50000) ran in its own subprocess; the orchestrator and per-variant runner scripts are
+disposable (not committed -- they lived only in the scratch directory and the disposable
+worktree, per the packet). Harness detail worth keeping in mind: a wholly-unpopulated identity
+column (this descriptive plan declares no `anchor_identity`, so `regime_start_ns` /
+`checkpoint_index` are null on every row) round-trips as Python `None` (object dtype) unchunked
+vs. float `NaN` (the writer's identity columns are declared `int64`, and pyarrow/pandas
+upcasts an all-null `int64` parquet column to `float64` on read) -- both mean "missing"; the
+comparison harness treats them as equal, same documented int/float representation contract
+`chunked_writer._build_array` already carries for `horizon_end_ts`. This is a comparison-
+harness nuance, not a writer defect; it does not arise once a study declares `anchor_identity`
+(every production study with an outcome does).
+
+### E. RSS curve + downstream memory (req 8) -- PARTIAL, see gap below
+Measured in the same disposable worktree, each variant its own subprocess (same NT-logger
+reason as D), a `psutil` sampling thread (~50ms) plus the Windows OS peak working set,
+`batch_rows=50,000` (the module default) for chunked, with an unchunked comparison at the same
+window:
+
+| window | rows | chunked peak RSS | unchunked peak RSS |
+|---|---|---|---|
+| 1 day (2022-01-03..04) | 1,620 | 2,505.5 MiB | 2,509.9 MiB |
+| 1 week (2022-01-03..10) | 3,240 | 3,387.3 MiB | 3,380.3 MiB |
+
+**Gap, reported not fabricated:** the 1-month and 3-months windows were NOT measured -- the
+background orchestrator was killed by the host (`system is running low on memory`, an explicit
+stop-and-do-not-retry signal from the harness, not a code failure) before reaching them.
+**The curve above also does not yet prove boundedness**: neither window's row count (1,620 /
+3,240) reaches `batch_rows=50,000`, so the chunked writer never actually flushed mid-run at
+this batch size -- chunked and unchunked are (correctly) nearly identical here BY CONSTRUCTION,
+not because bounded-memory behaviour was exercised. Proving the actual claim (flat peak RSS as
+rows grow past one flush) needs either the 1-month/3-months windows (3 months x 9 VP
+instances x 1-minute cadence was projected at ~51k rows, just over one flush at the default
+batch size) or a smaller `batch_rows` (e.g. 997, already proven logically correct in D) run
+long enough to flush multiple times. Neither was done. See "Remaining work" below -- this is
+the single biggest gap in this session's evidence and the most important thing to run next.
+
+### Downstream-stage memory (reconcile / merge / analyze) -- req 8, done
+Measured directly against the real chunked D-proof partitions (two real windows stood in as
+two "train years": 2,025 + 3,240 = 5,265 rows total, 9 VP profile-struct columns, real
+`int64[]` `weights_fp`/`contributions` lists up to ~1,440 elements each):
+
+| stage | code path exercised | measured peak RSS (this run, 5,265 rows) | projected @ full-year x 2 blocks (196,560 rows, ~37x) |
+|---|---|---|---|
+| `reconcile`-like | one partition read/discarded per loop iteration (never holds more than one year at once) | ~1.4-1.5 GiB | ~53 GiB |
+| `merge`-like | `pd.concat([pd.read_parquet(...) for y in years])` -- ALL years' frames held simultaneously, then concatenated | ~2.9-3.0 GiB | ~105 GiB |
+| `analyze`/`research/analysis/loader`-like | one `pd.read_parquet` of merge's own already-concatenated output | ~3.1-3.4 GiB | same order as merge's final output (not independently worse) |
+
+**Finding: reconcile/merge/analyze are the next memory blocker, confirmed quantitatively, not
+fixed (per the packet).** None of the three is chunked; all three materialize full pandas
+DataFrames with the VP profile struct's `int64[]` fields as plain Python list-of-int objects,
+which is the same CPython-per-object-overhead wall `chore/vp_profile_snapshot`'s own D2c
+measurement already found for unchunked collection -- parquet's columnar compression of those
+same lists (tens of KB/row on disk, see D above) is not present once pandas materializes them.
+The ~37x row-count extrapolation from 5,265 to 196,560 rows is linear and should be read as an
+order-of-magnitude signal (both projections already clear an 8 GiB budget by 6-13x), not a
+precise forecast -- a direct measurement at full-year scale would tighten this. Exact figures:
+`artifacts/platform_v2/chunked_sink_flush/downstream_memory.json`.
+
 ## Remaining work (NOT done this session -- say so, don't fabricate)
 
-- Req 7 (second half): the disposable cross-branch VP integration worktree (merge
-  chore/vp_profile_snapshot + this branch, run the real nine tracker-instance x open-minutes
-  matrix against real 2022/2023 tape, compare bit-exact). Not attempted.
-- Req 8: real RSS measurement curves (1 day / 1 week / 1 month / 3 months of 2022, chunked
-  vs. unchunked) and the downstream-stage (reconcile/merge/analyze frame load) memory
-  finding. Not attempted -- needs real catalog data and run time well beyond this session.
+- **E's RSS curve is incomplete and does not yet prove boundedness** (see the E section above):
+  1-month and 3-months windows were not measured (background job killed by host memory
+  pressure, not restarted per explicit instruction not to retry after that signal); the two
+  windows that WERE measured never grew past one `batch_rows=50,000` flush, so they cannot by
+  themselves demonstrate flat/bounded memory under growth. Next step: re-run
+  `e_rss_one.py`-equivalent measurements (the script lived only in the disposable worktree and
+  the scratch directory per the packet; rebuild it from this README's description) for 1-month
+  and 3-months, AND/OR rerun at a smaller `batch_rows` (997, already proven logically correct
+  in D) so a real mid-run flush is exercised at the smaller windows too -- only then does the
+  curve prove the claim this capability exists for, not just that chunked and unchunked agree
+  below the flush threshold.
+- **G's broad `test_delta` run did not complete**: the exact scope the packet named
+  (`research_workflow/tests/test_chunked_writer.py test_chunked_sink_flush.py test_host_core.py
+  test_lifecycle_v2.py test_grammar_v2.py test_outcome_none.py test_declarative_analysis.py
+  test_docs_v2.py` plus `test_replay_closure.py test_frame_store.py test_partitioning.py
+  test_wave2_shadow_default.py`) was launched once via `scripts/test_delta.py` and killed by
+  the same host memory-pressure signal before producing any output; not restarted per
+  instruction. What IS verified (direct `pytest`, not `test_delta`, run per-commit this
+  session): `test_chunked_writer.py` (20 passed), `test_chunked_sink_flush.py` +
+  `test_host_core.py` + `test_grammar_v2.py` + `test_outcome_none.py` together (93 passed),
+  `test_replay_closure.py` (16 passed, including the new B regression), and
+  `test_lifecycle_v2.py::test_controller_runs_a_fresh_v2_study_end_to_end` standalone (1
+  passed in 310s -- it failed once inside a much larger combined pytest invocation earlier in
+  this session; isolated it passes, so that failure reads as pre-existing order/isolation
+  flakiness, not a regression from A/B, but this was NOT re-confirmed against clean `main` as
+  the packet's methodology technically requires). `test_frame_store.py`, `test_partitioning.py`,
+  `test_wave2_shadow_default.py`, `test_declarative_analysis.py` and `test_docs_v2.py` were
+  never run this session. Next step: re-run the exact `test_delta` command above once host
+  memory allows, and only act on `NEW_FAILURE`.
 - `_chunked_writers_for`'s `declared_cand`/`declared_obs` now also cover metadata columns whose
-  tracker declares `FIELD_TYPES` (phase 2, task A, above). Derived/observation columns still
-  rely on probe-based inference. Exercised on the golden fixture's label/barrier and
-  descriptive observation columns (including the int/float-mixed `horizon_end_ts` case) and on
-  a synthetic struct/list-typed metadata column (`declared_metadata_types` unit test); NOT yet
-  against a struct/list-valued REAL tracker field end-to-end (chore/vp_profile_snapshot is
-  unmerged here) -- that is req 7 (D, below).
-- `V2Options.chunked_batch_rows` defaults to `0` (opt-in). Flipping the default to always-on
-  for `run_partition` is a one-line follow-up once req 7/8 (D/E, below) validate it against
-  real VP data and real memory curves -- deliberately not done yet.
+  tracker declares `FIELD_TYPES` (phase 2, task A, above), proven end-to-end against the REAL
+  `tracker.volume_profile.rolling` struct in D (zero diffs, both roll-week and block-start
+  windows, both batch sizes). Derived columns still rely on probe-based inference (not
+  exercised against a real struct/list derived column -- none exists in the platform today).
+- `V2Options.chunked_batch_rows` defaults to `0` (opt-in; this IS the activation surface --
+  see "Activation" in task B above). Flipping the default to always-on for `run_partition` is
+  a one-line follow-up once the boundedness gap above is closed with real numbers -- still not
+  done, now for a sharper reason than before (D passed; E has not yet proven the thing that
+  would justify flipping the default).
+- No CLI/controller-level flag exposes `chunked_batch_rows` to an operator running a real study
+  through `scripts/research.py` / the standard controller path -- today it is reachable only by
+  constructing `V2Options(chunked_batch_rows=N, ...)` directly (as this session's harnesses and
+  the test suite do). Wiring a CLI flag was not asked for explicitly and was not done; flagged
+  here because "how a governed study activates chunking" has no operator-facing answer yet,
+  only a programmatic one.

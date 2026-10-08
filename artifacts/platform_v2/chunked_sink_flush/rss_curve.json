@@ -1,0 +1,68 @@
+{
+ "curve": [
+  {
+   "window": "1_day",
+   "chunked": {
+    "start": "2022-01-03",
+    "end": "2022-01-04",
+    "batch_rows": 50000,
+    "rows": {
+     "candidates": 1620,
+     "observations": 1620
+    },
+    "rss_before_bytes": 274567168,
+    "rss_after_bytes": 1278119936,
+    "peak_rss_sampled_bytes": 2627194880,
+    "peak_working_set_windows_bytes": 2627399680,
+    "elapsed_s": 64.8
+   },
+   "unchunked": {
+    "start": "2022-01-03",
+    "end": "2022-01-04",
+    "batch_rows": 0,
+    "rows": {
+     "candidates": 1620,
+     "observations": 1620
+    },
+    "rss_before_bytes": 276189184,
+    "rss_after_bytes": 2629419008,
+    "peak_rss_sampled_bytes": 2631782400,
+    "peak_working_set_windows_bytes": 2632196096,
+    "elapsed_s": 62.1
+   }
+  },
+  {
+   "window": "1_week",
+   "chunked": {
+    "start": "2022-01-03",
+    "end": "2022-01-10",
+    "batch_rows": 50000,
+    "rows": {
+     "candidates": 3240,
+     "observations": 3240
+    },
+    "rss_before_bytes": 274718720,
+    "rss_after_bytes": 1399635968,
+    "peak_rss_sampled_bytes": 3551838208,
+    "peak_working_set_windows_bytes": 3554160640,
+    "elapsed_s": 131.6
+   },
+   "unchunked": {
+    "start": "2022-01-03",
+    "end": "2022-01-10",
+    "batch_rows": 0,
+    "rows": {
+     "candidates": 3240,
+     "observations": 3240
+    },
+    "rss_before_bytes": 275283968,
+    "rss_after_bytes": 3540545536,
+    "peak_rss_sampled_bytes": 3544514560,
+    "peak_working_set_windows_bytes": 3546787840,
+    "elapsed_s": 112.2
+   }
+  }
+ ],
+ "generated_at_utc": "2026-10-08T06:53:52Z",
+ "note": "1_month and 3_months windows NOT completed: the background orchestrator was killed by the host due to system memory pressure (not a code failure) before reaching them; not restarted per explicit instruction. See README remaining work."
+}
