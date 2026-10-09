@@ -254,8 +254,10 @@ def authorized_years(plan: Dict[str, Any], period: str, requested: Optional[Sequ
 MERGE_TARGET_BATCH_BYTES = 64 * 1024 * 1024  # host-constant: target Arrow bytes per streamed merge
 # write batch. Bounds the merge's working set (plus one source row group, see
 # _stream_merged_parquet) independently of the partition row count.
-MERGE_IDENTITY_SCALAR_BATCH_ROWS = 65_536  # host-constant: rows per batch when hashing the scalar
-# columns of a streamed merged file (8 bytes/row/column as numpy; bounded regardless of file size).
+MERGE_IDENTITY_SCALAR_BATCH_ROWS = 65_536  # host-constant: upper bound on rows per batch when hashing
+# the scalar columns of a streamed merged file.
+MERGE_IDENTITY_SCALAR_TARGET_BYTES = 16 * 1024 * 1024  # host-constant: target Python-object bytes per
+# scalar-column hashing batch (estimated with the chunked writer's calibrated estimator).
 
 
 def _sources_nested(sources: Sequence[Path]) -> bool:
@@ -464,7 +466,11 @@ def _streaming_frame_content_identity(path: Path) -> Dict[str, Any]:
                or pa.types.is_boolean(schema.field(n).type)}
     first = {n: True for n in names}
     if scalar:
-        for batch in pf.iter_batches(batch_size=MERGE_IDENTITY_SCALAR_BATCH_ROWS, columns=scalar):
+        # Byte-bounded like the nested pass: a fixed 65,536-row batch over ~190 scalar columns (many of
+        # them JSON strings) grew the pass's peak with the file until the cap (2.09 -> 2.97 GiB from
+        # 13,501 to 108,008 rows in the merge-mechanics stress).
+        scalar_rows = min(MERGE_IDENTITY_SCALAR_BATCH_ROWS, _bytes_bounded_batch_rows(pf, scalar, MERGE_IDENTITY_SCALAR_TARGET_BYTES))
+        for batch in pf.iter_batches(batch_size=scalar_rows, columns=scalar):
             for n in scalar:
                 series = batch.column(batch.schema.get_field_index(n)).to_pandas()
                 if float_ok[n]:
