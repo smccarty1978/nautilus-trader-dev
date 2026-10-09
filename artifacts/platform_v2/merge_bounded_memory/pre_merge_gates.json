@@ -1,0 +1,27 @@
+{
+ "recorded_utc": "2026-10-09",
+ "chore": "chore/merge_bounded_memory",
+ "gate_1_state": {
+  "main_head": "1b0a0ef1 (clean)",
+  "merge_base": "1b0a0ef12c02120a41be26e83e9654678b554dbe",
+  "chore_worktree_dirty": ["research_workflow/tests/first_passage_parity.json (untracked, test-generated, documented, not committed)"],
+  "targeted_tests": "test_merge_bounded_memory.py + test_merge_nested_schema.py + test_chunked_writer.py + test_c1_terminal_outcome.py: 74 passed, 0 failed (165.98 s)"
+ },
+ "gate_2_independent_hash_check": {
+  "method": "physical sha256 + recompute_logical_content_sha256 of the frozen pilot's accepted merged files (read-only)",
+  "candidates": {"physical": "0456062a", "logical": "0af00780", "rows": 13501, "matches_parity_json": true},
+  "observations": {"physical": "8b8b5f62", "logical": "4f809d6a", "rows": 13501, "matches_parity_json": true},
+  "frozen_identity_json_candidates_identity": "77310846 (= parity.json identity_legacy)",
+  "evidence_files_parse": ["allocation_map.json", "parity.json", "rss.json", "projection.json", "test_classification.json", "merge_packet.json"]
+ },
+ "gate_3_identity_contract": {
+  "documented_in": "docs/GOVERNED_STUDY_CONTROLLER.md -- 'Merge identity contract'",
+  "scheme": "streaming_frame_content_identity_v1 (recorded per file in identity.json merge_method.<file>.identity)",
+  "determinism": "parity.json determinism_matrix: 8 runs (batch 100 / 927 / 4000 / byte-bounded; 71 and 125 source row groups; 4..136 output row groups; reversed 2-source input) -> one candidates_identity_v1 value 8bfd784c, logical always = accepted, observations byte-identical"
+ },
+ "gate_4_regression_status": {
+  "verdict": "NO_NEW_REGRESSIONS",
+  "not_claimed": "an unqualified clean suite",
+  "detail": "broad test_delta (research_workflow/tests + scripts/tests/test_supervisor_blackbox.py): 1201 ran, 38 flagged NEW by test_delta because the committed baseline is stale (BASELINE_COMMIT_MISMATCH). Re-run on clean main 1b0a0ef1: 34 PRE_EXISTING (fail on main), 3 ENVIRONMENTAL (gitignored artifacts absent in worktree; WORKTREE_TESTS_DEPEND_ON_UNTRACKED_ARTIFACTS), 1 CAUSED_BY_CHORE fixed in caceab4f and passing. The committed test_delta baseline is still stale and was not re-recorded."
+ }
+}
