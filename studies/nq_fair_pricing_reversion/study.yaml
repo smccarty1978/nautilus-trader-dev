@@ -15,7 +15,8 @@ context:
 population:
   session: RTH
   cadence: completed_1m
-  direction: regime_1m.dir
+  qualify: "features.rth_open_elapsed_seconds <= 5400 and features.rth_recovery_direction != 0"
+  direction: features.rth_recovery_direction
 
 triggers: every_candidate
 
