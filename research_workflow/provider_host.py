@@ -847,6 +847,96 @@ class OHLCVDeltaAdapter(_BaseAdapter):
         return out
 
 
+class PriceLevelAdapter(_BaseAdapter):
+    """``GenericPriceLevelProvider`` -- completed-1m causal price levels.
+
+    Wraps ``GenericPriceLevelProvider``, driving it from ``STREAM_COMPLETED_1M`` events.
+    Computes distance to levels (points, ticks, ATR), level values, availability,
+    positions, and aggregate level metrics at decision epochs.
+    """
+
+    canonical_provider = "features.trackers.generic_price_levels.GenericPriceLevelProvider"
+
+    _CANONICAL = frozenset({
+        "distance_to_level",
+        "nearest_level_geometry",
+        "price_level_aggregate",
+        "price_level_available",
+        "price_level_position",
+        "price_level_value",
+    })
+
+    @classmethod
+    def can_emit(cls, spec: "InstanceSpec") -> bool:
+        return spec.canonical_name in cls._CANONICAL
+
+    def __init__(self, instances: Sequence[InstanceSpec]) -> None:
+        super().__init__(instances)
+        from features.trackers.generic_price_levels import GenericPriceLevelProvider
+
+        self._provider = GenericPriceLevelProvider()
+
+    def required_streams(self) -> frozenset[str]:
+        return frozenset({STREAM_COMPLETED_1M})
+
+    def on_event(self, event_type: str, event: Mapping[str, Any]) -> None:
+        if event_type == STREAM_COMPLETED_1M:
+            from utils.session_boundaries import is_rth_completed_bar_1m
+            close_ts = int(event.get("close_ts", event.get("ts_init", 0)))
+            is_rth = is_rth_completed_bar_1m(close_ts)
+            self._provider.update_completed_bar(
+                ts_avail=close_ts,
+                open_px=float(event["open"]),
+                high=float(event["high"]),
+                low=float(event["low"]),
+                close=float(event["close"]),
+                is_rth=is_rth,
+            )
+
+    def snapshot(self, *, decision_ts, price, atr, episode_state) -> Mapping[str, Any]:
+        direction = int(episode_state.get("prevailing_direction", -1) or -1)
+        snap = self._provider.snapshot(
+            observation_ts=int(decision_ts),
+            reference_price=float(price),
+            atr=float(atr),
+            direction=direction,
+        )
+        out: Dict[str, Any] = {}
+        for inst in self.instances:
+            alias = inst.physical_alias
+            if alias in snap:
+                out[alias] = snap[alias]
+            else:
+                p = inst.parameters
+                name = inst.canonical_name
+                if name == "distance_to_level":
+                    lvl = p.get("level")
+                    norm = p.get("normalization", "points")
+                    key = f"{lvl}_signed_distance_{norm}"
+                    out[alias] = snap.get(key)
+                elif name == "price_level_value":
+                    lvl = p.get("level")
+                    key = f"{lvl}_price" if lvl else p.get("metric")
+                    out[alias] = snap.get(key)
+                elif name == "price_level_available":
+                    lvl = p.get("level")
+                    key = f"{lvl}_available" if lvl else p.get("metric")
+                    out[alias] = snap.get(key)
+                elif name == "price_level_position":
+                    lvl = p.get("level")
+                    key = f"{lvl}_position"
+                    out[alias] = snap.get(key)
+                elif name == "price_level_aggregate":
+                    metric = p.get("metric")
+                    out[alias] = snap.get(metric)
+                elif name == "nearest_level_geometry":
+                    metric = p.get("metric")
+                    out[alias] = snap.get(metric)
+                else:
+                    out[alias] = snap.get(alias)
+        return out
+
+
 # canonical provider class path -> adapter factory. Deterministic, no study branches.
 ADAPTER_REGISTRY: Dict[str, Callable[[Sequence[InstanceSpec]], RuntimeProviderAdapter]] = {
     ArrivalVelocityAdapter.canonical_provider: ArrivalVelocityAdapter,
@@ -856,6 +946,7 @@ ADAPTER_REGISTRY: Dict[str, Callable[[Sequence[InstanceSpec]], RuntimeProviderAd
     EpisodeGeometryAdapter.canonical_provider: EpisodeGeometryAdapter,
     CompletedRegimeGeometryAdapter.canonical_provider: CompletedRegimeGeometryAdapter,
     OHLCVDeltaAdapter.canonical_provider: OHLCVDeltaAdapter,
+    PriceLevelAdapter.canonical_provider: PriceLevelAdapter,
 }
 
 
@@ -1178,7 +1269,7 @@ __all__ = [
     "NonMonotonicRuntimeEvent", "SnapshotBeforeLatestRuntimeEvent",
     "ArrivalVelocityAdapter", "ContextAdapter", "StructuralGeometryAdapter",
     "RollingProductivityAdapter", "EpisodeGeometryAdapter",
-    "CompletedRegimeGeometryAdapter", "OHLCVDeltaAdapter",
+    "CompletedRegimeGeometryAdapter", "OHLCVDeltaAdapter", "PriceLevelAdapter",
     "STREAM_COMPLETED_1S", "STREAM_COMPLETED_1M", "STREAM_COMPLETED_5M", "STREAM_COMPLETED_5S",
     "EVENT_REGIME_TRANSITION_1M", "EVENT_EPISODE_START", "EVENT_EPISODE_TERMINATE",
 ]

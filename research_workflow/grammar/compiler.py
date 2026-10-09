@@ -1125,6 +1125,39 @@ def _resolve_outcome(ctx: _Ctx, population: Mapping[str, Any]) -> Dict[str, Any]
                                 "flipped(to=...) accepts an absolute direction literal (-1 or 1); relative targets use against=position")
                 flip = {"horizon_ns": duration_seconds(hz) * NS if hz else None, "source": path[0], "role": role,
                         "inclusive_start": True, "target_direction": target_direction}
+    if o.recovery:
+        rec = dict(o.recovery)
+        ref_expr = rec.get("reference") or o.reference
+        if ref_expr is None:
+            ctx.gap(GapKind.INVALID_PARAMETERIZATION, "outcome.recovery.reference", "a recovery outcome needs a reference price expression (e.g. const:0.0 or tracker.field)")
+        else:
+            _validate_ref(ctx, ref_expr, "outcome.recovery.reference", allow_epoch=True)
+        milestones = rec.get("milestones") or [0.25, 0.50, 0.75, 1.00]
+        hz_default = rec.get("horizon") or o.horizon
+        hz_ns = duration_seconds(hz_default) * NS if hz_default else None
+        expiry = str(rec.get("expiry") or "censor")
+        if expiry not in ("censor", "negative"):
+            ctx.gap(GapKind.INVALID_PARAMETERIZATION, "outcome.recovery.expiry", f"unknown expiry policy {expiry!r}")
+        for m in milestones:
+            try:
+                mf = float(m)
+            except (TypeError, ValueError):
+                ctx.gap(GapKind.INVALID_PARAMETERIZATION, "outcome.recovery.milestones", f"invalid milestone fraction {m!r}")
+                continue
+            if not (0.0 < mf <= 1.0):
+                ctx.gap(GapKind.INVALID_PARAMETERIZATION, "outcome.recovery.milestones", f"milestone fraction must be in (0, 1.0], got {mf}")
+                continue
+            pct = int(round(mf * 100))
+            arm_id = f"m{pct}"
+            arms.append({
+                "id": arm_id,
+                "favorable_atr": mf,  # stores recovery fraction
+                "adverse_atr": 0.0,
+                "horizon_ns": hz_ns or 0,
+                "expiry": expiry,
+                "prefix": arm_id,
+            })
+        primary = rec.get("primary") or (arms[-1]["id"] if arms else None)  # default primary is m100 (full recovery)
     if o.items:
         ctx.gap(GapKind.MISSING_CAPABILITY, "outcome.items",
                 "exit items (stop_move/trail/event exits) require the trade execution sink, which is not available in this phase")
@@ -1132,15 +1165,19 @@ def _resolve_outcome(ctx: _Ctx, population: Mapping[str, Any]) -> Dict[str, Any]
         if o.composition is None:
             ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, "outcome.composition", "barrier and event outcomes together need composition: AND | OR")
         kernel = "composite"
+    elif o.recovery:
+        kernel = "recovery"
     elif arms:
         kernel = "barrier"
     elif flip:
         kernel = "flip"
     else:
-        ctx.gap(GapKind.INVALID_PARAMETERIZATION, "outcome", "an outcome needs a barrier, an event, or both")
-        kernel = "none"
-    if direction is None:
+        ctx.gap(GapKind.INVALID_PARAMETERIZATION, "outcome", "an outcome needs a barrier, an event, a recovery, or a combination")
+    if direction is None and kernel != "recovery":
         ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, "outcome.direction", "the outcome direction reference is not declared")
+    elif direction is None and kernel == "recovery":
+        # Recovery direction is dynamically derived from signed displacement at decision epoch T
+        direction = "const:0"
     max_gap = duration_seconds(o.max_gap) * NS if o.max_gap else None
     # WARN-3: under horizon_end_rule "strict" the unobserved span is measured as
     # `horizon_end - prev_ts`, so a max_gap that is not strictly shorter than the horizon
@@ -1158,9 +1195,10 @@ def _resolve_outcome(ctx: _Ctx, population: Mapping[str, Any]) -> Dict[str, Any]
             ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, "outcome.max_gap", strict_gap_rule,
                     max_gap_ns=max_gap, min_horizon_ns=min(candidate_horizons))
     stream = population.get("cadence", {}).get("stream")
+    ref_target = (rec.get("reference") or o.reference) if o.recovery else o.reference
     contract: Dict[str, Any] = {
         "contract": o.kind, "kernel": kernel, "direction": direction, "direction_sign": (-1 if o.relation == "fade" else 1),
-        "relation": o.relation, "atr": atr, "atr_availability": (o.atr_availability or "at_decision_delivery"), "entry_reference": o.entry_reference,
+        "relation": o.relation, "atr": atr, "reference": ref_target, "atr_availability": (o.atr_availability or "at_decision_delivery"), "entry_reference": o.entry_reference,
         "session_end_censoring": o.session_end in ("censor", "truncate"), "session_end_rule": o.session_end, "max_gap_ns": max_gap, "same_bar_rule": o.same_bar_rule, "horizon_end_rule": o.horizon_end_rule,
         "strict_gap_rule": strict_gap_rule,
         "resolution_precedence": ["SESSION_END", "GAP", "BARRIER_TOUCH", "HORIZON_EXPIRY"],

@@ -146,6 +146,7 @@ class LabelOutcomeContract:
     # Unconditional causal executable-entry observation (ENTRY_OBSERVATION_COLUMNS). Opt-in per
     # study (`outcome.entry_observation: true`); plans that do not request it replay unchanged.
     entry_observation: bool = False
+    reference_ref: Optional[str] = None
 
     @classmethod
     def from_plan(cls, spec: Mapping[str, Any]) -> "LabelOutcomeContract":
@@ -170,7 +171,8 @@ class LabelOutcomeContract:
                    entry_observation=bool(spec.get("entry_observation", False)),
                    cost_points_per_side=(float(spec["cost_points_per_side"])
                                          if spec.get("cost_points_per_side") is not None else None),
-                   data_end_lookahead_ns=(int(spec["data_end_lookahead_ns"]) if spec.get("data_end_lookahead_ns") is not None else None))
+                   data_end_lookahead_ns=(int(spec["data_end_lookahead_ns"]) if spec.get("data_end_lookahead_ns") is not None else None),
+                   reference_ref=(str(spec["reference"]) if spec.get("reference") is not None else None))
 
 
 @dataclass(frozen=True)
@@ -227,10 +229,12 @@ class _Pending:
                  "prev_ts", "arm_end", "arm_state", "arm_at", "arm_reason", "arm_good", "arm_bad", "arm_open",
                  "arm_truncated",
                  "flip_end", "flip_state", "flip_at", "flip_reason", "flip_ts", "opened_at",
-                 "exit_ts", "exit_price", "exit_reason")
+                 "exit_ts", "exit_price", "exit_reason",
+                 "reference_price", "decision_price")
 
     def __init__(self, identity: Dict[str, Any], T: int, direction: int, atr: float, session_close: Optional[int],
-                 n_arms: int, flip_end: Optional[int], prevailing: int) -> None:
+                 n_arms: int, flip_end: Optional[int], prevailing: int,
+                 reference_price: Optional[float] = None, decision_price: Optional[float] = None) -> None:
         self.identity = identity
         self.T = T
         self.direction = direction
@@ -263,6 +267,8 @@ class _Pending:
         self.exit_ts: Optional[int] = None
         self.exit_price: Optional[float] = None
         self.exit_reason: Optional[str] = None
+        self.reference_price = reference_price
+        self.decision_price = decision_price
 
 
 # --------------------------------------------------------------------------- #
@@ -280,13 +286,13 @@ class LabelOutcomeKernel:
         self.last_ts_seen: Optional[int] = None
         if contract.kernel == "flip" and contract.flip is None:
             raise OutcomeContractError("FLIP_KERNEL_WITHOUT_FLIP_ITEM")
-        if contract.kernel == "barrier" and not self.arms:
+        if contract.kernel in ("barrier", "recovery") and not self.arms:
             raise OutcomeContractError("BARRIER_KERNEL_WITHOUT_ARMS")
         if contract.kernel == "composite" and not (self.arms and contract.flip):
             raise OutcomeContractError("COMPOSITE_KERNEL_NEEDS_ARMS_AND_FLIP")
         if contract.entry_reference != "next_bar_open" and self.arms:
             raise OutcomeContractError(f"ENTRY_REFERENCE_UNSUPPORTED: {contract.entry_reference!r}")
-        if contract.entry_observation and contract.kernel not in ("barrier", "composite"):
+        if contract.entry_observation and contract.kernel not in ("barrier", "composite", "recovery"):
             # The flip kernel never reads the execution stream, so it has no entry bar to observe.
             raise OutcomeContractError("ENTRY_OBSERVATION_REQUIRES_EXECUTION_BARS: kernel "
                                        f"{contract.kernel!r} resolves no executable entry")
@@ -314,13 +320,30 @@ class LabelOutcomeKernel:
             self._primary_index = ids.index(contract.primary_arm)
 
     # -- opening ------------------------------------------------------------------
-    def open(self, identity: Dict[str, Any], T: int, direction: int, atr: Optional[float]) -> None:
-        if self.arms:
+    def open(self, identity: Dict[str, Any], T: int, direction: int, atr: Optional[float],
+             reference_price: Optional[float] = None, decision_price: Optional[float] = None) -> None:
+        if self.c.kernel == "recovery":
+            if reference_price is None or not math.isfinite(float(reference_price)):
+                raise OutcomeContractError("RECOVERY_REFERENCE_PRICE_MISSING: recovery outcome needs reference price at T")
+            dec_px = decision_price if decision_price is not None else identity.get("close")
+            if dec_px is None or not math.isfinite(float(dec_px)):
+                raise OutcomeContractError("RECOVERY_DECISION_PRICE_MISSING: recovery outcome needs decision price at T")
+            displacement = float(dec_px) - float(reference_price)
+            if displacement > 0:
+                recovery_dir = -1
+            elif displacement < 0:
+                recovery_dir = 1
+            else:
+                recovery_dir = 0
+            direction = recovery_dir
+        elif self.arms:
             if atr is None or not (float(atr) > 0.0) or not math.isfinite(float(atr)):
                 raise OutcomeContractError("TARGET_FROZEN_ATR_MISSING: barrier outcome needs a positive ATR at T")
         session_close = self.session_table.session_close(T) if self.c.session_end_censoring else None
         flip_end = (T + self.c.flip.horizon_ns) if self.c.flip is not None else None
-        p = _Pending(identity, T, int(direction) * self.c.direction_sign, float(atr or 0.0), session_close, self.n_arms, flip_end, int(direction))
+        p = _Pending(identity, T, int(direction) * self.c.direction_sign, float(atr or 0.0), session_close, self.n_arms, flip_end, int(direction),
+                     reference_price=float(reference_price) if reference_price is not None else None,
+                     decision_price=float(decision_price) if decision_price is not None else None)
         self.pending.append(p)
         if self.c.kernel == "flip":
             self._flip_queue.append(p)
@@ -424,22 +447,51 @@ class LabelOutcomeKernel:
                         self._resolve_arm(p, i, CENSORED, p.entry_ts, "GAP")
                 else:
                     d, atr, ep = p.direction, p.atr, op
-                    for i, arm in enumerate(self.arms):
-                        p.arm_end[i] = p.entry_ts + arm.horizon_ns
-                        p.arm_good[i] = ep + d * arm.favorable_atr * atr
-                        p.arm_bad[i] = ep - d * arm.adverse_atr * atr
-                        if p.session_close is not None and p.arm_end[i] > p.session_close:
-                            if truncate:
-                                # `truncate`: the close BOUNDS the observation window instead of
-                                # voiding it. The arm keeps running to `min(horizon_end,
-                                # session_close)` and is censored only if it REACHES that end
-                                # untouched. Censoring here instead -- as `censor` must -- makes
-                                # every arm whose declared horizon is longer than a trading day
-                                # SESSION_END by construction, before a single bar is examined.
-                                p.arm_end[i] = p.session_close
-                                p.arm_truncated[i] = True
-                            else:
-                                self._resolve_arm(p, i, CENSORED, p.session_close, "SESSION_END")
+                    is_recovery = self.c.kernel == "recovery"
+                    if is_recovery:
+                        if d == 0 or p.decision_price is None or p.reference_price is None:
+                            # Zero displacement or missing price: cannot recover
+                            for i in range(self.n_arms):
+                                self._resolve_arm(p, i, CENSORED, p.entry_ts, "ZERO_DISPLACEMENT")
+                        else:
+                            p_decision = p.decision_price
+                            p_ref = p.reference_price
+                            denom = abs(p_decision - p_ref)
+                            for i, arm in enumerate(self.arms):
+                                p.arm_end[i] = p.entry_ts + arm.horizon_ns
+                                fraction = arm.favorable_atr
+                                # Target is between decision price and anchor
+                                # For fraction = 1.0, target is exactly p_ref
+                                # For fraction < 1.0, target is p_decision + d * (fraction * denom)
+                                if abs(fraction - 1.0) < 1e-9:
+                                    target_px = p_ref
+                                else:
+                                    target_px = p_decision + d * (fraction * denom)
+                                p.arm_good[i] = target_px
+                                p.arm_bad[i] = float("-inf") if d > 0 else float("inf")
+                                if p.session_close is not None and p.arm_end[i] > p.session_close:
+                                    if truncate:
+                                        p.arm_end[i] = p.session_close
+                                        p.arm_truncated[i] = True
+                                    else:
+                                        self._resolve_arm(p, i, CENSORED, p.session_close, "SESSION_END")
+                    else:
+                        for i, arm in enumerate(self.arms):
+                            p.arm_end[i] = p.entry_ts + arm.horizon_ns
+                            p.arm_good[i] = ep + d * arm.favorable_atr * atr
+                            p.arm_bad[i] = ep - d * arm.adverse_atr * atr
+                            if p.session_close is not None and p.arm_end[i] > p.session_close:
+                                if truncate:
+                                    # `truncate`: the close BOUNDS the observation window instead of
+                                    # voiding it. The arm keeps running to `min(horizon_end,
+                                    # session_close)` and is censored only if it REACHES that end
+                                    # untouched. Censoring here instead -- as `censor` must -- makes
+                                    # every arm whose declared horizon is longer than a trading day
+                                    # SESSION_END by construction, before a single bar is examined.
+                                    p.arm_end[i] = p.session_close
+                                    p.arm_truncated[i] = True
+                                else:
+                                    self._resolve_arm(p, i, CENSORED, p.session_close, "SESSION_END")
             # C1: the canonical terminal exit is the OPEN of the first bar strictly after the
             # qualifying flip -- the same next_bar_open convention the entry already uses. No new
             # fill convention is invented here.
@@ -664,7 +716,7 @@ class LabelOutcomeKernel:
         row["regime_direction"] = p.prevailing
         if c.kernel == "flip":
             disp, at, reason, flip_ts, horizon_end = p.flip_state, p.flip_at, p.flip_reason, p.flip_ts, p.flip_end
-        elif c.kernel == "barrier":
+        elif c.kernel in ("barrier", "recovery"):
             i = self._primary_index
             disp, at, reason, horizon_end = p.arm_state[i], p.arm_at[i], p.arm_reason[i], (p.arm_end[i] if p.entry_resolved else None)
             flip_ts = at if disp == POSITIVE else None
