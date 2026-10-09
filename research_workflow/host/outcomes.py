@@ -463,7 +463,7 @@ class LabelOutcomeKernel:
                                 # Target is between decision price and anchor
                                 # For fraction = 1.0, target is exactly p_ref
                                 # For fraction < 1.0, target is p_decision + d * (fraction * denom)
-                                if abs(fraction - 1.0) < 1e-9:
+                                if abs(fraction - 1.0) < 1e-9:  # host-constant: float comparison tolerance
                                     target_px = p_ref
                                 else:
                                     target_px = p_decision + d * (fraction * denom)
