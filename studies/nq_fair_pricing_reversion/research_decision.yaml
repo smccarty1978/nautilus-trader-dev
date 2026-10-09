@@ -15,39 +15,55 @@ scientific_decisions:
     kind: time_defined_rth_open
     source: "09:30 America/New_York regular-session opening price (open of the first completed 1m bar at or after 09:30 ET)."
     time_zone_authority: "CME Globex Equity calendar schedule, timezone-aware America/New_York (never hardcoded UTC-5)."
-    invariance: "Remains strictly constant throughout the 09:30-11:00 NY observation window."
+    earliest_availability: "Available at 09:31:00 ET upon completion of the opening 1m bar (ts_init = 09:31:00 ET)."
+    invariance: "Remains strictly constant throughout the session window."
+
+  session_boundaries:
+    calendar: "CME Globex Equity (CME equity index product schedule)."
+    standard_rth_hours: "08:30:00 to 15:15:00 America/Chicago (09:30:00 to 16:15:00 America/New_York)."
+    holiday_shortened: "Session close or halt truncates the window; out-of-calendar days fail closed."
+
   observation_window:
-    start: "09:30 America/New_York"
-    end: "11:00 America/New_York (elapsed_seconds <= 5400s from RTH open)."
-    holiday_shortened: "Session close or halt truncates the window; out-of-calendar days rejected."
-  instrument: "NQ futures (XCME), native 1s execution stream + completed 1m context stream."
-  admissible_chronology:
-    train_partitions: [2021, 2022, 2023]
-    dev_reserved: [2024]
-    prohibited_reserved: [2025, 2026]
-    smoke_date: "2023-10-02"
-  signal_families:
-    A0_displacement_reference:
-      description: "Eligible observations where price is displaced from fair price by at least D points/ATR, without confirmation signals."
-      displacements: [20, 40, 60, 80]  # points
-    A1_displacement_candle:
-      description: "Qualifying opposite-color displacement candle with body expansion and wick penetration."
-      short_rule: "Candle is bearish, real body > prior candle real body, close < prior candle low, price > fair_price_anchor."
-      long_rule: "Candle is bullish, real body > prior candle real body, close > prior candle high, price < fair_price_anchor."
-      evaluation: "Completed 1m bars only. Entry reference is strictly next_bar_open (never decision close)."
-    A2_confirmed_bos:
-      description: "Confirmed 3-bar swing pivot broken by subsequent completed 1m close."
-      swing_low_rule: "Low[t-1] < Low[t-2] and Low[t-1] < Low[t]. Confirmed only upon close of bar t."
-      swing_high_rule: "High[t-1] > High[t-2] and High[t-1] > High[t]. Confirmed only upon close of bar t."
-      break_rule: "Subsequent bar t+k (k >= 1) closes below active confirmed swing low (short) or above active confirmed swing high (long)."
-      invalidation_rule: "A new confirmed swing in the same direction replaces the prior active swing. Active swings expire at session boundary."
-  outcomes_and_recoveries:
-    reversion_targets:
-      full_recovery: "Price touches or crosses the 09:30 anchor price (100% recovery)."
-      partial_recoveries: [0.25, 0.50, 0.75]  # fraction of displacement at decision time
-    measurement_type: "Descriptive path observation (touch/crossing of market price) separate from order-fill economics."
-    horizon: "End of observation window (11:00 ET) or RTH session close (16:00/16:15 CT)."
-    censoring: "Truncate at session close or window end; gap > 60s censors GAP."
+    start_instant: "09:31:00 America/New_York (first bar carrying causal anchor availability)."
+    cutoff_instant: "11:00:00 America/New_York (the completed 1m bar closing exactly at 11:00:00 ET is INCLUDED; no candidate emitted with ts_init > 11:00:00 ET)."
+    elapsed_seconds: "elapsed_seconds <= 5400s from 09:30 ET open."
+
+  direction_and_eligibility:
+    displacement_calculation: "displacement = close_T - anchor_T"
+    displacement_direction: "sign(displacement) -> +1 if close_T > anchor_T, -1 if close_T < anchor_T"
+    recovery_direction: "-displacement_direction -> -1 (short reversion) if displaced above anchor; +1 (long reversion) if displaced below anchor."
+    regime_role: "regime_1m.dir is preserved strictly as causal context, never used as recovery direction."
+    zero_displacement_policy: "Observations where close_T == anchor_T (displacement == 0) are strictly INELIGIBLE for recovery tracking."
+
+  population_identity:
+    primary_census: "All eligible 1-minute checkpoints within 09:31-11:00 ET with |displacement| >= threshold."
+    episode_first: "Earliest qualifying displacement checkpoint per excursion episode away from anchor."
+    reporting_strata: [20.0, 40.0, 60.0, 80.0]  # NQ points (predetermined descriptive reporting strata, not optimized gates)
+    atr_reporting_strata: [1.0, 1.5, 2.0]        # 1m ATR(14) units
+
+  forward_horizon_and_censoring:
+    forward_observation_end: "The earlier of the per-session RTH calendar close (15:15 CT / 16:15 ET or early holiday close) or declared horizon."
+    candidate_emission_vs_outcome: "Candidate emission stops at 11:00 ET; forward outcome tracking continues through RTH close."
+    independent_milestones: [0.25, 0.50, 0.75, 1.00]
+    milestone_censoring_policy: "Independent resolution per milestone. An unresolved milestone at session close is CENSORED SESSION_END, never recorded as a failure or loss."
+    gap_censoring_seconds: 60.0
+
+  recovery_calculation_precision:
+    frozen_at_T:
+      - anchor_T
+      - close_T
+      - displacement_direction
+      - abs_displacement_T
+      - recovery_prices: [P_25, P_50, P_75, P_100]
+    denominator_invariance: "abs_displacement_T remains immutable; future extrema never redefine the denominator."
+    touch_definition: "Exact market price touch or crossing of completed bar extremes without artificial tolerance (low <= target for short, high >= target for long)."
+    tick_size: 0.25
+
+admissible_chronology:
+  train_partitions: [2021, 2022, 2023]
+  dev_reserved: [2024]
+  prohibited_reserved: [2025, 2026]
+  smoke_date: "2023-10-02"
 
 terminal_decisions: {}
 
