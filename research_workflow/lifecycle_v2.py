@@ -21,7 +21,7 @@ import time
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Mapping, Optional, Sequence
+from typing import Any, Callable, Dict, List, Mapping, NamedTuple, Optional, Sequence
 
 import yaml
 
@@ -399,7 +399,15 @@ def _stream_merged_parquet(path: Path, sources: Sequence[Path], order: Any, *, b
             "output_row_groups": out_groups, "sources": len(sources)}
 
 
-def _merge_partition_file(sources: Sequence[Path], dest: Path, *, check_dup: bool) -> Dict[str, Any]:
+class MergedFile(NamedTuple):
+    """One merged file's record: content identity, persisted column names, row count, merge method."""
+    identity: str
+    columns: List[str]
+    rows: int
+    method: Dict[str, Any]
+
+
+def _merge_partition_file(sources: Sequence[Path], dest: Path, *, check_dup: bool) -> MergedFile:
     """Merge one partition file kind (candidates or observations) into ``dest`` in stable KEY order.
 
     Partitions carrying a nested (struct/list) column are merged by STREAMING bounded Arrow batches
@@ -418,15 +426,15 @@ def _merge_partition_file(sources: Sequence[Path], dest: Path, *, check_dup: boo
         del keys
         stats = _stream_merged_parquet(dest, sources, order)
         ident = _streaming_frame_content_identity(dest)
-        return {"identity": ident["identity"], "columns": list(pq.read_schema(dest).names), "rows": stats["rows"],
-                "method": {"write": "arrow_stream_v1", "identity": ident["method"], **stats}}
+        return MergedFile(identity=ident["identity"], columns=list(pq.read_schema(dest).names), rows=stats["rows"],
+                          method={"write": "arrow_stream_v1", "identity": ident["method"], **stats})
     frame = pd.concat([pd.read_parquet(p) for p in sources], ignore_index=True)
     if check_dup and len(frame) and frame.duplicated(list(KEY)).any():
         raise LifecycleV2Error("MERGE_DUPLICATE_KEYS")
     frame = frame.sort_values(list(KEY), kind="mergesort").reset_index(drop=True)
     frame.to_parquet(dest, index=False)
-    return {"identity": frame_content_identity(frame), "columns": [str(c) for c in frame.columns], "rows": int(len(frame)),
-            "method": {"write": "pandas_to_parquet", "identity": "frame_content_identity"}}
+    return MergedFile(identity=frame_content_identity(frame), columns=[str(c) for c in frame.columns], rows=int(len(frame)),
+                      method={"write": "pandas_to_parquet", "identity": "frame_content_identity"})
 
 
 def _row_group_slices(pf: Any, columns: Sequence[str], rows: int):
@@ -1421,21 +1429,21 @@ class V2Lifecycle:
         # the way to parquet -- that is exactly how a whole C1 terminal block went missing from a
         # completed collection with every stage reporting PASS. Fail the merge instead.
         declared = list((plan.get("outcome") or {}).get("observation_columns") or [])
-        missing = [c for c in declared if c not in obs["columns"]]
+        missing = [c for c in declared if c not in obs.columns]
         if missing:
             raise LifecycleV2Error(
                 "MERGE_PERSISTED_SCHEMA_MISSING_COLUMNS: the plan declares observation columns that "
                 f"are absent from the merged frame: {missing}. The kernel's observation_columns and "
                 "the compiled plan's observation_columns must agree; the sink buffers from the former.")
-        ident = _write(out / "identity.json", {"candidates_identity": cand["identity"], "observations_identity": obs["identity"],
-                                                "declared_observation_columns": declared, "persisted_observation_columns": obs["columns"],
-                                                "rows": cand["rows"], "years": list(years), "authority": "plan.chronology.train", "plan_sha256": plan["plan_sha256"],
+        ident = _write(out / "identity.json", {"candidates_identity": cand.identity, "observations_identity": obs.identity,
+                                                "declared_observation_columns": declared, "persisted_observation_columns": obs.columns,
+                                                "rows": cand.rows, "years": list(years), "authority": "plan.chronology.train", "plan_sha256": plan["plan_sha256"],
                                                 "candidates_sha256": _sha(out / "candidates.parquet"), "observations_sha256": _sha(out / "observations.parquet"),
                                                 # Canonical row-major logical-content hash (the chunked writer's own,
                                                 # byte-bounded streaming recompute): independent of row-group layout.
-                                                "candidates_logical_content_sha256": recompute_logical_content_sha256(out / "candidates.parquet", cand["columns"]),
-                                                "observations_logical_content_sha256": recompute_logical_content_sha256(out / "observations.parquet", obs["columns"]),
-                                                "merge_method": {"candidates": cand["method"], "observations": obs["method"]},
+                                                "candidates_logical_content_sha256": recompute_logical_content_sha256(out / "candidates.parquet", cand.columns),
+                                                "observations_logical_content_sha256": recompute_logical_content_sha256(out / "observations.parquet", obs.columns),
+                                                "merge_method": {"candidates": cand.method, "observations": obs.method},
                                                 "generated_at_utc": _now()})
         return {"status": "PASS", "outputs": [str(out / "candidates.parquet"), str(out / "observations.parquet"), str(ident)]}
 

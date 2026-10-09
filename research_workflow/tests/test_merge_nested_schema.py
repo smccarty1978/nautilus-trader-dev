@@ -98,7 +98,7 @@ def test_non_nested_merge_is_byte_identical_to_the_previous_path(tmp_path):
     old, new = tmp_path / "old.parquet", tmp_path / "new.parquet"
     frame.to_parquet(old, index=False)
     rec = _merge_partition_file([pa_, pb], new, check_dup=True)
-    assert rec["method"]["write"] == "pandas_to_parquet"
+    assert rec.method["write"] == "pandas_to_parquet"
     assert _sha(old) == _sha(new)
 
 
