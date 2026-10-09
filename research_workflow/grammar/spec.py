@@ -197,6 +197,8 @@ class OutcomeSpec(_Strict):
     # C1: per-side friction in POINTS for the canonical lifecycle terminal. Omitted means the
     # research contract supplies no cost assumption -- gross economics stay canonical and net
     # economics are emitted as explicitly unavailable (null) rather than guessed.
+    recovery: Optional[Dict[str, Any]] = None     # {reference, milestones: [...], horizon?, expiry?}
+    reference: Optional[str] = None                # target reference price, e.g. anchor level or price_level_tracker.rth_open_price
     cost_points_per_side: Optional[float] = None
     # Opt-in causal executable-entry observation: executable_entry_ts / executable_entry_price /
     # executable_entry_unavailable_reason, published whenever the entry is known, independent of any
