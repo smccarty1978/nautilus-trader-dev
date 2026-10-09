@@ -251,32 +251,221 @@ def authorized_years(plan: Dict[str, Any], period: str, requested: Optional[Sequ
     return req
 
 
-def _write_merged_parquet(frame: Any, path: Path, sources: Sequence[Path], order: Any) -> None:
-    """Write one merged file. Partitions with a nested (struct/list) column are merged in Arrow.
+MERGE_TARGET_BATCH_BYTES = 64 * 1024 * 1024  # host-constant: target Arrow bytes per streamed merge
+# write batch. Bounds the merge's working set (plus one source row group, see
+# _stream_merged_parquet) independently of the partition row count.
+MERGE_IDENTITY_SCALAR_BATCH_ROWS = 65_536  # host-constant: rows per batch when hashing the scalar
+# columns of a streamed merged file (8 bytes/row/column as numpy; bounded regardless of file size).
 
-    ``frame`` is the KEY-sorted pandas concatenation of ``sources``; ``order`` is the positional
-    permutation that sorted it. A pandas round trip is lossy for a typed nested column (e.g. a
-    tracker's declared ``profile`` struct written by the chunked collection writer): pyarrow's
-    ``to_pandas`` turns an int64 struct child into Python floats in any row group where that child
-    has a null, and ``to_parquet`` then re-infers the type and fails (``ArrowInvalid ... not
-    exactly representable``) or silently writes doubles. Such partitions are therefore merged as
-    their own Arrow tables -- identical schema required -- concatenated in the same order and
-    permuted by the same ``order``, so population, ordering and values equal the pandas path's
-    while every typed field keeps its declared type. Partitions with no nested column take the
-    unchanged ``to_parquet`` path, byte for byte.
-    """
+
+def _sources_nested(sources: Sequence[Path]) -> bool:
+    """True when the partitions' Arrow schema carries any nested (struct/list/map) column."""
     import pyarrow as pa
     import pyarrow.parquet as pq
+    return bool(sources) and any(pa.types.is_nested(f.type) for f in pq.read_schema(sources[0]))
+
+
+def _merge_key_order(sources: Sequence[Path]) -> tuple[Any, Any]:
+    """The KEY columns of ``sources`` (concatenated in order) and the stable KEY sort permutation.
+
+    Reads ONLY the KEY columns. The permutation equals the one the whole-frame pandas merge used
+    (``frame.sort_values(KEY, kind="mergesort")`` depends only on the KEY values, their pandas
+    dtypes and the concatenation order, all identical here).
+    """
+    import pandas as pd
+    keys = pd.concat([pd.read_parquet(p, columns=list(KEY)) for p in sources], ignore_index=True)
+    return keys, keys.sort_values(list(KEY), kind="mergesort").index.to_numpy()
+
+
+def _merge_batch_rows(pfs: Sequence[Any], target_bytes: int = MERGE_TARGET_BATCH_BYTES) -> int:
+    """Rows per streamed batch so one batch's in-memory Arrow footprint is near ``target_bytes``.
+
+    Arrow bytes/row is measured on the largest row group of the first non-empty source (one bounded
+    read). The footer's ``total_byte_size`` is NOT used: it counts encoded (dictionary/RLE) bytes and
+    understated the decoded Arrow size of the G2 pilot's profile structs ~5.6x (27 KB vs 151 KB/row).
+    """
+    for pf in pfs:
+        md = pf.metadata
+        if md.num_rows:
+            gi = max(range(md.num_row_groups), key=lambda i: md.row_group(i).num_rows)
+            t = pf.read_row_group(gi)
+            per_row = t.nbytes / max(1, t.num_rows)
+            del t
+            return max(1, int(target_bytes / per_row)) if per_row > 0 else max(1, md.num_rows)
+    return 1
+
+
+def _stream_merged_parquet(path: Path, sources: Sequence[Path], order: Any, *, batch_rows: Optional[int] = None) -> Dict[str, Any]:
+    """Write one merged file from ``sources`` permuted by ``order`` with bounded memory (Arrow only).
+
+    ``order`` is the positional permutation of the concatenated ``sources`` (``_merge_key_order``).
+    The output is produced in consecutive chunks of ``batch_rows`` OUTPUT positions: each chunk's
+    rows are taken from the source row groups that hold them (the most recently read row group of
+    each source is cached, so a merge whose order is monotone within each source -- the normal
+    case, interleaved or not -- reads every row group exactly once), reassembled in output order
+    and appended to a ``ParquetWriter`` as one row group. Nothing is converted to pandas or Python
+    objects, every column keeps its exact Arrow type, and the working set is one chunk plus at most
+    one row group per source, independent of the partition row count. Partitions must carry
+    identical Arrow schemas (``MERGE_NESTED_SCHEMA_MISMATCH`` otherwise). The file is written to a
+    temporary sibling and atomically renamed into place.
+
+    (Before chore/merge_bounded_memory the nested path read every partition into pandas AND as a
+    whole Arrow table, concatenated, ``take``-permuted the whole table and wrote one row group:
+    7.71 GiB peak RSS for 13,501 rows of the G2 pilot, linear in rows.)
+    """
+    import numpy as np
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+    path = Path(path)
     schemas = [pq.read_schema(p) for p in sources]
-    if not schemas or not any(pa.types.is_nested(f.type) for f in schemas[0]):
-        frame.to_parquet(path, index=False)
-        return
+    if not schemas:
+        raise LifecycleV2Error(f"MERGE_NO_PARTITIONS: {path.name}")
     if any(not s.remove_metadata().equals(schemas[0].remove_metadata()) for s in schemas[1:]):
         raise LifecycleV2Error(f"MERGE_NESTED_SCHEMA_MISMATCH: partitions of {path.name} carry different Arrow schemas")
-    table = pa.concat_tables([pq.read_table(p) for p in sources])
-    if table.num_rows != len(frame) or list(table.column_names) != [str(c) for c in frame.columns]:
-        raise LifecycleV2Error(f"MERGE_NESTED_SCHEMA_MISMATCH: {path.name} Arrow table does not match the merged frame")
-    pq.write_table(table.take(pa.array(order, type=pa.int64())), path)
+    pfs = [pq.ParquetFile(str(p)) for p in sources]
+    groups = [(fi, gi, pf.metadata.row_group(gi).num_rows) for fi, pf in enumerate(pfs) for gi in range(pf.metadata.num_row_groups)]
+    sizes = np.array([n for _, _, n in groups], dtype=np.int64)
+    starts = np.concatenate([[0], np.cumsum(sizes)[:-1]]) if len(sizes) else np.zeros(0, dtype=np.int64)
+    total = int(sizes.sum())
+    order = np.asarray(order, dtype=np.int64)
+    if len(order) != total or (total and (order.min() < 0 or order.max() >= total)) or len(np.unique(order)) != total:
+        raise LifecycleV2Error(f"MERGE_NESTED_SCHEMA_MISMATCH: {path.name} order is not a permutation of the {total} partition rows")
+    rows_per = int(batch_rows) if batch_rows else _merge_batch_rows(pfs)
+    tmp = path.with_name(path.name + ".tmp")
+    cached: Dict[int, Any] = {}  # source file -> (global row group, table): at most ONE row group per source
+
+    def _group(g: int):
+        fi, gi, _ = groups[g]
+        hit = cached.get(fi)
+        if hit is None or hit[0] != g:
+            cached.pop(fi, None)  # release this source's previous row group before reading the next
+            cached[fi] = (g, pfs[fi].read_row_group(gi))
+        return cached[fi][1]
+
+    out_groups = 0
+    try:
+        with pq.ParquetWriter(str(tmp), schemas[0]) as writer:
+            for s in range(0, total, rows_per):
+                pos = order[s:s + rows_per]
+                g_of = np.searchsorted(starts, pos, side="right") - 1
+                pieces, slots = [], []
+                for g in np.unique(g_of):
+                    sel = np.nonzero(g_of == g)[0]
+                    pieces.append(_group(int(g)).take(pa.array(pos[sel] - starts[g], type=pa.int64())))
+                    slots.append(sel)
+                chunk = pa.concat_tables(pieces) if len(pieces) > 1 else pieces[0]
+                if len(pieces) > 1:
+                    chunk = chunk.take(pa.array(np.argsort(np.concatenate(slots), kind="stable"), type=pa.int64()))
+                writer.write_table(chunk, row_group_size=max(1, chunk.num_rows))
+                out_groups += 1
+                del pieces, chunk
+            if total == 0:
+                writer.write_table(schemas[0].empty_table())
+        cached.clear()
+        os.replace(tmp, path)
+    finally:
+        cached.clear()
+        if tmp.exists():
+            tmp.unlink()
+    return {"rows": total, "batch_rows": rows_per, "source_row_groups": len(groups), "output_row_groups": out_groups,
+            "sources": len(sources)}
+
+
+def _merge_partition_file(sources: Sequence[Path], dest: Path, *, check_dup: bool) -> Dict[str, Any]:
+    """Merge one partition file kind (candidates or observations) into ``dest`` in stable KEY order.
+
+    Partitions carrying a nested (struct/list) column are merged by STREAMING bounded Arrow batches
+    (``_stream_merged_parquet``); only their KEY columns are ever read whole (duplicate check and
+    the stable sort order). Scalar-only partitions keep the previous whole-frame pandas path
+    unchanged, byte for byte, with the unchanged ``frame_content_identity``.
+    """
+    import pandas as pd
+    import pyarrow.parquet as pq
+
+    from research.analysis.modeling import frame_content_identity
+    if _sources_nested(sources):
+        keys, order = _merge_key_order(sources)
+        if check_dup and len(keys) and keys.duplicated(list(KEY)).any():
+            raise LifecycleV2Error("MERGE_DUPLICATE_KEYS")
+        del keys
+        stats = _stream_merged_parquet(dest, sources, order)
+        ident = _streaming_frame_content_identity(dest)
+        return {"identity": ident["identity"], "columns": list(pq.read_schema(dest).names), "rows": stats["rows"],
+                "method": {"write": "arrow_stream_v1", "identity": ident["method"], **stats}}
+    frame = pd.concat([pd.read_parquet(p) for p in sources], ignore_index=True)
+    if check_dup and len(frame) and frame.duplicated(list(KEY)).any():
+        raise LifecycleV2Error("MERGE_DUPLICATE_KEYS")
+    frame = frame.sort_values(list(KEY), kind="mergesort").reset_index(drop=True)
+    frame.to_parquet(dest, index=False)
+    return {"identity": frame_content_identity(frame), "columns": [str(c) for c in frame.columns], "rows": int(len(frame)),
+            "method": {"write": "pandas_to_parquet", "identity": "frame_content_identity"}}
+
+
+def _streaming_frame_content_identity(path: Path) -> Dict[str, Any]:
+    """Column-ordered content identity of a merged parquet file, computed by streaming it.
+
+    For every NON-nested column the per-column digest is exactly ``frame_content_identity``'s
+    (``research.analysis.modeling``): the sha256 of the 12-dp-rounded float64 bytes when the whole
+    column converts to float64, else the sha256 of the ``"\\x1f"``-joined ``repr`` of its pandas
+    values -- both are row-streamable, and a column takes the repr digest iff any batch fails the
+    float conversion (which is iff the whole column fails). A NESTED column's legacy digest was the
+    repr of pandas objects, which truncates arrays and depends on the physical row-group chunking
+    (to_pandas floats an int64 child in any chunk holding a null), so it is not a content identity;
+    nested columns are digested instead as the ``"\\x1f"``-joined canonical JSON of their exact
+    Arrow values (``to_pylist``), read in byte-bounded batches. The combined value is
+    ``canonical_sha256([[column, digest], ...])`` as before.
+    """
+    import hashlib as _h
+
+    import numpy as np
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+
+    from research.analysis.identity import canonical_sha256
+    from research_workflow.host.chunked_writer import (DEFAULT_RECOMPUTE_TARGET_BATCH_BYTES, _bytes_bounded_batch_rows,
+                                                       _canonical_json)
+    pf = pq.ParquetFile(str(path))
+    schema = pf.schema_arrow
+    names = list(schema.names)
+    nested = [n for n in names if pa.types.is_nested(schema.field(n).type)]
+    scalar = [n for n in names if n not in nested]
+    flt = {n: _h.sha256() for n in scalar}
+    rep = {n: _h.sha256() for n in scalar}
+    float_ok = {n: True for n in scalar}
+    # A numeric/boolean Arrow column always converts to float64 (nulls -> NaN), so only the other
+    # scalar types (strings, timestamps, ...) need the repr digest kept alongside.
+    numeric = {n for n in scalar if pa.types.is_integer(schema.field(n).type) or pa.types.is_floating(schema.field(n).type)
+               or pa.types.is_boolean(schema.field(n).type)}
+    first = {n: True for n in names}
+    if scalar:
+        for batch in pf.iter_batches(batch_size=MERGE_IDENTITY_SCALAR_BATCH_ROWS, columns=scalar):
+            for n in scalar:
+                series = batch.column(batch.schema.get_field_index(n)).to_pandas()
+                if float_ok[n]:
+                    try:
+                        flt[n].update(np.round(np.asarray(series.to_numpy(dtype="float64", na_value=np.nan), dtype="float64"), 12).tobytes())
+                    except (TypeError, ValueError):
+                        if n in numeric:
+                            raise LifecycleV2Error(f"MERGE_IDENTITY_INTERNAL: numeric column {n!r} did not convert to float64")
+                        float_ok[n] = False
+                if n in numeric:
+                    continue
+                values = series.tolist()
+                if values:
+                    rep[n].update((("" if first[n] else "\x1f") + "\x1f".join(map(repr, values))).encode("utf-8"))
+                    first[n] = False
+    nested_digest: Dict[str, str] = {}
+    for n in nested:
+        h = _h.sha256()
+        rows = _bytes_bounded_batch_rows(pf, [n], DEFAULT_RECOMPUTE_TARGET_BATCH_BYTES)
+        for batch in pf.iter_batches(batch_size=rows, columns=[n]):
+            for v in batch.column(0).to_pylist():
+                h.update((("" if first[n] else "\x1f") + _canonical_json(v)).encode("utf-8"))
+                first[n] = False
+        nested_digest[n] = h.hexdigest()
+    per_column = [[n, nested_digest[n] if n in nested_digest else (flt[n] if float_ok[n] else rep[n]).hexdigest()] for n in names]
+    return {"identity": canonical_sha256(per_column), "nested_columns": nested,
+            "method": "streaming_frame_content_identity_v1: scalar columns = frame_content_identity; nested columns = canonical JSON of Arrow values"}
 
 
 def _merge_window_stats(stats: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
@@ -1175,39 +1364,34 @@ class V2Lifecycle:
 
     def merge(self, study: Path | None = None) -> Dict[str, Any]:
         self._require_execute("merge")
-        import pandas as pd
-        from research.analysis.modeling import frame_content_identity
         plan = load_plan(self.study)
         years = self._authorized_years(plan, "train", self.opts.years)
         base = self.work / "partitions" / "train"
-        cands = pd.concat([pd.read_parquet(base / str(y) / "candidates.parquet") for y in years], ignore_index=True)
-        obs = pd.concat([pd.read_parquet(base / str(y) / "observations.parquet") for y in years], ignore_index=True)
-        if len(cands) and cands.duplicated(list(KEY)).any():
-            raise LifecycleV2Error("MERGE_DUPLICATE_KEYS")
-        # The stable KEY order, kept as positions so a nested-column merge can apply the SAME
-        # permutation to the partitions' own Arrow tables (_write_merged_parquet).
-        c_order = cands.sort_values(list(KEY), kind="mergesort").index.to_numpy()
-        o_order = obs.sort_values(list(KEY), kind="mergesort").index.to_numpy()
-        cands = cands.iloc[c_order].reset_index(drop=True)
-        obs = obs.iloc[o_order].reset_index(drop=True)
         out = self.work / "merged"; out.mkdir(parents=True, exist_ok=True)
-        _write_merged_parquet(cands, out / "candidates.parquet", [base / str(y) / "candidates.parquet" for y in years], c_order)
-        _write_merged_parquet(obs, out / "observations.parquet", [base / str(y) / "observations.parquet" for y in years], o_order)
+        from research_workflow.host.chunked_writer import recompute_logical_content_sha256
+        cand = _merge_partition_file([base / str(y) / "candidates.parquet" for y in years], out / "candidates.parquet", check_dup=True)
+        obs = _merge_partition_file([base / str(y) / "observations.parquet" for y in years], out / "observations.parquet", check_dup=False)
         # PERSISTED-SCHEMA ASSERTION. The sink buffers from the kernel's own column list, so a
         # column the plan declares can be emitted into the row dict and then silently dropped on
         # the way to parquet -- that is exactly how a whole C1 terminal block went missing from a
         # completed collection with every stage reporting PASS. Fail the merge instead.
         declared = list((plan.get("outcome") or {}).get("observation_columns") or [])
-        missing = [c for c in declared if c not in obs.columns]
+        missing = [c for c in declared if c not in obs["columns"]]
         if missing:
             raise LifecycleV2Error(
                 "MERGE_PERSISTED_SCHEMA_MISSING_COLUMNS: the plan declares observation columns that "
                 f"are absent from the merged frame: {missing}. The kernel's observation_columns and "
                 "the compiled plan's observation_columns must agree; the sink buffers from the former.")
-        ident = _write(out / "identity.json", {"candidates_identity": frame_content_identity(cands), "observations_identity": frame_content_identity(obs),
-                                                "declared_observation_columns": declared, "persisted_observation_columns": list(obs.columns),
-                                                "rows": int(len(cands)), "years": list(years), "authority": "plan.chronology.train", "plan_sha256": plan["plan_sha256"],
-                                                "candidates_sha256": _sha(out / "candidates.parquet"), "observations_sha256": _sha(out / "observations.parquet"), "generated_at_utc": _now()})
+        ident = _write(out / "identity.json", {"candidates_identity": cand["identity"], "observations_identity": obs["identity"],
+                                                "declared_observation_columns": declared, "persisted_observation_columns": obs["columns"],
+                                                "rows": cand["rows"], "years": list(years), "authority": "plan.chronology.train", "plan_sha256": plan["plan_sha256"],
+                                                "candidates_sha256": _sha(out / "candidates.parquet"), "observations_sha256": _sha(out / "observations.parquet"),
+                                                # Canonical row-major logical-content hash (the chunked writer's own,
+                                                # byte-bounded streaming recompute): independent of row-group layout.
+                                                "candidates_logical_content_sha256": recompute_logical_content_sha256(out / "candidates.parquet", cand["columns"]),
+                                                "observations_logical_content_sha256": recompute_logical_content_sha256(out / "observations.parquet", obs["columns"]),
+                                                "merge_method": {"candidates": cand["method"], "observations": obs["method"]},
+                                                "generated_at_utc": _now()})
         return {"status": "PASS", "outputs": [str(out / "candidates.parquet"), str(out / "observations.parquet"), str(ident)]}
 
     # -- modeling -------------------------------------------------------------------------------
