@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "kind": "CAPABILITY_GAP_HANDOFF",
+  "generated_at_utc": "2026-10-09T15:45:38.065463+00:00",
+  "study_id": "nq_fair_pricing_reversion",
+  "study_branch": "study/nq_fair_pricing_reversion",
+  "study_worktree": "C:/Users/Scott McCarty/Projects/Nautilus Trader-nq_fair_pricing_reversion",
+  "source_platform_commit": "4f53d9ae21fb0daf26aabfd51a22bbf6bd0662c7",
+  "research_question": "Does NQ exhibit a statistically meaningful tendency to revisit its regular-session opening price following intraday displacement, and do displacement-candle or confirmed BOS entries improve subsequent reversion outcomes?",
+  "gap_kinds": [
+    "INVALID_PARAMETERIZATION",
+    "MISSING_CAPABILITY",
+    "UNSUPPORTED_COMPOSITION"
+  ],
+  "gaps": [
+    {
+      "kind": "MISSING_CAPABILITY",
+      "where": "features.instances",
+      "message": "feature host cannot bind the surface: RUNTIME_PROVIDER_BINDING_MISSING: canonical provider 'features.trackers.generic_price_levels.GenericPriceLevelProvider' (needed by ['distance_to_level']) has no registered RuntimeProviderAdapter",
+      "detail": {},
+      "closest": null
+    },
+    {
+      "kind": "UNSUPPORTED_COMPOSITION",
+      "where": "outcome.event",
+      "message": "predicate references unknown context tracker 'anchor'",
+      "detail": {
+        "predicate": "anchor.reverted"
+      },
+      "closest": null
+    },
+    {
+      "kind": "INVALID_PARAMETERIZATION",
+      "where": "outcome",
+      "message": "an outcome needs a barrier, an event, or both",
+      "detail": {},
+      "closest": null
+    }
+  ],
+  "requested_semantics": [
+    {
+      "where": "features.instances",
+      "kind": "MISSING_CAPABILITY",
+      "requested": [
+        {
+          "feature": "distance_to_level",
+          "level": "rth_open",
+          "level_context": "session",
+          "normalization": "points",
+          "timeframe": "1m"
+        }
+      ],
+      "message": "feature host cannot bind the surface: RUNTIME_PROVIDER_BINDING_MISSING: canonical provider 'features.trackers.generic_price_levels.GenericPriceLevelProvider' (needed by ['distance_to_level']) has no registered RuntimeProviderAdapter",
+      "detail": {}
+    },
+    {
+      "where": "outcome.event",
+      "kind": "UNSUPPORTED_COMPOSITION",
+      "requested": "anchor.reverted",
+      "message": "predicate references unknown context tracker 'anchor'",
+      "detail": {
+        "predicate": "anchor.reverted"
+      }
+    },
+    {
+      "where": "outcome",
+      "kind": "INVALID_PARAMETERIZATION",
+      "requested": {
+        "kind": "label",
+        "entry_reference": "next_bar_open",
+        "event": "anchor.reverted",
+        "horizon": "5400s"
+      },
+      "message": "an outcome needs a barrier, an event, or both",
+      "detail": {}
+    }
+  ],
+  "compiler_evidence": {
+    "STATUS": "CAPABILITY_GAP",
+    "study_id": "nq_fair_pricing_reversion",
+    "kinds": [
+      "INVALID_PARAMETERIZATION",
+      "MISSING_CAPABILITY",
+      "UNSUPPORTED_COMPOSITION"
+    ],
+    "count": 3
+  },
+  "affected_yaml_fields": [
+    "features.instances",
+    "outcome",
+    "outcome.event"
+  ],
+  "existing_nearest_capabilities": [],
+  "capability_lookup": "python scripts/research.py cap search <term>; python scripts/research.py cap describe <id>",
+  "scientific_decisions_already_resolved": {
+    "terminal_decisions": {},
+    "autonomy_decisions": {
+      "on_capability_gap": "stop_and_handoff",
+      "platform_change_required": "chore_branch_and_fresh_session",
+      "deterministic_defect": "auto_fix",
+      "calendar_reference_parity": "common_interval_exact",
+      "frozen_parent_model": "rescore_if_authenticated",
+      "protected_period": "never_expand_authority"
+    }
+  },
+  "prohibited_changes": [
+    "modifying research_workflow/ (grammar, compiler, host, controller, outcomes, provider bindings)",
+    "modifying features/ or the capability registry seeds from the study branch",
+    "building the missing capability inside the study session",
+    "patching around the gap with study Python",
+    "continuing to accumulate context after this handoff: END THE SESSION"
+  ],
+  "suggested_platform_files": [
+    "features/definitions/canonical/<name>.py",
+    "features/definitions/golden/<name>.json",
+    "features/definitions/promotions/<name>.json (written by `research feature promote`)",
+    "features/trackers/",
+    "research_workflow/grammar/spec.py",
+    "research_workflow/host/outcomes.py",
+    "research_workflow/provider_host.py",
+    "research_workflow/target_replay_oracle.py"
+  ],
+  "proposed_chore_topic": "nq_fair_pricing_reversion-missing_capability",
+  "written_by": {
+    "owner": "Scott McCarty@NUCBOX_K10",
+    "agent": "antigravity",
+    "session_id": "antigravity.exe:17924:1790353239"
+  },
+  "next_action": {
+    "study_owner": "END THIS SESSION. Do not implement. Commit study.yaml + research_decision.yaml + this handoff on the study branch first.",
+    "capability_session": [
+      "python scripts/research.py ws chore claim nq_fair_pricing_reversion-missing_capability --paths features/definitions/canonical/<name>.py features/definitions/golden/<name>.json features/definitions/promotions/<name>.json (written by `research feature promote`) --surface \"<one line>\" --as <agent>",
+      "git worktree add \"../<repo>-nq_fair_pricing_reversion-missing_capability\" -b chore/nq_fair_pricing_reversion-missing_capability main",
+      "implement ONLY the capability named above; targeted tests; research cap generate --check; audit/promotion if the capability flow requires it",
+      "git switch main && git merge --no-ff chore/<topic>; write CAPABILITY_COMPLETE card (research study handoff --study <study> --phase A --note CAPABILITY_COMPLETE:<topic>)",
+      "python scripts/research.py ws chore release nq_fair_pricing_reversion-missing_capability"
+    ],
+    "resume_session": [
+      "git -C <study worktree> merge --no-ff main",
+      "python scripts/research.py ws claim nq_fair_pricing_reversion --as <agent>",
+      "python scripts/research.py study compile --study studies/nq_fair_pricing_reversion"
+    ]
+  }
+}

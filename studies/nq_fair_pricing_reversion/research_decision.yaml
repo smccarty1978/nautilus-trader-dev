@@ -1,0 +1,60 @@
+# Authoritative decision contract (research_decision.yaml > SPEC.md > study.yaml > compiled_study.json > code)
+study_id: nq_fair_pricing_reversion
+research_question: "Does NQ exhibit a statistically meaningful tendency to revisit its regular-session opening price following intraday displacement, and do displacement-candle or confirmed BOS entries improve subsequent reversion outcomes?"
+status: DRAFT
+dataset_id: NQ_1S_V2_GLOBEX
+
+hypotheses:
+  H1_anchor_reversion: "The probability and timing of a return to the regular-session opening price vary systematically with displacement distance, elapsed session time, and intraday market conditions."
+  H2_displacement_confirmation: "A qualifying opposite-direction displacement candle identifies subsequent favorable reversion behavior beyond that observed for comparable displaced-price checkpoints without the signal."
+  H3_bos_confirmation: "A confirmed 3-bar swing break provides incremental predictive information relative to displacement-candle entries."
+  H4_trend_day_failure: "Persistent directional sessions exhibit materially lower anchor-return probabilities and greater adverse excursions than balanced sessions (evaluated via causal state observable at decision time, without retrospective trend classification)."
+
+scientific_decisions:
+  anchor_definition:
+    kind: time_defined_rth_open
+    source: "09:30 America/New_York regular-session opening price (open of the first completed 1m bar at or after 09:30 ET)."
+    time_zone_authority: "CME Globex Equity calendar schedule, timezone-aware America/New_York (never hardcoded UTC-5)."
+    invariance: "Remains strictly constant throughout the 09:30-11:00 NY observation window."
+  observation_window:
+    start: "09:30 America/New_York"
+    end: "11:00 America/New_York (elapsed_seconds <= 5400s from RTH open)."
+    holiday_shortened: "Session close or halt truncates the window; out-of-calendar days rejected."
+  instrument: "NQ futures (XCME), native 1s execution stream + completed 1m context stream."
+  admissible_chronology:
+    train_partitions: [2021, 2022, 2023]
+    dev_reserved: [2024]
+    prohibited_reserved: [2025, 2026]
+    smoke_date: "2023-10-02"
+  signal_families:
+    A0_displacement_reference:
+      description: "Eligible observations where price is displaced from fair price by at least D points/ATR, without confirmation signals."
+      displacements: [20, 40, 60, 80]  # points
+    A1_displacement_candle:
+      description: "Qualifying opposite-color displacement candle with body expansion and wick penetration."
+      short_rule: "Candle is bearish, real body > prior candle real body, close < prior candle low, price > fair_price_anchor."
+      long_rule: "Candle is bullish, real body > prior candle real body, close > prior candle high, price < fair_price_anchor."
+      evaluation: "Completed 1m bars only. Entry reference is strictly next_bar_open (never decision close)."
+    A2_confirmed_bos:
+      description: "Confirmed 3-bar swing pivot broken by subsequent completed 1m close."
+      swing_low_rule: "Low[t-1] < Low[t-2] and Low[t-1] < Low[t]. Confirmed only upon close of bar t."
+      swing_high_rule: "High[t-1] > High[t-2] and High[t-1] > High[t]. Confirmed only upon close of bar t."
+      break_rule: "Subsequent bar t+k (k >= 1) closes below active confirmed swing low (short) or above active confirmed swing high (long)."
+      invalidation_rule: "A new confirmed swing in the same direction replaces the prior active swing. Active swings expire at session boundary."
+  outcomes_and_recoveries:
+    reversion_targets:
+      full_recovery: "Price touches or crosses the 09:30 anchor price (100% recovery)."
+      partial_recoveries: [0.25, 0.50, 0.75]  # fraction of displacement at decision time
+    measurement_type: "Descriptive path observation (touch/crossing of market price) separate from order-fill economics."
+    horizon: "End of observation window (11:00 ET) or RTH session close (16:00/16:15 CT)."
+    censoring: "Truncate at session close or window end; gap > 60s censors GAP."
+
+terminal_decisions: {}
+
+autonomy_decisions:
+  on_capability_gap: stop_and_handoff
+  platform_change_required: chore_branch_and_fresh_session
+  deterministic_defect: auto_fix
+  calendar_reference_parity: common_interval_exact
+  frozen_parent_model: rescore_if_authenticated
+  protected_period: never_expand_authority

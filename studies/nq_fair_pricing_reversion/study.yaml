@@ -1,0 +1,38 @@
+# Platform-v2 study: NQ Fair Pricing Theory — Anchor Reversion and Entry Confirmation
+study:
+  id: nq_fair_pricing_reversion
+  tier: 2
+  question: "Does NQ exhibit a statistically meaningful tendency to revisit its regular-session opening price following intraday displacement, and do displacement-candle or confirmed BOS entries improve subsequent reversion outcomes?"
+
+streams:
+  - {dataset: NQ_1S_V2_GLOBEX, timeframes: [1s, 1m]}
+
+context:
+  regime_1m:     {tracker: regime.dual_ema, timeframe: 1m}
+  excursion:     {tracker: regime.excursion, bars: 1s, regime: regime_1m}
+  regime_bar_5m: {tracker: regime_bar.calendar_bucket, bucket: 5m, bars: 1m, regime: regime_1m}
+
+population:
+  session: RTH
+  cadence: completed_1m
+  direction: regime_1m.dir
+
+triggers: every_candidate
+
+features:
+  instances:
+    - {feature: distance_to_level, level: rth_open, level_context: session, normalization: points, timeframe: 1m}
+
+outcome:
+  kind: label
+  entry_reference: next_bar_open
+  event: anchor.reverted
+  horizon: 5400s
+
+chronology:
+  train: [2021, 2022, 2023]
+  dev: [2024]
+  prohibited: [2025, 2026]
+  authorized_dates: ['2023-10-02']
+
+model: none
