@@ -1173,6 +1173,7 @@ def _resolve_outcome(ctx: _Ctx, population: Mapping[str, Any]) -> Dict[str, Any]
         kernel = "flip"
     else:
         ctx.gap(GapKind.INVALID_PARAMETERIZATION, "outcome", "an outcome needs a barrier, an event, a recovery, or a combination")
+        kernel = "none"
     if direction is None and kernel != "recovery":
         ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, "outcome.direction", "the outcome direction reference is not declared")
     elif direction is None and kernel == "recovery":
@@ -1195,6 +1196,7 @@ def _resolve_outcome(ctx: _Ctx, population: Mapping[str, Any]) -> Dict[str, Any]
             ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, "outcome.max_gap", strict_gap_rule,
                     max_gap_ns=max_gap, min_horizon_ns=min(candidate_horizons))
     stream = population.get("cadence", {}).get("stream")
+    rec = dict(o.recovery) if o.recovery else {}
     ref_target = (rec.get("reference") or o.reference) if o.recovery else o.reference
     contract: Dict[str, Any] = {
         "contract": o.kind, "kernel": kernel, "direction": direction, "direction_sign": (-1 if o.relation == "fade" else 1),
