@@ -430,15 +430,16 @@ def _merge_partition_file(sources: Sequence[Path], dest: Path, *, check_dup: boo
 
 
 def _row_group_slices(pf: Any, columns: Sequence[str], rows: int):
-    """Yield ``columns`` of ``pf`` as consecutive tables of at most ``rows`` rows, ONE row group at a
-    time (released before the next is read). ``ParquetFile.iter_batches`` is avoided on purpose: with
-    nested columns pyarrow 25's batch reader keeps Arrow buffers alive across the whole iteration
-    (measured linear growth), while a per-row-group read stays flat."""
+    """Yield ``columns`` of ``pf`` as consecutive tables of at most ``rows`` rows, with ONE batch reader
+    per row group. A single whole-file ``ParquetFile.iter_batches`` over nested columns keeps Arrow
+    buffers alive across the whole iteration in pyarrow 25 (measured linear growth); a reader
+    restricted to one row group releases them when exhausted (flat) and still streams within it."""
+    import pyarrow as pa
+    n = max(1, int(rows))
     for gi in range(pf.metadata.num_row_groups):
-        group = pf.read_row_group(gi, columns=list(columns))
-        for start in range(0, group.num_rows, max(1, int(rows))):
-            yield group.slice(start, max(1, int(rows)))
-        del group
+        for batch in pf.iter_batches(batch_size=n, columns=list(columns), row_groups=[gi]):
+            for start in range(0, batch.num_rows, n):
+                yield pa.Table.from_batches([batch.slice(start, n)])
 
 
 def _streaming_frame_content_identity(path: Path) -> Dict[str, Any]:
