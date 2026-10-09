@@ -123,7 +123,7 @@ class DisplacementCandleBinding(BaseBinding):
         anchor_val = None
         # Try finding anchor from epoch trackers if available
         for t_name, t_obj in (epoch.trackers or {}).items():
-            if hasattr(t_obj, "epoch_value"):
+            if t_obj is not self and hasattr(t_obj, "epoch_value"):
                 try:
                     anchor_val = t_obj.epoch_value("rth_open", epoch)
                     if anchor_val is not None:
