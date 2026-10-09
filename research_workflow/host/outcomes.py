@@ -88,6 +88,9 @@ class BarrierArm:
     horizon_ns: int
     expiry: str                 # "censor" | "negative"
     prefix: str                 # output column prefix (per-arm columns)
+    unit: str = "atr"           # "atr" | "points" | "reference"
+    favorable_points: Optional[float] = None
+    adverse_points: Optional[float] = None
 
 
 @dataclass(frozen=True)
@@ -147,13 +150,21 @@ class LabelOutcomeContract:
     # study (`outcome.entry_observation: true`); plans that do not request it replay unchanged.
     entry_observation: bool = False
     reference_ref: Optional[str] = None
+    session_cutoff: Optional[Mapping[str, Any]] = None
+    entry_cutoff: Optional[Mapping[str, Any]] = None
 
     @classmethod
     def from_plan(cls, spec: Mapping[str, Any]) -> "LabelOutcomeContract":
         if spec.get("contract") != "label":
             raise OutcomeContractError(f"NOT_A_LABEL_CONTRACT: {spec.get('contract')!r}")
-        arms = tuple(BarrierArm(a["id"], float(a["favorable_atr"]), float(a["adverse_atr"]), int(a["horizon_ns"]),
-                                str(a.get("expiry", "censor")), str(a.get("prefix", a["id"]))) for a in spec.get("arms") or ())
+        arms = tuple(BarrierArm(a["id"], float(a.get("favorable_atr", 0.0) or 0.0),
+                                float(a.get("adverse_atr", 0.0) or 0.0),
+                                int(a["horizon_ns"]),
+                                str(a.get("expiry", "censor")), str(a.get("prefix", a["id"])),
+                                unit=str(a.get("unit", "atr")),
+                                favorable_points=(float(a["favorable_points"]) if a.get("favorable_points") is not None else None),
+                                adverse_points=(float(a["adverse_points"]) if a.get("adverse_points") is not None else None))
+                     for a in spec.get("arms") or ())
         flip = spec.get("flip")
         return cls(kernel=str(spec["kernel"]), direction_ref=str(spec["direction"]), atr_ref=spec.get("atr"),
                    entry_reference=str(spec.get("entry_reference", "next_bar_open")),
@@ -172,7 +183,9 @@ class LabelOutcomeContract:
                    cost_points_per_side=(float(spec["cost_points_per_side"])
                                          if spec.get("cost_points_per_side") is not None else None),
                    data_end_lookahead_ns=(int(spec["data_end_lookahead_ns"]) if spec.get("data_end_lookahead_ns") is not None else None),
-                   reference_ref=(str(spec["reference"]) if spec.get("reference") is not None else None))
+                   reference_ref=(str(spec["reference"]) if spec.get("reference") is not None else None),
+                   session_cutoff=spec.get("session_cutoff"),
+                   entry_cutoff=spec.get("entry_cutoff"))
 
 
 @dataclass(frozen=True)
@@ -202,8 +215,14 @@ class TradeExecutionContract:
         if spec.get("contract") != "trade":
             raise OutcomeContractError(f"NOT_A_TRADE_CONTRACT: {spec.get('contract')!r}")
         fm = spec.get("fill_model") or {}
-        arms = tuple(BarrierArm(a["id"], float(a["favorable_atr"]), float(a["adverse_atr"]), int(a["horizon_ns"]),
-                                str(a.get("expiry", "censor")), str(a.get("prefix", a["id"]))) for a in spec.get("arms") or ())
+        arms = tuple(BarrierArm(a["id"], float(a.get("favorable_atr", 0.0) or 0.0),
+                                float(a.get("adverse_atr", 0.0) or 0.0),
+                                int(a["horizon_ns"]),
+                                str(a.get("expiry", "censor")), str(a.get("prefix", a["id"])),
+                                unit=str(a.get("unit", "atr")),
+                                favorable_points=(float(a["favorable_points"]) if a.get("favorable_points") is not None else None),
+                                adverse_points=(float(a["adverse_points"]) if a.get("adverse_points") is not None else None))
+                     for a in spec.get("arms") or ())
         return cls(direction_ref=str(spec["direction"]), atr_ref=spec.get("atr"),
                    entry_reference=str(spec.get("entry_reference", "next_bar_open")),
                    fill_model=FillModel(str(fm.get("order_type", "market")), int(fm.get("latency_bars", 0)),
@@ -439,15 +458,21 @@ class LabelOutcomeKernel:
                 p.entry_ts = ts - (bar.ts_init - bar.ts_event)
                 p.entry_bar_close = ts
                 p.prev_ts = p.entry_ts
-                # N-3: the entry observation is subject to the same gap rule as any other
-                # observation -- an execution reference (next_bar_open) more than max_gap
-                # after the decision epoch T is a stale price, never a valid entry.
-                if max_gap is not None and (p.entry_ts - p.T) > max_gap:
+                # Check entry_cutoff first:
+                entry_cutoff_ts = self._compute_cutoff_ts(p.T, self.c.entry_cutoff)
+                if entry_cutoff_ts is not None and p.entry_ts > entry_cutoff_ts:
+                    for i in range(self.n_arms):
+                        self._resolve_arm(p, i, CENSORED, p.entry_ts, "ENTRY_PAST_CUTOFF")
+                elif max_gap is not None and (p.entry_ts - p.T) > max_gap:
+                    # N-3: the entry observation is subject to the same gap rule as any other
+                    # observation -- an execution reference (next_bar_open) more than max_gap
+                    # after the decision epoch T is a stale price, never a valid entry.
                     for i in range(self.n_arms):
                         self._resolve_arm(p, i, CENSORED, p.entry_ts, "GAP")
                 else:
                     d, atr, ep = p.direction, p.atr, op
                     is_recovery = self.c.kernel == "recovery"
+                    session_cutoff_ts = self._compute_cutoff_ts(p.T, self.c.session_cutoff)
                     if is_recovery:
                         if d == 0 or p.decision_price is None or p.reference_price is None:
                             # Zero displacement or missing price: cannot recover
@@ -469,6 +494,8 @@ class LabelOutcomeKernel:
                                     target_px = p_decision + d * (fraction * denom)
                                 p.arm_good[i] = target_px
                                 p.arm_bad[i] = float("-inf") if d > 0 else float("inf")
+                                if session_cutoff_ts is not None and p.arm_end[i] > session_cutoff_ts:
+                                    p.arm_end[i] = session_cutoff_ts
                                 if p.session_close is not None and p.arm_end[i] > p.session_close:
                                     if truncate:
                                         p.arm_end[i] = p.session_close
@@ -478,8 +505,31 @@ class LabelOutcomeKernel:
                     else:
                         for i, arm in enumerate(self.arms):
                             p.arm_end[i] = p.entry_ts + arm.horizon_ns
-                            p.arm_good[i] = ep + d * arm.favorable_atr * atr
-                            p.arm_bad[i] = ep - d * arm.adverse_atr * atr
+                            if arm.unit == "points":
+                                p.arm_good[i] = ep + d * (arm.favorable_points or 0.0)
+                                p.arm_bad[i] = ep - d * (arm.adverse_points or 0.0)
+                            elif arm.unit == "reference":
+                                p_ref = p.reference_price
+                                if p_ref is None:
+                                    self._resolve_arm(p, i, CENSORED, p.entry_ts, "MISSING_REFERENCE_PRICE")
+                                    continue
+                                # Target is the reference price
+                                p.arm_good[i] = p_ref
+                                if arm.adverse_points is not None:
+                                    p.arm_bad[i] = ep - d * arm.adverse_points
+                                elif arm.adverse_atr is not None and atr:
+                                    p.arm_bad[i] = ep - d * arm.adverse_atr * atr
+                                else:
+                                    p.arm_bad[i] = float("-inf") if d > 0 else float("inf")
+                                # ANCHOR_ALREADY_CROSSED check at entry
+                                if (d > 0 and ep >= p_ref) or (d < 0 and ep <= p_ref):
+                                    self._resolve_arm(p, i, CENSORED, p.entry_ts, "ANCHOR_ALREADY_CROSSED")
+                                    continue
+                            else:
+                                p.arm_good[i] = ep + d * arm.favorable_atr * atr
+                                p.arm_bad[i] = ep - d * arm.adverse_atr * atr
+                            if session_cutoff_ts is not None and p.arm_end[i] > session_cutoff_ts:
+                                p.arm_end[i] = session_cutoff_ts
                             if p.session_close is not None and p.arm_end[i] > p.session_close:
                                 if truncate:
                                     # `truncate`: the close BOUNDS the observation window instead of
@@ -806,6 +856,19 @@ class LabelOutcomeKernel:
                 row[f"{arm.prefix}_resolution_seconds"] = res_s
         self.rows.append(row)
 
+    def _compute_cutoff_ts(self, epoch_t: int, cutoff_spec: Optional[Mapping[str, Any]]) -> Optional[int]:
+        if not cutoff_spec:
+            return None
+        import datetime
+        import zoneinfo
+        tz = zoneinfo.ZoneInfo(str(cutoff_spec["tz"]))
+        dt = datetime.datetime.fromtimestamp(epoch_t / NS, tz=tz)
+        h = int(cutoff_spec["hour"])
+        m = int(cutoff_spec["minute"])
+        s = int(cutoff_spec["second"])
+        cutoff_dt = dt.replace(hour=h, minute=m, second=s, microsecond=0)
+        return int(cutoff_dt.timestamp() * NS)
+
     def _entry_observation(self, p: _Pending) -> Tuple[Optional[int], Optional[float], Optional[str]]:
         """The executable entry, as known one bar after T.
 
@@ -813,6 +876,7 @@ class LabelOutcomeKernel:
         ``max_gap`` ONLY -- never of the exit, the flip, an arm, or the row's emission time -- so
         two candidates sharing their history through the entry bar publish bit-identical values
         whatever their futures. Unavailable, with a reason and no fabricated value, when:
+        ``ENTRY_PAST_CUTOFF`` -- the first bar after T opens strictly after the declared entry cutoff;
         ``SESSION_END`` -- the first bar after T closes past T's session close (the same bound
         and the same SESSION_END > GAP precedence as the C1 exit fill); ``GAP`` -- that bar opens
         more than ``max_gap`` after T (a stale execution reference, N-3); ``DATA_END`` -- the run
@@ -820,6 +884,9 @@ class LabelOutcomeKernel:
         """
         if not p.entry_resolved:
             return None, None, "DATA_END"
+        entry_cutoff_ts = self._compute_cutoff_ts(p.T, self.c.entry_cutoff)
+        if entry_cutoff_ts is not None and p.entry_ts > entry_cutoff_ts:
+            return None, None, "ENTRY_PAST_CUTOFF"
         if p.session_close is not None and p.entry_bar_close > p.session_close:
             return None, None, "SESSION_END"
         if self.c.max_gap_ns is not None and (p.entry_ts - p.T) > self.c.max_gap_ns:
