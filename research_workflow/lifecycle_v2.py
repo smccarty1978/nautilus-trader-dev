@@ -279,6 +279,18 @@ def _merge_key_order(sources: Sequence[Path]) -> tuple[Any, Any]:
     return keys, keys.sort_values(list(KEY), kind="mergesort").index.to_numpy()
 
 
+def _reconcile_parquet_shape(path: Path) -> tuple[tuple, int]:
+    """``(tuple(pd.read_parquet(path).columns), len(...))`` from the Parquet footer alone.
+
+    The column names are produced by the same pandas reconstruction a full read uses (stored
+    pandas metadata: index columns dropped, column-index dtype restored), applied to a zero-row
+    table of the file's schema, so no column data is decoded.
+    """
+    import pyarrow.parquet as pq
+    pf = pq.ParquetFile(path)
+    return tuple(pq.read_schema(path).empty_table().to_pandas().columns), pf.metadata.num_rows
+
+
 def _merge_row_group_bytes_per_row(pfs: Sequence[Any], groups: Sequence[tuple]) -> Any:
     """Estimated in-memory Arrow bytes/row of every source row group (``groups`` order).
 
@@ -1372,20 +1384,24 @@ class V2Lifecycle:
             m = _read(d / "manifest.json")
             if m.get("status") != "PASS":
                 findings.append(f"partition {y} not PASS"); continue
-            c = pd.read_parquet(d / "candidates.parquet"); o = pd.read_parquet(d / "observations.parquet")
-            schemas.append((tuple(c.columns), tuple(o.columns)))
+            # Bounded memory: the checks below need only column names, row counts and the KEY
+            # columns, so the (possibly very wide, nested) partitions are never loaded whole.
+            c_cols, n_c = _reconcile_parquet_shape(d / "candidates.parquet")
+            o_cols, n_o = _reconcile_parquet_shape(d / "observations.parquet")
+            schemas.append((c_cols, o_cols))
             if (m.get("dataset") or {}).get("logical_digest"):
                 digests.add(m["dataset"]["logical_digest"])
-            if len(c) != len(o):
-                findings.append(f"partition {y}: candidates {len(c)} != observations {len(o)}")
-            if len(c) and c.duplicated(list(KEY)).any():
+            if n_c != n_o:
+                findings.append(f"partition {y}: candidates {n_c} != observations {n_o}")
+            c = pd.read_parquet(d / "candidates.parquet", columns=[k for k in KEY if k in c_cols]) if n_c else None
+            if n_c and c.duplicated(list(KEY)).any():
                 findings.append(f"partition {y}: duplicate candidate keys")
-            if len(c) and not pd.to_datetime(c["observation_ts"], unit="ns", utc=True).dt.year.eq(int(y)).all():
+            if n_c and not pd.to_datetime(c["observation_ts"], unit="ns", utc=True).dt.year.eq(int(y)).all():
                 findings.append(f"partition {y}: rows outside the primary year")
             # A date-bounded year is only reconciled against its DECLARED windows: proving rows sit
             # inside the calendar year would not detect a partition that streamed unauthorized dates.
             declared = partition_windows(plan, int(y))
-            if declared and len(c):
+            if declared and n_c:
                 ts = pd.to_datetime(c["observation_ts"], unit="ns", utc=True)
                 inside = False
                 for w in declared:
@@ -1398,7 +1414,7 @@ class V2Lifecycle:
                                     f"{[w['id'] for w in declared]}")
                 if [str(x) for x in (m.get("windows") or [])] == []:
                     findings.append(f"partition {y}: manifest records no windows for a date-bounded year")
-            rows += len(c); seen_keys += len(c)
+            rows += n_c; seen_keys += n_c
         if len(set(schemas)) > 1:
             findings.append("partition output schema mismatch")
         if len(digests) > 1:
