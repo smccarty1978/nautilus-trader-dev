@@ -1,6 +1,6 @@
 {
   "authority": "platform_v2_plan_closure",
-  "file_count": 163,
+  "file_count": 165,
   "files": {
     "backtests/nt_runtime/__init__.py": "8a091704d4e8c5dfeeb2fc16e97035e3b7e1986440e5050d9d530d1f4691614f",
     "backtests/nt_runtime/compiled_study_loader.py": "37cf10d33f4565f5b16778277837d6b148a12199690281c93b74fbbd23f4554e",
@@ -67,6 +67,7 @@
     "features/promotion.py": "0495fedd16f619849109903c589cc212be126e468e6e88698ae512b4c8717076",
     "features/registry.py": "f6eb3b2126a9875db64502a20f638d1fb87e79796e7c5b05605764a541fea4fd",
     "features/trackers/base.py": "4b4c2aad1ea8a1632c12e733864f78148a7af2920334765476d0792a8fc45fc4",
+    "features/trackers/displacement_candle.py": "5405fb4801061ed57a88b7adfdfc3f3031e643cac8f7095d2989de3ddf5c4dd0",
     "features/trackers/generic_arrival.py": "29201991c71821f27e014238338eb1d0d5910c4e2b2f5984d09e1a47f5703e75",
     "features/trackers/generic_context.py": "79aff92632cd29a2494ed52c021940efc79d9827dd11570e4e609f7463e782de",
     "features/trackers/generic_episode_geometry.py": "008cb21f56b8279544dc829625e6bae39dc92c51d3a535132c6e5759c534aec6",
@@ -81,6 +82,7 @@
     "features/trackers/regime_dual_ema.py": "79d9777db4279914b6f138ce9541c151ba7120b03c82300d6f8e0a31ca2d7081",
     "features/trackers/rolling_5m_productivity.py": "666be87d2234a3e8896bb08c6901e3303bf799273de37c0abc69f33af7e94077",
     "features/trackers/structural_regime_geometry.py": "83ad179b02a35391d277d41cbcf6fd2556eb09ca23eeb705ab48c71fc9007f27",
+    "features/trackers/structure_bos.py": "7aa94350879b3e0019f9077ab1465b9d0317115fc189f89bde1fbc05d62355bf",
     "research/__init__.py": "dc81d77aa94b1cadf28e3a7b0480677f24cb5b9bef21f535f4c1eb65a86eae9d",
     "research/analysis/__init__.py": "fa4f688ab017537902d91d309c7aa909248dcc266aeb22f9623547b806519ea1",
     "research/analysis/errors.py": "0360870a6a601eb1055ddea586385f4773fbcd3ed91e96c21596e6e78762a691",
@@ -119,18 +121,18 @@
     "research_workflow/governed_controller.py": "0ebe4791a068ae46a2042d01b9ca004d2501dab8512953636f0f2513496b59ae",
     "research_workflow/governed_controller_v2.py": "e878042b11555a7fe5a5f6b75d6c369e8d331bd839c4a5d1f325781eeeda9714",
     "research_workflow/grammar/__init__.py": "8346e9b1ae1cf1c7950e06d278e21d162678d0345ad5b8b2a6aa2a7eeaba5eba",
-    "research_workflow/grammar/compiler.py": "31a4a198662633507caaa399636dfe0608afd6cb35c457d8d6a0c46d57ccea1b",
+    "research_workflow/grammar/compiler.py": "c63387e6dd3c7fd1c1381153de7339ab308a2568b0905335284797ab72955bbc",
     "research_workflow/grammar/deliverables.py": "f147d4f7f6fc8cf239a49440765d2410c3c6650f3f0f868b9c902e2ca9e87909",
     "research_workflow/grammar/expansion.py": "0b8124662c11dacba7a5680e229fb77433514894f10a51365287b2c8054de20d",
     "research_workflow/grammar/gaps.py": "9e3341d65135484e56e868bbe9fbb2f13637d133156ce17bdffee988c0d46b48",
     "research_workflow/grammar/plan.py": "57d130b47dab4757f27c2ea6948e67f4e5507cf62c02cc60a5f55be9d07b7270",
     "research_workflow/grammar/predicates.py": "7b0fa449a526e3f0d9a7eca1444b5e35f381426517172716651a28042831c417",
-    "research_workflow/grammar/spec.py": "fbfcb117e58abef6cfe66d8405951e0010ec382528f8cb70fe1045aa5aaabfc4",
+    "research_workflow/grammar/spec.py": "89de2a3f2c4540196576d75e6e97be96916519baf2cef71c9d06b49c0c5c101d",
     "research_workflow/host/__init__.py": "eeb674dcd8d9ce76b484669752dc2e9cb6b15934cab13257a7b010750ea1f79c",
     "research_workflow/host/chunked_writer.py": "52dbd8ad07f93a59c3a47fa6ac504a111013d1e2781f38449e42652166699e7f",
     "research_workflow/host/interfaces.py": "daa5844a4e770bfdceb765dd677bb59466aecb4a3dd0a2e3d84ab156b8022094",
     "research_workflow/host/mux.py": "44c7322624469f7293f09496fdb8cf640addefd639e0027f2cdc9757589c7419",
-    "research_workflow/host/outcomes.py": "75ec01f7590d7f2a8fd1139a75b2a0d6e7add13692e73129d9bfcdd606765281",
+    "research_workflow/host/outcomes.py": "b379f56245fa65a6f549fcee3de6a9fb85d21f2ab654885a6eb8933759695794",
     "research_workflow/host/predicate_eval.py": "940b1f4ac7bc2f82d9a1596e2f5dea7e3bfdebf4eb704dbc83152f6f9222012d",
     "research_workflow/host/sink.py": "85bec9f4fa8313ba898f4f7070a0f2e5ee7c41aa8e1d68a4d51cb12d52906f1b",
     "research_workflow/host/strategy.py": "198c8831a2f421f5f580a6f7a5888a052b9863fc6f9c0e80bd31510267fe544b",
@@ -166,12 +168,12 @@
     "utils/runner/data.py": "92fa0e2f9193336faa6f9e06825dd425c8f2682062cedc44ad26edbc1a121c46",
     "utils/session_boundaries.py": "15bbb046337a9fd2ed119e64fb79de5dab5d37608a0f6b9a7d1b9a73a20d5b0f"
   },
-  "frozen_execution_composite_sha256": "a61ce09e86d58d242fdf4c9c00cdf9de849870dc020f5a450c6c90d6d6fc4e37",
-  "generated_at_utc": "2026-10-09T19:14:01.049685+00:00",
+  "frozen_execution_composite_sha256": "a8144fcdb9ba519b9062e01d32300e1a18da766fa0d849c946925f54cf925752",
+  "generated_at_utc": "2026-10-09T22:14:46.742793+00:00",
   "hash_algorithm": "v2",
-  "plan_sha256": "85e78bc5d6b47528e1aeec4fd4a12558a1442d5310e69a54c5b4f32336c1e385",
+  "plan_sha256": "043fdefbeda4b2bde3cd17585430f26be2a7b00b4f3a4e59be7f8e1fb198cc6e",
   "schema_version": 2,
-  "spec_sha256": "e8c3abe7e73733e5ee64a60515fbb051c2728c67c8b330fa13f97b0f518856d9",
+  "spec_sha256": "b3040ad320460bfb098e93b2f75971495016bee59cb48e2e1905a605aad427d8",
   "stages": {
     "audit": {
       "composite_sha256": "3d95d92c039a694208ce11e572015afbcd89a839fd1d4fd50f2ac78a56896bbb",
@@ -180,7 +182,7 @@
       ]
     },
     "collection": {
-      "composite_sha256": "4cb133d4a0c7621e95bb6def1fd6517229b4e857c03afd3b6f879c94b8ccda46",
+      "composite_sha256": "7f02281845ae081ae8f506f14e968c7da3dc101a7c8bb3075d2c2789c3d9b0d5",
       "files": [
         "backtests/nt_runtime/__init__.py",
         "backtests/nt_runtime/compiled_study_loader.py",
@@ -246,6 +248,7 @@
         "features/promotion.py",
         "features/registry.py",
         "features/trackers/base.py",
+        "features/trackers/displacement_candle.py",
         "features/trackers/generic_arrival.py",
         "features/trackers/generic_context.py",
         "features/trackers/generic_episode_geometry.py",
@@ -260,6 +263,7 @@
         "features/trackers/regime_dual_ema.py",
         "features/trackers/rolling_5m_productivity.py",
         "features/trackers/structural_regime_geometry.py",
+        "features/trackers/structure_bos.py",
         "research/__init__.py",
         "research/analysis/__init__.py",
         "research/analysis/errors.py",
@@ -372,7 +376,7 @@
       ]
     },
     "replay": {
-      "composite_sha256": "9ab4d47be3ab90263166d6688e1d4f26a74400655eabe11c48b4afeb6f2c57db",
+      "composite_sha256": "c66bf59b817675b59d05e9d37f0989ce55464003e0bb7b2948e9962a33195452",
       "files": [
         "backtests/nt_runtime/__init__.py",
         "backtests/nt_runtime/compiled_study_loader.py",
@@ -438,6 +442,7 @@
         "features/promotion.py",
         "features/registry.py",
         "features/trackers/base.py",
+        "features/trackers/displacement_candle.py",
         "features/trackers/generic_arrival.py",
         "features/trackers/generic_context.py",
         "features/trackers/generic_episode_geometry.py",
@@ -452,6 +457,7 @@
         "features/trackers/regime_dual_ema.py",
         "features/trackers/rolling_5m_productivity.py",
         "features/trackers/structural_regime_geometry.py",
+        "features/trackers/structure_bos.py",
         "research/__init__.py",
         "research/analysis/__init__.py",
         "research/analysis/errors.py",

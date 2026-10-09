@@ -10,9 +10,9 @@ Derived from [`research_decision.yaml`](file:///C:/Users/Scott%20McCarty/Project
 
 **Question:** Does NQ exhibit a statistically meaningful tendency to revisit its regular-session opening price following intraday displacement, and do displacement-candle or confirmed BOS entries improve subsequent reversion outcomes?
 
-* **H1 — Anchor Reversion:** The probability and timing of a return to the regular-session opening price vary systematically with displacement distance, elapsed session time, and intraday market conditions.
-* **H2 — Displacement Confirmation (A1 - Deferred):** Opposite-direction displacement candle identification.
-* **H3 — BOS Confirmation (A2 - Deferred):** 3-bar swing break confirmation.
+* **H1 — Anchor Reversion (A0 Control):** The probability and timing of a return to the regular-session opening price vary systematically with displacement distance, elapsed session time, and intraday market conditions.
+* **H2 — Displacement Confirmation (A1 Signal):** Opposite-direction displacement candle identification (opposite color, body expansion, wick break, toward anchor) improves subsequent reversion outcomes.
+* **H3 — BOS Confirmation (A2 Signal):** 3-bar swing break confirmation (BOS break strictly after pivot confirmation, toward anchor) improves subsequent reversion outcomes.
 * **H4 — Trend-Day Failure:** Persistent directional sessions exhibit materially lower anchor-return probabilities (evaluated strictly causally).
 
 ---
@@ -27,11 +27,16 @@ Derived from [`research_decision.yaml`](file:///C:/Users/Scott%20McCarty/Project
 
 ### 2.2 Session Calendar & Observation Window
 * **Session Standard Hours:** 08:30:00 to 15:15:00 America/Chicago (09:30:00 to 16:15:00 America/New_York).
-* **Observation Window:** 09:31:00 through 11:00:00 America/New_York.
-* **Boundary Inclusion:** The 1-minute bar closing exactly at 11:00:00 ET is **INCLUDED**. No candidate is emitted with $ts\_init > 11:00:00\text{ ET}$.
-* **Elapsed Seconds:** $0 \le \text{elapsed\_seconds} \le 5400\text{s}$.
+* **Observation / Signal Decision Window:** Completed 1m bars from 09:31:00 through 11:00:00 America/New_York ($0 \le \text{elapsed\_seconds} \le 5400\text{s}$).
+* **Executable Entry Cutoff:** 11:00:00 America/New_York. The executable entry fill occurs at `next_bar_open`. If the next actual executable print occurs after 11:00:00 ET, the entry is strictly rejected (`ENTRY_PAST_CUTOFF`).
+* **Mandatory Flat Session Cutoff:** 11:30:00 America/New_York. Active trades/outcomes are forcefully flattened; outcomes reaching 11:30:00 ET resolve via `TIMEOUT` (or `SESSION_END` if shortened).
 
-### 2.3 Displacement & Recovery Direction
+### 2.3 Arms & Signals
+* **A0 (Observational Control):** All eligible 1-minute checkpoints within 09:31–11:00 ET with non-zero displacement toward anchor.
+* **A1 (Displacement Candle):** Completed 1m displacement candle (opposite color, body expansion over prior body, close breaks prior wick extreme, direction toward anchor). Tracker: `tracker.candle.displacement_1m`.
+* **A2 (Structure BOS):** 3-bar swing pivot confirmed at 3rd bar, BOS break strictly after confirmation bar, direction toward anchor. Tracker: `tracker.structure.bos_1m`.
+
+### 2.4 Displacement & Recovery Direction
 * **Displacement Calculation:** $\Delta_T = P_T - P_{\text{anchor}}$.
 * **Displacement Direction:** $\text{sign}(\Delta_T) \in \{+1, -1\}$.
 * **Recovery Direction:** $-\text{sign}(\Delta_T)$:
@@ -40,38 +45,20 @@ Derived from [`research_decision.yaml`](file:///C:/Users/Scott%20McCarty/Project
 * **Zero-Displacement Eligibility:** Observations where $P_T == P_{\text{anchor}}$ ($\Delta_T = 0$) are **strictly ineligible**.
 * **Regime Role:** `regime_1m.dir` is preserved strictly as causal context, never used as recovery direction.
 
-### 2.4 Population Strata
-* **Reporting Strata:** 20.0, 40.0, 60.0, 80.0 NQ points and 1.0, 1.5, 2.0 ATR(14) units. These are predetermined descriptive strata, not optimized gates.
-
 ---
 
-## 3. Forward Outcomes & Recovery Milestones
+## 3. Forward Outcomes & Barrier Arms
 
-### 3.1 Frozen Decision-Time State
-At candidate instant $T$, freeze:
-* $P_{\text{anchor}}$
-* $P_T$ (close of bar $T$)
-* $\text{displacement\_direction}$
-* $|\Delta_T| = |P_T - P_{\text{anchor}}|$
-* Recovery price thresholds:
-  - $P_{25} = P_T - \text{sign}(\Delta_T) \times (0.25 \times |\Delta_T|)$
-  - $P_{50} = P_T - \text{sign}(\Delta_T) \times (0.50 \times |\Delta_T|)$
-  - $P_{75} = P_T - \text{sign}(\Delta_T) \times (0.75 \times |\Delta_T|)$
-  - $P_{100} = P_{\text{anchor}}$
+### 3.1 Outcome Setup & Cutoffs
+* **Entry Reference:** `next_bar_open`.
+* **Entry Cutoff:** `11:00:00 America/New_York`.
+* **Session Cutoff:** `11:30:00 America/New_York`.
+* **Max Tape Gap:** 60s.
 
-### 3.2 Denominator Invariance & Touch Definition
-* The denominator $|\Delta_T|$ remains immutable; future price extrema never redefine it.
-* **Touch Definition:** Exact market-price touch or crossing of completed bar high/low:
-  - Short recovery: $\text{low}_t \le P_{\text{target}}$.
-  - Long recovery: $\text{high}_t \ge P_{\text{target}}$.
-* Evaluated at 0.25 tick precision without artificial tolerance.
-
-### 3.3 Horizon & Censoring
-* **Forward Observation Span:** The earlier of declared horizon or actual RTH calendar close (15:15 CT / 16:15 ET or scheduled early close).
-* Candidate emission ends at 11:00 ET; forward tracking continues through RTH close.
-* **Independent Milestone Resolution:** Each milestone (25%, 50%, 75%, 100%) resolves independently.
-* **Censoring Semantics:** An unresolved milestone at session close is stamped `SESSION_END_CENSORED`, never recorded as failure.
-* **Gap Censoring:** Tape gap $> 60\text{s}$ censors as `GAP`.
+### 3.2 Barrier Arms
+1. **Milestone Recovery Arms:** 25%, 50%, 75%, 100% recovery toward anchor.
+2. **Fixed Point Bracket Arm:** 38 points take profit / 25 points stop loss (`tp38_sl25`).
+3. **Anchor Target Bracket Arm:** Target at anchor reference price / 25 points stop loss (`anchor_tp_sl25`). Checks for `ANCHOR_ALREADY_CROSSED` at entry fill.
 
 ---
 

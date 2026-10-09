@@ -27,6 +27,8 @@ scientific_decisions:
     start_instant: "09:31:00 America/New_York (first bar carrying causal anchor availability)."
     cutoff_instant: "11:00:00 America/New_York (the completed 1m bar closing exactly at 11:00:00 ET is INCLUDED; no candidate emitted with ts_init > 11:00:00 ET)."
     elapsed_seconds: "elapsed_seconds <= 5400s from 09:30 ET open."
+    entry_cutoff: "11:00:00 America/New_York (executable entry strictly <= 11:00:00 ET)."
+    session_cutoff: "11:30:00 America/New_York (mandatory flat at 11:30:00 ET)."
 
   direction_and_eligibility:
     displacement_calculation: "displacement = close_T - anchor_T"
@@ -36,16 +38,18 @@ scientific_decisions:
     zero_displacement_policy: "Observations where close_T == anchor_T (displacement == 0) are strictly INELIGIBLE for recovery tracking."
 
   population_identity:
-    primary_census: "All eligible 1-minute checkpoints within 09:31-11:00 ET with |displacement| >= threshold."
-    episode_first: "Earliest qualifying displacement checkpoint per excursion episode away from anchor."
-    reporting_strata: [20.0, 40.0, 60.0, 80.0]  # NQ points (predetermined descriptive reporting strata, not optimized gates)
-    atr_reporting_strata: [1.0, 1.5, 2.0]        # 1m ATR(14) units
+    a0_control: "All eligible 1-minute checkpoints within 09:31-11:00 ET with non-zero displacement."
+    a1_displacement: "Opposite-color displacement candle with body expansion and wick break toward anchor."
+    a2_bos: "Confirmed 3-bar swing pivot broken strictly after confirmation toward anchor."
 
   forward_horizon_and_censoring:
-    forward_observation_end: "The earlier of the per-session RTH calendar close (15:15 CT / 16:15 ET or early holiday close) or declared horizon."
-    candidate_emission_vs_outcome: "Candidate emission stops at 11:00 ET; forward outcome tracking continues through RTH close."
-    independent_milestones: [0.25, 0.50, 0.75, 1.00]
-    milestone_censoring_policy: "Independent resolution per milestone. An unresolved milestone at session close is CENSORED SESSION_END, never recorded as a failure or loss."
+    forward_observation_end: "11:30:00 America/New_York (session_cutoff; mandatory flat)."
+    entry_cutoff: "11:00:00 America/New_York"
+    barrier_arms:
+      milestones: [0.25, 0.50, 0.75, 1.00]
+      tp38_sl25: {unit: points, favorable_points: 38.0, adverse_points: 25.0}
+      anchor_tp_sl25: {unit: reference, adverse_points: 25.0}
+    milestone_censoring_policy: "Independent resolution per milestone/arm. Expired at 11:30 ET resolves via TIMEOUT."
     gap_censoring_seconds: 60.0
 
   recovery_calculation_precision:

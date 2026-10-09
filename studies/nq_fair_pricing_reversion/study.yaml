@@ -8,9 +8,11 @@ streams:
   - {dataset: NQ_1S_V2_GLOBEX, timeframes: [1s, 1m]}
 
 context:
-  regime_1m:     {tracker: regime.dual_ema, timeframe: 1m}
-  excursion:     {tracker: regime.excursion, bars: 1s, regime: regime_1m}
-  regime_bar_5m: {tracker: regime_bar.calendar_bucket, bucket: 5m, bars: 1m, regime: regime_1m}
+  regime_1m:       {tracker: regime.dual_ema, timeframe: 1m}
+  excursion:       {tracker: regime.excursion, bars: 1s, regime: regime_1m}
+  regime_bar_5m:   {tracker: regime_bar.calendar_bucket, bucket: 5m, bars: 1m, regime: regime_1m}
+  displacement_1m: {tracker: candle.displacement_1m, bars: 1m}
+  bos_1m:          {tracker: structure.bos_1m, bars: 1m}
 
 population:
   session: RTH
@@ -23,10 +25,21 @@ triggers: every_candidate
 features:
   instances:
     - {feature: distance_to_level, level: rth_open, level_context: session, normalization: points, timeframe: 1m}
+  metadata:
+    is_displacement: "displacement_1m.is_displacement"
+    displacement_dir: "displacement_1m.displacement_dir"
+    displacement_toward_anchor: "displacement_1m.toward_anchor"
+    displacement_signal: "displacement_1m.signal"
+    is_bos: "bos_1m.is_bos"
+    bos_dir: "bos_1m.bos_dir"
+    bos_toward_anchor: "bos_1m.toward_anchor"
+    bos_signal: "bos_1m.signal"
 
 outcome:
   kind: label
   entry_reference: next_bar_open
+  entry_cutoff: "11:00:00 America/New_York"
+  session_cutoff: "11:30:00 America/New_York"
   session_end: truncate
   horizon_end_rule: strict
   horizon: 5400s
