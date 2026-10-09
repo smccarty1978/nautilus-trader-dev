@@ -1,0 +1,11 @@
+{
+ "recorded_utc": "2026-10-09",
+ "chore": "chore/reconcile_bounded_memory",
+ "main_head": "4f53d9ae (clean)",
+ "chore_worktree": "clean",
+ "targeted_tests": "research_workflow/tests/test_reconcile_bounded_memory.py: 20 passed (independent re-run)",
+ "evidence_files_parse": ["allocation_map.json", "merge_packet.json", "parity.json", "projection.json", "rss.json", "test_classification.json"],
+ "independent_parity_check": "accepted pilot reconcile.json, generated_at_utc line removed (harness/compare.py.txt rule), sha256 = 0fdcc1bf... = parity.json R2 accepted_stripped_sha256 and all four old/new run hashes",
+ "documented_behaviour_difference": "corrupt/unreadable partition parquet: pyarrow exception instead of pandas-path error; wording/type differ; neither version writes reconcile.json (docs/GOVERNED_STUDY_CONTROLLER.md 'Reconcile reads')",
+ "regression_status": "NO_NEW_REGRESSIONS (narrow test_delta over 14 reconcile-related files: 209/209; committed baseline still stale, not re-recorded)"
+}

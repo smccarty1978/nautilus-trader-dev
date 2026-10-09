@@ -1,0 +1,129 @@
+{
+ "comparison_rule": "reconcile.json parsed objects equal AND file text byte-identical after removing ONLY the generated_at_utc line",
+ "R1_micro_tests": {
+  "file": "research_workflow/tests/test_reconcile_bounded_memory.py",
+  "oracle": "V2Lifecycle.reconcile of main 4f53d9ae copied verbatim into the test module",
+  "cases": [
+   "passing (date-bounded + whole year, nested, multi row group)",
+   "row-count mismatch",
+   "duplicate keys",
+   "rows outside the year",
+   "rows outside declared windows",
+   "manifest without windows",
+   "schema mismatch",
+   "different dataset digests",
+   "partition not PASS",
+   "several findings at once (order)",
+   "whole-year + empty partition",
+   "empty partition under a declared window",
+   "missing KEY column -> identical KeyError; empty partition without KEY -> no KEY access",
+   "pandas-written partitions: default range index / stored unnamed index (__index_level_0__) / stored named index / no index",
+   "nested multi-row-group names+rows == pd.read_parquet",
+   "row-group layout invariance (1/7/1000)",
+   "memory: Arrow-pool + tracemalloc peak flat in nested width, KEY-bounded in rows"
+  ],
+  "result": "20 passed (pinned at c44e095b)",
+  "memory_test_against_old": "probe (scratch): OLD arrow peak 1.31 MB -> 87.3 MB when nested width x64; NEW 0.19 MB -> 0.19 MB (the width assertion fails on the old code)"
+ },
+ "R2_pilot": {
+  "accepted": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_vp_g2_location_pilot\\studies\\nq_vp_g2_location_pilot\\_work\\controller\\reconcile.json",
+  "accepted_stripped_sha256": "0fdcc1bfa62ca8a0001686f8de32fb562a07516460cf8d9e65360ce0915952f4",
+  "runs": [
+   {
+    "path": "pilot_old_main.reconcile.json",
+    "object_equal": true,
+    "stripped_text_identical": true,
+    "stripped_sha256": "0fdcc1bfa62ca8a0001686f8de32fb562a07516460cf8d9e65360ce0915952f4",
+    "generated_at_utc": "2026-10-09T16:06:49.986788+00:00",
+    "differing_keys": []
+   },
+   {
+    "path": "pilot_old_main_repeat.reconcile.json",
+    "object_equal": true,
+    "stripped_text_identical": true,
+    "stripped_sha256": "0fdcc1bfa62ca8a0001686f8de32fb562a07516460cf8d9e65360ce0915952f4",
+    "generated_at_utc": "2026-10-09T16:07:14.757833+00:00",
+    "differing_keys": []
+   },
+   {
+    "path": "pilot_new.reconcile.json",
+    "object_equal": true,
+    "stripped_text_identical": true,
+    "stripped_sha256": "0fdcc1bfa62ca8a0001686f8de32fb562a07516460cf8d9e65360ce0915952f4",
+    "generated_at_utc": "2026-10-09T16:25:12.556223+00:00",
+    "differing_keys": []
+   },
+   {
+    "path": "pilot_new_repeat.reconcile.json",
+    "object_equal": true,
+    "stripped_text_identical": true,
+    "stripped_sha256": "0fdcc1bfa62ca8a0001686f8de32fb562a07516460cf8d9e65360ce0915952f4",
+    "generated_at_utc": "2026-10-09T16:25:19.544423+00:00",
+    "differing_keys": []
+   }
+  ],
+  "column_names_vs_pandas_full_read": [
+   {
+    "path": "C:/Users/Scott McCarty/Projects/Nautilus Trader-nq_vp_g2_location_pilot/studies/nq_vp_g2_location_pilot/_work/controller/partitions/train/2022/candidates.parquet",
+    "columns": 202,
+    "rows": 13501,
+    "names_equal_pandas": true,
+    "rows_equal_pandas": true,
+    "pandas_metadata": false
+   },
+   {
+    "path": "C:/Users/Scott McCarty/Projects/Nautilus Trader-nq_vp_g2_location_pilot/studies/nq_vp_g2_location_pilot/_work/controller/partitions/train/2022/observations.parquet",
+    "columns": 3,
+    "rows": 13501,
+    "names_equal_pandas": true,
+    "rows_equal_pandas": true,
+    "pandas_metadata": false
+   }
+  ],
+  "pilot_tree_untouched": "inputs staged by plain file copy into scratch (stage_study.py); pilot accepted reconcile.json mtime/content unchanged"
+ },
+ "R3_stress": {
+  "reference": "OLD main 4f53d9ae on the flat 108,008-row stress (nested columns dropped; old nested stress would exceed 8 GiB, not run)",
+  "reference_stripped_sha256": "61f24795ea8b4e39aed5922f2ab5c5247fc0218d2b2770352a4072f467ef257c",
+  "runs": [
+   {
+    "path": "stress_new_flat.reconcile.json",
+    "object_equal": true,
+    "stripped_text_identical": true,
+    "stripped_sha256": "61f24795ea8b4e39aed5922f2ab5c5247fc0218d2b2770352a4072f467ef257c",
+    "generated_at_utc": "2026-10-09T16:25:53.197277+00:00",
+    "differing_keys": []
+   },
+   {
+    "path": "stress_new_p0.reconcile.json",
+    "object_equal": true,
+    "stripped_text_identical": true,
+    "stripped_sha256": "61f24795ea8b4e39aed5922f2ab5c5247fc0218d2b2770352a4072f467ef257c",
+    "generated_at_utc": "2026-10-09T16:25:36.949245+00:00",
+    "differing_keys": []
+   },
+   {
+    "path": "stress_new_rg1000.reconcile.json",
+    "object_equal": true,
+    "stripped_text_identical": true,
+    "stripped_sha256": "61f24795ea8b4e39aed5922f2ab5c5247fc0218d2b2770352a4072f467ef257c",
+    "generated_at_utc": "2026-10-09T16:25:45.486801+00:00",
+    "differing_keys": []
+   },
+   {
+    "path": "stress_new_p0_repeat.reconcile.json",
+    "object_equal": true,
+    "stripped_text_identical": true,
+    "stripped_sha256": "61f24795ea8b4e39aed5922f2ab5c5247fc0218d2b2770352a4072f467ef257c",
+    "generated_at_utc": "2026-10-09T16:26:03.415859+00:00",
+    "differing_keys": []
+   }
+  ],
+  "layout_invariance": "p0 (1,114 x 97-row groups) == rg1000 (109 x 1000-row groups) == flat (nested dropped) == p0 repeat == OLD(flat), byte-identical modulo timestamp",
+  "n4_54004_rows": {
+   "findings": [],
+   "passed": true,
+   "rows": 54004
+  }
+ }
+}

@@ -1,0 +1,194 @@
+[
+ {
+  "label": "names_pilot",
+  "out_dir": "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/r3",
+  "budget_gib": 8,
+  "cmd": [
+   "C:\\Users\\Scott McCarty\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/names_check.py",
+   "C:/Users/Scott McCarty/Projects/Nautilus Trader-reconcile_bounded_memory",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/r3/names_pilot.json",
+   "C:/Users/Scott McCarty/Projects/Nautilus Trader-nq_vp_g2_location_pilot/studies/nq_vp_g2_location_pilot/_work/controller/partitions/train/2022/candidates.parquet",
+   "C:/Users/Scott McCarty/Projects/Nautilus Trader-nq_vp_g2_location_pilot/studies/nq_vp_g2_location_pilot/_work/controller/partitions/train/2022/observations.parquet"
+  ]
+ },
+ {
+  "label": "build_stress",
+  "out_dir": "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/r3",
+  "budget_gib": 8,
+  "cmd": [
+   "C:\\Users\\Scott McCarty\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/build_stress.py",
+   "C:/Users/Scott McCarty/Projects/Nautilus Trader-nq_vp_g2_location_pilot/studies/nq_vp_g2_location_pilot/_work/controller/partitions/train/2022",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/stress",
+   "8",
+   "1"
+  ]
+ },
+ {
+  "label": "rechunk_rg1000",
+  "out_dir": "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/r3",
+  "budget_gib": 8,
+  "cmd": [
+   "C:\\Users\\Scott McCarty\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/restructure.py",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/stress/p0/candidates.parquet",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/stress/rg1000/candidates.parquet",
+   "1000"
+  ]
+ },
+ {
+  "label": "rechunk_rg1000_obs",
+  "out_dir": "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/r3",
+  "budget_gib": 8,
+  "cmd": [
+   "C:\\Users\\Scott McCarty\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/restructure.py",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/stress/p0/observations.parquet",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/stress/rg1000/observations.parquet",
+   "1000"
+  ]
+ },
+ {
+  "label": "drop_nested",
+  "out_dir": "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/r3",
+  "budget_gib": 8,
+  "cmd": [
+   "C:\\Users\\Scott McCarty\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/restructure.py",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/stress/p0/candidates.parquet",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/stress/flat/candidates.parquet",
+   "97",
+   "drop_nested"
+  ]
+ },
+ {
+  "label": "drop_nested_obs",
+  "out_dir": "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/r3",
+  "budget_gib": 8,
+  "cmd": [
+   "C:\\Users\\Scott McCarty\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/restructure.py",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/stress/p0/observations.parquet",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/stress/flat/observations.parquet",
+   "97"
+  ]
+ },
+ {
+  "label": "stage_p0",
+  "out_dir": "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/r3",
+  "budget_gib": 8,
+  "cmd": [
+   "C:\\Users\\Scott McCarty\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/stage_study.py",
+   "C:/Users/Scott McCarty/Projects/Nautilus Trader-nq_vp_g2_location_pilot/studies/nq_vp_g2_location_pilot",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/stress_study_p0",
+   "2022=C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/stress/p0"
+  ]
+ },
+ {
+  "label": "widen_p0",
+  "out_dir": "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/r3",
+  "budget_gib": 8,
+  "cmd": [
+   "C:\\Users\\Scott McCarty\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/widen_window.py",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/stress_study_p0",
+   "2022-05-31"
+  ]
+ },
+ {
+  "label": "stage_rg1000",
+  "out_dir": "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/r3",
+  "budget_gib": 8,
+  "cmd": [
+   "C:\\Users\\Scott McCarty\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/stage_study.py",
+   "C:/Users/Scott McCarty/Projects/Nautilus Trader-nq_vp_g2_location_pilot/studies/nq_vp_g2_location_pilot",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/stress_study_rg1000",
+   "2022=C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/stress/rg1000"
+  ]
+ },
+ {
+  "label": "widen_rg1000",
+  "out_dir": "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/r3",
+  "budget_gib": 8,
+  "cmd": [
+   "C:\\Users\\Scott McCarty\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/widen_window.py",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/stress_study_rg1000",
+   "2022-05-31"
+  ]
+ },
+ {
+  "label": "stage_flat",
+  "out_dir": "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/r3",
+  "budget_gib": 8,
+  "cmd": [
+   "C:\\Users\\Scott McCarty\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/stage_study.py",
+   "C:/Users/Scott McCarty/Projects/Nautilus Trader-nq_vp_g2_location_pilot/studies/nq_vp_g2_location_pilot",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/stress_study_flat",
+   "2022=C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/stress/flat"
+  ]
+ },
+ {
+  "label": "widen_flat",
+  "out_dir": "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/r3",
+  "budget_gib": 8,
+  "cmd": [
+   "C:\\Users\\Scott McCarty\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/widen_window.py",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/stress_study_flat",
+   "2022-05-31"
+  ]
+ },
+ {
+  "label": "stress_new_p0",
+  "out_dir": "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/r3",
+  "budget_gib": 8,
+  "cmd": [
+   "C:\\Users\\Scott McCarty\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/reconcile_run.py",
+   "C:/Users/Scott McCarty/Projects/Nautilus Trader-reconcile_bounded_memory",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/stress_study_p0",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/r3/stress_new_p0.reconcile.json"
+  ]
+ },
+ {
+  "label": "stress_new_rg1000",
+  "out_dir": "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/r3",
+  "budget_gib": 8,
+  "cmd": [
+   "C:\\Users\\Scott McCarty\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/reconcile_run.py",
+   "C:/Users/Scott McCarty/Projects/Nautilus Trader-reconcile_bounded_memory",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/stress_study_rg1000",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/r3/stress_new_rg1000.reconcile.json"
+  ]
+ },
+ {
+  "label": "stress_new_flat",
+  "out_dir": "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/r3",
+  "budget_gib": 8,
+  "cmd": [
+   "C:\\Users\\Scott McCarty\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/reconcile_run.py",
+   "C:/Users/Scott McCarty/Projects/Nautilus Trader-reconcile_bounded_memory",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/stress_study_flat",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/r3/stress_new_flat.reconcile.json"
+  ]
+ },
+ {
+  "label": "stress_new_p0_repeat",
+  "out_dir": "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/r3",
+  "budget_gib": 8,
+  "cmd": [
+   "C:\\Users\\Scott McCarty\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/reconcile_run.py",
+   "C:/Users/Scott McCarty/Projects/Nautilus Trader-reconcile_bounded_memory",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/stress_study_p0",
+   "C:/Users/SCOTTM~1/AppData/Local/Temp/claude/C--Users-Scott-McCarty-Projects-Nautilus-Trader/d3759a78-419b-4494-8051-925b4e364252/scratchpad/rbm/r3/stress_new_p0_repeat.reconcile.json"
+  ]
+ }
+]

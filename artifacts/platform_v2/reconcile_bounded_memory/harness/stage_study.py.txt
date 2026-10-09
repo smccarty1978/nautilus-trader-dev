@@ -1,0 +1,27 @@
+"""Evidence harness (not study code): stage a READ-ONLY copy of a study's reconcile inputs into a SCRATCH
+study dir (plain file copies; no links): compiled_plan.json, audit/frozen_execution_manifest.json,
+artifacts/{experiment_authorization,preexec_audit_seal}.json, _work/controller/{train_partition_reuse,
+partition_reuse_shadow}.json when present, and partitions/train/<year>/{manifest.json,candidates.parquet,
+observations.parquet}. Optionally replaces the partition parquet files from <partition_src_root>/<year>/.
+usage: stage_study.py <src_study> <scratch_study> [<year>=<partition_dir> ...]"""
+import sys, os, shutil, json
+src, dst = sys.argv[1], sys.argv[2]
+over = dict(a.split("=", 1) for a in sys.argv[3:])
+assert not os.path.exists(dst), dst
+def cp(rel, from_root=src, to_rel=None):
+    s = os.path.join(from_root, rel); d = os.path.join(dst, to_rel or rel)
+    if os.path.isfile(s):
+        os.makedirs(os.path.dirname(d), exist_ok=True); shutil.copyfile(s, d); return True
+    return False
+for rel in ("compiled_plan.json", "audit/frozen_execution_manifest.json", "artifacts/experiment_authorization.json",
+            "artifacts/preexec_audit_seal.json", "_work/controller/train_partition_reuse.json", "_work/controller/partition_reuse_shadow.json"):
+    cp(rel)
+base = "_work/controller/partitions/train"
+for y in sorted(os.listdir(os.path.join(src, base))):
+    cp(f"{base}/{y}/manifest.json")
+    for n in ("candidates.parquet", "observations.parquet"):
+        if y in over:
+            cp(n, from_root=over[y], to_rel=f"{base}/{y}/{n}")
+        else:
+            cp(f"{base}/{y}/{n}")
+print(json.dumps({"staged": dst, "years": sorted(os.listdir(os.path.join(dst, base))), "override": over}))

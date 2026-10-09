@@ -1,0 +1,17 @@
+"""Evidence harness (not study code): compare reconcile.json files to a reference, excluding ONLY
+generated_at_utc. Reports parsed-object equality and byte equality of the file text with the
+generated_at_utc line removed. usage: compare.py <reference.json> <candidate.json> [...]"""
+import sys, json, hashlib
+def load(p):
+    raw = open(p, encoding="utf-8").read()
+    obj = json.loads(raw); ts = obj.pop("generated_at_utc", None)
+    stripped = "".join(l for l in raw.splitlines(True) if '"generated_at_utc"' not in l)
+    return obj, stripped, ts
+ref, ref_txt, ref_ts = load(sys.argv[1])
+out = {"reference": sys.argv[1], "reference_stripped_sha256": hashlib.sha256(ref_txt.encode()).hexdigest(), "candidates": []}
+for p in sys.argv[2:]:
+    o, t, ts = load(p)
+    out["candidates"].append({"path": p, "object_equal": o == ref, "stripped_text_identical": t == ref_txt,
+                              "stripped_sha256": hashlib.sha256(t.encode()).hexdigest(), "generated_at_utc": ts,
+                              "differing_keys": sorted(k for k in set(o) | set(ref) if o.get(k) != ref.get(k))})
+print(json.dumps(out, indent=1))
