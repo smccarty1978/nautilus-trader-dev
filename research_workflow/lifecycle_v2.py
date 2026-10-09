@@ -284,11 +284,14 @@ def _reconcile_parquet_shape(path: Path) -> tuple[tuple, int]:
 
     The column names are produced by the same pandas reconstruction a full read uses (stored
     pandas metadata: index columns dropped, column-index dtype restored), applied to a zero-row
-    table of the file's schema, so no column data is decoded.
+    table of the file's schema, so no column data is decoded. The footer is parsed once
+    (``pq.read_schema`` is ``ParquetFile(path).schema_arrow``): for wide nested partitions with
+    many row groups the parsed footer itself is the dominant cost (~0.5 GiB for 1,114 row groups
+    x 427 leaf columns).
     """
     import pyarrow.parquet as pq
     pf = pq.ParquetFile(path)
-    return tuple(pq.read_schema(path).empty_table().to_pandas().columns), pf.metadata.num_rows
+    return tuple(pf.schema_arrow.empty_table().to_pandas().columns), pf.metadata.num_rows
 
 
 def _merge_row_group_bytes_per_row(pfs: Sequence[Any], groups: Sequence[tuple]) -> Any:
