@@ -533,7 +533,7 @@ class FeatureHostBinding(BaseBinding):
     PARAMS = {"instances": REQUIRED, "routing": REQUIRED, "snapshot": REQUIRED, "feature_authority": "active"}
     INPUTS = {}   # dynamic: one input per routing entry (compiler expands)
     FIELDS = ("aliases",)
-    EPOCH_FIELDS = ("structural_snapshot_ready", "rth_open")
+    EPOCH_FIELDS = ("structural_snapshot_ready", "rth_open", "rth_open_elapsed_seconds", "rth_recovery_direction")
     EVENTS = ()
     SUBSCRIBES = ("regime_bar", "changed")
     CADENCE = "per_source_event"
@@ -601,13 +601,32 @@ class FeatureHostBinding(BaseBinding):
                     tracker = adapter._provider._tracker
                     return bool(tracker.can_snapshot(int(epoch.T), adapter._five_close_ts))
             return True
-        if name == "rth_open":
+        if name in ("rth_open", "rth_open_elapsed_seconds", "rth_recovery_direction"):
             from research_workflow.provider_host import PriceLevelAdapter
+            tracker = None
             for adapter in self._host.adapters:
                 if isinstance(adapter, PriceLevelAdapter):
-                    lvl = adapter._provider._tracker._rth_open
-                    return float(lvl) if lvl is not None else None
-            return None
+                    tracker = adapter._provider._tracker
+                    break
+            lvl = getattr(tracker, "_rth_open", None) if tracker is not None else None
+            if name == "rth_open":
+                return float(lvl) if lvl is not None else None
+            if name == "rth_open_elapsed_seconds":
+                # Seconds since the 09:30 RTH-open INSTANT. The tracker stamps the anchor with the
+                # CLOSE of the opening 1m bar (its causal availability), so the open instant is one
+                # completed 1m bar earlier: T = 09:31 -> 60s, T = 11:00 -> 5400s. None until the
+                # anchor exists (a comparison against None is False: fail closed).
+                ts = getattr(tracker, "_rth_open_ts", None) if tracker is not None else None
+                if ts is None:
+                    return None
+                return (int(epoch.T) - int(ts)) / 1_000_000_000 + 60.0
+            # rth_recovery_direction = -sign(close_T - anchor_T): +1 long reversion when displaced
+            # BELOW the anchor, -1 short reversion when displaced ABOVE, 0 at zero displacement or
+            # while the anchor is unavailable. close_T is the completed 1m bar close of epoch T.
+            if lvl is None:
+                return 0
+            displacement = float(epoch.price) - float(lvl)
+            return -1 if displacement > 0.0 else (1 if displacement < 0.0 else 0)
         raise KeyError(name)
 
     def snapshot(self, epoch: EpochView, resolve) -> Dict[str, Any]:
