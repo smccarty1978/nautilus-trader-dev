@@ -533,7 +533,7 @@ class FeatureHostBinding(BaseBinding):
     PARAMS = {"instances": REQUIRED, "routing": REQUIRED, "snapshot": REQUIRED, "feature_authority": "active"}
     INPUTS = {}   # dynamic: one input per routing entry (compiler expands)
     FIELDS = ("aliases",)
-    EPOCH_FIELDS = ("structural_snapshot_ready",)
+    EPOCH_FIELDS = ("structural_snapshot_ready", "rth_open")
     EVENTS = ()
     SUBSCRIBES = ("regime_bar", "changed")
     CADENCE = "per_source_event"
@@ -601,6 +601,13 @@ class FeatureHostBinding(BaseBinding):
                     tracker = adapter._provider._tracker
                     return bool(tracker.can_snapshot(int(epoch.T), adapter._five_close_ts))
             return True
+        if name == "rth_open":
+            from research_workflow.provider_host import PriceLevelAdapter
+            for adapter in self._host.adapters:
+                if isinstance(adapter, PriceLevelAdapter):
+                    lvl = adapter._provider._tracker._rth_open
+                    return float(lvl) if lvl is not None else None
+            return None
         raise KeyError(name)
 
     def snapshot(self, epoch: EpochView, resolve) -> Dict[str, Any]:
