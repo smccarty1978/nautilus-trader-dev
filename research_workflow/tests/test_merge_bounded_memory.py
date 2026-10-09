@@ -125,6 +125,26 @@ def test_streamed_merge_is_independent_of_source_row_group_layout_and_determinis
     assert len(hashes) == 1 and len(idents) == 1
 
 
+def test_default_chunks_are_byte_bounded_and_exact(tmp_path, monkeypatch):
+    sources = _sources(tmp_path)
+    _, order = _merge_key_order(sources)
+    widest = max(pq.read_table(p).slice(i, 1).nbytes for p in sources for i in range(pq.ParquetFile(p).metadata.num_rows))
+    target = 4 * widest
+    monkeypatch.setattr(lv2, "MERGE_TARGET_BATCH_BYTES", target)
+    out = tmp_path / "m.parquet"
+    stats = _stream_merged_parquet(out, sources, order)
+    assert stats["output_row_groups"] > 3 and stats["batch_rows"] is None
+    assert stats["max_chunk_arrow_bytes"] <= 3 * target                       # estimate-driven, never the whole file
+    assert pq.read_table(out).to_pylist() == _reference(sources, order).to_pylist()
+
+
+def test_chunk_bounds_split_by_estimated_bytes():
+    b = lv2._merge_chunk_bounds(np.array([5.0, 5.0, 5.0, 20.0, 1.0, 1.0]), 10)
+    assert b.tolist()[0] == 0 and b.tolist()[-1] == 6 and all(x < y for x, y in zip(b[:-1], b[1:]))
+    assert b.tolist() == [0, 2, 4, 6]                                           # a chunk overshoots by at most one row
+    assert lv2._merge_chunk_bounds(np.zeros(0), 10).tolist() == [0]
+
+
 def test_in_order_merge_reads_each_source_row_group_once(tmp_path, monkeypatch):
     sources = _sources(tmp_path, shuffled=False)
     _, order = _merge_key_order(sources)

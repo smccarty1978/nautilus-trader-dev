@@ -277,30 +277,50 @@ def _merge_key_order(sources: Sequence[Path]) -> tuple[Any, Any]:
     return keys, keys.sort_values(list(KEY), kind="mergesort").index.to_numpy()
 
 
-def _merge_batch_rows(pfs: Sequence[Any], target_bytes: int = MERGE_TARGET_BATCH_BYTES) -> int:
-    """Rows per streamed batch so one batch's in-memory Arrow footprint is near ``target_bytes``.
+def _merge_row_group_bytes_per_row(pfs: Sequence[Any], groups: Sequence[tuple]) -> Any:
+    """Estimated in-memory Arrow bytes/row of every source row group (``groups`` order).
 
-    Arrow bytes/row is measured on the largest row group of the first non-empty source (one bounded
-    read). The footer's ``total_byte_size`` is NOT used: it counts encoded (dictionary/RLE) bytes and
-    understated the decoded Arrow size of the G2 pilot's profile structs ~5.6x (27 KB vs 151 KB/row).
+    Row width varies a lot within one partition (a profile's bin count grows and shrinks with the
+    session), so one global bytes/row would mis-size chunks. Each row group's footer ``total_byte_size``
+    is scaled by a per-source decode ratio measured on that source's largest row group (one bounded
+    read per source). The raw footer size alone is NOT usable: it counts encoded (dictionary/RLE)
+    bytes and understated the decoded Arrow size of the G2 pilot's profile structs ~5.6x.
     """
-    for pf in pfs:
+    import numpy as np
+    ratio: Dict[int, float] = {}
+    for fi, pf in enumerate(pfs):
         md = pf.metadata
-        if md.num_rows:
-            gi = max(range(md.num_row_groups), key=lambda i: md.row_group(i).num_rows)
-            t = pf.read_row_group(gi)
-            per_row = t.nbytes / max(1, t.num_rows)
-            del t
-            return max(1, int(target_bytes / per_row)) if per_row > 0 else max(1, md.num_rows)
-    return 1
+        if not md.num_rows:
+            continue
+        gi = max(range(md.num_row_groups), key=lambda i: md.row_group(i).total_byte_size)
+        t = pf.read_row_group(gi)
+        ratio[fi] = t.nbytes / max(1, md.row_group(gi).total_byte_size)
+        del t
+    return np.array([pfs[fi].metadata.row_group(gi).total_byte_size * ratio.get(fi, 1.0) / max(1, n) for fi, gi, n in groups], dtype=np.float64)
+
+
+def _merge_chunk_bounds(row_cost: Any, target_bytes: int) -> Any:
+    """Split consecutive output rows (estimated bytes each) into chunks of about ``target_bytes``.
+
+    Returns the chunk start offsets plus the final end. A chunk exceeds ``target_bytes`` by at most
+    one row, and every chunk holds at least one row.
+    """
+    import numpy as np
+    n = len(row_cost)
+    if n == 0:
+        return np.array([0], dtype=np.int64)
+    start_offset = np.cumsum(row_cost) - row_cost
+    cid = np.floor_divide(start_offset, float(max(1, target_bytes))).astype(np.int64)
+    return np.concatenate([[0], np.flatnonzero(np.diff(cid)) + 1, [n]]).astype(np.int64)
 
 
 def _stream_merged_parquet(path: Path, sources: Sequence[Path], order: Any, *, batch_rows: Optional[int] = None) -> Dict[str, Any]:
     """Write one merged file from ``sources`` permuted by ``order`` with bounded memory (Arrow only).
 
     ``order`` is the positional permutation of the concatenated ``sources`` (``_merge_key_order``).
-    The output is produced in consecutive chunks of ``batch_rows`` OUTPUT positions: each chunk's
-    rows are taken from the source row groups that hold them (the most recently read row group of
+    The output is produced in consecutive chunks of OUTPUT positions -- about
+    ``MERGE_TARGET_BATCH_BYTES`` of estimated Arrow bytes each (``_merge_chunk_bounds``), or exactly
+    ``batch_rows`` rows when given (tests/evidence): each chunk's rows are taken from the source row groups that hold them (the most recently read row group of
     each source is cached, so a merge whose order is monotone within each source -- the normal
     case, interleaved or not -- reads every row group exactly once), reassembled in output order
     and appended to a ``ParquetWriter`` as one row group. Nothing is converted to pandas or Python
@@ -330,7 +350,11 @@ def _stream_merged_parquet(path: Path, sources: Sequence[Path], order: Any, *, b
     order = np.asarray(order, dtype=np.int64)
     if len(order) != total or (total and (order.min() < 0 or order.max() >= total)) or len(np.unique(order)) != total:
         raise LifecycleV2Error(f"MERGE_NESTED_SCHEMA_MISMATCH: {path.name} order is not a permutation of the {total} partition rows")
-    rows_per = int(batch_rows) if batch_rows else _merge_batch_rows(pfs)
+    g_all = np.searchsorted(starts, order, side="right") - 1 if total else np.zeros(0, dtype=np.int64)
+    if batch_rows:
+        bounds = np.unique(np.concatenate([np.arange(0, total, int(batch_rows), dtype=np.int64), [total]]))
+    else:
+        bounds = _merge_chunk_bounds(_merge_row_group_bytes_per_row(pfs, groups)[g_all] if total else np.zeros(0), MERGE_TARGET_BATCH_BYTES)
     tmp = path.with_name(path.name + ".tmp")
     cached: Dict[int, Any] = {}  # source file -> (global row group, table): at most ONE row group per source
 
@@ -342,12 +366,12 @@ def _stream_merged_parquet(path: Path, sources: Sequence[Path], order: Any, *, b
             cached[fi] = (g, pfs[fi].read_row_group(gi))
         return cached[fi][1]
 
-    out_groups = 0
+    out_groups, max_chunk_rows, max_chunk_bytes = 0, 0, 0
     try:
         with pq.ParquetWriter(str(tmp), schemas[0]) as writer:
-            for s in range(0, total, rows_per):
-                pos = order[s:s + rows_per]
-                g_of = np.searchsorted(starts, pos, side="right") - 1
+            for s, e in zip(bounds[:-1], bounds[1:]):
+                pos = order[s:e]
+                g_of = g_all[s:e]
                 pieces, slots = [], []
                 for g in np.unique(g_of):
                     sel = np.nonzero(g_of == g)[0]
@@ -358,6 +382,7 @@ def _stream_merged_parquet(path: Path, sources: Sequence[Path], order: Any, *, b
                     chunk = chunk.take(pa.array(np.argsort(np.concatenate(slots), kind="stable"), type=pa.int64()))
                 writer.write_table(chunk, row_group_size=max(1, chunk.num_rows))
                 out_groups += 1
+                max_chunk_rows, max_chunk_bytes = max(max_chunk_rows, chunk.num_rows), max(max_chunk_bytes, chunk.nbytes)
                 del pieces, chunk
             if total == 0:
                 writer.write_table(schemas[0].empty_table())
@@ -367,8 +392,9 @@ def _stream_merged_parquet(path: Path, sources: Sequence[Path], order: Any, *, b
         cached.clear()
         if tmp.exists():
             tmp.unlink()
-    return {"rows": total, "batch_rows": rows_per, "source_row_groups": len(groups), "output_row_groups": out_groups,
-            "sources": len(sources)}
+    return {"rows": total, "batch_rows": int(batch_rows) if batch_rows else None, "target_chunk_bytes": None if batch_rows else MERGE_TARGET_BATCH_BYTES,
+            "max_chunk_rows": max_chunk_rows, "max_chunk_arrow_bytes": max_chunk_bytes, "source_row_groups": len(groups),
+            "output_row_groups": out_groups, "sources": len(sources)}
 
 
 def _merge_partition_file(sources: Sequence[Path], dest: Path, *, check_dup: bool) -> Dict[str, Any]:
