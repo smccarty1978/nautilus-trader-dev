@@ -182,16 +182,23 @@ class StructureBosBinding(BaseBinding):
         if name == "last_bar_close_ts":
             return self.last_bar_close_ts
 
-        # Anchor lookup for toward_anchor and signal
+        # Look for anchor on features tracker directly (FeatureHostBinding)
         anchor_val = None
-        for t_name, t_obj in (epoch.trackers or {}).items():
-            if t_obj is not self and hasattr(t_obj, "epoch_value"):
-                try:
-                    anchor_val = t_obj.epoch_value("rth_open", epoch)
-                    if anchor_val is not None:
-                        break
-                except (KeyError, AttributeError):
-                    pass
+        feat_tracker = (epoch.trackers or {}).get("features")
+        if feat_tracker is not None and hasattr(feat_tracker, "epoch_value"):
+            try:
+                anchor_val = feat_tracker.epoch_value("rth_open", epoch)
+            except (KeyError, AttributeError):
+                pass
+        if anchor_val is None:
+            for t_name, t_obj in (epoch.trackers or {}).items():
+                if t_name not in ("displacement_1m", "bos_1m") and t_obj is not self and hasattr(t_obj, "epoch_value"):
+                    try:
+                        anchor_val = t_obj.epoch_value("rth_open", epoch)
+                        if anchor_val is not None:
+                            break
+                    except (KeyError, AttributeError):
+                        pass
 
         toward = 0
         if self.is_bos and anchor_val is not None:

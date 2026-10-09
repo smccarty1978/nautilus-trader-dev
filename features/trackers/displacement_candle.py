@@ -119,17 +119,24 @@ class DisplacementCandleBinding(BaseBinding):
         if name == "displacement_dir":
             return self.displacement_dir
 
-        # For toward_anchor and signal, check anchor price:
+        # Look for anchor on features tracker directly (FeatureHostBinding)
         anchor_val = None
-        # Try finding anchor from epoch trackers if available
-        for t_name, t_obj in (epoch.trackers or {}).items():
-            if t_obj is not self and hasattr(t_obj, "epoch_value"):
-                try:
-                    anchor_val = t_obj.epoch_value("rth_open", epoch)
-                    if anchor_val is not None:
-                        break
-                except (KeyError, AttributeError):
-                    pass
+        feat_tracker = (epoch.trackers or {}).get("features")
+        if feat_tracker is not None and hasattr(feat_tracker, "epoch_value"):
+            try:
+                anchor_val = feat_tracker.epoch_value("rth_open", epoch)
+            except (KeyError, AttributeError):
+                pass
+        if anchor_val is None:
+            # Fallback to other trackers that are not signal detectors
+            for t_name, t_obj in (epoch.trackers or {}).items():
+                if t_name not in ("displacement_1m", "bos_1m") and t_obj is not self and hasattr(t_obj, "epoch_value"):
+                    try:
+                        anchor_val = t_obj.epoch_value("rth_open", epoch)
+                        if anchor_val is not None:
+                            break
+                    except (KeyError, AttributeError):
+                        pass
 
         toward = 0
         if self.is_displacement and anchor_val is not None:
