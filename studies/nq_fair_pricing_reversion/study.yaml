@@ -26,8 +26,15 @@ features:
 outcome:
   kind: label
   entry_reference: next_bar_open
-  event: anchor.reverted
+  session_end: truncate
+  horizon_end_rule: strict
   horizon: 5400s
+  max_gap: 60s
+  recovery:
+    reference: features.rth_open
+    milestones: [0.25, 0.50, 0.75, 1.00]
+    horizon: 5400s
+    expiry: censor
 
 chronology:
   train: [2021, 2022, 2023]

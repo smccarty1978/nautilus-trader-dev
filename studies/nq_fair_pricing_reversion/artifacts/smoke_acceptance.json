@@ -1,0 +1,70 @@
+{
+  "candidates_count_total": 405,
+  "checks": {
+    "candidates_nonempty": true,
+    "no_outcome_columns_in_candidates": true,
+    "observation_per_candidate": true,
+    "pending_resolved_at_run_end": true,
+    "primary_window_respected": true,
+    "replay_imports_within_collection_closure": true
+  },
+  "date": "2023-10-02",
+  "execution_manifest_composite_sha256": "4c3a67e582f30e88aa516cca4798ad06cbb226d4fa45c3b6a9d943a26353525c",
+  "generated_at_utc": "2026-10-09T17:53:11.000241+00:00",
+  "manifest": {
+    "candidates_sha256": "6ca9526b07f887760d02ddce2ea56ed76c49d523b44074213d2daf573b90fda5",
+    "composite_seal_hash": "3cb10dd7d82dd28f8dbded2b9cd8bfe856d3f63d22fbc380e9e015200287141c",
+    "dataset": {
+      "bytes_verification": "VERIFIED",
+      "dataset_id": "NQ_1S_V2_GLOBEX",
+      "logical_digest": "9e7aecb7a2910b4402a6cb4f34cc2f6deb5df19d0e889b2c696cf4f844292c64"
+    },
+    "date": "2023-10-02",
+    "elapsed_s": 48.43379749986343,
+    "execution_manifest_sha256": "4c3a67e582f30e88aa516cca4798ad06cbb226d4fa45c3b6a9d943a26353525c",
+    "kind": "smoke",
+    "observations_sha256": "3f219980c3bd52935502975f22da650b2039ef8cdf3d6d657d16e478df7e079b",
+    "plan_sha256": "368e4e12ca1d2f8669b85b22247e09dd3be10fcd12512fc70ecc0c2f1e4ed53b",
+    "rows": {
+      "candidates": 405,
+      "observations": 405
+    },
+    "stats": {
+      "bar_range": {
+        "nq_1m": {
+          "first_ts_event": 1695772740000000000,
+          "first_ts_init": 1695772800000000000,
+          "last_ts_event": 1696291080000000000,
+          "last_ts_init": 1696291140000000000
+        },
+        "nq_1s": {
+          "first_ts_event": 1695772799000000000,
+          "first_ts_init": 1695772800000000000,
+          "last_ts_event": 1696291198000000000,
+          "last_ts_init": 1696291199000000000
+        }
+      },
+      "bars": 213431,
+      "bars_by_stream": {
+        "nq_1m": 5520,
+        "nq_1s": 207911
+      },
+      "candidates": 405,
+      "dropped_outside_primary": {
+        "candidates": 1215,
+        "observations": 1215
+      },
+      "epochs": 5520,
+      "observations": 405,
+      "pending_at_end": 0
+    },
+    "status": "PASS",
+    "written_at_utc": "2026-10-09T17:53:10.989745+00:00"
+  },
+  "observations_count_total": 405,
+  "run_dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_fair_pricing_reversion\\studies\\nq_fair_pricing_reversion\\runs\\20261009_175211_nq_fair_pricing_reversion_smoke",
+  "sealed_composite_sha256": "3cb10dd7d82dd28f8dbded2b9cd8bfe856d3f63d22fbc380e9e015200287141c",
+  "status": "ACCEPTED",
+  "study_name": "nq_fair_pricing_reversion",
+  "validator": "research_workflow.lifecycle_v2"
+}

@@ -1,0 +1,22 @@
+{
+  "audits": {
+    "causal": {
+      "auditor": "lookahead-auditor",
+      "report_sha256": "250fcc265696668853aa0947d49b0d9c37d34d8c3d84356ee52199c1061a4bd5",
+      "status_sha256": "0a14c3995f68faccb1320ecaf90fc6a68962c8cc9b332ad03675e1f795f3eef2"
+    },
+    "contract": {
+      "auditor": "contract-checker",
+      "report_sha256": "81ead1e3ff18f329ddbf9a456d659b5387a9ab46bfdc23df2b3f345be414042d",
+      "status_sha256": "0fc09abac1459397dddf6f14aae1363774e23fcec284be91273aedc95526fe94"
+    }
+  },
+  "composite_seal_hash": "3cb10dd7d82dd28f8dbded2b9cd8bfe856d3f63d22fbc380e9e015200287141c",
+  "execution_manifest_composite_sha256": "4c3a67e582f30e88aa516cca4798ad06cbb226d4fa45c3b6a9d943a26353525c",
+  "plan_sha256": "368e4e12ca1d2f8669b85b22247e09dd3be10fcd12512fc70ecc0c2f1e4ed53b",
+  "platform": "v2",
+  "registry_sha256": "b2ffb819d2e23b39dc9c544da86f050644b05ef69fede914860ded2fcd7531b2",
+  "schema_version": 2,
+  "sealed_at_utc": "2026-10-09T17:50:19.556064+00:00",
+  "study_id": "nq_fair_pricing_reversion"
+}
