@@ -1,0 +1,29 @@
+{
+ "narrow_run": {
+  "command": "python scripts/test_delta.py research_workflow/tests/test_reconcile_bounded_memory.py research_workflow/tests/test_lifecycle_v2.py research_workflow/tests/test_chronology_windows.py research_workflow/tests/test_controller_actions.py research_workflow/tests/test_controller_stages_v2.py research_workflow/tests/test_forward_outcomes.py research_workflow/tests/test_globex_calendar_authority.py research_workflow/tests/test_governed_controller.py research_workflow/tests/test_partitioning.py research_workflow/tests/test_redteam_packet_f.py research_workflow/tests/test_redteam_v2_chronology.py research_workflow/tests/test_replay_closure.py research_workflow/tests/test_study_closed_state.py research_workflow/tests/test_workflow_engine.py --json (detached)",
+  "scope_selection": "every research_workflow/tests file that references reconcile (grep 'reconcile'), incl. test_lifecycle_v2.py and the new file; scripts/tests hits refer to the unrelated output_manager reconcile_* helpers",
+  "head": "c44e095b",
+  "baseline_issues": [
+   "BASELINE_COMMIT_MISMATCH"
+  ],
+  "baseline_check": "--check-baseline: BASELINE_INCOMPATIBLE [BASELINE_COMMIT_MISMATCH]; committed baseline not re-recorded or edited",
+  "ran": 209,
+  "passed": 209,
+  "failed": 0,
+  "pytest_exit_code": 0,
+  "wall_seconds": 5829.5,
+  "test_delta_counts": {
+   "NEW_FAILURE": 0,
+   "NEW_FAILURE_OUTSIDE_BASELINE_SCOPE": 0,
+   "KNOWN_BASELINE_FAILURE": 0,
+   "BASELINE_FAILURE_NOW_FIXED": 0,
+   "ENVIRONMENTAL_MISSING_ARTIFACT": 0
+  }
+ },
+ "per_commit_targeted": {
+  "d8c7c138": "test_reconcile_bounded_memory.py 20 passed",
+  "c44e095b": "test_reconcile_bounded_memory.py 20 passed"
+ },
+ "classification": "NO_NEW_REGRESSIONS (no failures to classify; no re-runs on main were needed)",
+ "failures": []
+}

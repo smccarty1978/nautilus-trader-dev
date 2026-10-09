@@ -1,0 +1,67 @@
+"""Evidence tooling (not study code): run ONE governed controller invocation as a child and sample the
+RSS of its whole process tree every ~200 ms with psutil. Records peak tree-sum RSS and peak single-process
+RSS; kills the tree if tree-sum RSS exceeds the budget. Usage:
+
+  python watch_run.py <label> <out_dir> <budget_gib> -- <cmd...>
+"""
+import json, os, sys, time, datetime
+import subprocess
+import psutil
+
+label, out_dir, budget_gib = sys.argv[1], sys.argv[2], float(sys.argv[3])
+cmd = sys.argv[sys.argv.index("--") + 1:]
+os.makedirs(out_dir, exist_ok=True)
+log = open(os.path.join(out_dir, f"{label}.log"), "w", encoding="utf-8")
+budget = int(budget_gib * 1024 ** 3)
+t0 = time.time()
+start = datetime.datetime.now(datetime.timezone.utc).isoformat()
+proc = subprocess.Popen(cmd, stdout=log, stderr=subprocess.STDOUT, cwd=os.getcwd())
+root = psutil.Process(proc.pid)
+peak_sum = peak_single = 0
+peak_sum_t = None
+peak_procs = 0
+samples = 0
+series = []          # (elapsed_s, tree_sum_bytes) every ~5 s
+last_series = -10.0
+killed = False
+while proc.poll() is None:
+    try:
+        procs = [root] + root.children(recursive=True)
+    except psutil.NoSuchProcess:
+        break
+    tot = 0
+    for p in procs:
+        try:
+            r = p.memory_info().rss
+        except (psutil.NoSuchProcess, psutil.AccessDenied):
+            continue
+        tot += r
+        peak_single = max(peak_single, r)
+    samples += 1
+    el = time.time() - t0
+    if tot > peak_sum:
+        peak_sum, peak_sum_t, peak_procs = tot, el, len(procs)
+    if el - last_series >= 5.0:
+        series.append([round(el, 1), tot]); last_series = el
+    if tot > budget:
+        for p in reversed(procs):
+            try:
+                p.kill()
+            except psutil.NoSuchProcess:
+                pass
+        killed = True
+        break
+    time.sleep(0.2)
+rc = proc.wait()
+rec = {
+    "label": label, "cmd": cmd, "cwd": os.getcwd(), "start_utc": start,
+    "end_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+    "elapsed_s": round(time.time() - t0, 1), "returncode": rc, "sample_interval_s": 0.2, "samples": samples,
+    "peak_tree_rss_bytes": peak_sum, "peak_tree_rss_gib": round(peak_sum / 1024 ** 3, 3),
+    "peak_tree_rss_at_s": None if peak_sum_t is None else round(peak_sum_t, 1), "processes_at_peak": peak_procs,
+    "peak_single_process_rss_gib": round(peak_single / 1024 ** 3, 3),
+    "budget_gib": budget_gib, "killed_over_budget": killed, "series_5s": series,
+}
+with open(os.path.join(out_dir, f"{label}.rss.json"), "w", encoding="utf-8") as f:
+    json.dump(rec, f, indent=1)
+log.close()

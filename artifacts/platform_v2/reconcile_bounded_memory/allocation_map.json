@@ -1,0 +1,26 @@
+{
+ "stage": "V2Lifecycle.reconcile (research_workflow/lifecycle_v2.py)",
+ "before_main_4f53d9ae": {
+  "per_year_allocations": [
+   "pd.read_parquet(candidates.parquet): every column incl. 9 nested profile structs decoded to pandas objects (202 columns, 13,501 rows -> ~2.85 GiB above the ~0.1 GiB interpreter baseline)",
+   "pd.read_parquet(observations.parquet): 3 columns (small)",
+   "c.duplicated(KEY), pd.to_datetime(c.observation_ts) x2, window masks: O(rows) on 3 KEY columns"
+  ],
+  "uses_of_the_loaded_frames": ["tuple(c.columns), tuple(o.columns) (schema-mismatch finding)", "len(c), len(o) (row-count finding, rows)", "KEY columns only (duplicate / year / declared-window findings)"],
+  "measured_peak_tree_rss_gib": {"pilot_scratch": 2.964, "pilot_scratch_repeat": 2.957, "pilot_controller_recorded": 3.23, "flat_108008_row_stress_no_nested": 2.002},
+  "scaling": "linear in rows x row width (nested payload); ~69 GiB PROJECTED for a full G2 year (not run)"
+ },
+ "after_c44e095b": {
+  "per_year_allocations": [
+   "pq.ParquetFile(path) footer parse (once per file): column names via the pandas reconstruction of a ZERO-ROW table of the file schema (exactly pd.read_parquet's names), num_rows from the footer",
+   "pd.read_parquet(candidates.parquet, columns=[KEY present]) only when num_rows > 0 (where the old code first touched KEY); 24 B/row",
+   "unchanged pandas expressions on the KEY frame (duplicated, to_datetime, window masks)"
+  ],
+  "dominant_cost": "the parsed Parquet footer, proportional to row_groups x leaf_columns (diag: 75 MB serialized footer of 1,114 x 427 -> ~0.49 GiB parsed; 109 x 427 -> ~0.05 GiB). The first commit d8c7c138 parsed it twice (pq.read_schema + ParquetFile) -> c44e095b parses once.",
+  "measured_peak_tree_rss_gib": {"pilot": 0.118, "pilot_repeat": 0.112, "stress_54004_rows_557_groups": 0.36, "stress_108008_rows_1114_groups": 0.606, "stress_108008_rows_1114_groups_repeat": 0.632,
+                                 "stress_108008_rows_109_groups": 0.141, "stress_108008_rows_1114_groups_no_nested_193_leaf": 0.318},
+  "nested_payload_width": "does not enter: nested column data is never decoded (unit test: 64x list<int64> width leaves Arrow-pool and tracemalloc peaks unchanged)"
+ },
+ "unchanged_by_design": ["finding strings, their order, every reconcile.json field", "_reattest_partition_reuse (still reads manifests and hashes bytes only for reused partitions)", "merge / fit / analyze / hashing"],
+ "exception_behaviour": "missing KEY column with rows > 0 -> the same pandas KeyError from c.duplicated(KEY) (only present KEY columns are read); empty partitions never touch KEY (as before). An unreadable observations.parquet still raises, from pyarrow's ParquetFile instead of pandas' read_parquet (message may differ; no reconcile.json is written in either case)."
+}

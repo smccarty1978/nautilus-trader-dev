@@ -1,0 +1,17 @@
+"""Evidence harness (not study code): run V2Lifecycle.reconcile() of the code checkout <code_root>
+(main for OLD, the chore worktree for NEW) on a SCRATCH study and copy reconcile.json to <out_json>.
+usage: reconcile_run.py <code_root> <scratch_study> <out_json>"""
+import sys, time, json, shutil
+code, study, out = sys.argv[1], sys.argv[2], sys.argv[3]
+sys.path.insert(0, code)
+from pathlib import Path
+import research_workflow.lifecycle_v2 as lv2
+assert Path(lv2.__file__).resolve().is_relative_to(Path(code).resolve()), lv2.__file__
+t0 = time.time(); err = None
+try:
+    r = lv2.V2Lifecycle(Path(study), options=lv2.V2Options(execute=True)).reconcile()
+except Exception as e:
+    err = f"{type(e).__name__}: {e}"
+el = time.time() - t0
+print(json.dumps({"code": lv2.__file__, "reconcile_s": round(el, 2), "error": err}), flush=True)
+shutil.copyfile(Path(study) / "_work" / "controller" / "reconcile.json", out)

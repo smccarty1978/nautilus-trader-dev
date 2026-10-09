@@ -1,0 +1,68 @@
+"""Evidence harness (not study code): assemble rss.json / parity.json / projection.json for
+artifacts/platform_v2/reconcile_bounded_memory from the scratch run records. usage: assemble.py <scratch_root> <out_dir>"""
+import sys, json, os, glob
+import numpy as np
+import pyarrow.parquet as pq
+H, OUT = sys.argv[1], sys.argv[2]
+PILOT = r"C:\Users\Scott McCarty\Projects\Nautilus Trader-nq_vp_g2_location_pilot\studies\nq_vp_g2_location_pilot\_work\controller\partitions\train\2022\candidates.parquet"
+def layout(p):
+    md = pq.ParquetFile(p).metadata
+    return {"rows": md.num_rows, "row_groups": md.num_row_groups, "leaf_columns": md.num_columns, "serialized_footer_bytes": md.serialized_size}
+inputs = {"pilot": PILOT, "n4": f"{H}/stress/n4/p0/candidates.parquet", "p0": f"{H}/stress/p0/candidates.parquet",
+          "rg1000": f"{H}/stress/rg1000/candidates.parquet", "flat": f"{H}/stress/flat/candidates.parquet"}
+lay = {k: layout(v) for k, v in inputs.items()}
+def rec(path, code, inp):
+    r = json.load(open(path, encoding="utf-8"))
+    log = open(path.replace(".rss.json", ".log"), encoding="utf-8").read().strip().splitlines()
+    inner = next((json.loads(l) for l in log if l.startswith("{") and "reconcile_s" in l), {})
+    return {"label": r["label"], "code": code, "input": inp, **lay[inp], "peak_tree_rss_gib": r["peak_tree_rss_gib"],
+            "peak_single_process_rss_gib": r["peak_single_process_rss_gib"], "process_wall_s": r["elapsed_s"],
+            "reconcile_s": inner.get("reconcile_s"), "error": inner.get("error"), "returncode": r["returncode"],
+            "killed_over_budget": r["killed_over_budget"], "budget_gib": r["budget_gib"], "sample_interval_s": r["sample_interval_s"]}
+runs = [rec(f"{H}/r2/pilot_old_main.rss.json", "OLD main 4f53d9ae", "pilot"),
+        rec(f"{H}/r2/pilot_old_main_repeat.rss.json", "OLD main 4f53d9ae", "pilot"),
+        rec(f"{H}/final/pilot_new.rss.json", "NEW c44e095b", "pilot"),
+        rec(f"{H}/final/pilot_new_repeat.rss.json", "NEW c44e095b", "pilot"),
+        rec(f"{H}/r3b/stress_old_main_flat.rss.json", "OLD main 4f53d9ae", "flat"),
+        rec(f"{H}/final/stress_new_n4.rss.json", "NEW c44e095b", "n4"),
+        rec(f"{H}/final/stress_new_p0.rss.json", "NEW c44e095b", "p0"),
+        rec(f"{H}/final/stress_new_p0_repeat.rss.json", "NEW c44e095b", "p0"),
+        rec(f"{H}/final/stress_new_rg1000.rss.json", "NEW c44e095b", "rg1000"),
+        rec(f"{H}/final/stress_new_flat.rss.json", "NEW c44e095b", "flat")]
+superseded = [rec(f"{H}/r3b/stress_new_{v}.rss.json", "NEW d8c7c138 (superseded: footer parsed twice)", v) for v in ("n4", "p0", "rg1000", "flat")] + \
+             [rec(f"{H}/r2/pilot_new.rss.json", "NEW d8c7c138 (superseded: footer parsed twice)", "pilot")]
+diag = {v: [json.loads(l.replace("'", '"')) for l in open(f"{H}/final/diag_{v}.log", encoding="utf-8") if l.startswith("{")] for v in ("p0", "rg1000")}
+json.dump({"method": "detached child (DETACHED_PROCESS|CREATE_NEW_PROCESS_GROUP) under watch_run.py: psutil process-tree RSS sampled every 0.2 s, 8 GiB kill; "
+                     "reconcile_run.py runs V2Lifecycle(<scratch study>, V2Options(execute=True)).reconcile() from the named code checkout",
+           "old_controller_recorded_pilot_reconcile_peak_gib": 3.23,
+           "runs": runs, "superseded_runs_first_commit": superseded,
+           "footer_step_diagnostic_new_code_accesses": diag,
+           "inputs": {k: {"path": v, **lay[k]} for k, v in inputs.items()},
+           "inputs_note": "n4/p0 = build_stress.py (8 resp. 4 time-shifted copies of the pilot partition, k x 14 days, one file, 97-row groups); "
+                          "rg1000 = p0 rewritten with 1000-row groups; flat = p0 with the 9 nested profile columns dropped (97-row groups). "
+                          "Stress schema == pilot schema incl. metadata. MECHANICS STRESS, not science; scratch plan/authorization window widened to 2022-01-10..2022-05-31 so the declared-window check stays active and passing."},
+          open(os.path.join(OUT, "rss.json"), "w", encoding="utf-8"), indent=1)
+# projection: peak vs parsed footer size (row_groups x leaf_columns) for the NEW code
+new = [r for r in runs if r["code"].startswith("NEW")]
+x = np.array([r["row_groups"] * r["leaf_columns"] for r in new], float); y = np.array([r["peak_tree_rss_gib"] for r in new])
+a, b = np.polyfit(x, y, 1)
+xr = np.array([r["rows"] for r in new if r["input"] in ("pilot", "n4", "p0")], float)
+yr = np.array([r["peak_tree_rss_gib"] for r in new if r["input"] in ("pilot", "n4", "p0")])
+pilot_rows_per_rg = lay["pilot"]["rows"] / lay["pilot"]["row_groups"]
+FY = 315_000
+proj = {}
+for name, rprg in (("pilot_layout_%.0f_rows_per_group" % pilot_rows_per_rg, pilot_rows_per_rg), ("stress_layout_97_rows_per_group", 97.0), ("1000_rows_per_group", 1000.0)):
+    rg = FY / rprg
+    proj[name] = {"row_groups": round(rg), "leaf_columns": 427, "projected_peak_tree_rss_gib": round(b + a * rg * 427, 3)}
+rt = np.polyfit(np.array([r["rows"] for r in new if r["input"] in ("pilot", "n4", "p0")], float),
+                np.array([r["reconcile_s"] for r in new if r["input"] in ("pilot", "n4", "p0")]), 1)
+json.dump({"label": "PROJECTION (not a measurement)", "full_year_rows": FY,
+           "model": "NEW peak_tree_rss_gib = intercept + slope * (row_groups x leaf_columns); the parsed Parquet footer dominates (diag: 0.49 GiB for 1,114 x 427), KEY columns are 24 B/row",
+           "fit_peak_vs_footer_cells": {"slope_gib_per_cell": a, "intercept_gib": b, "points": [[int(xi), float(yi)] for xi, yi in zip(x, y)],
+                                        "r2": float(1 - ((y - (a * x + b)) ** 2).sum() / ((y - y.mean()) ** 2).sum())},
+           "fit_peak_vs_rows_97_row_groups": dict(zip(("slope_gib_per_row", "intercept_gib"), map(float, np.polyfit(xr, yr, 1)))) | {"points": [[int(u), float(v)] for u, v in zip(xr, yr)]},
+           "fit_reconcile_seconds_vs_rows": {"slope_s_per_row": float(rt[0]), "intercept_s": float(rt[1]), "projected_full_year_s": round(float(rt[0] * FY + rt[1]), 1)},
+           "projected_full_year_peak": proj,
+           "old_code": "OLD pilot 2.96 GiB for 13,501 rows (scratch) / 3.23 GiB controller-recorded; whole-frame pandas read is linear in rows x width: ~2.96/13501*315000 ~= 69 GiB PROJECTED (not run)"},
+          open(os.path.join(OUT, "projection.json"), "w", encoding="utf-8"), indent=1)
+print(json.dumps({"a": a, "b": b, "proj": proj, "rt": list(rt)}))

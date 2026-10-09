@@ -1,0 +1,31 @@
+{
+ "chore": "chore/reconcile_bounded_memory",
+ "worktree": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-reconcile_bounded_memory",
+ "base": "main 4f53d9ae",
+ "commits": {"d8c7c138": "reconcile reads Parquet footer + KEY columns only; oracle tests", "c44e095b": "parse each footer once (read_schema == ParquetFile.schema_arrow)", "evidence": "the commit carrying this file"},
+ "status": "AWAITING_OWNER_APPROVAL (not merged)",
+ "changed_files": ["research_workflow/lifecycle_v2.py (reconcile body + new _reconcile_parquet_shape helper)", "research_workflow/tests/test_reconcile_bounded_memory.py (new)", "artifacts/platform_v2/reconcile_bounded_memory/* (evidence)"],
+ "verdicts": {
+  "R1_MICRO_TESTS_ORACLE_PARITY": "PASS",
+  "R2_PILOT_RECONCILE_JSON_IDENTICAL": "PASS",
+  "R3_STRESS_AND_LAYOUT_INVARIANCE": "PASS",
+  "R4_TESTS": "PASS (NO_NEW_REGRESSIONS: 209/209 passed)"
+ },
+ "pilot": {"accepted_reconcile_json_identical_modulo_generated_at_utc": true, "stripped_sha256": "0fdcc1bfa62ca8a0001686f8de32fb562a07516460cf8d9e65360ce0915952f4",
+           "peak_tree_rss_gib": {"old_main": [2.964, 2.957], "new": [0.118, 0.112], "old_controller_recorded": 3.23},
+           "reconcile_seconds": {"old_main": [2.02, 2.51], "new": [0.59, 0.66]},
+           "column_names_equal_full_pandas_read": true},
+ "stress_108008_rows": {"label": "MECHANICS STRESS, not science (8 time-shifted pilot copies, scratch window widened)",
+                        "peak_tree_rss_gib": {"new_97_row_groups_1114": [0.606, 0.632], "new_1000_row_groups_109": 0.141, "new_no_nested_1114_groups": 0.318, "old_main_no_nested": 2.002, "new_54004_rows_557_groups": 0.36},
+                        "reconcile_seconds": {"new_1114_groups": [2.92, 3.37], "new_109_groups": 0.77, "new_no_nested": 1.3, "old_main_no_nested": 4.31},
+                        "reconcile_json": "identical across 1114/109 row-group layouts, nested vs dropped, repeat, and OLD main (no-nested input)"},
+ "projection": "projection.json -- PROJECTED full year ~315k rows: 0.88 GiB peak at the pilot's ~190 rows/row group, 1.65 GiB worst case at 97 rows/group, 0.24 GiB at 1000 rows/group; ~8.6 s. Old code ~69 GiB PROJECTED. Not a measurement.",
+ "residual_cost": "parsed Parquet footer (row_groups x leaf_columns); it is the only O(row groups) term left and is shared with any reader of the file",
+ "risks": [
+  "lifecycle_v2.py is in every V2 study's execution closure: merging stales freezes/seals of in-flight sealed studies (re-run PREPARE).",
+  "An unreadable/corrupt partition parquet now raises from pyarrow ParquetFile rather than pandas read_parquet (different exception text; no reconcile.json written in either case).",
+  "Column-name equivalence relies on pyarrow's pandas reconstruction of a zero-row table == pd.read_parquet's; proven on the pilot, the stress inputs (schema == pilot incl. metadata) and pandas-written fixtures (range / stored unnamed / stored named / no index); not exercised for exotic column-index dtypes (pandas refuses non-string parquet column names)."
+ ],
+ "not_done": ["old-code nested stress run (would exceed 8 GiB: ~2.96 GiB per 13,501 rows)", "broad test_delta (task scoped a narrow run; committed baseline stale and not re-recorded)"],
+ "merge_command": "git -C \"C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\" merge --no-ff chore/reconcile_bounded_memory -m \"merge(chore/reconcile_bounded_memory): bounded-memory RECONCILE (footer + KEY columns); byte-identical reconcile.json\""
+}
