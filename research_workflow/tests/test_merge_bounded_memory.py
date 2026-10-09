@@ -261,3 +261,37 @@ def test_streamed_merge_arrow_peak_does_not_grow_with_rows(tmp_path):
     # within a small constant of the 1x peak, and far below the 32 MB a whole-table merge must hold.
     assert large < 1.5 * small + (2 << 20), out
     assert large < 16 << 20, out
+
+
+_RECOMPUTE_SCRIPT = textwrap.dedent("""
+    import json, os, sys, tempfile
+    import numpy as np, pyarrow as pa, pyarrow.parquet as pq
+    from research_workflow.host import chunked_writer as cw
+    n = int(sys.argv[1]); path = os.path.join(tempfile.mkdtemp(dir=sys.argv[2]), "f.parquet")
+    schema = pa.schema([("k", pa.int64()), ("p", pa.struct([("w", pa.list_(pa.int64())), ("c", pa.int64())]))])
+    with pq.ParquetWriter(path, schema) as w:
+        for s in range(0, n, 100):
+            m = min(100, n - s); ks = np.arange(s, s + m)
+            w.write_table(pa.table({"k": ks, "p": pa.StructArray.from_arrays(
+                [pa.array([list(range(2000))] * m, pa.list_(pa.int64())), pa.array(ks)], ["w", "c"])}, schema=schema))
+    seen = [0]; orig = cw._rows_canonical_from_table
+    def spy(t, c):
+        seen[0] = max(seen[0], pa.total_allocated_bytes()); return orig(t, c)
+    cw._rows_canonical_from_table = spy
+    cw.recompute_logical_content_sha256(path, ["k", "p"], batch_size=10)
+    print(json.dumps({"live_max": seen[0]}))
+""")
+
+
+def test_logical_hash_recompute_live_arrow_bytes_do_not_grow_with_rows(tmp_path):
+    """The canonical recompute the merge records must not accumulate Arrow buffers across a file.
+
+    pyarrow's ParquetFile.iter_batches over a nested column kept buffers alive for the whole pass
+    (live Arrow bytes 2.8 MB at 4,000 rows -> 8.2 MB at 16,000 here; 1.90 -> 3.10 GiB peak on the
+    real merge-mechanics stress); per-row-group reads stay flat."""
+    out = {}
+    for n in (4_000, 16_000):
+        r = subprocess.run([sys.executable, "-c", _RECOMPUTE_SCRIPT, str(n), str(tmp_path)], cwd=str(REPO),
+                           capture_output=True, text=True, check=True)
+        out[n] = json.loads(r.stdout.strip().splitlines()[-1])["live_max"]
+    assert out[16_000] < 1.25 * out[4_000] + (1 << 20), out

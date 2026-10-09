@@ -429,6 +429,18 @@ def _merge_partition_file(sources: Sequence[Path], dest: Path, *, check_dup: boo
             "method": {"write": "pandas_to_parquet", "identity": "frame_content_identity"}}
 
 
+def _row_group_slices(pf: Any, columns: Sequence[str], rows: int):
+    """Yield ``columns`` of ``pf`` as consecutive tables of at most ``rows`` rows, ONE row group at a
+    time (released before the next is read). ``ParquetFile.iter_batches`` is avoided on purpose: with
+    nested columns pyarrow 25's batch reader keeps Arrow buffers alive across the whole iteration
+    (measured linear growth), while a per-row-group read stays flat."""
+    for gi in range(pf.metadata.num_row_groups):
+        group = pf.read_row_group(gi, columns=list(columns))
+        for start in range(0, group.num_rows, max(1, int(rows))):
+            yield group.slice(start, max(1, int(rows)))
+        del group
+
+
 def _streaming_frame_content_identity(path: Path) -> Dict[str, Any]:
     """Column-ordered content identity of a merged parquet file, computed by streaming it.
 
@@ -440,7 +452,7 @@ def _streaming_frame_content_identity(path: Path) -> Dict[str, Any]:
     repr of pandas objects, which truncates arrays and depends on the physical row-group chunking
     (to_pandas floats an int64 child in any chunk holding a null), so it is not a content identity;
     nested columns are digested instead as the ``"\\x1f"``-joined canonical JSON of their exact
-    Arrow values (``to_pylist``), read in byte-bounded batches. The combined value is
+    Arrow values (``to_pylist``), converted in byte-bounded slices of one row group at a time. The combined value is
     ``canonical_sha256([[column, digest], ...])`` as before.
     """
     import hashlib as _h
@@ -470,9 +482,9 @@ def _streaming_frame_content_identity(path: Path) -> Dict[str, Any]:
         # them JSON strings) grew the pass's peak with the file until the cap (2.09 -> 2.97 GiB from
         # 13,501 to 108,008 rows in the merge-mechanics stress).
         scalar_rows = min(MERGE_IDENTITY_SCALAR_BATCH_ROWS, _bytes_bounded_batch_rows(pf, scalar, MERGE_IDENTITY_SCALAR_TARGET_BYTES))
-        for batch in pf.iter_batches(batch_size=scalar_rows, columns=scalar):
+        for batch in _row_group_slices(pf, scalar, scalar_rows):
             for n in scalar:
-                series = batch.column(batch.schema.get_field_index(n)).to_pandas()
+                series = batch.column(n).to_pandas()
                 if float_ok[n]:
                     try:
                         flt[n].update(np.round(np.asarray(series.to_numpy(dtype="float64", na_value=np.nan), dtype="float64"), 12).tobytes())
@@ -490,7 +502,7 @@ def _streaming_frame_content_identity(path: Path) -> Dict[str, Any]:
     for n in nested:
         h = _h.sha256()
         rows = _bytes_bounded_batch_rows(pf, [n], DEFAULT_RECOMPUTE_TARGET_BATCH_BYTES)
-        for batch in pf.iter_batches(batch_size=rows, columns=[n]):
+        for batch in _row_group_slices(pf, [n], rows):
             for v in batch.column(0).to_pylist():
                 h.update((("" if first[n] else "\x1f") + _canonical_json(v)).encode("utf-8"))
                 first[n] = False

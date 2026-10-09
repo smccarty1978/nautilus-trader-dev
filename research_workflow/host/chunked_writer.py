@@ -202,17 +202,20 @@ def recompute_logical_content_sha256(path: Path, columns: Sequence[str], *,
     hasher = hashlib.sha256()
     pf = pq.ParquetFile(str(path))
     rows_per_batch = batch_size if batch_size is not None else _bytes_bounded_batch_rows(pf, columns, target_batch_bytes)
-    for arrow_batch in pf.iter_batches(batch_size=rows_per_batch, columns=list(columns)):
-        # Defensive re-slice: iter_batches is expected to honor batch_size, but this makes the
-        # bound on the to_pylist conversion below (the actual memory-hungry step) independent
-        # of that pyarrow guarantee -- a batch bigger than requested still gets converted in
-        # rows_per_batch-sized slices, never all at once.
-        n = arrow_batch.num_rows
-        for start in range(0, n, rows_per_batch):
-            tbl = pa.Table.from_batches([arrow_batch.slice(start, rows_per_batch)])
-            for row in _rows_canonical_from_table(tbl, columns):
+    # One row group at a time, released before the next. NOT ``pf.iter_batches``: with nested
+    # (struct/list) columns pyarrow's batch reader keeps Arrow buffers alive across the whole
+    # iteration (measured, pyarrow 25.0.0, one G2 profile column of a 108,008-row file in 30-row
+    # batches: Arrow pool +0.05 GiB per 600 batches, linear, vs flat per row group), which made this
+    # recompute's peak grow with the file (merge-mechanics stress: 1.90 GiB at 13,501 rows ->
+    # 3.10 GiB at 108,008). Row-major file order -- and so the hash -- is unchanged.
+    for gi in range(pf.metadata.num_row_groups):
+        group = pf.read_row_group(gi, columns=list(columns))
+        # Converted in rows_per_batch-sized slices, never a whole row group at once.
+        for start in range(0, group.num_rows, rows_per_batch):
+            for row in _rows_canonical_from_table(group.slice(start, rows_per_batch), columns):
                 hasher.update(_canonical_json(row).encode("utf-8"))
                 hasher.update(b"\n")
+        del group
     return hasher.hexdigest()
 
 
