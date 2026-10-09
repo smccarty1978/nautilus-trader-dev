@@ -115,6 +115,20 @@ stage bodies are:
 | `oos` / `analyze` | dev-year partitions after `assert_oos_open`; metrics per model | `_work/controller/partitions/oos/`, `artifacts/experiment_analysis_v2.json` |
 | `close` | operator decision → `study_closure.json` validated by `load_study_closure` before it persists; binds seal, TRAIN freeze and the V2 final evidence (`experiment_analysis_v2.json`, `analysis_decision.json`) by bytes **and** by the plan/freeze they were produced from | `artifacts/study_closure.json` |
 
+### Reconcile reads (`_work/controller/reconcile.json`)
+
+`reconcile` does not load partitions whole. Column names and row counts come from each Parquet
+file's metadata, read once per file. Only the KEY columns
+(`observation_ts`, `regime_start_ns`, `checkpoint_index`) are read as data. Every check, finding
+string, finding order and `reconcile.json` field is identical to the previous whole-frame
+implementation, byte for byte except `generated_at_utc`. Evidence:
+`artifacts/platform_v2/reconcile_bounded_memory/`.
+
+Known difference: an unreadable or corrupt partition file now raises a **pyarrow**
+exception (e.g. `ArrowInvalid`) instead of a pandas/pyarrow error raised through
+`pd.read_parquet`, so the exception type and message wording differ. In both versions reconcile
+aborts and writes no `reconcile.json`. Nothing should match on the old error text.
+
 ### Merge identity contract (`merged/identity.json`)
 
 `merge` records three identities per merged file. Which one is authoritative depends on
