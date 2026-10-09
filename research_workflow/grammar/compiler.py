@@ -1061,31 +1061,79 @@ def _resolve_outcome(ctx: _Ctx, population: Mapping[str, Any]) -> Dict[str, Any]
         b = dict(o.barrier)
         arm_specs = b.get("arms")
         if not arm_specs:
-            arm_specs = [{"id": b.get("id", "barrier"), "favorable_atr": b.get("favorable_atr"), "adverse_atr": b.get("adverse_atr")}]
+            arm_specs = [{"id": b.get("id", "barrier"), "unit": b.get("unit", "atr"),
+                          "favorable_atr": b.get("favorable_atr"), "adverse_atr": b.get("adverse_atr"),
+                          "favorable_points": b.get("favorable_points"), "adverse_points": b.get("adverse_points")}]
+        has_atr_arm = False
+        has_ref_arm = False
         for a in arm_specs:
             hz = a.get("horizon") or b.get("horizon") or o.horizon
             if hz is None:
                 ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"outcome.barrier.{a.get('id')}", "a barrier arm needs a horizon")
                 continue
-            try:
-                fav, adv = float(a["favorable_atr"]), float(a["adverse_atr"])
-            except (KeyError, TypeError, ValueError):
-                ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"outcome.barrier.{a.get('id')}", "favorable_atr and adverse_atr are required positive numbers")
+            unit = str(a.get("unit") or b.get("unit") or "atr")
+            if unit not in ("atr", "points", "reference"):
+                ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"outcome.barrier.{a.get('id')}.unit", f"unknown arm unit {unit!r}")
                 continue
-            if fav <= 0 or adv <= 0:
-                ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"outcome.barrier.{a.get('id')}", "barrier distances must be positive ATR multiples")
+            fav_atr = None
+            adv_atr = None
+            fav_pts = None
+            adv_pts = None
+            if unit == "atr":
+                has_atr_arm = True
+                try:
+                    fav_atr, adv_atr = float(a["favorable_atr"]), float(a["adverse_atr"])
+                except (KeyError, TypeError, ValueError):
+                    ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"outcome.barrier.{a.get('id')}", "favorable_atr and adverse_atr are required positive numbers for unit: atr")
+                    continue
+                if fav_atr <= 0 or adv_atr <= 0:
+                    ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"outcome.barrier.{a.get('id')}", "barrier distances must be positive ATR multiples")
+            elif unit == "points":
+                try:
+                    fav_pts, adv_pts = float(a["favorable_points"]), float(a["adverse_points"])
+                except (KeyError, TypeError, ValueError):
+                    ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"outcome.barrier.{a.get('id')}", "favorable_points and adverse_points are required positive numbers for unit: points")
+                    continue
+                if fav_pts <= 0 or adv_pts <= 0:
+                    ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"outcome.barrier.{a.get('id')}", "barrier distances must be positive point values")
+            elif unit == "reference":
+                has_ref_arm = True
+                # Target is reference price. Adverse barrier can be adverse_points or adverse_atr
+                if a.get("adverse_points") is not None:
+                    try:
+                        adv_pts = float(a["adverse_points"])
+                        if adv_pts <= 0:
+                            ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"outcome.barrier.{a.get('id')}", "adverse_points must be positive")
+                    except (TypeError, ValueError):
+                        ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"outcome.barrier.{a.get('id')}", "adverse_points must be a valid number")
+                elif a.get("adverse_atr") is not None:
+                    has_atr_arm = True
+                    try:
+                        adv_atr = float(a["adverse_atr"])
+                        if adv_atr <= 0:
+                            ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"outcome.barrier.{a.get('id')}", "adverse_atr must be positive")
+                    except (TypeError, ValueError):
+                        ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"outcome.barrier.{a.get('id')}", "adverse_atr must be a valid number")
+                else:
+                    ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"outcome.barrier.{a.get('id')}", "unit: reference requires adverse_points or adverse_atr")
+
             expiry = str(a.get("expiry") or b.get("expiry") or "censor")
             if expiry not in ("censor", "negative"):
                 ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"outcome.barrier.{a.get('id')}.expiry", f"unknown expiry policy {expiry!r}")
-            arms.append({"id": str(a["id"]), "favorable_atr": fav, "adverse_atr": adv, "horizon_ns": duration_seconds(hz) * NS,
+            arms.append({"id": str(a["id"]), "unit": unit,
+                         "favorable_atr": fav_atr or 0.0, "adverse_atr": adv_atr or 0.0,
+                         "favorable_points": fav_pts, "adverse_points": adv_pts,
+                         "horizon_ns": duration_seconds(hz) * NS,
                          "expiry": expiry, "prefix": str(a.get("prefix") or a["id"])})
         primary = b.get("primary") or (arms[0]["id"] if len(arms) == 1 else None)
         if len(arms) > 1 and primary is None:
             ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, "outcome.barrier.primary",
                     "a multi-arm barrier outcome must name which arm is the primary label (the legacy label columns)")
-        if atr is None:
-            ctx.gap(GapKind.INVALID_PARAMETERIZATION, "outcome.atr", "a barrier outcome needs the ATR reference frozen at the decision (e.g. regime_1m.atr)")
-        if o.atr_availability is None:
+        if has_ref_arm and (o.reference is None and not o.recovery):
+            ctx.gap(GapKind.INVALID_PARAMETERIZATION, "outcome.reference", "unit: reference arm requires outcome.reference")
+        if has_atr_arm and atr is None:
+            ctx.gap(GapKind.INVALID_PARAMETERIZATION, "outcome.atr", "a barrier outcome with ATR arms needs the ATR reference frozen at the decision (e.g. regime_1m.atr)")
+        if has_atr_arm and o.atr_availability is None:
             ctx.gap(GapKind.AMBIGUOUS_TEMPORAL_SEMANTICS, "outcome.atr_availability",
                     "two causal readings of 'the ATR available at T' exist when a coarser bar closes exactly at T: "
                     "declare atr_availability: at_decision_delivery (tracker state when the decision bar arrives) or "
@@ -1197,11 +1245,49 @@ def _resolve_outcome(ctx: _Ctx, population: Mapping[str, Any]) -> Dict[str, Any]
                     max_gap_ns=max_gap, min_horizon_ns=min(candidate_horizons))
     stream = population.get("cadence", {}).get("stream")
     rec = dict(o.recovery) if o.recovery else {}
+    session_cutoff_info: Optional[Dict[str, Any]] = None
+    if o.session_cutoff:
+        try:
+            parts = o.session_cutoff.strip().split()
+            if len(parts) != 2:
+                raise ValueError("Expected format 'HH:MM:SS TimeZone'")
+            time_parts = [int(p) for p in parts[0].split(":")]
+            if len(time_parts) != 3:
+                raise ValueError("Expected time format 'HH:MM:SS'")
+            import zoneinfo
+            zoneinfo.ZoneInfo(parts[1])
+            session_cutoff_info = {
+                "hour": time_parts[0], "minute": time_parts[1], "second": time_parts[2], "tz": parts[1],
+            }
+        except Exception as exc:
+            ctx.gap(GapKind.INVALID_PARAMETERIZATION, "outcome.session_cutoff",
+                    f"invalid session_cutoff {o.session_cutoff!r}: {exc}")
+
+    entry_cutoff_info: Optional[Dict[str, Any]] = None
+    if o.entry_cutoff:
+        try:
+            parts = o.entry_cutoff.strip().split()
+            if len(parts) != 2:
+                raise ValueError("Expected format 'HH:MM:SS TimeZone'")
+            time_parts = [int(p) for p in parts[0].split(":")]
+            if len(time_parts) != 3:
+                raise ValueError("Expected time format 'HH:MM:SS'")
+            import zoneinfo
+            zoneinfo.ZoneInfo(parts[1])
+            entry_cutoff_info = {
+                "hour": time_parts[0], "minute": time_parts[1], "second": time_parts[2], "tz": parts[1],
+            }
+        except Exception as exc:
+            ctx.gap(GapKind.INVALID_PARAMETERIZATION, "outcome.entry_cutoff",
+                    f"invalid entry_cutoff {o.entry_cutoff!r}: {exc}")
+
     ref_target = (rec.get("reference") or o.reference) if o.recovery else o.reference
+
     contract: Dict[str, Any] = {
         "contract": o.kind, "kernel": kernel, "direction": direction, "direction_sign": (-1 if o.relation == "fade" else 1),
         "relation": o.relation, "atr": atr, "reference": ref_target, "atr_availability": (o.atr_availability or "at_decision_delivery"), "entry_reference": o.entry_reference,
         "session_end_censoring": o.session_end in ("censor", "truncate"), "session_end_rule": o.session_end, "max_gap_ns": max_gap, "same_bar_rule": o.same_bar_rule, "horizon_end_rule": o.horizon_end_rule,
+        "session_cutoff": session_cutoff_info, "entry_cutoff": entry_cutoff_info,
         "strict_gap_rule": strict_gap_rule,
         "resolution_precedence": ["SESSION_END", "GAP", "BARRIER_TOUCH", "HORIZON_EXPIRY"],
         "arms": arms, "primary_arm": primary, "flip": flip, "stream": stream, "label_column": o.label_column or "target_flip_within_horizon",
