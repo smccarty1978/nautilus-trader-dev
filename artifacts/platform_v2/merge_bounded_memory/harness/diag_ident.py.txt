@@ -1,0 +1,19 @@
+"""Identity-pass-only RSS attribution on an already merged file. usage: diag_ident.py <worktree> <merged.parquet> <out_json>"""
+import sys, json, time, threading
+WT, F, OUTJ = sys.argv[1:4]
+sys.path.insert(0, WT)
+import psutil, pyarrow.parquet as pq
+import research_workflow.lifecycle_v2 as lv2
+proc = psutil.Process(); peak = [0]; stop = [False]
+def sampler():
+    while not stop[0]:
+        r = proc.memory_info().rss
+        if r > peak[0]: peak[0] = r
+        time.sleep(0.02)
+threading.Thread(target=sampler, daemon=True).start()
+t0 = time.time(); r0 = proc.memory_info().rss
+idn = lv2._streaming_frame_content_identity(F)
+stop[0] = True
+rec = {"file": F, "rows": pq.ParquetFile(F).metadata.num_rows, "identity": idn["identity"], "elapsed_s": round(time.time() - t0, 1),
+       "rss_before_gib": round(r0 / 2**30, 3), "peak_rss_gib": round(peak[0] / 2**30, 3)}
+print(rec, flush=True); json.dump(rec, open(OUTJ, "w", encoding="utf-8"), indent=1)

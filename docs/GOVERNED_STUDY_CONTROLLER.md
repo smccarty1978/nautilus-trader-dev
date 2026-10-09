@@ -115,6 +115,34 @@ stage bodies are:
 | `oos` / `analyze` | dev-year partitions after `assert_oos_open`; metrics per model | `_work/controller/partitions/oos/`, `artifacts/experiment_analysis_v2.json` |
 | `close` | operator decision → `study_closure.json` validated by `load_study_closure` before it persists; binds seal, TRAIN freeze and the V2 final evidence (`experiment_analysis_v2.json`, `analysis_decision.json`) by bytes **and** by the plan/freeze they were produced from | `artifacts/study_closure.json` |
 
+### Merge identity contract (`merged/identity.json`)
+
+`merge` records three identities per merged file. Which one is authoritative depends on
+the question being asked:
+
+| Field | Meaning | Layout-independent |
+| --- | --- | --- |
+| `*_sha256` | physical file bytes | no — changes with row-group layout / encoding |
+| `*_logical_content_sha256` | canonical row-major logical content (`chunked_writer.recompute_logical_content_sha256`, the same hash the collection partition manifest records) | yes — the scientific-equivalence identity |
+| `*_identity` | per-column content digest that `freeze` binds; its scheme is named in `merge_method.<file>.identity` | yes |
+
+`*_identity` schemes:
+
+- `frame_content_identity` — scalar-only files (pandas merge path, unchanged, byte-identical
+  output).
+- `streaming_frame_content_identity_v1` — files with any nested (struct/list) column, merged by
+  bounded Arrow streaming (`merge_method.<file>.write = arrow_stream_v1`). Scalar-column digests
+  are identical to `frame_content_identity`. Nested columns hash the canonical JSON of their exact
+  Arrow values.
+
+The legacy digest of a nested column was a `repr` of pandas objects. That truncates arrays over
+1,000 elements and depends on the row-group chunking, so it was not a content identity; v1 corrects
+it. A merge identity is therefore comparable only within one scheme.
+Cross-version equivalence is proven by `*_logical_content_sha256`, never by `*_identity`.
+Evidence: `artifacts/platform_v2/merge_bounded_memory/parity.json` (the frozen G2 pilot: legacy
+`773108…` → v1 `8bfd784c…`, logical `0af00780…` unchanged; v1 invariant across 8 chunk-size /
+row-group layouts).
+
 A V2 study owns its own directory (the scaffold is untracked until the researcher commits it);
 every other dirty path is still contamination. Options: `--smoke-date`, `--years`,
 `--studies-root` (parent studies for frozen external scores), `--max-runtime` for year runs.

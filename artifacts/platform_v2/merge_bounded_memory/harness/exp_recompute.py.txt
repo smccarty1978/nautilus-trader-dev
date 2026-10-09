@@ -1,0 +1,22 @@
+import sys, json, tempfile, os
+sys.path.insert(0, sys.argv[1]); n = int(sys.argv[2]); mode = sys.argv[3]
+import numpy as np, pyarrow as pa, pyarrow.parquet as pq
+from research_workflow.host import chunked_writer as cw
+d = tempfile.mkdtemp(); path = os.path.join(d, "f.parquet")
+schema = pa.schema([("k", pa.int64()), ("p", pa.struct([("w", pa.list_(pa.int64())), ("c", pa.int64())]))])
+with pq.ParquetWriter(path, schema) as w:
+    for s in range(0, n, 100):
+        m = min(100, n - s); ks = np.arange(s, s + m)
+        w.write_table(pa.table({"k": ks, "p": pa.StructArray.from_arrays([pa.array([list(range(2000))] * m, pa.list_(pa.int64())), pa.array(ks)], ["w", "c"])}, schema=schema))
+pool = pa.default_memory_pool(); base = pool.max_memory()
+seen = [0]; orig = cw._rows_canonical_from_table
+def spy(t, c):
+    seen[0] = max(seen[0], pa.total_allocated_bytes()); return orig(t, c)
+cw._rows_canonical_from_table = spy
+if mode == "old":
+    pf = pq.ParquetFile(path)
+    for b in pf.iter_batches(batch_size=10, columns=["k", "p"]):
+        spy(pa.Table.from_batches([b]), ["k", "p"])
+else:
+    cw.recompute_logical_content_sha256(path, ["k", "p"], batch_size=10)
+print(json.dumps({"n": n, "mode": mode, "live_max": seen[0]}))

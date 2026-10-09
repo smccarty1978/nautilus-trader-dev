@@ -1,0 +1,20 @@
+"""Chain 5: final code (HEAD of chore) end-to-end merge body on pilot + parity, and the 8x mechanics stress."""
+import subprocess, sys, os, json
+S = os.path.dirname(os.path.abspath(__file__))
+WT = r"C:\Users\Scott McCarty\Projects\Nautilus Trader-merge_bounded_memory"
+PART = r"C:\Users\Scott McCarty\Projects\Nautilus Trader-nq_vp_g2_location_pilot\studies\nq_vp_g2_location_pilot\_work\controller\partitions\train\2022"
+ACC = r"C:\Users\Scott McCarty\Projects\Nautilus Trader-nq_vp_g2_location_pilot\studies\nq_vp_g2_location_pilot\_work\controller\merged"
+py = sys.executable
+ST8 = [os.path.join(S, "in_stress8", f"p{i}") for i in range(3)]
+steps = [
+    ("final_pilot", [py, os.path.join(S, "merge_new.py"), WT, os.path.join(S, "out_final_pilot"), "0", PART]),
+    ("final_parity", [py, os.path.join(S, "parity.py"), WT, ACC, os.path.join(S, "out_final_pilot"), os.path.join(S, "parity_final.json"), "200"]),
+    ("final_stress8", [py, os.path.join(S, "merge_new.py"), WT, os.path.join(S, "out_final_stress8"), "0"] + ST8),
+]
+for label, cmd in steps:
+    subprocess.run([py, os.path.join(S, "watch_run.py"), label, os.path.join(S, "rss"), "8", "--"] + cmd, cwd=S)
+    rec = json.load(open(os.path.join(S, "rss", f"{label}.rss.json"), encoding="utf-8"))
+    print(label, rec["returncode"], rec["peak_tree_rss_gib"], rec["elapsed_s"], flush=True)
+    if rec["returncode"] != 0 or rec["killed_over_budget"]:
+        print("STOP", label, flush=True); break
+print("CHAIN_DONE", flush=True)

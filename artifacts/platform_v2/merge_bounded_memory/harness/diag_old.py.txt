@@ -1,0 +1,45 @@
+"""Phase-1 diagnostic: replay main@1b0a0ef1 merge() steps on the frozen pilot partitions into a SCRATCH dir,
+recording process RSS (current + peak between steps, 20 ms sampler thread) and Arrow pool bytes per step."""
+import sys, os, json, time, threading, gc
+WT = sys.argv[1]; OUT = sys.argv[2]
+sys.path.insert(0, WT)
+import psutil, numpy as np, pandas as pd, pyarrow as pa, pyarrow.parquet as pq
+from research_workflow.lifecycle_v2 import _write_merged_parquet, KEY
+from research.analysis.modeling import frame_content_identity
+P = r"C:\Users\Scott McCarty\Projects\Nautilus Trader-nq_vp_g2_location_pilot\studies\nq_vp_g2_location_pilot\_work\controller\partitions\train"
+years = [2022]
+proc = psutil.Process(); peak = [0]; stop = [False]
+def sampler():
+    while not stop[0]:
+        r = proc.memory_info().rss
+        if r > peak[0]: peak[0] = r
+        time.sleep(0.02)
+threading.Thread(target=sampler, daemon=True).start()
+steps = []; t0 = time.time()
+def mark(name, **kw):
+    gib = lambda b: round(b / 1024**3, 3)
+    steps.append({"step": name, "t_s": round(time.time() - t0, 1), "rss_gib": gib(proc.memory_info().rss), "peak_since_prev_gib": gib(peak[0]),
+                  "arrow_pool_gib": gib(pa.total_allocated_bytes()), **kw})
+    peak[0] = proc.memory_info().rss
+    print(steps[-1], flush=True)
+mark("start")
+base = __import__("pathlib").Path(P)
+cands = pd.concat([pd.read_parquet(base / str(y) / "candidates.parquet") for y in years], ignore_index=True); mark("read+concat candidates (pandas, all 202 cols)", rows=len(cands))
+obs = pd.concat([pd.read_parquet(base / str(y) / "observations.parquet") for y in years], ignore_index=True); mark("read+concat observations (pandas)")
+dup = bool(cands.duplicated(list(KEY)).any()); mark("duplicated(KEY) check", dup=dup)
+c_order = cands.sort_values(list(KEY), kind="mergesort").index.to_numpy(); o_order = obs.sort_values(list(KEY), kind="mergesort").index.to_numpy(); mark("sort_values -> order")
+cands = cands.iloc[c_order].reset_index(drop=True); obs = obs.iloc[o_order].reset_index(drop=True); mark("iloc permute + reset_index")
+out = __import__("pathlib").Path(OUT); out.mkdir(parents=True, exist_ok=True)
+_write_merged_parquet(cands, out / "candidates.parquet", [base / str(y) / "candidates.parquet" for y in years], c_order); gc.collect(); mark("_write_merged_parquet candidates (Arrow read_table+concat+take+write_table)")
+_write_merged_parquet(obs, out / "observations.parquet", [base / str(y) / "observations.parquet" for y in years], o_order); mark("_write_merged_parquet observations (pandas to_parquet)")
+ci = frame_content_identity(cands); mark("frame_content_identity(candidates)", value=ci)
+oi = frame_content_identity(obs); mark("frame_content_identity(observations)", value=oi)
+# isolate sub-costs of the Arrow write on a fresh state
+del cands, obs; gc.collect(); mark("del pandas frames + gc")
+t = pq.read_table(base / "2022" / "candidates.parquet"); mark("isolated: pq.read_table candidates", nbytes=t.nbytes)
+t2 = pa.concat_tables([t]); tk = t2.take(pa.array(c_order, type=pa.int64())); mark("isolated: concat_tables+take", nbytes=tk.nbytes)
+del t, t2, tk; gc.collect(); mark("isolated: freed")
+one = pq.read_table(base / "2022" / "candidates.parquet", columns=["r0_h120_profile"]); pdone = one.to_pandas(); mark("isolated: one profile column read + to_pandas", arrow_nbytes=one.nbytes)
+del one, pdone; gc.collect(); mark("end")
+stop[0] = True
+json.dump({"harness": "diag_old.py", "code": "main@1b0a0ef1 merge() steps", "steps": steps, "candidates_identity": ci, "observations_identity": oi}, open(out / "diag_old_steps.json", "w", encoding="utf-8"), indent=1)

@@ -5,6 +5,10 @@ to_pandas turns an int64 struct child into Python floats in any row group where 
 null, and to_parquet re-inferred the struct and failed with `ArrowInvalid ... not exactly
 representable` (seen on the real nq_vp_g2_location_pilot collection). Non-nested studies must stay
 byte-identical.
+
+Since chore/merge_bounded_memory the nested path STREAMS bounded Arrow batches
+(``_stream_merged_parquet``) instead of materializing whole tables; the scalar-only path is the
+unchanged pandas ``to_parquet`` (``_merge_partition_file``).
 """
 from __future__ import annotations
 
@@ -15,7 +19,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import pytest
 
-from research_workflow.lifecycle_v2 import KEY, LifecycleV2Error, _write_merged_parquet
+from research_workflow.lifecycle_v2 import KEY, LifecycleV2Error, _merge_key_order, _merge_partition_file, _stream_merged_parquet
 
 BIG = 1_641_821_640_000_000_123          # > 2**53 and not a multiple of 2**k for k >= 1: not exact as float64
 PROFILE = pa.struct([("snapshot_ts", pa.int64()), ("segment_start_ts", pa.int64()), ("tick", pa.float64()),
@@ -67,8 +71,10 @@ def test_pre_fix_pandas_round_trip_fails_on_a_nested_int64_child(tmp_path):
 def test_nested_merge_keeps_population_order_values_and_types(tmp_path):
     sources = _partitions(tmp_path)
     frame, order = _merged_frame(sources)
+    _, key_order = _merge_key_order(sources)
+    assert key_order.tolist() == order.tolist()                                         # KEY-only sort == whole-frame sort
     out = tmp_path / "merged.parquet"
-    _write_merged_parquet(frame, out, sources, order)
+    _stream_merged_parquet(out, sources, key_order, batch_rows=2)
     got = pq.read_table(out)
     src = pa.concat_tables([pq.read_table(p) for p in sources])
     assert got.schema.remove_metadata().equals(src.schema.remove_metadata())            # declared types kept
@@ -91,7 +97,8 @@ def test_non_nested_merge_is_byte_identical_to_the_previous_path(tmp_path):
     frame, order = _merged_frame([pa_, pb])
     old, new = tmp_path / "old.parquet", tmp_path / "new.parquet"
     frame.to_parquet(old, index=False)
-    _write_merged_parquet(frame, new, [pa_, pb], order)
+    rec = _merge_partition_file([pa_, pb], new, check_dup=True)
+    assert rec.method["write"] == "pandas_to_parquet"
     assert _sha(old) == _sha(new)
 
 
@@ -99,6 +106,7 @@ def test_nested_partitions_with_different_schemas_fail_closed(tmp_path):
     sources = _partitions(tmp_path)
     other = pq.read_table(sources[1]).cast(pa.schema([(k, pa.int64()) for k in KEY] + [("score", pa.float32()), ("profile", PROFILE)]))
     pq.write_table(other, sources[1])
-    frame, order = _merged_frame(sources)
+    _, order = _merge_key_order(sources)
     with pytest.raises(LifecycleV2Error, match="MERGE_NESTED_SCHEMA_MISMATCH"):
-        _write_merged_parquet(frame, tmp_path / "m.parquet", sources, order)
+        _stream_merged_parquet(tmp_path / "m.parquet", sources, order)
+    assert not (tmp_path / "m.parquet").exists() and not (tmp_path / "m.parquet.tmp").exists()

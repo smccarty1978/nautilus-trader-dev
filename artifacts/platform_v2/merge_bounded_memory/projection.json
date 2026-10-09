@@ -1,0 +1,39 @@
+{
+ "LABEL": "PROJECTION (not a measurement). Only the 13,501-row pilot and the 108,008-row merge-mechanics stress were run.",
+ "measured_points_final_code": {
+  "final2_pilot": {
+   "rows": 13501,
+   "peak_tree_rss_gib": 1.302,
+   "elapsed_s": 645.8
+  },
+  "final2_stress8": {
+   "rows": 108008,
+   "peak_tree_rss_gib": 1.523,
+   "elapsed_s": 5253.9
+  }
+ },
+ "fit": {
+  "peak_rss_gib": "1.270 + 2.338e-6 * rows",
+  "elapsed_s": "-12.5 + 48.759e-3 * rows",
+  "note": "two-point linear fit; the per-row term covers O(rows) KEY/order/cost arrays (~48 B/row + pandas overhead) and allocator noise"
+ },
+ "full_year_rows_assumption": {
+  "rows": 315432,
+  "basis": "pilot density 13,501 rows / 11 days x 257 Globex trading days (2022); profile width as in the pilot"
+ },
+ "projected_full_year": {
+  "peak_rss_gib": 2.01,
+  "elapsed_h": 4.27
+ },
+ "old_path_projection": {
+  "peak_rss_gib_measured_pilot": 7.428,
+  "projected_full_year_gib": 173.5,
+  "basis": "every allocation on the old path is whole-partition (allocation_map.json)"
+ },
+ "caveats": [
+  "row width (profile bins) of a real full year can exceed the 11-day pilot's; chunks are byte-bounded so this changes elapsed time, not the bound",
+  "the bound also includes ONE source row group per partition: the chunked collection sink flushes at <=50,000 rows / 256 MiB estimated, so a partition row group can be ~256 MiB (decoded Arrow may differ)",
+  "LifecycleV2.reconcile (the stage BEFORE merge) still pd.read_parquet's every whole partition: ~2.74 GiB per 13,501 G2 rows measured -> ~64 GiB projected for a full year; a full-year G2 lifecycle cannot reach MERGE until reconcile is bounded",
+  "downstream readers of the merged file (fit _train_frame, controller_actions._merged_frames) load it whole; outside MERGE"
+ ]
+}

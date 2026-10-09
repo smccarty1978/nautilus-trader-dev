@@ -1,0 +1,52 @@
+{
+  "id": "MERGE_ALLOCATION_MAP",
+  "chore": "chore/merge_bounded_memory",
+  "baseline_code": "main 1b0a0ef1 research_workflow/lifecycle_v2.py LifecycleV2.merge + _write_merged_parquet (d097c583)",
+  "input": {
+    "study": "nq_vp_g2_location_pilot (CLOSED, closure 7f90d03e; read-only, never written)",
+    "partition": "_work/controller/partitions/train/2022",
+    "candidates": {"rows": 13501, "columns": 202, "nested_columns": 9, "row_groups": 71, "bytes_on_disk": 192688661,
+                    "footer_uncompressed_bytes": 363709477, "arrow_nbytes_read_table": 2037823506,
+                    "note": "the 9 typed `profile` structs live in CANDIDATES (observations are the 3 KEY columns only)"},
+    "observations": {"rows": 13501, "columns": 3, "nested_columns": 0, "row_groups": 1, "bytes_on_disk": 119458},
+    "span": "2022-01-10 .. 2022-01-21 (11 days)"
+  },
+  "measurement": {
+    "harness": "harness/diag_old.py.txt replays the exact main@1b0a0ef1 merge() steps (real functions) into a scratch dir; harness/watch_run.py.txt tree-RSS watcher (0.2 s, 8 GiB kill)",
+    "raw": "rss.json -> steps.old_main_1b0a0ef1_pilot and watcher.diag_old",
+    "watcher_peak_tree_rss_gib": 7.428,
+    "controller_recorded_peak_gib": 7.71
+  },
+  "questions": {
+    "which_op_makes_the_peak": "_write_merged_parquet (nested branch): pq.read_table(all partitions) + pa.concat_tables + table.take(order) + pq.write_table, executed WHILE the pandas copy of the same partition is still alive. Step peak 7.449 GiB (from 2.868 GiB before the step).",
+    "all_rows_all_columns_read": "yes, twice: once by pd.read_parquet (all 202 columns, all rows) and once by pq.read_table (all columns, all rows).",
+    "nested_materialized_to_pandas_or_python": "yes: pd.read_parquet turns every non-null struct into a Python dict holding numpy arrays (9 x 13,470 dicts); frame_content_identity then repr()s every one (408 s CPU).",
+    "live_tables_batches_buffers": "at the peak: pandas candidates frame (2.84 GiB RSS incl. 1.79 GiB Arrow pool kept by zero-copy numpy views) + the read_table result (2.04 GB Arrow) + the take() copy (2.01 GB Arrow) + writer buffers; after the write 6.96 GiB stays resident (allocator retention) until the frames are freed.",
+    "growth": "linear in total rows (every term is whole-partition); independent of row-group count; proportional to profile width (bins per profile: 2.04 GB Arrow / 13,501 rows = 151 KB/row); linear in partition count (pd.concat + concat_tables of all years). Projected full year (~24x pilot rows): ~170 GiB."
+  },
+  "allocations": [
+    {"owner": "LifecycleV2.merge: pd.concat([pd.read_parquet(candidates)])", "input": "13,501 x 202 cols incl. 9 nested", "measured": "+2.74 GiB RSS (2.956 GiB step peak); Arrow pool 1.79 GiB retained by pandas", "behaviour": "O(rows x width); nested -> Python dicts + numpy views", "correction": "nested files: read ONLY the KEY columns (_merge_key_order)"},
+    {"owner": "LifecycleV2.merge: duplicated(KEY) / sort_values / iloc", "input": "whole frames", "measured": "+0.02 GiB", "behaviour": "O(rows) but tiny once only KEY columns are present", "correction": "same ops on the KEY-only frame; same stable mergesort permutation"},
+    {"owner": "_write_merged_parquet nested branch: read_table + concat_tables + take + write_table", "input": "all partitions as one Arrow table", "measured": "step peak 7.449 GiB; isolated: read_table 2.04 GB Arrow, concat+take +2.01 GB Arrow (5.46 GiB RSS)", "behaviour": "2 x whole-table Arrow copies, one output row group", "correction": "_stream_merged_parquet: output written in ~64 MiB (estimated Arrow bytes) chunks taken from source row groups (one cached row group per source) into a ParquetWriter; temp + os.replace"},
+    {"owner": "frame_content_identity(candidates) (research.analysis.modeling)", "input": "pandas frame with nested dict objects", "measured": "+0.12 GiB, 408 s CPU", "behaviour": "repr() of numpy arrays truncates >1000 elements and depends on row-group chunking (to_pandas floats an int64 child in any chunk holding a null): not a content identity for nested columns", "correction": "_streaming_frame_content_identity: scalar columns byte-for-byte the same digest rule; nested columns = canonical JSON of Arrow values, byte-bounded batches"},
+    {"owner": "frame_content_identity(observations) + to_parquet(observations)", "input": "3 scalar columns", "measured": "~0", "behaviour": "scalar-only path", "correction": "none: scalar-only files keep the pandas path (byte-identical output, unchanged identity)"}
+  ],
+  "after_fix_attribution": {
+    "raw": "rss.json (watcher.* and steps.*); commits named per run",
+    "final_code_32de5180_end_to_end_merge_body_peak_tree_rss_gib": {"pilot_13501_rows": 1.302, "stress8_108008_rows": 1.523},
+    "write_step_peak_rss_gib_c0fa313d": {"pilot_13501_rows": 1.035, "stress3_40503_rows": 1.157, "stress8_108008_rows": 1.43},
+    "write_step_arrow_pool_max_gib_c0fa313d": {"pilot": 0.246, "stress3": 0.323, "stress8": 0.63},
+    "write_growth_note": "the stress8 inputs deliberately use up to 1000-row source row groups (~150 MB Arrow each, vs ~190-row groups written by the chunked collection sink); the one-cached-row-group-per-source term, not the row count, explains the Arrow-pool increase",
+    "found_during_validation": [
+      {"commit_fixed": "c0fa313d", "defect": "chunk rows sized from ONE sampled row group: row width varies through the session, 3x stress got 2,534-row chunks (Arrow pool 1.07 GiB)", "fix": "per-row-group decoded-bytes estimate, ~64 MiB chunks"},
+      {"commit_fixed": "17c35ac7", "defect": "identity scalar pass used fixed 65,536-row batches over ~190 scalar columns: peak grew with the file up to the cap", "fix": "byte-bounded scalar batches"},
+      {"commit_fixed": "2cbb8f7d + 32de5180", "defect": "pyarrow 25 ParquetFile.iter_batches over a nested column keeps Arrow buffers alive across the WHOLE iteration (one profile column, 30-row batches: +0.05 GiB live Arrow per 600 batches, linear). This made BOTH the merge identity and the existing canonical recompute_logical_content_sha256 grow with rows: 1.90 GiB at 13,501 rows -> 3.10 GiB at 108,008 (end-to-end merge body 2.12 -> 3.10 GiB)", "fix": "one batch reader per row group (iter_batches(row_groups=[gi])): flat (0.00-0.01 GiB live), still streams inside a large row group; hashes unchanged"}
+    ],
+    "dominant_term_after_fix": "Python objects of the byte-bounded hashing slices (canonical JSON of nested values) plus one decoded row group per source; flat in rows (1.30 -> 1.52 GiB for 8x rows)"
+  },
+  "not_in_scope_but_found": [
+    {"where": "research_workflow/lifecycle_v2.py LifecycleV2.reconcile", "what": "pd.read_parquet(candidates) and (observations) of every partition, whole, all columns -- the same +2.74 GiB op measured above, linear in rows (~66 GiB projected for a full G2 year)", "needed": "read KEY/observation_ts columns only and take column lists/row counts from the parquet schema/footer"},
+    {"where": "research_workflow/controller_actions.py production_actions.merge (legacy controller path)", "what": "whole-frame pandas merge of collection outputs", "needed": "not used by the V2 lifecycle merge stage; untouched"},
+    {"where": "LifecycleV2._train_frame / fit, controller_actions._merged_frames", "what": "pd.read_parquet of the whole merged candidates", "needed": "downstream projection (outside MERGE)"}
+  ]
+}

@@ -1,0 +1,44 @@
+"""Evidence harness (not study code): run the chore's merge body -- the same helper calls
+LifecycleV2.merge() makes (_merge_partition_file for candidates/observations + the canonical
+logical hashes) -- on given partition dirs into a SCRATCH out dir, sampling own RSS per step.
+usage: merge_new.py <worktree> <out_dir> <batch_rows|0> <partition_dir> [<partition_dir> ...]"""
+import sys, os, json, time, threading
+WT, OUT, BR = sys.argv[1], sys.argv[2], int(sys.argv[3]); PARTS = sys.argv[4:]
+sys.path.insert(0, WT)
+import psutil, pyarrow as pa, pyarrow.parquet as pq
+from pathlib import Path
+import research_workflow.lifecycle_v2 as lv2
+from research_workflow.host.chunked_writer import recompute_logical_content_sha256
+if BR:
+    _orig = lv2._stream_merged_parquet
+    lv2._stream_merged_parquet = lambda path, sources, order, batch_rows=None: _orig(path, sources, order, batch_rows=BR)
+proc = psutil.Process(); peak = [0]; stop = [False]
+def sampler():
+    while not stop[0]:
+        r = proc.memory_info().rss
+        if r > peak[0]: peak[0] = r
+        time.sleep(0.02)
+threading.Thread(target=sampler, daemon=True).start()
+steps = []; t0 = time.time(); tl = [t0]
+def mark(name, **kw):
+    gib = lambda b: round(b / 1024**3, 3)
+    now = time.time()
+    steps.append({"step": name, "t_s": round(now - t0, 1), "dt_s": round(now - tl[0], 1), "rss_gib": gib(proc.memory_info().rss),
+                  "peak_since_prev_gib": gib(peak[0]), "arrow_pool_gib": gib(pa.total_allocated_bytes()), **kw})
+    tl[0] = now; peak[0] = proc.memory_info().rss
+    print(steps[-1], flush=True)
+out = Path(OUT); out.mkdir(parents=True, exist_ok=True)
+mark("start")
+res = {}
+for name in ("candidates.parquet", "observations.parquet"):
+    srcs = [Path(p) / name for p in PARTS]
+    r = lv2._merge_partition_file(srcs, out / name, check_dup=(name == "candidates.parquet"))
+    mark(f"_merge_partition_file {name}", method=r["method"], rows=r["rows"])
+    lg = recompute_logical_content_sha256(out / name, r["columns"])
+    mark(f"logical hash {name}")
+    md = pq.ParquetFile(out / name).metadata
+    res[name] = {"identity": r["identity"], "rows": r["rows"], "method": r["method"], "logical_content_sha256": lg,
+                 "physical_sha256": lv2._sha(out / name), "row_groups": md.num_row_groups, "bytes": os.path.getsize(out / name)}
+stop[0] = True
+json.dump({"harness": "merge_new.py", "batch_rows_override": BR or None, "partitions": PARTS, "steps": steps, "result": res,
+           "peak_rss_gib_in_process": max(s["peak_since_prev_gib"] for s in steps)}, open(out / "merge_new_result.json", "w", encoding="utf-8"), indent=1)
