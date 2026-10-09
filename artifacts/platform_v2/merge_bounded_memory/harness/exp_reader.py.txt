@@ -1,0 +1,16 @@
+import sys, psutil, pyarrow as pa, pyarrow.parquet as pq, time
+F = sys.argv[1]; mode = sys.argv[2]; col = "r0_h1440_profile"
+p = psutil.Process(); pf = pq.ParquetFile(F); n = pf.metadata.num_row_groups
+out = []
+t0 = time.time()
+if mode == "iter":
+    for i, b in enumerate(pf.iter_batches(batch_size=30, columns=[col])):
+        if i % 600 == 0: out.append((i, round(p.memory_info().rss / 2**30, 2), round(pa.total_allocated_bytes() / 2**30, 2)))
+else:
+    for g in range(n):
+        t = pf.read_row_group(g, columns=[col])
+        for b in t.to_batches(max_chunksize=30):
+            pass
+        del t
+        if g % 20 == 0: out.append((g, round(p.memory_info().rss / 2**30, 2), round(pa.total_allocated_bytes() / 2**30, 2)))
+print(mode, round(time.time() - t0, 1), out)

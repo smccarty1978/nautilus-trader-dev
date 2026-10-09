@@ -1,0 +1,6 @@
+import subprocess, sys, os
+# launch.py <logfile> -- cmd...  (detached)
+log = sys.argv[1]; cmd = sys.argv[sys.argv.index("--")+1:]
+f = open(log, "w", encoding="utf-8")
+p = subprocess.Popen(cmd, stdout=f, stderr=subprocess.STDOUT, creationflags=0x00000008 | 0x00000200, cwd=os.getcwd())
+print(p.pid)

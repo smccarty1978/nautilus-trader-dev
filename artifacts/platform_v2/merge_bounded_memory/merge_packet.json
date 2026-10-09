@@ -1,0 +1,35 @@
+{
+  "chore": "chore/merge_bounded_memory",
+  "worktree": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-merge_bounded_memory",
+  "base": "main 1b0a0ef1",
+  "status": "AWAITING_OWNER_APPROVAL (not merged)",
+  "verdicts": {
+    "MERGE_LOGICAL_PARITY": "PASS",
+    "NESTED_SCHEMA_PRESERVATION": "PASS",
+    "SCALAR_BACKWARD_COMPATIBILITY": "PASS",
+    "MERGE_MEMORY_8GIB": "PASS",
+    "FULL_YEAR_FEASIBILITY": "NOT_PROVEN",
+    "REGRESSION_TESTS": "PASS"
+  },
+  "frozen_pilot_comparison": {
+    "candidates": {"rows": 13501, "columns": 202, "nested_profile_columns": 9, "non_null_per_profile_column": 13470,
+                   "logical_content_sha256": {"accepted": "0af0078055e7ee489bde3b565cae6060eb993d9d378fdcb8ae283cb9c566ccb7", "new": "0af0078055e7ee489bde3b565cae6060eb993d9d378fdcb8ae283cb9c566ccb7", "partition_manifest": "0af0078055e7ee489bde3b565cae6060eb993d9d378fdcb8ae283cb9c566ccb7"},
+                   "physical_sha256": {"accepted": "0456062aad78b1bd12ecf2f3640659c3ba0a7e6e32191215e3ff4b8b71da7e8e", "new": "99a435e2c912b6bf058fe353e650fe644282a2c0927dcecf9cd125f7a381397f", "why_different": "1 row group (whole-table write) vs 27 streamed row groups"},
+                   "streaming_window_compare": "13,501 rows x 202 columns, 0 mismatching cells; schema equal incl. metadata; per-profile non-null/bins/contributions/triplet/null-child counts equal",
+                   "identity": {"accepted_legacy_repr": "773108461d68615fdcb30f06e7a38c523190f8c7b308dcbd2d757fe16f670a68", "new_streaming_v1": "8bfd784c9f57fc2b687d04ecbbcac1e46b7528cdcba019b496d42a07542a414d",
+                                "note": "legacy digest repr()s pandas objects of nested columns (truncates arrays > 1000 elements, depends on row-group chunking); reproduced exactly by replaying main's code (diag_old) but not a content identity. Scalar-column digests are unchanged by construction (tested)."}},
+    "observations": {"rows": 13501, "nested": false, "physical_sha256_byte_identical": "8b8b5f62e97f8daa8f9d60ff123a97d4f93404fd94fcc0aca398e23091155099",
+                     "identity_unchanged": "e8fd67b78b80a78c00be88cf9d2353ca3a1cb576cc2910f976c8196cac7ac5b6", "logical_content_sha256": "4f809d6a062db8b56d791df93de9db7321e105ce04c3fa23cbd9c0213dbe8bbb"},
+    "determinism": "candidates logical 0af00780 and identity 8bfd784c identical for fixed 100 / 4000-row chunks, byte-bounded chunks (927-row sampled at ca3b4209; ~64 MiB at c0fa313d+), and a re-chunked 2-source reversed-order input (rg 500 / 61 rows); same-batch re-runs byte-identical (99a435e2 at c0fa313d, 2cbb8f7d, 32de5180)"
+  },
+  "peak_merge_rss_gib": {
+    "before_main_1b0a0ef1_pilot": {"scratch_replay_tree": 7.428, "controller_recorded": 7.71},
+    "after_final_32de5180": {"pilot_13501_rows": 1.302, "stress8_108008_rows": 1.523},
+    "stress": "MERGE-MECHANICS STRESS, not science: 8 time-shifted (k x 14 days) copies of the pilot partition in 3 scratch partitions (row groups 97/500/1000 rows), reversed file order; KEYs unique, duplicate check active and passing; 108,008 rows, 528 source row groups -> 263 output row groups, max chunk 756 rows / 92.9 MB Arrow; logical 4e31317e.., identical at c0fa313d and 32de5180"
+  },
+  "projection": "projection.json -- PROJECTED full year (~315k rows): ~2.0 GiB peak, ~4.3 h; old path ~174 GiB. Not a measurement.",
+  "full_year_blocker_outside_scope": "LifecycleV2.reconcile still pd.read_parquet's whole partitions (~2.74 GiB per 13,501 G2 rows measured, ~64 GiB projected/year): a full-year G2 lifecycle fails at RECONCILE before MERGE.",
+  "evidence": ["allocation_map.json", "parity.json", "rss.json", "projection.json", "test_classification.json", "harness/*.txt"],
+  "execution_closure_note": "research_workflow/lifecycle_v2.py and research_workflow/host/chunked_writer.py are in every V2 study's execution closure: merging stales freezes/seals of in-flight sealed studies (re-run PREPARE). recompute_logical_content_sha256 values are unchanged.",
+  "merge_command": "git -C \"C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader\" merge --no-ff chore/merge_bounded_memory -m \"merge(chore/merge_bounded_memory): bounded-memory streamed MERGE for nested partitions; exact logical parity\""
+}

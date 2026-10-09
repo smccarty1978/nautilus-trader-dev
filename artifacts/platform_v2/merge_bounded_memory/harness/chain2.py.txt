@@ -1,0 +1,22 @@
+"""Sequential evidence chain (one heavy job at a time), each step under the 8 GiB kill watcher."""
+import subprocess, sys, os, json, time
+S = os.path.dirname(os.path.abspath(__file__))
+WT = r"C:\Users\Scott McCarty\Projects\Nautilus Trader-merge_bounded_memory"
+PART = r"C:\Users\Scott McCarty\Projects\Nautilus Trader-nq_vp_g2_location_pilot\studies\nq_vp_g2_location_pilot\_work\controller\partitions\train\2022"
+py = sys.executable
+def watched(label, cmd):
+    r = subprocess.run([py, os.path.join(S, "watch_run.py"), label, os.path.join(S, "rss"), "8", "--"] + cmd, cwd=S)
+    rec = json.load(open(os.path.join(S, "rss", f"{label}.rss.json"), encoding="utf-8"))
+    print(label, rec["returncode"], rec["peak_tree_rss_gib"], rec["elapsed_s"], flush=True)
+    return rec
+steps = [
+    ("stress3_build", [py, os.path.join(S, "build_stress.py"), PART, os.path.join(S, "in_stress3"), "3", "2"]),
+    ("diagnew_stress3", [py, os.path.join(S, "diag_new.py"), WT, os.path.join(S, "out_diagnew_stress3"), "0", os.path.join(S, "in_stress3", "p0"), os.path.join(S, "in_stress3", "p1")]),
+    ("stress8_build", [py, os.path.join(S, "build_stress.py"), PART, os.path.join(S, "in_stress8"), "8", "3"]),
+    ("new_stress8", [py, os.path.join(S, "merge_new.py"), WT, os.path.join(S, "out_new_stress8"), "0"] + [os.path.join(S, "in_stress8", f"p{i}") for i in range(3)]),
+]
+for label, cmd in steps:
+    rec = watched(label, cmd)
+    if rec["returncode"] != 0 or rec["killed_over_budget"]:
+        print("STOP", label, flush=True); break
+print("CHAIN_DONE", flush=True)

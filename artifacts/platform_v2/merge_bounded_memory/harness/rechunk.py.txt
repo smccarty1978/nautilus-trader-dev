@@ -1,0 +1,23 @@
+"""Re-chunk the frozen pilot partition (read-only) into 2 scratch 'partition' dirs with different row-group
+boundaries and REVERSED order (p0 = second half of the rows, rg=500; p1 = first half, rg=61), so the merge
+must apply a cross-source permutation. Same logical rows, no shift. usage: rechunk.py <pilot_part_dir> <out_root>"""
+import sys, os, json
+import pyarrow as pa, pyarrow.parquet as pq
+src, root = sys.argv[1], sys.argv[2]
+for name in ("candidates.parquet", "observations.parquet"):
+    pf = pq.ParquetFile(os.path.join(src, name)); n = pf.metadata.num_rows; half = n // 2
+    specs = [("p0", half, n, 500), ("p1", 0, half, 61)]
+    for d, lo, hi, rg in specs:
+        os.makedirs(os.path.join(root, d), exist_ok=True)
+        with pq.ParquetWriter(os.path.join(root, d, name), pf.schema_arrow) as w:
+            pos, buf = 0, None
+            for gi in range(pf.metadata.num_row_groups):
+                t = pf.read_row_group(gi); a, b = max(lo, pos), min(hi, pos + t.num_rows)
+                if a < b:
+                    s = t.slice(a - pos, b - a); buf = s if buf is None else pa.concat_tables([buf, s])
+                    while buf.num_rows >= rg:
+                        w.write_table(buf.slice(0, rg), row_group_size=rg); buf = buf.slice(rg)
+                pos += t.num_rows
+            if buf is not None and buf.num_rows:
+                w.write_table(buf, row_group_size=buf.num_rows)
+print(json.dumps({d: pq.ParquetFile(os.path.join(root, d, "candidates.parquet")).metadata.num_row_groups for d in ("p0", "p1")}))

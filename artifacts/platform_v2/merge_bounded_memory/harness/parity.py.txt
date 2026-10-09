@@ -1,0 +1,69 @@
+"""Streaming exact-parity comparison of two merged dirs (candidates/observations parquet).
+usage: parity.py <worktree> <accepted_dir> <new_dir> <out_json> [window_rows]
+Compares in aligned fixed-size row windows (bounded memory): schema (incl. nested types), row count,
+KEY order, every column via Arrow equality (NaN-aware canonical-JSON fallback on mismatch), plus
+per-profile-column field counts and the canonical logical-content hash of both files."""
+import sys, json, hashlib
+WT, A, B, OUTJ = sys.argv[1:5]; W = int(sys.argv[5]) if len(sys.argv) > 5 else 200
+sys.path.insert(0, WT)
+import pyarrow as pa, pyarrow.parquet as pq, pyarrow.compute as pc
+from pathlib import Path
+from research_workflow.host.chunked_writer import recompute_logical_content_sha256, _canonical_json, sha256_file
+
+def windows(path, cols, w):
+    buf, n = [], 0
+    for b in pq.ParquetFile(path).iter_batches(batch_size=w, columns=cols):
+        buf.append(b); n += b.num_rows
+        while n >= w:
+            t = pa.Table.from_batches(buf).combine_chunks()
+            yield t.slice(0, w); rest = t.slice(w)
+            buf = rest.to_batches() if rest.num_rows else []; n = rest.num_rows
+    if n:
+        yield pa.Table.from_batches(buf).combine_chunks()
+
+report = {"accepted_dir": A, "new_dir": B, "window_rows": W, "files": {}}
+ok_all = True
+for name in ("candidates.parquet", "observations.parquet"):
+    pa_, pb = Path(A) / name, Path(B) / name
+    fa, fb = pq.ParquetFile(pa_), pq.ParquetFile(pb)
+    sa, sb = fa.schema_arrow, fb.schema_arrow
+    rec = {"rows": [fa.metadata.num_rows, fb.metadata.num_rows], "row_groups": [fa.metadata.num_row_groups, fb.metadata.num_row_groups],
+           "schema_equal_ignoring_metadata": sa.remove_metadata().equals(sb.remove_metadata()),
+           "schema_equal_with_metadata": sa.equals(sb, check_metadata=True),
+           "column_names_equal": sa.names == sb.names, "n_columns": len(sa.names),
+           "nested_columns": [f.name for f in sa if pa.types.is_nested(f.type)]}
+    nested = rec["nested_columns"]
+    mism = {}; rows_seen = 0; arrow_unequal_but_canonical_equal = 0
+    prof = {side: {c: {"non_null": 0, "weights_fp_elems": 0, "contrib_elems": 0, "triplet_elems": 0, "null_children": 0} for c in nested} for side in ("accepted", "new")}
+    for ta, tb in zip(windows(pa_, sa.names, W), windows(pb, sa.names, W)):
+        if ta.num_rows != tb.num_rows:
+            mism["__window_rows__"] = mism.get("__window_rows__", 0) + 1; break
+        for c in sa.names:
+            x, y = ta.column(c), tb.column(c)
+            if not x.equals(y):
+                xa, ya = x.to_pylist(), y.to_pylist()
+                bad = sum(_canonical_json(u) != _canonical_json(v) for u, v in zip(xa, ya))
+                if bad: mism[c] = mism.get(c, 0) + bad
+                else: arrow_unequal_but_canonical_equal += 1
+        for side, tt in (("accepted", ta), ("new", tb)):
+          for c in nested:
+            col = tt.column(c).combine_chunks(); p = prof[side][c]
+            p["non_null"] += len(col) - col.null_count
+            for f, k in (("weights_fp", "weights_fp_elems"), ("contributions", "contrib_elems"), ("triplet_tick", "triplet_elems")):
+                if f in [col.type.field(i).name for i in range(col.type.num_fields)]:
+                    ch = pc.struct_field(col, f); p[k] += int(pc.sum(pc.list_value_length(ch)).as_py() or 0)
+            p["null_children"] += sum(pc.struct_field(col, i).null_count for i in range(col.type.num_fields))
+        rows_seen += ta.num_rows
+    rec.update({"rows_compared": rows_seen, "mismatching_cells_by_column": mism,
+                "arrow_unequal_windows_resolved_canonical_equal": arrow_unequal_but_canonical_equal, "profile_field_counts": prof, "profile_field_counts_equal": prof["accepted"] == prof["new"]})
+    la = recompute_logical_content_sha256(pa_, sa.names); lb = recompute_logical_content_sha256(pb, sb.names)
+    rec["logical_content_sha256"] = {"accepted": la, "new": lb, "equal": la == lb}
+    h = sha256_file
+    rec["physical_sha256"] = {"accepted": h(pa_), "new": h(pb), "equal": h(pa_) == h(pb)}
+    rec["pass"] = (rec["rows"][0] == rec["rows"][1] == rows_seen and rec["schema_equal_ignoring_metadata"] and rec["column_names_equal"]
+                   and not mism and la == lb and prof["accepted"] == prof["new"])
+    ok_all &= rec["pass"]
+    report["files"][name] = rec
+    print(name, rec["pass"], rec["logical_content_sha256"], flush=True)
+report["MERGE_LOGICAL_PARITY"] = "PASS" if ok_all else "FAIL"
+json.dump(report, open(OUTJ, "w", encoding="utf-8"), indent=1)

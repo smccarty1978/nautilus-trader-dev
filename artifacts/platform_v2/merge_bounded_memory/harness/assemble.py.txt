@@ -1,0 +1,41 @@
+"""Assemble committed evidence JSON from scratch run outputs. usage: assemble.py <evidence_dir>"""
+import json, os, sys
+S = os.path.dirname(os.path.abspath(__file__)); E = sys.argv[1]; os.makedirs(E, exist_ok=True)
+L = lambda *p: json.load(open(os.path.join(S, *p), encoding="utf-8"))
+ACC = {"candidates": {"physical": "0456062aad78b1bd12ecf2f3640659c3ba0a7e6e32191215e3ff4b8b71da7e8e", "logical": "0af0078055e7ee489bde3b565cae6060eb993d9d378fdcb8ae283cb9c566ccb7", "identity_legacy": "773108461d68615fdcb30f06e7a38c523190f8c7b308dcbd2d757fe16f670a68"},
+       "observations": {"physical": "8b8b5f62e97f8daa8f9d60ff123a97d4f93404fd94fcc0aca398e23091155099", "logical": "4f809d6a062db8b56d791df93de9db7321e105ce04c3fa23cbd9c0213dbe8bbb", "identity_legacy": "e8fd67b78b80a78c00be88cf9d2353ca3a1cb576cc2910f976c8196cac7ac5b6"}}
+runs = {}
+for lab, d in [("pilot_default_ca3b4209_rowsampled_chunks", "out_new_default"), ("pilot_batch100", "out_new_br100"), ("pilot_batch4000", "out_new_br4000"), ("pilot_rechunked_2src_reversed_ca3b4209", "out_new_rechunk"),
+                ("pilot_default_c0fa313d_byte_chunks", "out_new_default2"), ("pilot_rechunked_2src_reversed_c0fa313d", "out_new_rechunk2"), ("stress8_c0fa313d", "out_new_stress8"),
+                ("pilot_2cbb8f7d", "out_final_pilot"), ("pilot_FINAL_32de5180", "out_final2_pilot"), ("stress8_FINAL_32de5180", "out_final2_stress8")]:
+    p = os.path.join(S, d, "merge_new_result.json")
+    if os.path.exists(p):
+        r = L(d, "merge_new_result.json"); runs[lab] = {"partitions": r["partitions"], "batch_rows_override": r["batch_rows_override"], "result": r["result"], "steps": r["steps"]}
+matrix = {}
+for lab in [l for l in runs if l.startswith("pilot_")]:
+    if lab in runs:
+        c, o = runs[lab]["result"]["candidates.parquet"], runs[lab]["result"]["observations.parquet"]
+        matrix[lab] = {"rows": c["rows"], "batch_rows": c["method"].get("batch_rows"), "source_row_groups": c["method"].get("source_row_groups"), "output_row_groups": c["row_groups"],
+                       "candidates_logical_equals_accepted": c["logical_content_sha256"] == ACC["candidates"]["logical"], "candidates_identity_v1": c["identity"],
+                       "candidates_physical": c["physical_sha256"], "observations_logical_equals_accepted": o["logical_content_sha256"] == ACC["observations"]["logical"],
+                       "observations_physical_equals_accepted": o["physical_sha256"] == ACC["observations"]["physical"], "observations_identity_equals_accepted": o["identity"] == ACC["observations"]["identity_legacy"]}
+ids = {m["candidates_identity_v1"] for m in matrix.values()}
+det = {"runs": matrix, "candidates_identity_v1_unique_values": sorted(ids),
+       "all_logical_equal_accepted": all(m["candidates_logical_equals_accepted"] and m["observations_logical_equals_accepted"] for m in matrix.values()),
+       "identity_v1_invariant": len(ids) == 1, "observations_byte_identical_all": all(m["observations_physical_equals_accepted"] for m in matrix.values())}
+json.dump({"accepted_frozen_pilot": ACC, "streaming_window_parity_vs_accepted": {"ca3b4209": L("parity_default.json"), "c0fa313d": L("parity_default2.json"), "2cbb8f7d": L("parity_final.json"), "FINAL_32de5180": L("parity_final2.json")}, "determinism_matrix": det},
+          open(os.path.join(E, "parity.json"), "w", encoding="utf-8"), indent=1)
+rss = {}
+for lab in ["diag_old", "new_default", "new_br100", "new_br4000", "new_rechunk", "diagnew_pilot", "diagnew_stress3", "w_pilot", "w_stress3", "w_stress8", "new_default2", "new_rechunk2", "new_stress8", "final_pilot", "final_parity", "final2_pilot", "final2_parity", "final2_stress8", "stress3_build", "stress8_build", "rechunk_build", "parity_default", "parity_default2"]:
+    p = os.path.join(S, "rss", f"{lab}.rss.json")
+    if os.path.exists(p):
+        r = L("rss", f"{lab}.rss.json"); rss[lab] = {k: r[k] for k in ("elapsed_s", "returncode", "peak_tree_rss_gib", "peak_tree_rss_at_s", "peak_single_process_rss_gib", "killed_over_budget", "budget_gib", "samples", "series_5s")}
+steps = {}
+for lab, f in [("old_main_1b0a0ef1_pilot", ("out_old", "diag_old_steps.json")), ("new_pilot", ("out_diagnew_pilot", "diag_new_steps.json")), ("new_stress3", ("out_diagnew_stress3", "diag_new_steps.json")),
+                   ("write_only_pilot_c0fa313d", ("out_w_pilot", "diag_new_steps.json")), ("write_only_stress3_c0fa313d", ("out_w_stress3", "diag_new_steps.json")), ("write_only_stress8_c0fa313d", ("out_w_stress8", "diag_new_steps.json"))]:
+    if os.path.exists(os.path.join(S, *f)): steps[lab] = L(*f)["steps"]
+for lab in runs: steps[f"merge_body_{lab}"] = runs[lab]["steps"]
+stress = {n: L(n, "stress_manifest.json") for n in ("in_stress3", "in_stress8") if os.path.exists(os.path.join(S, n, "stress_manifest.json"))}
+json.dump({"method": "watch_run.py (psutil tree RSS every 0.2 s, 8 GiB kill) + in-process 20 ms sampler per step", "watcher": rss, "steps": steps, "stress_inputs": stress},
+          open(os.path.join(E, "rss.json"), "w", encoding="utf-8"), indent=1)
+print("ok", list(rss), list(steps))

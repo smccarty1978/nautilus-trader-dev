@@ -1,0 +1,30 @@
+"""Evidence chain 3 (after c0fa313d byte-bounded chunks). Sequential; 8 GiB kill watcher per step."""
+import subprocess, sys, os, json, time
+S = os.path.dirname(os.path.abspath(__file__))
+WT = r"C:\Users\Scott McCarty\Projects\Nautilus Trader-merge_bounded_memory"
+PART = r"C:\Users\Scott McCarty\Projects\Nautilus Trader-nq_vp_g2_location_pilot\studies\nq_vp_g2_location_pilot\_work\controller\partitions\train\2022"
+ACC = r"C:\Users\Scott McCarty\Projects\Nautilus Trader-nq_vp_g2_location_pilot\studies\nq_vp_g2_location_pilot\_work\controller\merged"
+py = sys.executable
+while not os.path.exists(os.path.join(S, "rss", "stress8_build.rss.json")):
+    time.sleep(10)
+def watched(label, cmd, env=None):
+    subprocess.run([py, os.path.join(S, "watch_run.py"), label, os.path.join(S, "rss"), "8", "--"] + cmd, cwd=S, env={**os.environ, **(env or {})})
+    rec = json.load(open(os.path.join(S, "rss", f"{label}.rss.json"), encoding="utf-8"))
+    print(label, rec["returncode"], rec["peak_tree_rss_gib"], rec["elapsed_s"], flush=True); return rec
+ST3 = [os.path.join(S, "in_stress3", f"p{i}") for i in range(2)]
+ST8 = [os.path.join(S, "in_stress8", f"p{i}") for i in range(3)]
+W = {"DIAG_SKIP_IDENTITY": "1"}
+steps = [
+    ("w_pilot", [py, os.path.join(S, "diag_new.py"), WT, os.path.join(S, "out_w_pilot"), "0", PART], W),
+    ("w_stress3", [py, os.path.join(S, "diag_new.py"), WT, os.path.join(S, "out_w_stress3"), "0"] + ST3, W),
+    ("w_stress8", [py, os.path.join(S, "diag_new.py"), WT, os.path.join(S, "out_w_stress8"), "0"] + ST8, W),
+    ("new_default2", [py, os.path.join(S, "merge_new.py"), WT, os.path.join(S, "out_new_default2"), "0", PART], None),
+    ("parity_default2", [py, os.path.join(S, "parity.py"), WT, ACC, os.path.join(S, "out_new_default2"), os.path.join(S, "parity_default2.json"), "200"], None),
+    ("new_rechunk2", [py, os.path.join(S, "merge_new.py"), WT, os.path.join(S, "out_new_rechunk2"), "0", os.path.join(S, "in_rechunk", "p0"), os.path.join(S, "in_rechunk", "p1")], None),
+    ("new_stress8", [py, os.path.join(S, "merge_new.py"), WT, os.path.join(S, "out_new_stress8"), "0"] + ST8, None),
+]
+for label, cmd, env in steps:
+    rec = watched(label, cmd, env)
+    if rec["returncode"] != 0 or rec["killed_over_budget"]:
+        print("STOP", label, flush=True); break
+print("CHAIN_DONE", flush=True)
