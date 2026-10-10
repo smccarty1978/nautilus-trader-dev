@@ -88,7 +88,7 @@ class BarrierArm:
     horizon_ns: int
     expiry: str                 # "censor" | "negative"
     prefix: str                 # output column prefix (per-arm columns)
-    unit: str = "atr"           # "atr" | "points" | "reference"
+    unit: str = "atr"           # "atr" | "points" | "reference" | "recovery"
     favorable_points: Optional[float] = None
     adverse_points: Optional[float] = None
 
@@ -356,7 +356,8 @@ class LabelOutcomeKernel:
                 recovery_dir = 0
             direction = recovery_dir
         elif self.arms:
-            if atr is None or not (float(atr) > 0.0) or not math.isfinite(float(atr)):
+            has_atr_arm = any(a.unit == "atr" for a in self.arms)
+            if has_atr_arm and (atr is None or not (float(atr) > 0.0) or not math.isfinite(float(atr))):
                 raise OutcomeContractError("TARGET_FROZEN_ATR_MISSING: barrier outcome needs a positive ATR at T")
         session_close = self.session_table.session_close(T) if self.c.session_end_censoring else None
         flip_end = (T + self.c.flip.horizon_ns) if self.c.flip is not None else None
@@ -471,77 +472,54 @@ class LabelOutcomeKernel:
                         self._resolve_arm(p, i, CENSORED, p.entry_ts, "GAP")
                 else:
                     d, atr, ep = p.direction, p.atr, op
-                    is_recovery = self.c.kernel == "recovery"
                     session_cutoff_ts = self._compute_cutoff_ts(p.T, self.c.session_cutoff)
-                    if is_recovery:
-                        if d == 0 or p.decision_price is None or p.reference_price is None:
-                            # Zero displacement or missing price: cannot recover
-                            for i in range(self.n_arms):
+                    p_decision = p.decision_price
+                    p_ref = p.reference_price
+                    denom = abs(p_decision - p_ref) if (p_decision is not None and p_ref is not None) else None
+
+                    for i, arm in enumerate(self.arms):
+                        p.arm_end[i] = p.entry_ts + arm.horizon_ns
+                        if arm.unit == "recovery" or self.c.kernel == "recovery":
+                            if d == 0 or p_decision is None or p_ref is None or denom is None:
                                 self._resolve_arm(p, i, CENSORED, p.entry_ts, "ZERO_DISPLACEMENT")
-                        else:
-                            p_decision = p.decision_price
-                            p_ref = p.reference_price
-                            denom = abs(p_decision - p_ref)
-                            for i, arm in enumerate(self.arms):
-                                p.arm_end[i] = p.entry_ts + arm.horizon_ns
-                                fraction = arm.favorable_atr
-                                # Target is between decision price and anchor
-                                # For fraction = 1.0, target is exactly p_ref
-                                # For fraction < 1.0, target is p_decision + d * (fraction * denom)
-                                if abs(fraction - 1.0) < 1e-9:  # host-constant: float comparison tolerance
-                                    target_px = p_ref
-                                else:
-                                    target_px = p_decision + d * (fraction * denom)
-                                p.arm_good[i] = target_px
-                                p.arm_bad[i] = float("-inf") if d > 0 else float("inf")
-                                if session_cutoff_ts is not None and p.arm_end[i] > session_cutoff_ts:
-                                    p.arm_end[i] = session_cutoff_ts
-                                if p.session_close is not None and p.arm_end[i] > p.session_close:
-                                    if truncate:
-                                        p.arm_end[i] = p.session_close
-                                        p.arm_truncated[i] = True
-                                    else:
-                                        self._resolve_arm(p, i, CENSORED, p.session_close, "SESSION_END")
-                    else:
-                        for i, arm in enumerate(self.arms):
-                            p.arm_end[i] = p.entry_ts + arm.horizon_ns
-                            if arm.unit == "points":
-                                p.arm_good[i] = ep + d * (arm.favorable_points or 0.0)
-                                p.arm_bad[i] = ep - d * (arm.adverse_points or 0.0)
-                            elif arm.unit == "reference":
-                                p_ref = p.reference_price
-                                if p_ref is None:
-                                    self._resolve_arm(p, i, CENSORED, p.entry_ts, "MISSING_REFERENCE_PRICE")
-                                    continue
-                                # Target is the reference price
-                                p.arm_good[i] = p_ref
-                                if arm.adverse_points is not None:
-                                    p.arm_bad[i] = ep - d * arm.adverse_points
-                                elif arm.adverse_atr is not None and atr:
-                                    p.arm_bad[i] = ep - d * arm.adverse_atr * atr
-                                else:
-                                    p.arm_bad[i] = float("-inf") if d > 0 else float("inf")
-                                # ANCHOR_ALREADY_CROSSED check at entry
-                                if (d > 0 and ep >= p_ref) or (d < 0 and ep <= p_ref):
-                                    self._resolve_arm(p, i, CENSORED, p.entry_ts, "ANCHOR_ALREADY_CROSSED")
-                                    continue
+                                continue
+                            fraction = arm.favorable_atr
+                            if abs(fraction - 1.0) < 1e-9:  # host-constant: float comparison tolerance
+                                target_px = p_ref
                             else:
-                                p.arm_good[i] = ep + d * arm.favorable_atr * atr
+                                target_px = p_decision + d * (fraction * denom)
+                            p.arm_good[i] = target_px
+                            p.arm_bad[i] = float("-inf") if d > 0 else float("inf")
+                        elif arm.unit == "points":
+                            p.arm_good[i] = ep + d * (arm.favorable_points or 0.0)
+                            p.arm_bad[i] = ep - d * (arm.adverse_points or 0.0)
+                        elif arm.unit == "reference":
+                            if p_ref is None:
+                                self._resolve_arm(p, i, CENSORED, p.entry_ts, "MISSING_REFERENCE_PRICE")
+                                continue
+                            p.arm_good[i] = p_ref
+                            if arm.adverse_points is not None:
+                                p.arm_bad[i] = ep - d * arm.adverse_points
+                            elif arm.adverse_atr is not None and atr:
                                 p.arm_bad[i] = ep - d * arm.adverse_atr * atr
-                            if session_cutoff_ts is not None and p.arm_end[i] > session_cutoff_ts:
-                                p.arm_end[i] = session_cutoff_ts
-                            if p.session_close is not None and p.arm_end[i] > p.session_close:
-                                if truncate:
-                                    # `truncate`: the close BOUNDS the observation window instead of
-                                    # voiding it. The arm keeps running to `min(horizon_end,
-                                    # session_close)` and is censored only if it REACHES that end
-                                    # untouched. Censoring here instead -- as `censor` must -- makes
-                                    # every arm whose declared horizon is longer than a trading day
-                                    # SESSION_END by construction, before a single bar is examined.
-                                    p.arm_end[i] = p.session_close
-                                    p.arm_truncated[i] = True
-                                else:
-                                    self._resolve_arm(p, i, CENSORED, p.session_close, "SESSION_END")
+                            else:
+                                p.arm_bad[i] = float("-inf") if d > 0 else float("inf")
+                            # ANCHOR_ALREADY_CROSSED check at entry
+                            if (d > 0 and ep >= p_ref) or (d < 0 and ep <= p_ref):
+                                self._resolve_arm(p, i, CENSORED, p.entry_ts, "ANCHOR_ALREADY_CROSSED")
+                                continue
+                        else:  # arm.unit == "atr"
+                            p.arm_good[i] = ep + d * arm.favorable_atr * atr
+                            p.arm_bad[i] = ep - d * arm.adverse_atr * atr
+
+                        if session_cutoff_ts is not None and p.arm_end[i] > session_cutoff_ts:
+                            p.arm_end[i] = session_cutoff_ts
+                        if p.session_close is not None and p.arm_end[i] > p.session_close:
+                            if truncate:
+                                p.arm_end[i] = p.session_close
+                                p.arm_truncated[i] = True
+                            else:
+                                self._resolve_arm(p, i, CENSORED, p.session_close, "SESSION_END")
             # C1: the canonical terminal exit is the OPEN of the first bar strictly after the
             # qualifying flip -- the same next_bar_open convention the entry already uses. No new
             # fill convention is invented here.

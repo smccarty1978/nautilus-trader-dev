@@ -141,7 +141,7 @@ class FeaturesSpec(_Strict):
 
 class BarrierArmSpec(_Strict):
     id: str
-    unit: Literal["atr", "points", "reference"] = "atr"
+    unit: Literal["atr", "points", "reference", "recovery"] = "atr"
     favorable_atr: Optional[float] = Field(default=None, gt=0)
     adverse_atr: Optional[float] = Field(default=None, gt=0)
     favorable_points: Optional[float] = Field(default=None, gt=0)
