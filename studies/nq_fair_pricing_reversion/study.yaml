@@ -37,6 +37,7 @@ features:
 
 outcome:
   kind: label
+  reference: features.rth_open
   entry_reference: next_bar_open
   entry_cutoff: "11:00:00 America/New_York"
   session_cutoff: "11:30:00 America/New_York"
@@ -44,11 +45,15 @@ outcome:
   horizon_end_rule: strict
   horizon: 5400s
   max_gap: 60s
-  recovery:
-    reference: features.rth_open
-    milestones: [0.25, 0.50, 0.75, 1.00]
-    horizon: 5400s
-    expiry: censor
+  barrier:
+    primary: tp38_sl25
+    arms:
+      - {id: m25, unit: recovery, favorable_atr: 0.25}
+      - {id: m50, unit: recovery, favorable_atr: 0.50}
+      - {id: m75, unit: recovery, favorable_atr: 0.75}
+      - {id: m100, unit: recovery, favorable_atr: 1.00}
+      - {id: tp38_sl25, unit: points, favorable_points: 38.0, adverse_points: 25.0}
+      - {id: anchor_sl25, unit: reference, adverse_points: 25.0}
 
 chronology:
   train: [2021, 2022, 2023]

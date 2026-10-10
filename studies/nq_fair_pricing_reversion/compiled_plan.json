@@ -137,7 +137,7 @@
     "windows": []
   },
   "closure": {
-    "composite_sha256": "a8144fcdb9ba519b9062e01d32300e1a18da766fa0d849c946925f54cf925752",
+    "composite_sha256": "dad232b5150ed7b50e230579cc7068e4ff11ff1166ddffde975b1a1a2860595e",
     "file_count": 165,
     "files": {
       "backtests/nt_runtime/__init__.py": "8a091704d4e8c5dfeeb2fc16e97035e3b7e1986440e5050d9d530d1f4691614f",
@@ -259,18 +259,18 @@
       "research_workflow/governed_controller.py": "0ebe4791a068ae46a2042d01b9ca004d2501dab8512953636f0f2513496b59ae",
       "research_workflow/governed_controller_v2.py": "e878042b11555a7fe5a5f6b75d6c369e8d331bd839c4a5d1f325781eeeda9714",
       "research_workflow/grammar/__init__.py": "8346e9b1ae1cf1c7950e06d278e21d162678d0345ad5b8b2a6aa2a7eeaba5eba",
-      "research_workflow/grammar/compiler.py": "c63387e6dd3c7fd1c1381153de7339ab308a2568b0905335284797ab72955bbc",
+      "research_workflow/grammar/compiler.py": "1de1d81d7a007a3e71394c7a0c0d712f607f5fda1f13ad5185cf97d77b356648",
       "research_workflow/grammar/deliverables.py": "f147d4f7f6fc8cf239a49440765d2410c3c6650f3f0f868b9c902e2ca9e87909",
       "research_workflow/grammar/expansion.py": "0b8124662c11dacba7a5680e229fb77433514894f10a51365287b2c8054de20d",
       "research_workflow/grammar/gaps.py": "9e3341d65135484e56e868bbe9fbb2f13637d133156ce17bdffee988c0d46b48",
       "research_workflow/grammar/plan.py": "57d130b47dab4757f27c2ea6948e67f4e5507cf62c02cc60a5f55be9d07b7270",
       "research_workflow/grammar/predicates.py": "7b0fa449a526e3f0d9a7eca1444b5e35f381426517172716651a28042831c417",
-      "research_workflow/grammar/spec.py": "89de2a3f2c4540196576d75e6e97be96916519baf2cef71c9d06b49c0c5c101d",
+      "research_workflow/grammar/spec.py": "a185aa523b0059998635ac4e448eeaa7f542dd0ac2d7a41833ca30301e36afcd",
       "research_workflow/host/__init__.py": "eeb674dcd8d9ce76b484669752dc2e9cb6b15934cab13257a7b010750ea1f79c",
       "research_workflow/host/chunked_writer.py": "52dbd8ad07f93a59c3a47fa6ac504a111013d1e2781f38449e42652166699e7f",
       "research_workflow/host/interfaces.py": "daa5844a4e770bfdceb765dd677bb59466aecb4a3dd0a2e3d84ab156b8022094",
       "research_workflow/host/mux.py": "44c7322624469f7293f09496fdb8cf640addefd639e0027f2cdc9757589c7419",
-      "research_workflow/host/outcomes.py": "b379f56245fa65a6f549fcee3de6a9fb85d21f2ab654885a6eb8933759695794",
+      "research_workflow/host/outcomes.py": "73fa6f18694130665cf1ded3a44875db4071b8f38a36beec994bfbdc99b7f3d8",
       "research_workflow/host/predicate_eval.py": "940b1f4ac7bc2f82d9a1596e2f5dea7e3bfdebf4eb704dbc83152f6f9222012d",
       "research_workflow/host/sink.py": "85bec9f4fa8313ba898f4f7070a0f2e5ee7c41aa8e1d68a4d51cb12d52906f1b",
       "research_workflow/host/strategy.py": "198c8831a2f421f5f580a6f7a5888a052b9863fc6f9c0e80bd31510267fe544b",
@@ -315,7 +315,7 @@
         ]
       },
       "collection": {
-        "composite_sha256": "7f02281845ae081ae8f506f14e968c7da3dc101a7c8bb3075d2c2789c3d9b0d5",
+        "composite_sha256": "a44eac6d02da83b4d95c5aa540dbfa80fd9c7d65a32f88ed6313f55926113945",
         "files": [
           "backtests/nt_runtime/__init__.py",
           "backtests/nt_runtime/compiled_study_loader.py",
@@ -509,7 +509,7 @@
         ]
       },
       "replay": {
-        "composite_sha256": "c66bf59b817675b59d05e9d37f0989ce55464003e0bb7b2948e9962a33195452",
+        "composite_sha256": "6d4144c985991d10cc934167ebdec5f9457e31dbd4592c77ed392035c09c44cf",
         "files": [
           "backtests/nt_runtime/__init__.py",
           "backtests/nt_runtime/compiled_study_loader.py",
@@ -733,6 +733,14 @@
       "m100_disposition",
       "m100_censor_reason",
       "m100_resolution_seconds",
+      "tp38_sl25_label",
+      "tp38_sl25_disposition",
+      "tp38_sl25_censor_reason",
+      "tp38_sl25_resolution_seconds",
+      "anchor_sl25_label",
+      "anchor_sl25_disposition",
+      "anchor_sl25_censor_reason",
+      "anchor_sl25_resolution_seconds",
       "observed_seconds"
     ]
   },
@@ -818,35 +826,69 @@
     "arms": [
       {
         "adverse_atr": 0.0,
+        "adverse_points": null,
         "expiry": "censor",
         "favorable_atr": 0.25,
+        "favorable_points": null,
         "horizon_ns": 5400000000000,
         "id": "m25",
-        "prefix": "m25"
+        "prefix": "m25",
+        "unit": "recovery"
       },
       {
         "adverse_atr": 0.0,
+        "adverse_points": null,
         "expiry": "censor",
         "favorable_atr": 0.5,
+        "favorable_points": null,
         "horizon_ns": 5400000000000,
         "id": "m50",
-        "prefix": "m50"
+        "prefix": "m50",
+        "unit": "recovery"
       },
       {
         "adverse_atr": 0.0,
+        "adverse_points": null,
         "expiry": "censor",
         "favorable_atr": 0.75,
+        "favorable_points": null,
         "horizon_ns": 5400000000000,
         "id": "m75",
-        "prefix": "m75"
+        "prefix": "m75",
+        "unit": "recovery"
       },
       {
         "adverse_atr": 0.0,
+        "adverse_points": null,
         "expiry": "censor",
         "favorable_atr": 1.0,
+        "favorable_points": null,
         "horizon_ns": 5400000000000,
         "id": "m100",
-        "prefix": "m100"
+        "prefix": "m100",
+        "unit": "recovery"
+      },
+      {
+        "adverse_atr": 0.0,
+        "adverse_points": 25.0,
+        "expiry": "censor",
+        "favorable_atr": 0.0,
+        "favorable_points": 38.0,
+        "horizon_ns": 5400000000000,
+        "id": "tp38_sl25",
+        "prefix": "tp38_sl25",
+        "unit": "points"
+      },
+      {
+        "adverse_atr": 0.0,
+        "adverse_points": 25.0,
+        "expiry": "censor",
+        "favorable_atr": 0.0,
+        "favorable_points": null,
+        "horizon_ns": 5400000000000,
+        "id": "anchor_sl25",
+        "prefix": "anchor_sl25",
+        "unit": "reference"
       }
     ],
     "atr": null,
@@ -864,7 +906,7 @@
     "entry_reference": "next_bar_open",
     "flip": null,
     "horizon_end_rule": "strict",
-    "kernel": "recovery",
+    "kernel": "barrier",
     "label_column": "target_flip_within_horizon",
     "max_gap_ns": 60000000000,
     "observation_columns": [
@@ -897,10 +939,18 @@
       "m100_disposition",
       "m100_censor_reason",
       "m100_resolution_seconds",
+      "tp38_sl25_label",
+      "tp38_sl25_disposition",
+      "tp38_sl25_censor_reason",
+      "tp38_sl25_resolution_seconds",
+      "anchor_sl25_label",
+      "anchor_sl25_disposition",
+      "anchor_sl25_censor_reason",
+      "anchor_sl25_resolution_seconds",
       "observed_seconds"
     ],
     "observed_seconds": true,
-    "primary_arm": "m100",
+    "primary_arm": "tp38_sl25",
     "reference": "features.rth_open",
     "relation": "continuation",
     "resolution_precedence": [
@@ -921,7 +971,7 @@
     "stream": "nq_1m",
     "strict_gap_rule": "max_gap must be shorter than the horizon under strict, else a horizon with zero interior observations expires instead of censoring GAP"
   },
-  "plan_sha256": "043fdefbeda4b2bde3cd17585430f26be2a7b00b4f3a4e59be7f8e1fb198cc6e",
+  "plan_sha256": "9b9b80c640aff865546e9000a8bbed5d5b0ffc4050aece8606f9dec8a442c5cb",
   "plan_version": 1,
   "population": {
     "anchor_identity": null,
@@ -987,7 +1037,7 @@
     ],
     "session": "RTH"
   },
-  "spec_sha256": "b3040ad320460bfb098e93b2f75971495016bee59cb48e2e1905a605aad427d8",
+  "spec_sha256": "b016920026fce08046609739aec2cd92df16ddc0810bf509a9dae1669f2a768d",
   "streams": [
     {
       "bar_type": "NQ.XCME-1-SECOND-LAST-EXTERNAL",

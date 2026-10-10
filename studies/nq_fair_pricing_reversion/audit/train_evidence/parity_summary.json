@@ -1,0 +1,266 @@
+{
+ "days_compared": 27,
+ "candidates_compared": 2427,
+ "identity_divergences": 0,
+ "membership_mismatch": 0,
+ "entry": {
+  "ts_equal": 2393,
+  "px_equal": 2427,
+  "ts_delta_s_counts": {
+   "0.0": 2393,
+   "1.0": 16,
+   "2.0": 11,
+   "3.0": 3,
+   "4.0": 2,
+   "5.0": 1,
+   "10.0": 1
+  },
+  "px_delta_counts": {
+   "0.0": 2427
+  },
+  "unavailable_reason_1m": {
+   "null": 2427
+  },
+  "unavailable_reason_1s": {
+   "null": 2427
+  }
+ },
+ "arms": {
+  "m25": {
+   "RESOLUTION_PRECISION": 1976,
+   "IDENTICAL": 449,
+   "RESOLUTION_TIME_OTHER": 2
+  },
+  "m50": {
+   "RESOLUTION_PRECISION": 1660,
+   "IDENTICAL": 766,
+   "RESOLUTION_TIME_OTHER": 1
+  },
+  "m75": {
+   "RESOLUTION_PRECISION": 1437,
+   "IDENTICAL": 989,
+   "RESOLUTION_TIME_OTHER": 1
+  },
+  "m100": {
+   "RESOLUTION_PRECISION": 1263,
+   "IDENTICAL": 1164
+  },
+  "tp38_sl25": {
+   "RESOLUTION_PRECISION": 2206,
+   "IDENTICAL": 190,
+   "SAME_MINUTE_DISAMBIGUATION": 31
+  },
+  "anchor_sl25": {
+   "RESOLUTION_PRECISION": 2106,
+   "IDENTICAL": 292,
+   "SAME_MINUTE_DISAMBIGUATION": 29
+  }
+ },
+ "transitions": {
+  "m25": {},
+  "m50": {},
+  "m75": {},
+  "m100": {},
+  "tp38_sl25": {
+   "C:AMBIGUOUS_SAME_BAR_TOUCH -> NEGATIVE": 23,
+   "C:AMBIGUOUS_SAME_BAR_TOUCH -> POSITIVE": 8
+  },
+  "anchor_sl25": {
+   "C:AMBIGUOUS_SAME_BAR_TOUCH -> NEGATIVE": 12,
+   "C:AMBIGUOUS_SAME_BAR_TOUCH -> POSITIVE": 17
+  }
+ },
+ "at_1100": {
+  "n": 27,
+  "entry_ts_delta_s": {
+   "0.0": 27
+  },
+  "tp38_1s": {
+   "NEGATIVE": 11,
+   "POSITIVE": 11,
+   "C:TIMEOUT": 5
+  }
+ },
+ "overlap": {
+  "n": 31,
+  "tp38_classes": {
+   "RESOLUTION_PRECISION": 29,
+   "IDENTICAL": 2
+  },
+  "anchor_classes": {
+   "RESOLUTION_PRECISION": 24,
+   "IDENTICAL": 6,
+   "SAME_MINUTE_DISAMBIGUATION": 1
+  }
+ },
+ "fidelity": {
+  "2021-07-07_1m_eo": {
+   "same_candidate_set": true,
+   "n": 90,
+   "candidate_col_diffs": {},
+   "observation_col_diffs": {}
+  },
+  "2021-10-06_1m_eo": {
+   "same_candidate_set": true,
+   "n": 90,
+   "candidate_col_diffs": {},
+   "observation_col_diffs": {}
+  },
+  "2021-11-02_1m_eo": {
+   "same_candidate_set": true,
+   "n": 90,
+   "candidate_col_diffs": {},
+   "observation_col_diffs": {}
+  },
+  "2021-12-17_1m_eo": {
+   "same_candidate_set": true,
+   "n": 90,
+   "candidate_col_diffs": {},
+   "observation_col_diffs": {}
+  },
+  "2021-12-20_1m_eo": {
+   "same_candidate_set": true,
+   "n": 90,
+   "candidate_col_diffs": {},
+   "observation_col_diffs": {}
+  },
+  "2022-01-06_1m_eo": {
+   "same_candidate_set": true,
+   "n": 90,
+   "candidate_col_diffs": {},
+   "observation_col_diffs": {}
+  },
+  "2022-02-01_1m_eo": {
+   "same_candidate_set": true,
+   "n": 90,
+   "candidate_col_diffs": {},
+   "observation_col_diffs": {}
+  },
+  "2022-02-28_1m_eo": {
+   "same_candidate_set": true,
+   "n": 90,
+   "candidate_col_diffs": {},
+   "observation_col_diffs": {}
+  },
+  "2022-03-02_1m_eo": {
+   "same_candidate_set": true,
+   "n": 90,
+   "candidate_col_diffs": {},
+   "observation_col_diffs": {}
+  },
+  "2022-03-09_1m_eo": {
+   "same_candidate_set": true,
+   "n": 90,
+   "candidate_col_diffs": {},
+   "observation_col_diffs": {}
+  },
+  "2022-03-28_1m_eo": {
+   "same_candidate_set": true,
+   "n": 90,
+   "candidate_col_diffs": {},
+   "observation_col_diffs": {}
+  },
+  "2022-05-02_1m_eo": {
+   "same_candidate_set": true,
+   "n": 90,
+   "candidate_col_diffs": {},
+   "observation_col_diffs": {}
+  },
+  "2022-05-09_sealed": {
+   "same_candidate_set": true,
+   "n": 90,
+   "candidate_col_diffs": {},
+   "observation_col_diffs": {}
+  },
+  "2022-05-09_1m_eo": {
+   "same_candidate_set": true,
+   "n": 90,
+   "candidate_col_diffs": {},
+   "observation_col_diffs": {}
+  },
+  "2022-05-13_1m_eo": {
+   "same_candidate_set": true,
+   "n": 90,
+   "candidate_col_diffs": {},
+   "observation_col_diffs": {}
+  },
+  "2022-07-08_1m_eo": {
+   "same_candidate_set": true,
+   "n": 90,
+   "candidate_col_diffs": {},
+   "observation_col_diffs": {}
+  },
+  "2022-07-12_1m_eo": {
+   "same_candidate_set": true,
+   "n": 90,
+   "candidate_col_diffs": {},
+   "observation_col_diffs": {}
+  },
+  "2022-10-20_1m_eo": {
+   "same_candidate_set": true,
+   "n": 90,
+   "candidate_col_diffs": {},
+   "observation_col_diffs": {}
+  },
+  "2022-11-11_1m_eo": {
+   "same_candidate_set": true,
+   "n": 90,
+   "candidate_col_diffs": {},
+   "observation_col_diffs": {}
+  },
+  "2022-12-01_1m_eo": {
+   "same_candidate_set": true,
+   "n": 90,
+   "candidate_col_diffs": {},
+   "observation_col_diffs": {}
+  },
+  "2022-12-09_1m_eo": {
+   "same_candidate_set": true,
+   "n": 89,
+   "candidate_col_diffs": {},
+   "observation_col_diffs": {}
+  },
+  "2022-12-23_1m_eo": {
+   "same_candidate_set": true,
+   "n": 90,
+   "candidate_col_diffs": {},
+   "observation_col_diffs": {}
+  },
+  "2023-04-27_1m_eo": {
+   "same_candidate_set": true,
+   "n": 90,
+   "candidate_col_diffs": {},
+   "observation_col_diffs": {}
+  },
+  "2023-07-03_1m_eo": {
+   "same_candidate_set": true,
+   "n": 89,
+   "candidate_col_diffs": {},
+   "observation_col_diffs": {}
+  },
+  "2023-07-04_1m_eo": {
+   "same_candidate_set": true,
+   "n": 90,
+   "candidate_col_diffs": {},
+   "observation_col_diffs": {}
+  },
+  "2023-08-11_1m_eo": {
+   "same_candidate_set": true,
+   "n": 90,
+   "candidate_col_diffs": {},
+   "observation_col_diffs": {}
+  },
+  "2023-08-18_1m_eo": {
+   "same_candidate_set": true,
+   "n": 89,
+   "candidate_col_diffs": {},
+   "observation_col_diffs": {}
+  },
+  "2023-12-04_1m_eo": {
+   "same_candidate_set": true,
+   "n": 90,
+   "candidate_col_diffs": {},
+   "observation_col_diffs": {}
+  }
+ }
+}

@@ -1,0 +1,149 @@
+{
+ "study": "nq_fair_pricing_reversion",
+ "branch": "study/nq_fair_pricing_reversion",
+ "worktree_head": "e622784c0a194047350e90091605aac29f7e6f29",
+ "worktree_dirty_uncommitted": true,
+ "lease": {
+  "owner_agent": "antigravity",
+  "state": "live"
+ },
+ "controller": {
+  "pid": 62500,
+  "command": "scripts/run_governed_study.py --study studies/nq_fair_pricing_reversion --through merge --execute-authorized --chunked-batch-rows 50000 --max-runtime 86400 --stale-progress-timeout 1800 --json",
+  "started_local": "2026-10-09T22:18:38-05:00",
+  "final_status_utc": "2026-10-10T05:16:07Z",
+  "state": "READY_TO_FIT"
+ },
+ "identity": {
+  "plan_sha256": "9b9b80c640aff865546e9000a8bbed5d5b0ffc4050aece8606f9dec8a442c5cb",
+  "execution_composite_sha256": "dad232b5150ed7b50e230579cc7068e4ff11ff1166ddffde975b1a1a2860595e",
+  "dataset": "NQ_1S_V2_GLOBEX",
+  "dataset_logical_digest": "9e7aecb7a2910b4402a6cb4f34cc2f6deb5df19d0e889b2c696cf4f844292c64",
+  "composite_seal_hash": "b80487723b4f6ff3b6475f7482307c7fe00aab2aa5050fe9e6a902dc971bbbf3",
+  "authorization_sha256": "8d6fd75c7b1f87a8505c39db363a528d2d35792def089750a22effdccfacbf8e"
+ },
+ "qualifications": [
+  "outcome stream nq_1m (1-minute OHLC barrier resolution), not 1s sequencing",
+  "11:00 ET candidates (772) admitted on minute-stamped entry",
+  "sealed contract uncommitted in study worktree",
+  "peak memory not recorded"
+ ],
+ "files": {
+  "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_fair_pricing_reversion\\studies\\nq_fair_pricing_reversion\\compiled_plan.json": {
+   "sha256": "3ee494b189297b2ce25b1d2965c57284e02628e691ab8e6ff3f5ea6ea6683ad3",
+   "bytes": 61787
+  },
+  "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_fair_pricing_reversion\\studies\\nq_fair_pricing_reversion\\study.yaml": {
+   "sha256": "d8273620b1ad575156953637f4936c957a746cb407b1f52f16c9e8cf24fcde81",
+   "bytes": 2337
+  },
+  "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_fair_pricing_reversion\\studies\\nq_fair_pricing_reversion\\audit\\frozen_execution_manifest.json": {
+   "sha256": "3d6fe2ff7c35949c4af481ef6f49c0af5ca1f42dfe12a92e6f7c9560d3982162",
+   "bytes": 38927
+  },
+  "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_fair_pricing_reversion\\studies\\nq_fair_pricing_reversion\\audit\\readiness.json": {
+   "sha256": "27fcbe5d533d8200601deda3a519015068cd730b4902b5120795ab47df666fd2",
+   "bytes": 1413
+  },
+  "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_fair_pricing_reversion\\studies\\nq_fair_pricing_reversion\\artifacts\\preexec_audit_seal.json": {
+   "sha256": "6d85e63040e2f648d302555f32ba07c354416bbbe320c1ac059f8390dd729361",
+   "bytes": 1045
+  },
+  "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_fair_pricing_reversion\\studies\\nq_fair_pricing_reversion\\artifacts\\experiment_authorization.json": {
+   "sha256": "3e746b867233818a305da6a0fdc84368ca7d8f423f52a11798beacc0870bdd44",
+   "bytes": 425
+  },
+  "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_fair_pricing_reversion\\studies\\nq_fair_pricing_reversion\\artifacts\\smoke_acceptance.json": {
+   "sha256": "2e9ad9fbc483f0fae4128e2f24ecb2fc00954643971d1b62a7e084ea0a305f24",
+   "bytes": 2710
+  },
+  "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_fair_pricing_reversion\\studies\\nq_fair_pricing_reversion\\_work\\controller\\status.json": {
+   "sha256": "a0cd2a8c83ac51a0521d5c9802c85f54a21f4df3c1e3088b6a9f126ec4d53f9c",
+   "bytes": 2786
+  },
+  "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_fair_pricing_reversion\\studies\\nq_fair_pricing_reversion\\_work\\controller\\reconcile.json": {
+   "sha256": "11d3e114d02e1a9475bbd8902b072584ffe120601d0a27e0836d49c89124d6a6",
+   "bytes": 591
+  },
+  "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_fair_pricing_reversion\\studies\\nq_fair_pricing_reversion\\_work\\controller\\merged\\identity.json": {
+   "sha256": "2f33b8db3d97420113570dd8315771f3e0c177dbae45cb6a7f0f97f5a2fa5ea5",
+   "bytes": 3160
+  },
+  "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_fair_pricing_reversion\\studies\\nq_fair_pricing_reversion\\_work\\controller\\merged\\candidates.parquet": {
+   "sha256": "606a4f4cc126e3300bd8c840259df86a5aeefb9267742355a309129b96ba5873",
+   "bytes": 827667
+  },
+  "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_fair_pricing_reversion\\studies\\nq_fair_pricing_reversion\\_work\\controller\\merged\\observations.parquet": {
+   "sha256": "f1a15a18c33bb3c00698cc9fe49c656b8e2befe6e6aac3611f61096aab2a591e",
+   "bytes": 1703753
+  },
+  "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_fair_pricing_reversion\\studies\\nq_fair_pricing_reversion\\_work\\controller\\receipts\\collection.json": {
+   "sha256": "b1199b889a3185ff102c612934ade56e9f889e8fbaf6a18cfc4d702a569edee7",
+   "bytes": 3465
+  },
+  "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_fair_pricing_reversion\\studies\\nq_fair_pricing_reversion\\_work\\controller\\receipts\\reconcile.json": {
+   "sha256": "9e606b1a103f8aac99cbffe66d20166e3e7edc5502d97bf0893392b7bb589640",
+   "bytes": 840
+  },
+  "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_fair_pricing_reversion\\studies\\nq_fair_pricing_reversion\\_work\\controller\\receipts\\merge.json": {
+   "sha256": "0bcf480040a749bf8516f07ad2f46deb5b8baaf331898239586b3b7a85cfe828",
+   "bytes": 1397
+  },
+  "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_fair_pricing_reversion\\studies\\nq_fair_pricing_reversion\\_work\\controller\\partitions\\train\\2021\\manifest.json": {
+   "sha256": "de776097af396f5dd47cf833f1727900a608a5afdd3face647c6aabd622a85bf",
+   "bytes": 7430
+  },
+  "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_fair_pricing_reversion\\studies\\nq_fair_pricing_reversion\\_work\\controller\\partitions\\train\\2021\\candidates.parquet": {
+   "sha256": "161afc23f76eea7e24b413efd96bf12457ad0c35138161a4d20ce464c59005d1",
+   "bytes": 276116
+  },
+  "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_fair_pricing_reversion\\studies\\nq_fair_pricing_reversion\\_work\\controller\\partitions\\train\\2021\\observations.parquet": {
+   "sha256": "5c8c376efa4469acf5220cd2a3718f3f1f9b81ab1f2c69aafddb1c240252a1fa",
+   "bytes": 558944
+  },
+  "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_fair_pricing_reversion\\studies\\nq_fair_pricing_reversion\\_work\\controller\\partitions\\train\\2021\\replay_trace.json": {
+   "sha256": "adcd4fd813130d6936fcc2cae81a15d5cce813b67f53a0f3dbd4dffe363f4eec",
+   "bytes": 1467
+  },
+  "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_fair_pricing_reversion\\studies\\nq_fair_pricing_reversion\\_work\\controller\\partitions\\train\\2022\\manifest.json": {
+   "sha256": "35b377f81bef09c0137c0188394e0a38c3840eab24e7264f4a536c50c6c7d0a4",
+   "bytes": 7430
+  },
+  "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_fair_pricing_reversion\\studies\\nq_fair_pricing_reversion\\_work\\controller\\partitions\\train\\2022\\candidates.parquet": {
+   "sha256": "3df792acf203174c23e7ec766ccee840761428ddb60f9e423773dea7ce218e41",
+   "bytes": 282443
+  },
+  "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_fair_pricing_reversion\\studies\\nq_fair_pricing_reversion\\_work\\controller\\partitions\\train\\2022\\observations.parquet": {
+   "sha256": "a7d07908376b17e91d8eb6049727e618bdd3a2e0247c31456e6db98b55edc635",
+   "bytes": 592231
+  },
+  "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_fair_pricing_reversion\\studies\\nq_fair_pricing_reversion\\_work\\controller\\partitions\\train\\2022\\replay_trace.json": {
+   "sha256": "359f237468fc0572a66db2cf4b671d41c17205fbfd653e50017f74eab20e7dac",
+   "bytes": 1467
+  },
+  "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_fair_pricing_reversion\\studies\\nq_fair_pricing_reversion\\_work\\controller\\partitions\\train\\2023\\manifest.json": {
+   "sha256": "ce8e8fa204e3c67776ffaf0bf438ae16beeec51ca4173433e575e170e10f1842",
+   "bytes": 7430
+  },
+  "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_fair_pricing_reversion\\studies\\nq_fair_pricing_reversion\\_work\\controller\\partitions\\train\\2023\\candidates.parquet": {
+   "sha256": "bd2253ba6900c961855ba74bf8c73219f435bd5730b3ff0b6b4259dbef369bb9",
+   "bytes": 275735
+  },
+  "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_fair_pricing_reversion\\studies\\nq_fair_pricing_reversion\\_work\\controller\\partitions\\train\\2023\\observations.parquet": {
+   "sha256": "77a35135ff2312c9fcfc2d42902891d724039ae9374539905958771ec9deac02",
+   "bytes": 565047
+  },
+  "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_fair_pricing_reversion\\studies\\nq_fair_pricing_reversion\\_work\\controller\\partitions\\train\\2023\\replay_trace.json": {
+   "sha256": "ed72c263762f6acb9b166dd8f06fd22c96445fac4affae0430ce1c4b148bee5c",
+   "bytes": 1467
+  },
+  "C:\\Users\\SCOTTM~1\\AppData\\Local\\Temp\\claude\\C--Users-Scott-McCarty-Projects-Nautilus-Trader\\d3759a78-419b-4494-8051-925b4e364252\\scratchpad\\fpr\\audit.py": {
+   "sha256": "5809ebb4f8e7dc5c6bd5fd8c5a283b2b5aec8957efcb987e590f303b70cd85c3",
+   "bytes": 18730
+  },
+  "C:\\Users\\SCOTTM~1\\AppData\\Local\\Temp\\claude\\C--Users-Scott-McCarty-Projects-Nautilus-Trader\\d3759a78-419b-4494-8051-925b4e364252\\scratchpad\\fpr\\out\\audit_2021_2022_2023.json": {
+   "sha256": "a1643e8d84d5cca1356873450cdb9ee87dd0744194849069b6177dae4e5d1871",
+   "bytes": 93808
+  }
+ }
+}
