@@ -1072,7 +1072,7 @@ def _resolve_outcome(ctx: _Ctx, population: Mapping[str, Any]) -> Dict[str, Any]
                 ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"outcome.barrier.{a.get('id')}", "a barrier arm needs a horizon")
                 continue
             unit = str(a.get("unit") or b.get("unit") or "atr")
-            if unit not in ("atr", "points", "reference"):
+            if unit not in ("atr", "points", "reference", "recovery"):
                 ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"outcome.barrier.{a.get('id')}.unit", f"unknown arm unit {unit!r}")
                 continue
             fav_atr = None
@@ -1116,6 +1116,18 @@ def _resolve_outcome(ctx: _Ctx, population: Mapping[str, Any]) -> Dict[str, Any]
                         ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"outcome.barrier.{a.get('id')}", "adverse_atr must be a valid number")
                 else:
                     ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"outcome.barrier.{a.get('id')}", "unit: reference requires adverse_points or adverse_atr")
+            elif unit == "recovery":
+                has_ref_arm = True
+                try:
+                    mf = float(a["favorable_atr"])
+                except (KeyError, TypeError, ValueError):
+                    ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"outcome.barrier.{a.get('id')}", "favorable_atr is required for unit: recovery (stores recovery fraction in (0.0, 1.0])")
+                    continue
+                if not (0.0 < mf <= 1.0):
+                    ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"outcome.barrier.{a.get('id')}", f"recovery fraction must be in (0, 1.0], got {mf}")
+                    continue
+                fav_atr = mf
+                adv_atr = 0.0
 
             expiry = str(a.get("expiry") or b.get("expiry") or "censor")
             if expiry not in ("censor", "negative"):
@@ -1130,7 +1142,9 @@ def _resolve_outcome(ctx: _Ctx, population: Mapping[str, Any]) -> Dict[str, Any]
             ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, "outcome.barrier.primary",
                     "a multi-arm barrier outcome must name which arm is the primary label (the legacy label columns)")
         if has_ref_arm and (o.reference is None and not o.recovery):
-            ctx.gap(GapKind.INVALID_PARAMETERIZATION, "outcome.reference", "unit: reference arm requires outcome.reference")
+            ctx.gap(GapKind.INVALID_PARAMETERIZATION, "outcome.reference", "unit: reference or recovery arm requires outcome.reference")
+        elif has_ref_arm and o.reference is not None:
+            _validate_ref(ctx, o.reference, "outcome.reference", allow_epoch=True)
         if has_atr_arm and atr is None:
             ctx.gap(GapKind.INVALID_PARAMETERIZATION, "outcome.atr", "a barrier outcome with ATR arms needs the ATR reference frozen at the decision (e.g. regime_1m.atr)")
         if has_atr_arm and o.atr_availability is None:
