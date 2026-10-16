@@ -857,6 +857,10 @@ class V2Lifecycle:
         if collect:
             body["seal_kind"] = "frame"
         body["composite_seal_hash"] = hashlib.sha256(json.dumps({k: v for k, v in body.items() if k != "sealed_at_utc"}, sort_keys=True).encode()).hexdigest()
+        if plan["chronology"].get("dev"):
+            # A reseal after the held-out period was opened cannot reset the OOS access latch.
+            identity = self._oos_identity(plan, seal_hash=body["composite_seal_hash"])
+            self._oos_latch("seal", lambda oa: oa.check_identity(self.artifacts, identity, stage="seal", ignore=("train_freeze",)))
         path = _write(self.artifacts / "preexec_audit_seal.json", body)
         return {"status": "PASS", "outputs": [str(path)]}
 
@@ -1373,6 +1377,150 @@ class V2Lifecycle:
         self._require_execute("collection")
         return self._collect_period("train")
 
+    def _partition_population_findings(self, plan: Dict[str, Any], d: Path, y: int, m: Mapping[str, Any], findings: List[str]) -> Dict[str, Any]:
+        """The per-partition population checks of RECONCILE, shared by the TRAIN and the OOS gate.
+
+        Bounded memory: the checks need only column names, row counts and the KEY columns, so the
+        (possibly very wide, nested) partitions are never loaded whole. Findings are appended in a
+        fixed order (reconcile.json is byte-stable)."""
+        import pandas as pd
+        c_cols, n_c = _reconcile_parquet_shape(d / "candidates.parquet")
+        o_cols, n_o = _reconcile_parquet_shape(d / "observations.parquet")
+        if n_c != n_o:
+            findings.append(f"partition {y}: candidates {n_c} != observations {n_o}")
+        c = pd.read_parquet(d / "candidates.parquet", columns=[k for k in KEY if k in c_cols]) if n_c else None
+        if n_c and c.duplicated(list(KEY)).any():
+            findings.append(f"partition {y}: duplicate candidate keys")
+        if n_c and not pd.to_datetime(c["observation_ts"], unit="ns", utc=True).dt.year.eq(int(y)).all():
+            findings.append(f"partition {y}: rows outside the primary year")
+        # A date-bounded year is only reconciled against its DECLARED windows: proving rows sit
+        # inside the calendar year would not detect a partition that streamed unauthorized dates.
+        declared = partition_windows(plan, int(y))
+        if declared and n_c:
+            ts = pd.to_datetime(c["observation_ts"], unit="ns", utc=True)
+            inside = False
+            for w in declared:
+                lo = pd.Timestamp(w["start"], tz="UTC")
+                hi = pd.Timestamp(w["end"], tz="UTC") + pd.Timedelta(days=1) - pd.Timedelta(nanoseconds=1)
+                inside = ((ts >= lo) & (ts <= hi)) if inside is False else (inside | ((ts >= lo) & (ts <= hi)))
+            outside = int((~inside).sum())
+            if outside:
+                findings.append(f"partition {y}: {outside} row(s) outside the declared windows "
+                                f"{[w['id'] for w in declared]}")
+            if [str(x) for x in (m.get("windows") or [])] == []:
+                findings.append(f"partition {y}: manifest records no windows for a date-bounded year")
+        return {"schema": (c_cols, o_cols), "digest": (m.get("dataset") or {}).get("logical_digest"), "rows": n_c,
+                "candidate_keys": c, "observation_columns": o_cols}
+
+    # -- OOS access latch + OOS reconcile (research_workflow.oos_access) ---------------------------------
+    _FREEZE_BINDING = ("partition", "plan_sha256", "execution_composite_sha256", "authorization_sha256", "feature_sets",
+                       "model_hashes", "model_canonical_sha256", "label_column", "thresholds", "deciles")
+
+    def _oos_identity(self, plan: Dict[str, Any], *, freeze: Optional[Mapping[str, Any]] = None, seal_hash: Optional[str] = None) -> Dict[str, Any]:
+        """The held-out evaluation identity the first OOS opening binds (every component is re-derived
+        from the study's own artifacts, never taken from a caller)."""
+        from research.analysis.identity import canonical_sha256
+        auth = _read(self.artifacts / "experiment_authorization.json")
+        frz = _read(self.artifacts / "train_experiment_freeze.json") if freeze is None else freeze
+        return {"study_id": plan["study"]["id"], "plan_sha256": plan["plan_sha256"],
+                "analysis_spec_sha256": canonical_sha256(plan["analysis"]) if plan.get("analysis") else None,
+                "execution_composite_sha256": _read(self.audit / "frozen_execution_manifest.json").get("frozen_execution_composite_sha256"),
+                "composite_seal_hash": seal_hash or _read(self.artifacts / "preexec_audit_seal.json").get("composite_seal_hash"),
+                "authorization_sha256": auth.get("authorization_sha256"),
+                "year_roles": {"train": sorted(int(y) for y in auth.get("train_years") or []),
+                               "oos": sorted(int(y) for y in auth.get("oos_years") or []),
+                               "prohibited": sorted(int(y) for y in auth.get("prohibited_years") or []),
+                               "dev": sorted(int(y) for y in plan["chronology"].get("dev") or [])},
+                "dataset": self._plan_dataset(plan),
+                "train_freeze": {k: frz.get(k) for k in self._FREEZE_BINDING}}
+
+    def _oos_latch(self, stage: str, call: Callable[[Any], Any]) -> Any:
+        from research_workflow import oos_access
+        try:
+            return call(oos_access)
+        except oos_access.OOSAccessRefused as exc:
+            oos_access.write_refusal(self.work, stage, exc)
+            raise LifecycleV2Error(str(exc)) from exc
+
+    def _oos_evidence(self, years: Sequence[int]) -> Dict[str, Dict[str, Any]]:
+        """The bytes of the held-out partitions, read from the files themselves (not the manifests)."""
+        base = self.work / "partitions" / "oos"
+        return {str(y): {"candidates_sha256": _sha(base / str(y) / "candidates.parquet"),
+                         "observations_sha256": _sha(base / str(y) / "observations.parquet"),
+                         "manifest_rows": _read(base / str(y) / "manifest.json").get("rows")} for y in years}
+
+    def _held_out_present(self) -> bool:
+        from research_workflow import oos_access
+        base = self.work / "partitions" / "oos"
+        return (self.artifacts / oos_access.COMPLETION_NAME).exists() or (base.is_dir() and any(p.is_file() for p in base.rglob("*")))
+
+    def _reconcile_oos(self, plan: Dict[str, Any], identity: Mapping[str, Any], years: Sequence[int]) -> Dict[str, Any]:
+        """G2: the held-out partitions get the TRAIN reconcile population checks plus lineage checks, read
+        from the parquet itself: a manifest that declares the right year proves nothing about its rows."""
+        import pandas as pd
+        base = self.work / "partitions" / "oos"
+        roles = identity["year_roles"]
+        findings: List[str] = []
+        schemas, rows = set(), 0
+        for y in years:
+            d = base / str(y)
+            m = _read(d / "manifest.json")
+            if int(y) not in roles["oos"] or int(y) in roles["train"] or int(y) in roles["prohibited"]:
+                findings.append(f"oos partition {y}: year is not an authorized OOS year {roles['oos']}")
+            if m.get("status") != "PASS":
+                findings.append(f"oos partition {y} not PASS"); continue
+            if m.get("plan_sha256") != identity["plan_sha256"] or m.get("composite_seal_hash") != identity["composite_seal_hash"]:
+                findings.append(f"oos partition {y}: manifest plan/seal lineage differs from the recorded OOS opening")
+            if _sha(d / "candidates.parquet") != m.get("candidates_sha256") or _sha(d / "observations.parquet") != m.get("observations_sha256"):
+                findings.append(f"oos partition {y}: parquet bytes do not hash to the manifest")
+            # A catalog replay always records the dataset it read; only an injected bar source (synthetic tests) has none.
+            read_digest = (m.get("dataset") or {}).get("logical_digest")
+            if (read_digest is not None or self.opts.bar_source is None) and read_digest != (identity["dataset"] or {}).get("logical_digest"):
+                findings.append(f"oos partition {y}: dataset {read_digest} != plan dataset")
+            auth_bound = (((m.get("replay_closure") or {}).get("components") or {}).get("authorization_sha256"))
+            if auth_bound is not None and auth_bound != identity["authorization_sha256"]:
+                findings.append(f"oos partition {y}: collected under authorization {str(auth_bound)[:12]} != recorded")
+            exp = self._expected_partition(plan, int(y), "oos")
+            if (m.get("primary_start"), m.get("primary_end")) != (exp["primary_start"], exp["primary_end"]) or int(m.get("year", -1)) != int(y):
+                findings.append(f"oos partition {y}: manifest interval {m.get('primary_start')}..{m.get('primary_end')} != authorized "
+                                f"{exp['primary_start']}..{exp['primary_end']}")
+            shape = self._partition_population_findings(plan, d, int(y), m, findings)
+            schemas.add(shape["schema"]); rows += shape["rows"]
+            if shape["rows"]:
+                o = pd.read_parquet(d / "observations.parquet", columns=[k for k in KEY if k in shape["observation_columns"]])
+                if o.duplicated(list(KEY)).any():
+                    findings.append(f"oos partition {y}: duplicate observation keys")
+                c_keys = set(map(tuple, shape["candidate_keys"][list(KEY)].itertuples(index=False, name=None)))
+                if c_keys != set(map(tuple, o[list(KEY)].itertuples(index=False, name=None))):
+                    findings.append(f"oos partition {y}: candidate keys != observation keys")
+        if len(schemas) > 1:
+            findings.append("oos partition output schema mismatch")
+        out = {"passed": not findings, "findings": findings, "years": [int(y) for y in years], "rows": rows,
+               "identity_plan_sha256": identity["plan_sha256"], "authority": "artifacts/oos_access_record.json", "generated_at_utc": _now()}
+        _write(self.work / "oos_reconcile.json", out)
+        if findings:
+            raise LifecycleV2Error("OOS_RECONCILE_FAILED: " + "; ".join(findings))
+        return out
+
+    def _oos_analysis_gate(self, plan: Dict[str, Any], *, reads_held_out: bool) -> None:
+        """Before any analysis of a study with a protected period: the current identity must equal the
+        recorded opening; analysis of held-out rows additionally needs the pinned, reconciled evidence."""
+        identity = self._oos_identity(plan)
+        rec = self._oos_latch("analyze", lambda oa: oa.check_identity(self.artifacts, identity, stage="analyze"))
+        if not reads_held_out:
+            return
+        from research_workflow import oos_access
+        if rec is None:
+            self._oos_latch("analyze", lambda oa: oa.refuse(
+                "OOS_ACCESS_RECORD_MISSING", "held-out analysis without a recorded OOS opening"))
+        years = self._authorized_years(plan, "oos")
+        done = self._oos_latch("analyze", lambda oa: oa.verify_evidence(self.artifacts, rec["identity_sha256"], self._oos_evidence(years)))
+        if done is None:
+            self._oos_latch("analyze", lambda oa: oa.refuse(
+                "OOS_COLLECTION_INCOMPLETE", f"the held-out collection opened at {rec.get('opened_at_utc')} never completed; "
+                f"resume the oos stage under the recorded identity ({oos_access.COMPLETION_NAME} missing)"))
+        self._reconcile_oos(plan, identity, years)
+
     def reconcile(self, study: Path | None = None) -> Dict[str, Any]:
         self._require_execute("reconcile")
         import pandas as pd
@@ -1387,37 +1535,11 @@ class V2Lifecycle:
             m = _read(d / "manifest.json")
             if m.get("status") != "PASS":
                 findings.append(f"partition {y} not PASS"); continue
-            # Bounded memory: the checks below need only column names, row counts and the KEY
-            # columns, so the (possibly very wide, nested) partitions are never loaded whole.
-            c_cols, n_c = _reconcile_parquet_shape(d / "candidates.parquet")
-            o_cols, n_o = _reconcile_parquet_shape(d / "observations.parquet")
-            schemas.append((c_cols, o_cols))
-            if (m.get("dataset") or {}).get("logical_digest"):
-                digests.add(m["dataset"]["logical_digest"])
-            if n_c != n_o:
-                findings.append(f"partition {y}: candidates {n_c} != observations {n_o}")
-            c = pd.read_parquet(d / "candidates.parquet", columns=[k for k in KEY if k in c_cols]) if n_c else None
-            if n_c and c.duplicated(list(KEY)).any():
-                findings.append(f"partition {y}: duplicate candidate keys")
-            if n_c and not pd.to_datetime(c["observation_ts"], unit="ns", utc=True).dt.year.eq(int(y)).all():
-                findings.append(f"partition {y}: rows outside the primary year")
-            # A date-bounded year is only reconciled against its DECLARED windows: proving rows sit
-            # inside the calendar year would not detect a partition that streamed unauthorized dates.
-            declared = partition_windows(plan, int(y))
-            if declared and n_c:
-                ts = pd.to_datetime(c["observation_ts"], unit="ns", utc=True)
-                inside = False
-                for w in declared:
-                    lo = pd.Timestamp(w["start"], tz="UTC")
-                    hi = pd.Timestamp(w["end"], tz="UTC") + pd.Timedelta(days=1) - pd.Timedelta(nanoseconds=1)
-                    inside = ((ts >= lo) & (ts <= hi)) if inside is False else (inside | ((ts >= lo) & (ts <= hi)))
-                outside = int((~inside).sum())
-                if outside:
-                    findings.append(f"partition {y}: {outside} row(s) outside the declared windows "
-                                    f"{[w['id'] for w in declared]}")
-                if [str(x) for x in (m.get("windows") or [])] == []:
-                    findings.append(f"partition {y}: manifest records no windows for a date-bounded year")
-            rows += n_c; seen_keys += n_c
+            shape = self._partition_population_findings(plan, d, int(y), m, findings)
+            schemas.append(shape["schema"])
+            if shape["digest"]:
+                digests.add(shape["digest"])
+            rows += shape["rows"]; seen_keys += shape["rows"]
         if len(set(schemas)) > 1:
             findings.append("partition output schema mismatch")
         if len(digests) > 1:
@@ -1979,6 +2101,10 @@ class V2Lifecycle:
                    # metrics -- a false record, in the artifact reuse paths and the platform cards read.
                    "new_models_trained": bool(models.get("new_models_trained") or models.get("model_id")),
                    "merge_identity": ident, "metrics": _model_record_metrics(models), "label_column": plan["outcome"].get("label_column")}
+        # After the held-out period was opened, a re-freeze must bind exactly what the opening bound.
+        prospective = {**payload, "authorization_sha256": _read(self.artifacts / "experiment_authorization.json").get("authorization_sha256")}
+        identity = self._oos_identity(plan, freeze=prospective)
+        self._oos_latch("freeze", lambda oa: oa.check_identity(self.artifacts, identity, stage="freeze"))
         path = write_train_freeze(self.study, payload)
         return {"status": "PASS", "outputs": [str(path)]}
 
@@ -2000,7 +2126,22 @@ class V2Lifecycle:
         frozen = _read(self.audit / "frozen_execution_manifest.json").get("frozen_execution_composite_sha256")
         if self.current_composite() != frozen:
             raise LifecycleV2Error("TRAIN_CLOSURE_STALE: the plan closure changed after the TRAIN freeze")
-        return self._collect_period("oos")
+        # G1: the first opening is recorded (atomically) BEFORE any held-out bar is read and binds the
+        # evaluation identity; a resumed opening must match it; pinned held-out evidence is never re-collected.
+        identity = self._oos_identity(plan)
+        rec = self._oos_latch("oos", lambda oa: oa.open_access(self.artifacts, identity, held_out_evidence_present=self._held_out_present()))
+        all_years = self._authorized_years(plan, "oos")
+        self._oos_latch("oos", lambda oa: oa.verify_evidence(self.artifacts, rec["identity_sha256"], self._oos_evidence(all_years)))
+        result = self._collect_period("oos")
+        from research_workflow import oos_access
+        collected = [int(p["year"]) for p in result["partitions"]]
+        self._reconcile_oos(plan, identity, collected)  # G2: before the evidence is pinned or analysed
+        result["outputs"] += [str(self.artifacts / oos_access.RECORD_NAME), str(self.work / "oos_reconcile.json")]
+        if sorted(collected) == sorted(int(y) for y in all_years):
+            self._oos_latch("oos", lambda oa: oa.record_completion(self.artifacts, rec["identity_sha256"], self._oos_evidence(all_years)))
+            result["outputs"].append(str(self.artifacts / oos_access.COMPLETION_NAME))
+        result["oos_access"] = {"opening": rec["opening"], "identity_sha256": rec["identity_sha256"], "opened_at_utc": rec["opened_at_utc"]}
+        return result
 
     def _declared_analysis(self, plan: Dict[str, Any]) -> Dict[str, Any]:
         """Run the study's declared ``analysis:`` pipeline over its own collected frame.
@@ -2071,6 +2212,8 @@ class V2Lifecycle:
         self._require_execute("analyze")
         import pandas as pd
         plan = load_plan(self.study)
+        if plan["chronology"].get("dev"):
+            self._oos_analysis_gate(plan, reads_held_out=(plan["analysis"]["source"] == "oos") if plan.get("analysis") else True)
         # A study that declares an `analysis:` pipeline is analysed by it. Its own declared
         # source decides whether the protected OOS gate applies: a train-source diagnostic
         # never opens a dev year, so demanding assert_oos_open of it would be a gate that

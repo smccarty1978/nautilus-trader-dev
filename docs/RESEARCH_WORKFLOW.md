@@ -343,6 +343,10 @@ lives in `studies/<id>/CLOSURE.md` (see `docs/DOCUMENT_MAP.md`).
   binding at the NT boundary and rejects prohibited years.
 - **OOS opens only at stage 14**, and only when `artifacts/train_experiment_freeze.json`
   exists and binds to the current authorization.
+- **The first V2 OOS opening is write-once** (`research_workflow/oos_access.py`, WORKFLOW.md golden rule 4b):
+  `artifacts/oos_access_record.json` binds the evaluation identity before any held-out bar is read;
+  later seal/freeze/oos/analyze under another identity, or with replaced held-out partitions, are refused,
+  and the held-out partitions pass the OOS reconcile gate (`_work/controller/oos_reconcile.json`) before analysis.
 - **OOS may not influence** feature selection, preprocessing, model class, hyperparameters,
   calibration, thresholds, or deciles — all are fields of the TRAIN freeze, frozen at stage 13.
   Thresholds and deciles carry `derivation_population: "train"`.
