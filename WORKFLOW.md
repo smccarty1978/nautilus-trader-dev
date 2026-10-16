@@ -52,6 +52,7 @@ creates v2 studies; `study compile` and `study run` refuse a new v1 study.
 2. `ts_init` (bar close / availability) controls visibility; `ts_event` (bar open) never does.
 3. No look-ahead: a coarser bar closing exactly at the epoch is a context stream, visible strictly before the next epoch.
 4. No protected OOS until authorized: dev years open only through the `oos` stage after the TRAIN freeze; prohibited years never open.
+4b. The first `oos` opening is permanent (`research_workflow/oos_access.py`): `artifacts/oos_access_record.json` is written once, before any held-out bar is read, and binds plan, analysis spec, execution composite, seal, authorization/year roles, dataset and TRAIN freeze; `oos_access_completion.json` pins the held-out partition bytes. Afterwards any seal/freeze/oos/analyze under a different identity is refused (`OOS_IDENTITY_CONFLICT`), altered or re-collected evidence is refused (`OOS_EVIDENCE_ALTERED`), and held-out partitions pass an OOS reconcile gate (`OOS_RECONCILE_FAILED`: actual row years, interval, keys, lineage) before analysis. There is no reopen: an amended evaluation is a new study.
 4a. `chronology.windows` NARROWS an authorized train/dev year to explicit dates; it never opens a year the roles did not authorize.
 5. One writing agent per git worktree; `study new` gives every study its own branch and sibling worktree.
 6. Canonical sparse 1s data is never forward-filled (Dataset V2 is native rows only).

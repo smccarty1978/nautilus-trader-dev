@@ -181,6 +181,26 @@
       "invariant": "No agent tool call may create a link, recursively delete a tree, or mutate live data/DatasetSpecs; deletion goes only through scripts/safe_cleanup.py (fails closed on any reparse point or protected path); live catalogs and raw files carry deny-Everyone delete/write ACEs.",
       "detection": "scripts/hooks/data_guard.py (PreToolUse, .claude/settings.json); scripts/protect_live_data.py verify; scripts/safe_cleanup.py",
       "regression_test": "scripts/tests/test_protect_live_data.py::test_incident_reproduction_forced_worktree_removal_through_junction_loses_nothing"
+    },
+    {
+      "id": "OOS_POST_ACCESS_AMENDMENT",
+      "rule_id": "G1",
+      "severity": "CRITICAL",
+      "name": "Study plan amended after the held-out period was opened; OOS re-collected and re-analysed under the new rules",
+      "root_cause": "assert_oos_open bound only the freeze to the authorization; seal/freeze/oos/analyze accepted any re-sealed plan and nothing recorded the first OOS access (HV1 synthetic proof N2: loosened thresholds flipped the class to VALIDATED and overwrote the first-access OOS manifests).",
+      "invariant": "The first OOS opening is recorded once (artifacts/oos_access_record.json) before any held-out bar is read; a different evaluation identity or replaced held-out evidence is refused at seal/freeze/oos/analyze.",
+      "detection": "research_workflow/oos_access.py via V2Lifecycle seal/freeze/oos/analyze (OOS_IDENTITY_CONFLICT, OOS_EVIDENCE_ALTERED, OOS_ACCESS_RECORD_MISSING)",
+      "regression_test": "research_workflow/tests/test_oos_access_latch.py::test_post_oos_amendment_is_refused_at_every_stage_and_evidence_is_untouched"
+    },
+    {
+      "id": "OOS_PARTITION_UNRECONCILED",
+      "rule_id": "G2",
+      "severity": "HIGH",
+      "name": "Held-out partitions analysed without population/lineage reconciliation",
+      "root_cause": "RECONCILE covered TRAIN only; analysis lineage reported the declared years, not the rows' years (HV1 proof N8: a TRAIN-year row in the OOS partition with recomputed manifest hashes was analysed as [2031]).",
+      "invariant": "OOS partitions pass the TRAIN reconcile population checks plus key equality, interval and plan/seal/dataset/authorization lineage, read from the parquet, before the evidence is pinned or analysed.",
+      "detection": "V2Lifecycle._reconcile_oos (OOS_RECONCILE_FAILED, _work/controller/oos_reconcile.json)",
+      "regression_test": "research_workflow/tests/test_oos_access_latch.py::test_oos_partition_population_defects_are_refused"
     }
   ]
 }

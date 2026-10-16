@@ -1,0 +1,238 @@
+{
+ "N1_post_oos": {
+  "STATUS": "BLOCKED",
+  "actions": [
+   "compile",
+   "prepare",
+   "readiness",
+   "preflight"
+  ],
+  "evidence_untouched": true,
+  "latch_refusal": {
+   "code": "OOS_IDENTITY_CONFLICT",
+   "conflicts": [
+    {
+     "current": "24eafdaf5727b6c931c774ee4cb5631d1ecd4957711661d3dfd0ff1595f366b8",
+     "field": "analysis_spec_sha256",
+     "recorded": "8de2e88623b59c67354d59a264844241bd92bc39445d2ae072a680e1d7f17569"
+    },
+    {
+     "current": "e0c4483c6821674be571894594ba1d6db4206ed91c3c85a5fcc63600cc601b54",
+     "field": "composite_seal_hash",
+     "recorded": "d88c4f3d8fa0d964f16880981c525e350d896c0cec74aed0b78b59261525cbc9"
+    },
+    {
+     "current": "690fc841c8041f0bf2598fea1ece33392d9fd82c9570875146663f8d44187e5c",
+     "field": "plan_sha256",
+     "recorded": "d66616f1e9493e3fbe5eaf7b99c951b04439b35bd9826f3d75d8a3ce9fe64a80"
+    }
+   ],
+   "detail": "seal refused: the held-out period was opened at 2026-10-16T15:13:25.520428+00:00 under a different evaluation identity (analysis_spec_sha256, composite_seal_hash, plan_sha256 changed); an amended evaluation needs a new study",
+   "refused_at_utc": "2026-10-16T15:16:33.048902+00:00",
+   "stage": "seal"
+  },
+  "reason": "{\"affected_artifacts\": [\"C:\\\\Users\\\\Scott McCarty\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-Scott-McCarty-Projects-Nautilus-Trader\\\\26f8edd5-f033-4103-85ad-5b27d8130135\\\\scratchpad\\\\proof\\\\workL\\\\studies\\\\hv1_original\\\\audit\", \"C:\\\\Users\\\\Scott McCarty\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-Scott-McCarty-Projects-Nautilus-Trader\\\\26f8edd5-f033-4103-85ad-5b27d8130135\\\\scratchpad\\\\proof\\\\workL\\\\studi",
+  "stage": "seal"
+ },
+ "N2": {
+  "STATUS": "BLOCKED",
+  "actions": [
+   "compile",
+   "prepare",
+   "readiness",
+   "preflight"
+  ],
+  "evidence_untouched": true,
+  "latch_refusal": {
+   "code": "OOS_IDENTITY_CONFLICT",
+   "conflicts": [
+    {
+     "current": "fcb668f30b56efc781a3d183a2029708800a20aeb2fe11515c6ed76d2d149bb7",
+     "field": "analysis_spec_sha256",
+     "recorded": "8de2e88623b59c67354d59a264844241bd92bc39445d2ae072a680e1d7f17569"
+    },
+    {
+     "current": "8d4926c00d18c92358cc13a96440694d1e8b7f9610bdbe5f83fc4ca253ff8f25",
+     "field": "composite_seal_hash",
+     "recorded": "d88c4f3d8fa0d964f16880981c525e350d896c0cec74aed0b78b59261525cbc9"
+    },
+    {
+     "current": "4e4f4fa146164e7243584c98f6ce1ebc8b55be1212ae74f9e934c9faf1aa3094",
+     "field": "plan_sha256",
+     "recorded": "d66616f1e9493e3fbe5eaf7b99c951b04439b35bd9826f3d75d8a3ce9fe64a80"
+    }
+   ],
+   "detail": "seal refused: the held-out period was opened at 2026-10-16T15:13:25.520428+00:00 under a different evaluation identity (analysis_spec_sha256, composite_seal_hash, plan_sha256 changed); an amended evaluation needs a new study",
+   "refused_at_utc": "2026-10-16T15:15:03.518320+00:00",
+   "stage": "seal"
+  },
+  "reason": "{\"affected_artifacts\": [\"C:\\\\Users\\\\Scott McCarty\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-Scott-McCarty-Projects-Nautilus-Trader\\\\26f8edd5-f033-4103-85ad-5b27d8130135\\\\scratchpad\\\\proof\\\\workL\\\\studies\\\\hv1_original\\\\audit\", \"C:\\\\Users\\\\Scott McCarty\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-Scott-McCarty-Projects-Nautilus-Trader\\\\26f8edd5-f033-4103-85ad-5b27d8130135\\\\scratchpad\\\\proof\\\\workL\\\\studi",
+  "stage": "seal"
+ },
+ "N5": "AnalysisOpError: ANALYSIS_REPLICATION_CLAIMS_HASH_MISMATCH: prereg/hv1_claims.json sha256 d8034b95d173c59b5f46bb8df81315ddab26cf34e9b5a731119e4d63e30e73dd != pinned 2677c43c67a25bebf7043344b512b58daaac00e9aa36615ff9cf",
+ "N8": {
+  "STATUS": "BLOCKED",
+  "actions": [],
+  "latch_refusal": {
+   "code": "OOS_EVIDENCE_ALTERED",
+   "conflicts": [
+    {
+     "current": {
+      "candidates_sha256": "c5844cd1859cb5fd3489135e87b6c31459ead6533d7e7119d41fc870834518bc",
+      "manifest_rows": {
+       "candidates": 278,
+       "observations": 278
+      },
+      "observations_sha256": "016744d974788d5909ef72a4be2f48b404e85734aa82a0e8c7919a653a6dfea9"
+     },
+     "field": "2031",
+     "recorded": {
+      "candidates_sha256": "281ffd4078f4b5bbebf4f82ed56f253d65b7314ffda8aeb47134f09b0ff709fb",
+      "manifest_rows": {
+       "candidates": 278,
+       "observations": 278
+      },
+      "observations_sha256": "411b51da61108d116d4cbdd078b8a329526417e1f744581098c895189e8ca05f"
+     }
+    }
+   ],
+   "detail": "the held-out partitions pinned at 2026-10-16T15:13:26.710371+00:00 were replaced, removed or re-collected (2031); the held-out period is never collected twice",
+   "refused_at_utc": "2026-10-16T15:24:46.918588+00:00",
+   "stage": "oos"
+  },
+  "reason": "{\"affected_artifacts\": [\"C:\\\\Users\\\\Scott McCarty\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-Scott-McCarty-Projects-Nautilus-Trader\\\\26f8edd5-f033-4103-85ad-5b27d8130135\\\\scratchpad\\\\proof\\\\workL\\\\studies\\\\hv1_original\\\\audit\", \"C:\\\\Users\\\\Scott McCarty\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-Scott-McCarty-Projects-Nautilus-Trader\\\\26f8edd5-f033-4103-85ad-5b27d8130135\\\\scratchpad\\\\proof\\\\workL\\\\studi",
+  "stage": "oos"
+ },
+ "chain": {
+  "analysis_identity_sha256": "62a80ccae8498a6652153ff87099342b92f0b1233418e13fbf2e64dc1f634a1a",
+  "analysis_lineage_plan_sha256": "d66616f1e9493e3fbe5eaf7b99c951b04439b35bd9826f3d75d8a3ce9fe64a80",
+  "analysis_spec_sha256": "8de2e88623b59c67354d59a264844241bd92bc39445d2ae072a680e1d7f17569",
+  "analysis_years": [
+   2031
+  ],
+  "auth": "66df24f4596563308bc41525fd4dff1e5f14cecaaf9bfcb1d4958d1b20035a84",
+  "chain_consistent": true,
+  "freeze_auth": "66df24f4596563308bc41525fd4dff1e5f14cecaaf9bfcb1d4958d1b20035a84",
+  "freeze_plan_sha256": "d66616f1e9493e3fbe5eaf7b99c951b04439b35bd9826f3d75d8a3ce9fe64a80",
+  "oos_manifest_plan_sha256": {
+   "2031": "d66616f1e9493e3fbe5eaf7b99c951b04439b35bd9826f3d75d8a3ce9fe64a80"
+  },
+  "oos_manifest_seal": {
+   "2031": "d88c4f3d8fa0d964f16880981c525e350d896c0cec74aed0b78b59261525cbc9"
+  },
+  "plan_sha256": "d66616f1e9493e3fbe5eaf7b99c951b04439b35bd9826f3d75d8a3ce9fe64a80",
+  "seal_hash": "d88c4f3d8fa0d964f16880981c525e350d896c0cec74aed0b78b59261525cbc9",
+  "seal_plan_sha256": "d66616f1e9493e3fbe5eaf7b99c951b04439b35bd9826f3d75d8a3ce9fe64a80",
+  "train_frame": {
+   "rows": 594,
+   "years": [
+    2029,
+    2030
+   ]
+  }
+ },
+ "close": "STUDY_CLOSED",
+ "evidence_equal_first_access_at_close": true,
+ "final_class": {
+  "adequacy_labels": [
+   "ADEQUATE",
+   "INADEQUATE_OVERLAP_CENSOR_RATE",
+   "INADEQUATE_OVERLAP_SESSIONS"
+  ],
+  "final": "INCONCLUSIVE_INADEQUATE_SAMPLE",
+  "primary_class": "INCONCLUSIVE_INADEQUATE_SAMPLE"
+ },
+ "opening": {
+  "completion": true,
+  "identity_plan": "d66616f1e9493e3fbe5eaf7b99c951b04439b35bd9826f3d75d8a3ce9fe64a80",
+  "oos_reconcile": true,
+  "opened_at_utc": "2026-10-16T15:13:25.520428+00:00",
+  "plan_now": "d66616f1e9493e3fbe5eaf7b99c951b04439b35bd9826f3d75d8a3ce9fe64a80"
+ },
+ "pre_oos_amendment": {
+  "card": "OK",
+  "record_exists": false
+ },
+ "pre_oos_revert": "OK",
+ "repeat_analyze": {
+  "STATUS": "OK",
+  "evidence_untouched": true
+ },
+ "resume_analyze": {
+  "STATUS": "OK",
+  "actions": [
+   "compile",
+   "prepare",
+   "readiness",
+   "preflight",
+   "analyze"
+  ],
+  "evidence_untouched": true
+ },
+ "years_widened": {
+  "STATUS": "BLOCKED",
+  "actions": [
+   "compile",
+   "prepare",
+   "readiness",
+   "preflight"
+  ],
+  "evidence_untouched": true,
+  "latch_refusal": {
+   "code": "OOS_IDENTITY_CONFLICT",
+   "conflicts": [
+    {
+     "current": "4a130cc5ec1311d02b562386017e83cc421718d6237059aceffd63287f03804b",
+     "field": "authorization_sha256",
+     "recorded": "66df24f4596563308bc41525fd4dff1e5f14cecaaf9bfcb1d4958d1b20035a84"
+    },
+    {
+     "current": "3e9329f8f4c8e425a0f975c54462cf6feffde88eb189326cb20ff26f8680788f",
+     "field": "composite_seal_hash",
+     "recorded": "d88c4f3d8fa0d964f16880981c525e350d896c0cec74aed0b78b59261525cbc9"
+    },
+    {
+     "current": "0d2be02be27a0de04f0ac29c96548f83335c4f56aebf143f430a9796da4f2aa0",
+     "field": "plan_sha256",
+     "recorded": "d66616f1e9493e3fbe5eaf7b99c951b04439b35bd9826f3d75d8a3ce9fe64a80"
+    },
+    {
+     "current": {
+      "dev": [
+       2031,
+       2032
+      ],
+      "oos": [
+       2031,
+       2032
+      ],
+      "prohibited": [],
+      "train": [
+       2029,
+       2030
+      ]
+     },
+     "field": "year_roles",
+     "recorded": {
+      "dev": [
+       2031
+      ],
+      "oos": [
+       2031
+      ],
+      "prohibited": [],
+      "train": [
+       2029,
+       2030
+      ]
+     }
+    }
+   ],
+   "detail": "seal refused: the held-out period was opened at 2026-10-16T15:13:25.520428+00:00 under a different evaluation identity (authorization_sha256, composite_seal_hash, plan_sha256, year_roles changed); an amended evaluation needs a new study",
+   "refused_at_utc": "2026-10-16T15:18:03.950267+00:00",
+   "stage": "seal"
+  },
+  "reason": "{\"affected_artifacts\": [\"C:\\\\Users\\\\Scott McCarty\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-Scott-McCarty-Projects-Nautilus-Trader\\\\26f8edd5-f033-4103-85ad-5b27d8130135\\\\scratchpad\\\\proof\\\\workL\\\\studies\\\\hv1_original\\\\audit\", \"C:\\\\Users\\\\Scott McCarty\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-Scott-McCarty-Projects-Nautilus-Trader\\\\26f8edd5-f033-4103-85ad-5b27d8130135\\\\scratchpad\\\\proof\\\\workL\\\\studi",
+  "stage": "seal"
+ }
+}
