@@ -1,0 +1,1396 @@
+{
+  "STATUS": "OK",
+  "baseline": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-oos_access_latch\\config\\test_failure_baseline.json",
+  "baseline_commit": "c480d8af0068c69d19669497c53747efa187b5dd",
+  "head": "7f13e4d9",
+  "baseline_issues": [
+    "BASELINE_COMMIT_MISMATCH"
+  ],
+  "pytest_exit_code": 0,
+  "wall_seconds": 2884.4000088999965,
+  "per_test_timings": {
+    "research_workflow/tests/test_lifecycle_v2.py::test_sha_helper_streams_and_matches_whole_file_digest": {
+      "seconds": 0.023421800000505755,
+      "phases": {
+        "setup": 0.004688699998951051,
+        "call": 0.01856250000128057,
+        "teardown": 0.0001706000002741348
+      }
+    },
+    "research_workflow/tests/test_lifecycle_v2.py::test_controller_runs_a_fresh_v2_study_end_to_end": {
+      "seconds": 820.7102332000031,
+      "phases": {
+        "setup": 2.2408959999993385,
+        "call": 818.4687969000006,
+        "teardown": 0.0005403000031947158
+      }
+    },
+    "research_workflow/tests/test_lifecycle_v2.py::test_controller_runs_a_descriptive_outcome_none_study_end_to_end": {
+      "seconds": 731.2726798999975,
+      "phases": {
+        "setup": 0.007577500000479631,
+        "call": 731.2645764000008,
+        "teardown": 0.0005259999961708672
+      }
+    },
+    "research_workflow/tests/test_lifecycle_v2.py::test_controller_reports_typed_capability_gap": {
+      "seconds": 2.0344347999998718,
+      "phases": {
+        "setup": 0.006731900000886526,
+        "call": 2.027216499998758,
+        "teardown": 0.0004864000002271496
+      }
+    },
+    "research_workflow/tests/test_lifecycle_v2.py::test_second_controller_on_a_live_study_is_refused": {
+      "seconds": 30.135350999997172,
+      "phases": {
+        "setup": 0.006157199997687712,
+        "call": 30.128892000000633,
+        "teardown": 0.000301799998851493
+      }
+    },
+    "research_workflow/tests/test_lifecycle_v2.py::test_tuning_adapter_is_bounded_walk_forward_and_persists_a_ledger": {
+      "seconds": 0.9391203999985009,
+      "phases": {
+        "setup": 0.003841500001726672,
+        "call": 0.9259677000009106,
+        "teardown": 0.009311199995863717
+      }
+    },
+    "research_workflow/tests/test_replay_closure.py::test_collection_stage_closure_is_a_subset_of_the_frozen_manifest": {
+      "seconds": 7.099953799996001,
+      "phases": {
+        "setup": 2.1423910000012256,
+        "call": 4.9571129999967525,
+        "teardown": 0.00044979999802308157
+      }
+    },
+    "research_workflow/tests/test_replay_closure.py::test_key_ignores_post_collection_declarations_and_binds_replay_ones": {
+      "seconds": 5.285942900001828,
+      "phases": {
+        "setup": 0.005687500000931323,
+        "call": 5.279789000000164,
+        "teardown": 0.00046640000073239207
+      }
+    },
+    "research_workflow/tests/test_replay_closure.py::test_off_by_default_and_same_bytes_as_reuse_mode": {
+      "seconds": 10.874456100005773,
+      "phases": {
+        "setup": 0.005388400000811089,
+        "call": 10.868894799998088,
+        "teardown": 0.00017290000687353313
+      }
+    },
+    "research_workflow/tests/test_replay_closure.py::test_study_text_change_reuses_both_partitions_and_shadow_is_identical": {
+      "seconds": 8.49587099999917,
+      "phases": {
+        "setup": 0.0019302000000607222,
+        "call": 8.493768499996804,
+        "teardown": 0.0001723000023048371
+      }
+    },
+    "research_workflow/tests/test_replay_closure.py::test_shadow_verification_tolerates_a_different_batch_rows_than_the_served_partition": {
+      "seconds": 5.809327800001483,
+      "phases": {
+        "setup": 0.0018993000048794784,
+        "call": 5.807092299997748,
+        "teardown": 0.0003361999988555908
+      }
+    },
+    "research_workflow/tests/test_replay_closure.py::test_audit_stage_module_change_reuses_but_replay_module_change_refuses": {
+      "seconds": 8.506520800001454,
+      "phases": {
+        "setup": 0.004500099996221252,
+        "call": 8.501682200003415,
+        "teardown": 0.00033850000181701034
+      }
+    },
+    "research_workflow/tests/test_replay_closure.py::test_population_change_refuses_reuse": {
+      "seconds": 5.7431371999991825,
+      "phases": {
+        "setup": 0.004702199999883305,
+        "call": 5.738286500003596,
+        "teardown": 0.00014849999570287764
+      }
+    },
+    "research_workflow/tests/test_replay_closure.py::test_shadow_mismatch_is_terminal": {
+      "seconds": 5.583044200000586,
+      "phases": {
+        "setup": 0.0017521999980090186,
+        "call": 5.581022300000768,
+        "teardown": 0.0002697000018088147
+      }
+    },
+    "research_workflow/tests/test_replay_closure.py::test_reconcile_refuses_missing_receipt_and_tampered_binding": {
+      "seconds": 8.555455800000345,
+      "phases": {
+        "setup": 0.0035184000007575378,
+        "call": 8.551757799999905,
+        "teardown": 0.0001795999996829778
+      }
+    },
+    "research_workflow/tests/test_replay_closure.py::test_smoke_proves_replay_imports_inside_the_collection_closure": {
+      "seconds": 3.509713899991766,
+      "phases": {
+        "setup": 0.0021444000012706965,
+        "call": 3.507408499994199,
+        "teardown": 0.00016099999629659578
+      }
+    },
+    "research_workflow/tests/test_replay_closure.py::test_contract_packet_carries_the_reuse_decision": {
+      "seconds": 5.186575400002766,
+      "phases": {
+        "setup": 0.0019012999982805923,
+        "call": 5.184524500000407,
+        "teardown": 0.00014960000407882035
+      }
+    },
+    "research_workflow/tests/test_replay_closure.py::test_select_shadow_is_uniform_seeded_and_sampled_policy_skips": {
+      "seconds": 0.0018991999968420714,
+      "phases": {
+        "setup": 0.001025199999276083,
+        "call": 0.0007494999954360537,
+        "teardown": 0.00012450000212993473
+      }
+    },
+    "research_workflow/tests/test_replay_closure.py::test_compiler_change_reuses_unless_it_alters_the_plan": {
+      "seconds": 8.490307899999607,
+      "phases": {
+        "setup": 0.001639699999941513,
+        "call": 8.488411999998789,
+        "teardown": 0.0002562000008765608
+      }
+    },
+    "research_workflow/tests/test_replay_closure.py::test_partition_run_halts_on_a_replay_module_outside_the_key": {
+      "seconds": 3.080566099997668,
+      "phases": {
+        "setup": 0.003946099997847341,
+        "call": 3.076409399996919,
+        "teardown": 0.0002106000029016286
+      }
+    },
+    "research_workflow/tests/test_replay_closure.py::test_reuse_requires_a_clean_smoke_trace_for_the_current_plan": {
+      "seconds": 5.20719289999397,
+      "phases": {
+        "setup": 0.003151199998683296,
+        "call": 5.203892799996538,
+        "teardown": 0.000148899998748675
+      }
+    },
+    "research_workflow/tests/test_replay_closure.py::test_key_binds_replay_time_data_files": {
+      "seconds": 1.8160105999995722,
+      "phases": {
+        "setup": 0.0017924999992828816,
+        "call": 1.8140418000039062,
+        "teardown": 0.00017629999638302252
+      }
+    },
+    "research_workflow/tests/test_reconcile_bounded_memory.py::test_parity_passing_case": {
+      "seconds": 0.12101510000502458,
+      "phases": {
+        "setup": 0.002290100004756823,
+        "call": 0.1185782000029576,
+        "teardown": 0.00014679999731015414
+      }
+    },
+    "research_workflow/tests/test_reconcile_bounded_memory.py::test_parity_failure_modes[row_count]": {
+      "seconds": 0.09088380000321195,
+      "phases": {
+        "setup": 0.001999799998884555,
+        "call": 0.08873880000464851,
+        "teardown": 0.00014519999967887998
+      }
+    },
+    "research_workflow/tests/test_reconcile_bounded_memory.py::test_parity_failure_modes[duplicate_keys]": {
+      "seconds": 0.112086699991778,
+      "phases": {
+        "setup": 0.00200829999812413,
+        "call": 0.1099296999964281,
+        "teardown": 0.00014869999722577631
+      }
+    },
+    "research_workflow/tests/test_reconcile_bounded_memory.py::test_parity_failure_modes[outside_year]": {
+      "seconds": 0.0846464000060223,
+      "phases": {
+        "setup": 0.002239100002043415,
+        "call": 0.08225420000235317,
+        "teardown": 0.00015310000162571669
+      }
+    },
+    "research_workflow/tests/test_reconcile_bounded_memory.py::test_parity_failure_modes[outside_windows]": {
+      "seconds": 0.11332720000064,
+      "phases": {
+        "setup": 0.0021379999961936846,
+        "call": 0.1108479000031366,
+        "teardown": 0.00034130000130971894
+      }
+    },
+    "research_workflow/tests/test_reconcile_bounded_memory.py::test_parity_failure_modes[manifest_no_windows]": {
+      "seconds": 0.10552159999497235,
+      "phases": {
+        "setup": 0.005393300001742318,
+        "call": 0.09995899999921676,
+        "teardown": 0.00016929999401327223
+      }
+    },
+    "research_workflow/tests/test_reconcile_bounded_memory.py::test_parity_failure_modes[schema_mismatch]": {
+      "seconds": 0.14812029999302467,
+      "phases": {
+        "setup": 0.0023565999945276417,
+        "call": 0.14560070000152336,
+        "teardown": 0.0001629999969736673
+      }
+    },
+    "research_workflow/tests/test_reconcile_bounded_memory.py::test_parity_failure_modes[digests]": {
+      "seconds": 0.0799025000014808,
+      "phases": {
+        "setup": 0.0022628000006079674,
+        "call": 0.07749060000060126,
+        "teardown": 0.00014910000027157366
+      }
+    },
+    "research_workflow/tests/test_reconcile_bounded_memory.py::test_parity_failure_modes[not_pass]": {
+      "seconds": 0.09880210000119405,
+      "phases": {
+        "setup": 0.0020670000012614764,
+        "call": 0.09656979999999749,
+        "teardown": 0.00016529999993508682
+      }
+    },
+    "research_workflow/tests/test_reconcile_bounded_memory.py::test_parity_failure_modes[several]": {
+      "seconds": 0.09784209999634186,
+      "phases": {
+        "setup": 0.002106899999489542,
+        "call": 0.09556999999767868,
+        "teardown": 0.00016519999917363748
+      }
+    },
+    "research_workflow/tests/test_reconcile_bounded_memory.py::test_parity_whole_year_and_empty_partition": {
+      "seconds": 0.08592659999703756,
+      "phases": {
+        "setup": 0.002439599993522279,
+        "call": 0.08332199999858858,
+        "teardown": 0.00016500000492669642
+      }
+    },
+    "research_workflow/tests/test_reconcile_bounded_memory.py::test_parity_empty_partition_under_declared_window": {
+      "seconds": 0.05510819999472005,
+      "phases": {
+        "setup": 0.003040399999008514,
+        "call": 0.051909199995861854,
+        "teardown": 0.00015859999984968454
+      }
+    },
+    "research_workflow/tests/test_reconcile_bounded_memory.py::test_parity_missing_key_column_raises_the_same_error": {
+      "seconds": 0.09297119999973802,
+      "phases": {
+        "setup": 0.0021803999989060685,
+        "call": 0.09062370000174269,
+        "teardown": 0.00016709999908925965
+      }
+    },
+    "research_workflow/tests/test_reconcile_bounded_memory.py::test_parity_pandas_written_partitions[default_range]": {
+      "seconds": 0.09339400000317255,
+      "phases": {
+        "setup": 0.0023475999987567775,
+        "call": 0.09082800000032876,
+        "teardown": 0.00021840000408701599
+      }
+    },
+    "research_workflow/tests/test_reconcile_bounded_memory.py::test_parity_pandas_written_partitions[stored_unnamed]": {
+      "seconds": 0.0932223999989219,
+      "phases": {
+        "setup": 0.0022743999943486415,
+        "call": 0.09080060000269441,
+        "teardown": 0.00014740000187885016
+      }
+    },
+    "research_workflow/tests/test_reconcile_bounded_memory.py::test_parity_pandas_written_partitions[stored_named]": {
+      "seconds": 0.10697809999692254,
+      "phases": {
+        "setup": 0.002278100000694394,
+        "call": 0.10449869999865768,
+        "teardown": 0.0002012999975704588
+      }
+    },
+    "research_workflow/tests/test_reconcile_bounded_memory.py::test_parity_pandas_written_partitions[no_index]": {
+      "seconds": 0.10549529999843799,
+      "phases": {
+        "setup": 0.002787899997201748,
+        "call": 0.10241959999984829,
+        "teardown": 0.00028780000138795003
+      }
+    },
+    "research_workflow/tests/test_reconcile_bounded_memory.py::test_shape_matches_pandas_on_nested_multi_row_group": {
+      "seconds": 0.026244699998642318,
+      "phases": {
+        "setup": 0.0038732000029995106,
+        "call": 0.022225199994863942,
+        "teardown": 0.00014630000077886507
+      }
+    },
+    "research_workflow/tests/test_reconcile_bounded_memory.py::test_row_group_layout_invariance": {
+      "seconds": 0.3215505999978632,
+      "phases": {
+        "setup": 0.002346399996895343,
+        "call": 0.31904840000061085,
+        "teardown": 0.00015580000035697594
+      }
+    },
+    "research_workflow/tests/test_reconcile_bounded_memory.py::test_reconcile_peak_flat_in_payload_width_and_key_bounded_in_rows": {
+      "seconds": 5.417254600011802,
+      "phases": {
+        "setup": 0.0025053000063053332,
+        "call": 5.414580800003023,
+        "teardown": 0.00016850000247359276
+      }
+    },
+    "research_workflow/tests/test_model_target_and_reattest.py::test_target_expression_compiles_and_is_hashed": {
+      "seconds": 1.9270204999993439,
+      "phases": {
+        "setup": 0.0014327000026241876,
+        "call": 1.925447699999495,
+        "teardown": 0.00014009999722475186
+      }
+    },
+    "research_workflow/tests/test_model_target_and_reattest.py::test_target_may_read_outcome_columns_but_features_may_not": {
+      "seconds": 2.0731985999955214,
+      "phases": {
+        "setup": 0.0013569000002462417,
+        "call": 2.0717020999945817,
+        "teardown": 0.0001396000006934628
+      }
+    },
+    "research_workflow/tests/test_model_target_and_reattest.py::test_target_referencing_an_unknown_column_is_refused": {
+      "seconds": 0.26181780000479193,
+      "phases": {
+        "setup": 0.001368700002785772,
+        "call": 0.26030590000300435,
+        "teardown": 0.00014319999900180846
+      }
+    },
+    "research_workflow/tests/test_model_target_and_reattest.py::test_target_syntax_error_is_a_compile_gap": {
+      "seconds": 0.20181249999586726,
+      "phases": {
+        "setup": 0.0014374999955180101,
+        "call": 0.2002384000006714,
+        "teardown": 0.00013659999967785552
+      }
+    },
+    "research_workflow/tests/test_model_target_and_reattest.py::test_target_shape_is_validated": {
+      "seconds": 0.03345939999417169,
+      "phases": {
+        "setup": 0.0028080999982194044,
+        "call": 0.030394000001251698,
+        "teardown": 0.0002572999947005883
+      }
+    },
+    "research_workflow/tests/test_model_target_and_reattest.py::test_score_mode_refuses_a_target": {
+      "seconds": 0.01167029998759972,
+      "phases": {
+        "setup": 0.0012920999943162315,
+        "call": 0.010255199995299336,
+        "teardown": 0.0001229999979841523
+      }
+    },
+    "research_workflow/tests/test_model_target_and_reattest.py::test_plan_without_a_target_is_unchanged": {
+      "seconds": 1.8391083000024082,
+      "phases": {
+        "setup": 0.001242999998794403,
+        "call": 1.8377162000033422,
+        "teardown": 0.00014910000027157366
+      }
+    },
+    "research_workflow/tests/test_model_target_and_reattest.py::test_derived_target_trains_and_records_its_population": {
+      "seconds": 0.15808639999158913,
+      "phases": {
+        "setup": 0.0025189999942085706,
+        "call": 0.15531280000141123,
+        "teardown": 0.00025459999596932903
+      }
+    },
+    "research_workflow/tests/test_model_target_and_reattest.py::test_fit_uses_only_the_tuning_years": {
+      "seconds": 0.14376380000612698,
+      "phases": {
+        "setup": 0.0043443000031402335,
+        "call": 0.13920019999932265,
+        "teardown": 0.0002193000036641024
+      }
+    },
+    "research_workflow/tests/test_model_target_and_reattest.py::test_single_class_target_hard_fails": {
+      "seconds": 0.050904999996419065,
+      "phases": {
+        "setup": 0.003672200000437442,
+        "call": 0.047040799996466376,
+        "teardown": 0.0001919999995152466
+      }
+    },
+    "research_workflow/tests/test_model_target_and_reattest.py::test_the_raw_degenerate_label_still_hard_fails_without_a_target": {
+      "seconds": 0.06386069999280153,
+      "phases": {
+        "setup": 0.003117499996733386,
+        "call": 0.060478899998997804,
+        "teardown": 0.0002642999970703386
+      }
+    },
+    "research_workflow/tests/test_model_target_and_reattest.py::test_non_binary_target_is_refused": {
+      "seconds": 0.062159799999790266,
+      "phases": {
+        "setup": 0.005225699998845812,
+        "call": 0.05665210000006482,
+        "teardown": 0.00028200000087963417
+      }
+    },
+    "research_workflow/tests/test_model_target_and_reattest.py::test_unresolvable_target_is_refused": {
+      "seconds": 0.05622420000145212,
+      "phases": {
+        "setup": 0.004785700002685189,
+        "call": 0.05129830000078073,
+        "teardown": 0.0001401999979862012
+      }
+    },
+    "research_workflow/tests/test_model_target_and_reattest.py::test_incomplete_arm_set_hard_fails": {
+      "seconds": 0.10426719999668421,
+      "phases": {
+        "setup": 0.0026068000006489456,
+        "call": 0.10149339999770746,
+        "teardown": 0.00016699999832781032
+      }
+    },
+    "research_workflow/tests/test_model_target_and_reattest.py::test_attestation_permits_a_pure_closure_change": {
+      "seconds": 0.0018278999996255152,
+      "phases": {
+        "setup": 0.0015611999988323078,
+        "call": 0.00014099999680183828,
+        "teardown": 0.00012570000399136916
+      }
+    },
+    "research_workflow/tests/test_model_target_and_reattest.py::test_attestation_permits_a_cross_study_authorization_with_identical_year_roles": {
+      "seconds": 0.0016824999984237365,
+      "phases": {
+        "setup": 0.0014324000003398396,
+        "call": 0.00012969999806955457,
+        "teardown": 0.00012040000001434237
+      }
+    },
+    "research_workflow/tests/test_model_target_and_reattest.py::test_attestation_never_excuses_plan_dataset_or_interval[over0-ATTESTATION_SCOPE]": {
+      "seconds": 0.0020239999939803965,
+      "phases": {
+        "setup": 0.0017088000022340566,
+        "call": 0.00015409999468829483,
+        "teardown": 0.00016109999705804512
+      }
+    },
+    "research_workflow/tests/test_model_target_and_reattest.py::test_attestation_never_excuses_plan_dataset_or_interval[over1-ATTESTATION_SCOPE]": {
+      "seconds": 0.002228900011687074,
+      "phases": {
+        "setup": 0.0019242000053054653,
+        "call": 0.00014930000179447234,
+        "teardown": 0.0001554000045871362
+      }
+    },
+    "research_workflow/tests/test_model_target_and_reattest.py::test_attestation_never_excuses_plan_dataset_or_interval[over2-ATTESTATION_SCOPE]": {
+      "seconds": 0.0022118000051705167,
+      "phases": {
+        "setup": 0.0019083000006503426,
+        "call": 0.000145800004247576,
+        "teardown": 0.00015770000027259812
+      }
+    },
+    "research_workflow/tests/test_model_target_and_reattest.py::test_attestation_requires_byte_equality": {
+      "seconds": 0.002137200004654005,
+      "phases": {
+        "setup": 0.001844300000811927,
+        "call": 0.00014799999917158857,
+        "teardown": 0.00014490000467048958
+      }
+    },
+    "research_workflow/tests/test_model_target_and_reattest.py::test_attestation_requires_identical_closure_membership": {
+      "seconds": 0.002147400002286304,
+      "phases": {
+        "setup": 0.0018209999980172142,
+        "call": 0.0001714000027277507,
+        "teardown": 0.00015500000154133886
+      }
+    },
+    "research_workflow/tests/test_model_target_and_reattest.py::test_attestation_requires_matching_composites": {
+      "seconds": 0.0022059999901102856,
+      "phases": {
+        "setup": 0.0019000999964191578,
+        "call": 0.0001553999973111786,
+        "teardown": 0.00015049999637994915
+      }
+    },
+    "research_workflow/tests/test_model_target_and_reattest.py::test_attestation_refuses_widened_authorization_years": {
+      "seconds": 0.002219699992565438,
+      "phases": {
+        "setup": 0.0019192999970982783,
+        "call": 0.00014989999908721074,
+        "teardown": 0.00015049999637994915
+      }
+    },
+    "research_workflow/tests/test_model_target_and_reattest.py::test_no_attestation_means_no_reuse": {
+      "seconds": 0.0022041000047465786,
+      "phases": {
+        "setup": 0.001901499999803491,
+        "call": 0.000149200001033023,
+        "teardown": 0.0001534000039100647
+      }
+    },
+    "research_workflow/tests/test_oos_analysis_lineage.py::test_fresh_after_generation": {
+      "seconds": 0.05923649999749614,
+      "phases": {
+        "setup": 0.003684299997985363,
+        "call": 0.055337300000246614,
+        "teardown": 0.00021489999926416203
+      }
+    },
+    "research_workflow/tests/test_oos_analysis_lineage.py::test_none_when_no_artifact": {
+      "seconds": 0.01887840000563301,
+      "phases": {
+        "setup": 0.004067200003191829,
+        "call": 0.014653800004452933,
+        "teardown": 0.0001573999979882501
+      }
+    },
+    "research_workflow/tests/test_oos_analysis_lineage.py::test_identity_block_has_the_required_bindings": {
+      "seconds": 0.03377909999835538,
+      "phases": {
+        "setup": 0.003143499998259358,
+        "call": 0.030476400002953596,
+        "teardown": 0.00015919999714242294
+      }
+    },
+    "research_workflow/tests/test_oos_analysis_lineage.py::test_stale_when_train_freeze_bytes_change": {
+      "seconds": 0.036276200000429526,
+      "phases": {
+        "setup": 0.0028908000022056513,
+        "call": 0.033225799998035654,
+        "teardown": 0.0001596000001882203
+      }
+    },
+    "research_workflow/tests/test_oos_analysis_lineage.py::test_stale_when_modeling_closure_moves": {
+      "seconds": 0.05100500000116881,
+      "phases": {
+        "setup": 0.0032742999974288978,
+        "call": 0.0475771999990684,
+        "teardown": 0.00015350000467151403
+      }
+    },
+    "research_workflow/tests/test_oos_analysis_lineage.py::test_invalid_when_freeze_deleted": {
+      "seconds": 0.02966940000624163,
+      "phases": {
+        "setup": 0.002973900001961738,
+        "call": 0.02653650000138441,
+        "teardown": 0.00015900000289548188
+      }
+    },
+    "research_workflow/tests/test_oos_analysis_lineage.py::test_invalid_when_identity_block_edited": {
+      "seconds": 0.0359251999980188,
+      "phases": {
+        "setup": 0.003040399999008514,
+        "call": 0.03273389999958454,
+        "teardown": 0.0001508999994257465
+      }
+    },
+    "research_workflow/tests/test_oos_analysis_lineage.py::test_workflow_state_surfaces_the_classification": {
+      "seconds": 0.05157859999599168,
+      "phases": {
+        "setup": 0.003333699998620432,
+        "call": 0.04809219999879133,
+        "teardown": 0.00015269999857991934
+      }
+    },
+    "research_workflow/tests/test_oos_analysis_lineage.py::test_workflow_state_none_without_analysis": {
+      "seconds": 0.02852780000102939,
+      "phases": {
+        "setup": 0.002983500002301298,
+        "call": 0.025383599997439887,
+        "teardown": 0.00016070000128820539
+      }
+    },
+    "research_workflow/tests/test_oos_analysis_lineage.py::test_stage17_empty_bound_lineage_is_invalid": {
+      "seconds": 0.030283100000815466,
+      "phases": {
+        "setup": 0.0030655000009573996,
+        "call": 0.027013300001272,
+        "teardown": 0.00020429999858606607
+      }
+    },
+    "research_workflow/tests/test_oos_analysis_lineage.py::test_train_only_stage17_missing_required_anchor_is_invalid": {
+      "seconds": 0.022686099997372366,
+      "phases": {
+        "setup": 0.0032429999992018566,
+        "call": 0.019277299994428176,
+        "teardown": 0.0001658000037423335
+      }
+    },
+    "research_workflow/tests/test_oos_analysis_lineage.py::test_train_only_stage17_with_minimum_anchors_is_fresh": {
+      "seconds": 0.03794949999428354,
+      "phases": {
+        "setup": 0.003176799997163471,
+        "call": 0.03443909999623429,
+        "teardown": 0.0003336000008857809
+      }
+    },
+    "research_workflow/tests/test_oos_analysis_lineage.py::test_train_only_stage17_goes_stale_when_train_freeze_rewritten": {
+      "seconds": 0.032751899991126265,
+      "phases": {
+        "setup": 0.00791429999662796,
+        "call": 0.024684799995156936,
+        "teardown": 0.00015279999934136868
+      }
+    },
+    "research_workflow/tests/test_chronology_windows.py::test_a_valid_window_compiles_ordered_and_role_tagged": {
+      "seconds": 1.702751700002409,
+      "phases": {
+        "setup": 0.003196699995896779,
+        "call": 1.6994019000048866,
+        "teardown": 0.00015310000162571669
+      }
+    },
+    "research_workflow/tests/test_chronology_windows.py::test_malformed_windows_are_typed_gaps[windows0-INVALID_PARAMETERIZATION]": {
+      "seconds": 0.3219928999969852,
+      "phases": {
+        "setup": 0.0032349999964935705,
+        "call": 0.3186053000026732,
+        "teardown": 0.00015259999781847
+      }
+    },
+    "research_workflow/tests/test_chronology_windows.py::test_malformed_windows_are_typed_gaps[windows1-INVALID_PARAMETERIZATION]": {
+      "seconds": 0.2825337999893236,
+      "phases": {
+        "setup": 0.0033504999955766834,
+        "call": 0.2789758999933838,
+        "teardown": 0.00020740000036312267
+      }
+    },
+    "research_workflow/tests/test_chronology_windows.py::test_malformed_windows_are_typed_gaps[windows2-INVALID_PARAMETERIZATION]": {
+      "seconds": 0.2565500999990036,
+      "phases": {
+        "setup": 0.0037849000000278465,
+        "call": 0.2526155999948969,
+        "teardown": 0.00014960000407882035
+      }
+    },
+    "research_workflow/tests/test_chronology_windows.py::test_malformed_windows_are_typed_gaps[windows3-INVALID_PARAMETERIZATION]": {
+      "seconds": 0.2665489999926649,
+      "phases": {
+        "setup": 0.0033636999942245893,
+        "call": 0.26303639999969164,
+        "teardown": 0.000148899998748675
+      }
+    },
+    "research_workflow/tests/test_chronology_windows.py::test_malformed_windows_are_typed_gaps[windows4-SEMANTIC_DECISION_REQUIRED]": {
+      "seconds": 0.25565229999483563,
+      "phases": {
+        "setup": 0.003478999999060761,
+        "call": 0.2520187999980408,
+        "teardown": 0.00015449999773409218
+      }
+    },
+    "research_workflow/tests/test_chronology_windows.py::test_a_window_can_never_open_an_unauthorized_year": {
+      "seconds": 0.7675677999941399,
+      "phases": {
+        "setup": 0.003259799996158108,
+        "call": 0.7641676999992342,
+        "teardown": 0.00014029999874765053
+      }
+    },
+    "research_workflow/tests/test_chronology_windows.py::test_authorized_windows_may_only_narrow": {
+      "seconds": 0.002200200004153885,
+      "phases": {
+        "setup": 0.0018822000056388788,
+        "call": 0.00020309999672463164,
+        "teardown": 0.00011490000179037452
+      }
+    },
+    "research_workflow/tests/test_chronology_windows.py::test_stale_authorization_windows_refuse_the_run": {
+      "seconds": 0.001971800003957469,
+      "phases": {
+        "setup": 0.0017135000016423874,
+        "call": 0.00014700000610901043,
+        "teardown": 0.00011129999620607123
+      }
+    },
+    "research_workflow/tests/test_chronology_windows.py::test_a_windowed_partition_emits_only_the_declared_dates": {
+      "seconds": 4.143046100005449,
+      "phases": {
+        "setup": 2.04666370000632,
+        "call": 2.0962015999975847,
+        "teardown": 0.00018080000154441223
+      }
+    },
+    "research_workflow/tests/test_declarative_analysis.py::test_a_train_only_diagnostic_runs_compile_to_close_and_writes_its_declared_artifacts": {
+      "seconds": 139.61616890000005,
+      "phases": {
+        "setup": 2.061072199998307,
+        "call": 137.5549358999997,
+        "teardown": 0.00016080000204965472
+      }
+    },
+    "research_workflow/tests/test_declarative_analysis.py::test_a_malformed_pipeline_is_a_typed_gap_at_compile_time[<lambda>-analysis.steps[0].op]": {
+      "seconds": 0.25783709999814164,
+      "phases": {
+        "setup": 0.0034666999999899417,
+        "call": 0.2542179000010947,
+        "teardown": 0.00015249999705702066
+      }
+    },
+    "research_workflow/tests/test_declarative_analysis.py::test_a_malformed_pipeline_is_a_typed_gap_at_compile_time[<lambda>-analysis.steps[1].rows]": {
+      "seconds": 0.27250459999777377,
+      "phases": {
+        "setup": 0.003530100002535619,
+        "call": 0.2688244999953895,
+        "teardown": 0.00014999999984866008
+      }
+    },
+    "research_workflow/tests/test_declarative_analysis.py::test_a_malformed_pipeline_is_a_typed_gap_at_compile_time[<lambda>-analysis.steps[3].inputs]": {
+      "seconds": 0.25747019999835175,
+      "phases": {
+        "setup": 0.0036186000070301816,
+        "call": 0.2536896999954479,
+        "teardown": 0.0001618999958736822
+      }
+    },
+    "research_workflow/tests/test_declarative_analysis.py::test_a_malformed_pipeline_is_a_typed_gap_at_compile_time[<lambda>-analysis.artifacts[0].source]": {
+      "seconds": 0.27064660000178264,
+      "phases": {
+        "setup": 0.0036510999998426996,
+        "call": 0.26684129999921424,
+        "teardown": 0.00015420000272570178
+      }
+    },
+    "research_workflow/tests/test_declarative_analysis.py::test_a_malformed_pipeline_is_a_typed_gap_at_compile_time[<lambda>-analysis.artifacts[0].name]": {
+      "seconds": 0.2759915000060573,
+      "phases": {
+        "setup": 0.004369600006612018,
+        "call": 0.2714728999999352,
+        "teardown": 0.00014899999951012433
+      }
+    },
+    "research_workflow/tests/test_declarative_analysis.py::test_a_malformed_pipeline_is_a_typed_gap_at_compile_time[<lambda>-analysis.artifacts]": {
+      "seconds": 0.27048040000227047,
+      "phases": {
+        "setup": 0.0036591000025509857,
+        "call": 0.26667509999970207,
+        "teardown": 0.00014620000001741573
+      }
+    },
+    "research_workflow/tests/test_declarative_analysis.py::test_a_malformed_pipeline_is_a_typed_gap_at_compile_time[<lambda>-analysis.source]": {
+      "seconds": 0.2853365999981179,
+      "phases": {
+        "setup": 0.0037067000012029894,
+        "call": 0.2814834000018891,
+        "teardown": 0.00014649999502580613
+      }
+    },
+    "research_workflow/tests/test_declarative_analysis.py::test_a_malformed_pipeline_is_a_typed_gap_at_compile_time[<lambda>-analysis.model_scores]": {
+      "seconds": 0.35070400000404334,
+      "phases": {
+        "setup": 0.0038273000027402304,
+        "call": 0.3467037000009441,
+        "teardown": 0.00017300000035902485
+      }
+    },
+    "research_workflow/tests/test_declarative_analysis.py::test_a_malformed_pipeline_is_a_typed_gap_at_compile_time[<lambda>-analysis.steps[3].inputs.anchors]": {
+      "seconds": 0.267596700003196,
+      "phases": {
+        "setup": 0.004917999998724554,
+        "call": 0.2625144999983604,
+        "teardown": 0.00016420000611105934
+      }
+    },
+    "research_workflow/tests/test_declarative_analysis.py::test_tail_lift_runs_against_the_study_own_fitted_model_train_reference_oos_rows": {
+      "seconds": 140.32785400001012,
+      "phases": {
+        "setup": 0.003768400005355943,
+        "call": 140.3238521000021,
+        "teardown": 0.00023350000265054405
+      }
+    },
+    "research_workflow/tests/test_experiment.py::test_authorization_materializes_disjoint_periods": {
+      "seconds": 0.00747399999818299,
+      "phases": {
+        "setup": 0.00425589999940712,
+        "call": 0.003084399999352172,
+        "teardown": 0.0001336999994236976
+      }
+    },
+    "research_workflow/tests/test_experiment.py::test_runtime_authorization_is_exact_and_rejects_tampering": {
+      "seconds": 0.03096229999209754,
+      "phases": {
+        "setup": 0.004057599995576311,
+        "call": 0.026755999999295454,
+        "teardown": 0.00014869999722577631
+      }
+    },
+    "research_workflow/tests/test_experiment.py::test_oos_locked_until_train_freeze": {
+      "seconds": 0.05164899999363115,
+      "phases": {
+        "setup": 0.004323799999838229,
+        "call": 0.04717769999842858,
+        "teardown": 0.00014749999536434188
+      }
+    },
+    "research_workflow/tests/test_experiment.py::test_deciles_and_first_crossing_are_deterministic": {
+      "seconds": 0.0059454000074765645,
+      "phases": {
+        "setup": 0.002519300003768876,
+        "call": 0.003296200004115235,
+        "teardown": 0.00012989999959245324
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_chronology.py::test_train_request_for_an_undeclared_year_rejects": {
+      "seconds": 0.0016704999943613075,
+      "phases": {
+        "setup": 0.0013656000010087155,
+        "call": 0.00019029999384656549,
+        "teardown": 0.0001145999995060265
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_chronology.py::test_oos_request_for_a_train_year_rejects": {
+      "seconds": 0.001411900004313793,
+      "phases": {
+        "setup": 0.0011682000040309504,
+        "call": 0.00012660000356845558,
+        "teardown": 0.00011709999671438709
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_chronology.py::test_prohibited_year_rejects_for_train": {
+      "seconds": 0.0013297000041347928,
+      "phases": {
+        "setup": 0.0011023000042769127,
+        "call": 0.00012229999992996454,
+        "teardown": 0.00010509999992791563
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_chronology.py::test_prohibited_year_rejects_for_oos": {
+      "seconds": 0.0013281999927130528,
+      "phases": {
+        "setup": 0.0011021999962395057,
+        "call": 0.00011989999620709568,
+        "teardown": 0.00010610000026645139
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_chronology.py::test_prohibited_year_mixed_with_a_valid_year_still_rejects_the_whole_request": {
+      "seconds": 0.0013114999965182506,
+      "phases": {
+        "setup": 0.0010918999978457578,
+        "call": 0.0001173999989987351,
+        "teardown": 0.0001021999996737577
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_chronology.py::test_valid_subset_passes_and_returns_exactly_the_subset_sorted": {
+      "seconds": 0.0013204999995650724,
+      "phases": {
+        "setup": 0.0010967999987769872,
+        "call": 0.00011619999713730067,
+        "teardown": 0.00010750000365078449
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_chronology.py::test_omitted_years_equals_role_years_exactly": {
+      "seconds": 0.0012822999924537726,
+      "phases": {
+        "setup": 0.0010745999970822595,
+        "call": 0.00010379999730503187,
+        "teardown": 0.0001038999980664812
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_chronology.py::test_empty_requested_list_rejects": {
+      "seconds": 0.0013596000062534586,
+      "phases": {
+        "setup": 0.0011360000062268227,
+        "call": 0.00011839999933727086,
+        "teardown": 0.00010520000068936497
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_chronology.py::test_duplicate_and_str_years_normalize_and_still_cannot_expand": {
+      "seconds": 0.001328200007264968,
+      "phases": {
+        "setup": 0.001094899998861365,
+        "call": 0.00012960000458406284,
+        "teardown": 0.00010370000381954014
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_chronology.py::test_stale_authorization_artifact_rejects_even_a_valid_request": {
+      "seconds": 0.0013565999979618937,
+      "phases": {
+        "setup": 0.0011325000014039688,
+        "call": 0.00011919999815290794,
+        "teardown": 0.00010489999840501696
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_chronology.py::test_stale_authorization_prohibited_mismatch_rejects": {
+      "seconds": 0.001334399996267166,
+      "phases": {
+        "setup": 0.0010955999969155528,
+        "call": 0.00013439999747788534,
+        "teardown": 0.00010440000187372789
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_chronology.py::test_matching_authorization_artifact_passes": {
+      "seconds": 0.00129420000303071,
+      "phases": {
+        "setup": 0.0010817000002134591,
+        "call": 0.00010970000585075468,
+        "teardown": 0.00010279999696649611
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_chronology.py::test_unknown_period_rejects": {
+      "seconds": 0.0013442000054055825,
+      "phases": {
+        "setup": 0.001121200002671685,
+        "call": 0.0001157000006060116,
+        "teardown": 0.00010730000212788582
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_chronology.py::test_omitted_years_rejects_when_role_intersects_prohibited": {
+      "seconds": 0.0013595999917015433,
+      "phases": {
+        "setup": 0.0011317999960738234,
+        "call": 0.00012269999569980428,
+        "teardown": 0.00010509999992791563
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_chronology.py::test_omitted_years_rejects_when_oos_role_intersects_prohibited": {
+      "seconds": 0.001323299999057781,
+      "phases": {
+        "setup": 0.0010915999955614097,
+        "call": 0.00012340000102994964,
+        "teardown": 0.00010830000246642157
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_chronology.py::test_fractional_float_year_rejects_never_truncates": {
+      "seconds": 0.0014140000057523139,
+      "phases": {
+        "setup": 0.0011143000010633841,
+        "call": 0.00019260000408394262,
+        "teardown": 0.00010710000060498714
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_chronology.py::test_fractional_string_year_rejects_never_truncates": {
+      "seconds": 0.001402999994752463,
+      "phases": {
+        "setup": 0.0011656999995466322,
+        "call": 0.0001269999993382953,
+        "teardown": 0.00011029999586753547
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_chronology.py::test_bool_year_rejects": {
+      "seconds": 0.0014781999925617129,
+      "phases": {
+        "setup": 0.00124639999557985,
+        "call": 0.0001249999986612238,
+        "teardown": 0.00010679999832063913
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_chronology.py::test_integral_float_and_string_years_normalize": {
+      "seconds": 0.0014244000049075112,
+      "phases": {
+        "setup": 0.0012115999998059124,
+        "call": 0.00010460000339662656,
+        "teardown": 0.00010820000170497224
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_model_authority.py::test_f_legit_model_authenticates_and_returns_evidence": {
+      "seconds": 0.056372600003669504,
+      "phases": {
+        "setup": 0.002143199999409262,
+        "call": 0.05386700000235578,
+        "teardown": 0.00036240000190446153
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_model_authority.py::test_a_copied_model_dir_refuses_without_manifest_edit": {
+      "seconds": 0.0323872000008123,
+      "phases": {
+        "setup": 0.005031200002122205,
+        "call": 0.027193300004000776,
+        "teardown": 0.00016269999468931928
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_model_authority.py::test_a_copied_model_dir_refuses_even_with_manifest_id_edited": {
+      "seconds": 0.04965029999584658,
+      "phases": {
+        "setup": 0.002506199998606462,
+        "call": 0.04680999999982305,
+        "teardown": 0.00033409999741706997
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_model_authority.py::test_b_corrupted_canonical_bytes_refused": {
+      "seconds": 0.05388479999965057,
+      "phases": {
+        "setup": 0.005010599998058751,
+        "call": 0.0485391999973217,
+        "teardown": 0.000335000004270114
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_model_authority.py::test_c_tampered_golden_prediction_refused": {
+      "seconds": 0.059897400009504054,
+      "phases": {
+        "setup": 0.0057524000003468245,
+        "call": 0.053972200003045145,
+        "teardown": 0.0001728000061120838
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_model_authority.py::test_c_missing_golden_frame_refused": {
+      "seconds": 0.05485670000052778,
+      "phases": {
+        "setup": 0.0027402000050642528,
+        "call": 0.051768699995591305,
+        "teardown": 0.00034779999987222254
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_model_authority.py::test_d_reordered_ordered_inputs_refused": {
+      "seconds": 0.05156029999488965,
+      "phases": {
+        "setup": 0.005117100001371,
+        "call": 0.04609299999719951,
+        "teardown": 0.0003501999963191338
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_model_authority.py::test_e_expectation_mismatch_refused": {
+      "seconds": 0.04846840000391239,
+      "phases": {
+        "setup": 0.005973300001642201,
+        "call": 0.04233810000005178,
+        "teardown": 0.00015700000221841037
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_model_authority.py::test_h_ledger_rejected_tier_refused_for_reuse": {
+      "seconds": 0.03371099998912541,
+      "phases": {
+        "setup": 0.002623499996843748,
+        "call": 0.0308971999984351,
+        "teardown": 0.00019029999384656549
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_model_authority.py::test_legacy_unrecomputable_identity_rule_fails_closed": {
+      "seconds": 0.03691629999957513,
+      "phases": {
+        "setup": 0.002671800000825897,
+        "call": 0.034069699999236036,
+        "teardown": 0.0001747999995131977
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_model_authority.py::test_g_score_models_refuses_attacks_and_passes_legit": {
+      "seconds": 0.1002358999903663,
+      "phases": {
+        "setup": 0.0028152999948360957,
+        "call": 0.0972570999947493,
+        "teardown": 0.00016350000078091398
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_model_authority.py::test_g_score_models_honors_expect": {
+      "seconds": 0.026683599993702956,
+      "phases": {
+        "setup": 0.0026849999994738027,
+        "call": 0.023842399998102337,
+        "teardown": 0.00015619999612681568
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_model_authority.py::test_i_late_input_marks_score_unavailable_at_t": {
+      "seconds": 0.021757599992270116,
+      "phases": {
+        "setup": 0.0025968999980250373,
+        "call": 0.018998699997609947,
+        "teardown": 0.00016199999663513154
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_model_authority.py::test_ii_all_inputs_on_time_available_at_t": {
+      "seconds": 0.0094913000066299,
+      "phases": {
+        "setup": 0.0024981000024126843,
+        "call": 0.00685689999954775,
+        "teardown": 0.00013630000466946512
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_model_authority.py::test_iii_async_evaluation_availability_is_max_inputs_and_evaluation": {
+      "seconds": 0.010575199994491413,
+      "phases": {
+        "setup": 0.002314499994099606,
+        "call": 0.008115999997244217,
+        "teardown": 0.0001447000031475909
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_model_authority.py::test_iv_compiled_availability_table_names_the_rule_and_dependencies": {
+      "seconds": 1.8430242000031285,
+      "phases": {
+        "setup": 0.001467000001866836,
+        "call": 1.841417800002091,
+        "teardown": 0.00013939999917056412
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_model_authority.py::test_legacy_committed_registry_pass": {
+      "seconds": 0.260613899998134,
+      "phases": {
+        "setup": 0.05958229999669129,
+        "call": 0.20086230000015348,
+        "teardown": 0.00016930000128922984
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_model_authority.py::test_legacy_committed_registry_untracked_record_unverifiable": {
+      "seconds": 0.11772039999777917,
+      "phases": {
+        "setup": 0.05268429999705404,
+        "call": 0.06485170000087237,
+        "teardown": 0.0001843999998527579
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_model_authority.py::test_legacy_committed_registry_sha_mismatch": {
+      "seconds": 0.22656179999466985,
+      "phases": {
+        "setup": 0.05329809999966528,
+        "call": 0.17309869999735383,
+        "teardown": 0.0001649999976507388
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_model_authority.py::test_legacy_committed_registry_study_id_mismatch": {
+      "seconds": 0.23873279999679653,
+      "phases": {
+        "setup": 0.052888899997924455,
+        "call": 0.18568329999834532,
+        "teardown": 0.00016060000052675605
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_model_authority.py::test_legacy_committed_registry_runtime_identity_mismatch": {
+      "seconds": 0.21473629999672994,
+      "phases": {
+        "setup": 0.05264739999984158,
+        "call": 0.16191020000405842,
+        "teardown": 0.00017869999282993376
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_model_authority.py::test_binding_passes_score_evaluation_ts_explicitly": {
+      "seconds": 0.009091699990676716,
+      "phases": {
+        "setup": 0.0026816999961738475,
+        "call": 0.006273099999816623,
+        "teardown": 0.00013689999468624592
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_model_authority.py::test_binding_refuses_a_synthetic_availability_later_than_checkpoint": {
+      "seconds": 0.0073114999977406114,
+      "phases": {
+        "setup": 0.0023644999964744784,
+        "call": 0.004818200002773665,
+        "teardown": 0.00012879999849246815
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_model_authority.py::test_w1_canonical_sha256_expectation_passes_when_correct": {
+      "seconds": 0.039055700006429106,
+      "phases": {
+        "setup": 0.0022929000042495318,
+        "call": 0.03660469999886118,
+        "teardown": 0.00015810000331839547
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_model_authority.py::test_w1_canonical_sha256_expectation_catches_wrong_declared_bytes": {
+      "seconds": 0.03299120000156108,
+      "phases": {
+        "setup": 0.002736000002187211,
+        "call": 0.03004309999960242,
+        "teardown": 0.00021209999977145344
+      }
+    },
+    "research_workflow/tests/test_redteam_v2_model_authority.py::test_w1_freeze_records_model_canonical_sha256": {
+      "seconds": 215.6275678999882,
+      "phases": {
+        "setup": 0.00376509999478003,
+        "call": 215.62363199999527,
+        "teardown": 0.00017079999815905467
+      }
+    },
+    "research_workflow/tests/test_redteam_packet_f.py::test_through_seal_without_the_flag_proceeds": {
+      "seconds": 152.30189250000694,
+      "phases": {
+        "setup": 2.092180899999221,
+        "call": 150.20954450000136,
+        "teardown": 0.00016710000636521727
+      }
+    },
+    "research_workflow/tests/test_redteam_packet_f.py::test_through_collection_without_the_flag_is_blocked": {
+      "seconds": 133.46381280000787,
+      "phases": {
+        "setup": 0.0027639000036288053,
+        "call": 133.46088240000245,
+        "teardown": 0.00016650000179652125
+      }
+    },
+    "research_workflow/tests/test_redteam_packet_f.py::test_through_smoke_with_the_flag_runs": {
+      "seconds": 156.488949400009,
+      "phases": {
+        "setup": 0.002547500000218861,
+        "call": 156.48624190000555,
+        "teardown": 0.00016000000323401764
+      }
+    },
+    "research_workflow/tests/test_redteam_packet_f.py::test_direct_lifecycle_collection_without_execute_raises": {
+      "seconds": 153.06577839999954,
+      "phases": {
+        "setup": 0.002690900000743568,
+        "call": 153.06288369999675,
+        "teardown": 0.000203800002054777
+      }
+    },
+    "research_workflow/tests/test_oos_access_latch.py::test_first_opening_recorded_before_any_held_out_bar_and_analysis_repeats_without_collection": {
+      "seconds": 9.468315199992503,
+      "phases": {
+        "setup": 5.107776899996679,
+        "call": 4.360381299993605,
+        "teardown": 0.00015700000221841037
+      }
+    },
+    "research_workflow/tests/test_oos_access_latch.py::test_resume_after_interruption_keeps_the_original_opening": {
+      "seconds": 4.246207300006063,
+      "phases": {
+        "setup": 0.016729200004192535,
+        "call": 4.229319300000498,
+        "teardown": 0.0001588000013725832
+      }
+    },
+    "research_workflow/tests/test_oos_access_latch.py::test_post_oos_amendment_is_refused_at_every_stage_and_evidence_is_untouched[threshold]": {
+      "seconds": 6.128176500009431,
+      "phases": {
+        "setup": 0.014851600004476495,
+        "call": 6.113165000002482,
+        "teardown": 0.0001599000024725683
+      }
+    },
+    "research_workflow/tests/test_oos_access_latch.py::test_post_oos_amendment_is_refused_at_every_stage_and_evidence_is_untouched[treatment]": {
+      "seconds": 6.119945799997367,
+      "phases": {
+        "setup": 0.01817529999971157,
+        "call": 6.101619499997469,
+        "teardown": 0.00015100000018719584
+      }
+    },
+    "research_workflow/tests/test_oos_access_latch.py::test_reseal_cannot_reset_the_latch": {
+      "seconds": 5.974852300001658,
+      "phases": {
+        "setup": 0.018897199995990377,
+        "call": 5.955805800003873,
+        "teardown": 0.00014930000179447234
+      }
+    },
+    "research_workflow/tests/test_oos_access_latch.py::test_interrupted_opening_cannot_resume_under_a_different_plan": {
+      "seconds": 3.8186734999981127,
+      "phases": {
+        "setup": 0.01784600000246428,
+        "call": 3.8006478999959654,
+        "teardown": 0.0001795999996829778
+      }
+    },
+    "research_workflow/tests/test_oos_access_latch.py::test_changing_oos_years_is_refused": {
+      "seconds": 4.243934500002069,
+      "phases": {
+        "setup": 0.017028400005074218,
+        "call": 4.2267225999967195,
+        "teardown": 0.00018350000027567148
+      }
+    },
+    "research_workflow/tests/test_oos_access_latch.py::test_unauthorized_year_request_is_refused": {
+      "seconds": 1.9224627000075998,
+      "phases": {
+        "setup": 0.018159300001570955,
+        "call": 1.9041428999989876,
+        "teardown": 0.00016050000704126433
+      }
+    },
+    "research_workflow/tests/test_oos_access_latch.py::test_replacing_or_deleting_held_out_evidence_is_refused_without_recollection[delete_manifest]": {
+      "seconds": 4.086456899989571,
+      "phases": {
+        "setup": 0.017206299999088515,
+        "call": 4.069088099997316,
+        "teardown": 0.0001624999931664206
+      }
+    },
+    "research_workflow/tests/test_oos_access_latch.py::test_replacing_or_deleting_held_out_evidence_is_refused_without_recollection[delete_partition]": {
+      "seconds": 4.365954699991562,
+      "phases": {
+        "setup": 0.016448599999421276,
+        "call": 4.349339399996097,
+        "teardown": 0.0001666999960434623
+      }
+    },
+    "research_workflow/tests/test_oos_access_latch.py::test_replacing_or_deleting_held_out_evidence_is_refused_without_recollection[recollect]": {
+      "seconds": 4.168719100009184,
+      "phases": {
+        "setup": 0.01678820000233827,
+        "call": 4.1517688000021735,
+        "teardown": 0.0001621000046725385
+      }
+    },
+    "research_workflow/tests/test_oos_access_latch.py::test_deleting_the_access_record_is_refused": {
+      "seconds": 6.052722600012203,
+      "phases": {
+        "setup": 0.016587000005529262,
+        "call": 6.035938100001658,
+        "teardown": 0.00019750000501517206
+      }
+    },
+    "research_workflow/tests/test_oos_access_latch.py::test_tampered_access_record_is_refused": {
+      "seconds": 2.2855066000047373,
+      "phases": {
+        "setup": 0.017113699999754317,
+        "call": 2.2682396000018343,
+        "teardown": 0.00015330000314861536
+      }
+    },
+    "research_workflow/tests/test_oos_access_latch.py::test_oos_partition_population_defects_are_refused[N8_train_year_row]": {
+      "seconds": 2.2912781999912113,
+      "phases": {
+        "setup": 0.015172599996731151,
+        "call": 2.2759253999975044,
+        "teardown": 0.0001801999969757162
+      }
+    },
+    "research_workflow/tests/test_oos_access_latch.py::test_oos_partition_population_defects_are_refused[duplicate_key]": {
+      "seconds": 2.2738772000011522,
+      "phases": {
+        "setup": 0.017617400000744965,
+        "call": 2.2560911000036867,
+        "teardown": 0.00016869999672053382
+      }
+    },
+    "research_workflow/tests/test_oos_access_latch.py::test_oos_partition_population_defects_are_refused[key_mismatch]": {
+      "seconds": 2.3745917999985977,
+      "phases": {
+        "setup": 0.015964999998686835,
+        "call": 2.3584620999972685,
+        "teardown": 0.0001647000026423484
+      }
+    },
+    "research_workflow/tests/test_oos_access_latch.py::test_two_processes_racing_the_opening_gate[conflicting]": {
+      "seconds": 6.599055899998348,
+      "phases": {
+        "setup": 0.0027014000006602146,
+        "call": 6.596190899996145,
+        "teardown": 0.00016360000154236332
+      }
+    },
+    "research_workflow/tests/test_oos_access_latch.py::test_two_processes_racing_the_opening_gate[identical]": {
+      "seconds": 5.985077500001353,
+      "phases": {
+        "setup": 0.0031541999996989034,
+        "call": 5.980591799998365,
+        "teardown": 0.0013315000032889657
+      }
+    }
+  },
+  "ran": 171,
+  "passed": 171,
+  "failed": 0,
+  "counts": {
+    "NEW_FAILURE": 0,
+    "NEW_FAILURE_OUTSIDE_BASELINE_SCOPE": 0,
+    "KNOWN_BASELINE_FAILURE": 0,
+    "BASELINE_FAILURE_NOW_FIXED": 0,
+    "ENVIRONMENTAL_MISSING_ARTIFACT": 0
+  },
+  "NEW_FAILURE": [],
+  "NEW_FAILURE_OUTSIDE_BASELINE_SCOPE": [],
+  "BASELINE_FAILURE_NOW_FIXED": [],
+  "ENVIRONMENTAL_MISSING_ARTIFACT": [],
+  "KNOWN_BASELINE_FAILURE": []
+}

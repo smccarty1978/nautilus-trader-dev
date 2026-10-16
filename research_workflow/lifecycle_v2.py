@@ -859,8 +859,7 @@ class V2Lifecycle:
         body["composite_seal_hash"] = hashlib.sha256(json.dumps({k: v for k, v in body.items() if k != "sealed_at_utc"}, sort_keys=True).encode()).hexdigest()
         if plan["chronology"].get("dev"):
             # A reseal after the held-out period was opened cannot reset the OOS access latch.
-            identity = self._oos_identity(plan, seal_hash=body["composite_seal_hash"])
-            self._oos_latch("seal", lambda oa: oa.check_identity(self.artifacts, identity, stage="seal", ignore=("train_freeze",)))
+            self._oos_check("seal", lambda: self._oos_identity(plan, seal_hash=body["composite_seal_hash"]), ignore=("train_freeze",))
         path = _write(self.artifacts / "preexec_audit_seal.json", body)
         return {"status": "PASS", "outputs": [str(path)]}
 
@@ -1442,6 +1441,15 @@ class V2Lifecycle:
             oos_access.write_refusal(self.work, stage, exc)
             raise LifecycleV2Error(str(exc)) from exc
 
+    def _oos_check(self, stage: str, identity: Callable[[], Dict[str, Any]], *, ignore: tuple = ()) -> Optional[Dict[str, Any]]:
+        """Compare the current identity with the recorded opening; the identity is only derived once a
+        record exists (a study that never opened its held-out period has nothing to conflict with). A
+        corrupt record is still refused by read_record."""
+        if self._oos_latch(stage, lambda oa: oa.read_record(self.artifacts)) is None:
+            return None
+        current = identity()
+        return self._oos_latch(stage, lambda oa: oa.check_identity(self.artifacts, current, stage=stage, ignore=ignore))
+
     def _oos_evidence(self, years: Sequence[int]) -> Dict[str, Dict[str, Any]]:
         """The bytes of the held-out partitions, read from the files themselves (not the manifests)."""
         base = self.work / "partitions" / "oos"
@@ -1505,8 +1513,7 @@ class V2Lifecycle:
     def _oos_analysis_gate(self, plan: Dict[str, Any], *, reads_held_out: bool) -> None:
         """Before any analysis of a study with a protected period: the current identity must equal the
         recorded opening; analysis of held-out rows additionally needs the pinned, reconciled evidence."""
-        identity = self._oos_identity(plan)
-        rec = self._oos_latch("analyze", lambda oa: oa.check_identity(self.artifacts, identity, stage="analyze"))
+        rec = self._oos_check("analyze", lambda: self._oos_identity(plan))
         if not reads_held_out:
             return
         from research_workflow import oos_access
@@ -1519,7 +1526,7 @@ class V2Lifecycle:
             self._oos_latch("analyze", lambda oa: oa.refuse(
                 "OOS_COLLECTION_INCOMPLETE", f"the held-out collection opened at {rec.get('opened_at_utc')} never completed; "
                 f"resume the oos stage under the recorded identity ({oos_access.COMPLETION_NAME} missing)"))
-        self._reconcile_oos(plan, identity, years)
+        self._reconcile_oos(plan, self._oos_identity(plan), years)
 
     def reconcile(self, study: Path | None = None) -> Dict[str, Any]:
         self._require_execute("reconcile")
@@ -2103,8 +2110,7 @@ class V2Lifecycle:
                    "merge_identity": ident, "metrics": _model_record_metrics(models), "label_column": plan["outcome"].get("label_column")}
         # After the held-out period was opened, a re-freeze must bind exactly what the opening bound.
         prospective = {**payload, "authorization_sha256": _read(self.artifacts / "experiment_authorization.json").get("authorization_sha256")}
-        identity = self._oos_identity(plan, freeze=prospective)
-        self._oos_latch("freeze", lambda oa: oa.check_identity(self.artifacts, identity, stage="freeze"))
+        self._oos_check("freeze", lambda: self._oos_identity(plan, freeze=prospective))
         path = write_train_freeze(self.study, payload)
         return {"status": "PASS", "outputs": [str(path)]}
 

@@ -1,0 +1,132 @@
+"""Controller-level regression of the OOS access latch (G1) and OOS reconcile gate (G2) -- scratchpad only.
+
+Re-drives the HV1 synthetic proof through the REAL V2StudyController of the chore/oos_access_latch commit
+(HV1_REPO = a --shared clone of it). p0/p1/p2 are the unchanged HV1 phases (p2 = Architecture B, now through the
+latch). p3L replaces the old p3: an in-place amendment BEFORE first OOS access is accepted; after first access the
+N1/N2/N5/N8 negatives must be refused with typed reasons and the first-access evidence must be untouched.
+Run:  pytest test_latch_proof.py -k "p0 or p1 or p2 or p3L" -x
+"""
+from __future__ import annotations
+
+import json
+import os
+
+from hv1_proof import (DEV, S0, _install_claim, audits, ev, final_class, lc, plan_of, prereg_analysis, prereg_chain, rd,
+                       run, sha_file, spec, state, study_dir, write_spec, PRIMARY_RULES, CLAIM_REL)
+from hv1_proof import (test_p0_original_study_through_merge, test_p1_two_stage_claim_study,  # noqa: F401  (re-run as is)
+                       test_p2_architecture_b_separate_study)
+import copy
+import pandas as pd
+
+
+def refusal(study, card):
+    """The typed reason behind a BLOCKED card: the failure packet's reason and the latch's own refusal record."""
+    st = rd(study / "_work" / "controller" / "status.json")
+    fp = rd(st.get("failure_packet")) if st.get("failure_packet") else {}
+    return {"STATUS": card.get("STATUS"), "stage": card.get("stage"), "actions": card.get("actions_executed"),
+            "reason": ((rd(study / "_work" / "controller" / "oos_access_refusal.json").get("code") or "") + " " + json.dumps(fp)[:400]),
+            "latch_refusal": rd(study / "_work" / "controller" / "oos_access_refusal.json")}
+
+
+def evidence(study):
+    base = study / "_work" / "controller" / "partitions" / "oos"
+    files = sorted(p for p in base.rglob("*") if p.is_file()) if base.is_dir() else []
+    out = {p.relative_to(study).as_posix(): sha_file(p) for p in files}
+    for n in ("oos_access_record.json", "oos_access_completion.json"):
+        out[f"artifacts/{n}"] = sha_file(study / "artifacts" / n)
+    return out
+
+
+def test_p3L_architecture_a_latch(monkeypatch):
+    s0 = study_dir(S0)
+    claim = state()["claim_sha"]
+    good = spec(S0, reuse=True, analysis=prereg_analysis(claim))
+    write_spec(S0, good)
+    _install_claim(s0)
+    c = run(s0, "tests", "L_tests"); assert c["STATUS"] != "BLOCKED", c
+    audits(s0)
+    c = run(s0, "freeze", "L_freeze"); assert c["STATUS"] != "BLOCKED", c
+    out = {}
+
+    # ---- POSITIVE: a resealed amendment BEFORE first OOS access is accepted (and can be reverted) -------
+    write_spec(S0, spec(S0, reuse=True, analysis=prereg_analysis(claim, sig_a1="f_5s_dir != 1")))
+    c = run(s0, "freeze", "L_pre_oos_amend"); out["pre_oos_amendment"] = {"card": c["STATUS"], "record_exists": (s0 / "artifacts/oos_access_record.json").exists()}
+    write_spec(S0, good)
+    c = run(s0, "freeze", "L_pre_oos_revert"); out["pre_oos_revert"] = c["STATUS"]
+    assert out["pre_oos_amendment"] == {"card": "OK", "record_exists": False} and c["STATUS"] == "OK", out
+
+    # ---- first OOS access ---------------------------------------------------------------------------------
+    c = run(s0, "oos", "L_oos"); assert c["STATUS"] == "OK", c
+    rec = rd(s0 / "artifacts/oos_access_record.json")
+    out["opening"] = {"identity_plan": rec["identity"]["plan_sha256"], "plan_now": plan_of(s0)["plan_sha256"], "opened_at_utc": rec["opened_at_utc"],
+                      "completion": bool(rd(s0 / "artifacts/oos_access_completion.json")), "oos_reconcile": rd(s0 / "_work/controller/oos_reconcile.json").get("passed")}
+    first = evidence(s0)
+    assert out["opening"]["identity_plan"] == out["opening"]["plan_now"] and out["opening"]["completion"] and out["opening"]["oos_reconcile"], out
+
+    # ---- N2: decision thresholds loosened after OOS --------------------------------------------------------
+    loose = copy.deepcopy(PRIMARY_RULES); loose[0]["when"] = [["support_child", "lt", 1]]; loose[1]["when"] = [["n_clusters", "lt", 1]]
+    loose[2]["when"] = [["estimate", "gte", -1.0]]
+    write_spec(S0, spec(S0, reuse=True, analysis=prereg_analysis(claim, primary_rules=loose)))
+    out["N2"] = refusal(s0, run(s0, "analyze", "L_N2"))
+    out["N2"]["evidence_untouched"] = evidence(s0) == first
+    # ---- N1': treatment redefined after OOS ---------------------------------------------------------------
+    write_spec(S0, spec(S0, reuse=True, analysis=prereg_analysis(claim, sig_a1="f_5s_dir != 1")))
+    out["N1_post_oos"] = refusal(s0, run(s0, "analyze", "L_N1"))
+    out["N1_post_oos"]["evidence_untouched"] = evidence(s0) == first
+    # ---- OOS years widened ------------------------------------------------------------------------------
+    write_spec(S0, {**good, "chronology": {**good["chronology"], "dev": list(DEV) + [2032]}})
+    out["years_widened"] = refusal(s0, run(s0, "analyze", "L_years"))
+    out["years_widened"]["evidence_untouched"] = evidence(s0) == first
+
+    # ---- RESUME: the original definition restored -> analysis under the recorded identity -------------------
+    write_spec(S0, good)
+    c = run(s0, "analyze", "L_resume"); out["resume_analyze"] = {"STATUS": c["STATUS"], "actions": c.get("actions_executed"),
+                                                                  "evidence_untouched": evidence(s0) == first}
+    assert c["STATUS"] == "OK", (c, refusal(s0, c))
+    c = run(s0, "analyze", "L_repeat"); out["repeat_analyze"] = {"STATUS": c["STATUS"], "evidence_untouched": evidence(s0) == first}
+
+    # ---- N5: claim file altered ------------------------------------------------------------------------------
+    claim_p = s0 / CLAIM_REL; keep = claim_p.read_bytes()
+    claim_p.write_bytes(keep + b" ")
+    try:
+        lc(s0).analyze(); out["N5"] = "NOT_REFUSED"
+    except Exception as exc:
+        out["N5"] = f"{type(exc).__name__}: {str(exc)[:200]}"
+    claim_p.write_bytes(keep)
+
+    # ---- N8: a TRAIN-year row in the pinned OOS partition, manifest hashes recomputed -----------------------
+    d = s0 / "_work/controller/partitions/oos" / str(DEV[0])
+    saved = {n: (d / n).read_bytes() for n in ("candidates.parquet", "observations.parquet", "manifest.json")}
+    shift = 400 * 86_400 * 1_000_000_000
+    cdf, odf = pd.read_parquet(d / "candidates.parquet"), pd.read_parquet(d / "observations.parquet")
+    rc_, ro_ = cdf.iloc[[0]].copy(), odf.iloc[[0]].copy()
+    for f_ in (rc_, ro_):
+        for col in [x for x in f_.columns if x.endswith("_ts") or x in ("observation_ts", "regime_start_ns")]:
+            if pd.api.types.is_integer_dtype(f_[col]):
+                f_[col] = f_[col] - shift
+    pd.concat([cdf, rc_], ignore_index=True).to_parquet(d / "candidates.parquet", index=False)
+    pd.concat([odf, ro_], ignore_index=True).to_parquet(d / "observations.parquet", index=False)
+    m = json.loads(saved["manifest.json"]); m["candidates_sha256"] = sha_file(d / "candidates.parquet"); m["observations_sha256"] = sha_file(d / "observations.parquet")
+    (d / "manifest.json").write_text(json.dumps(m, indent=2), encoding="utf-8")
+    out["N8"] = refusal(s0, run(s0, "analyze", "L_N8"))
+    for n, b_ in saved.items():
+        (d / n).write_bytes(b_)
+
+    # ---- clean completion ------------------------------------------------------------------------------------
+    c = run(s0, "close", "L_close"); out["close"] = c.get("state")
+    out["final_class"] = final_class(s0)
+    out["evidence_equal_first_access_at_close"] = evidence(s0) == first
+    out["chain"] = prereg_chain(s0, "p3L_A")
+    ev("p3L_result", out)
+    assert out["years_widened"]["STATUS"] == "BLOCKED" and out["years_widened"]["evidence_untouched"], out["years_widened"]
+    for k in ("N2", "N1_post_oos"):
+        assert out[k]["STATUS"] == "BLOCKED" and "OOS_IDENTITY_CONFLICT" in out[k]["reason"] and out[k]["evidence_untouched"], (k, out[k])
+    assert "OOS_EVIDENCE_ALTERED" in out["N8"]["reason"], out["N8"]
+    assert out["N5"].startswith("AnalysisOpError: ANALYSIS_REPLICATION_CLAIMS_HASH_MISMATCH") or "CLAIMS_HASH_MISMATCH" in out["N5"], out["N5"]
+    assert out["repeat_analyze"] == {"STATUS": "OK", "evidence_untouched": True} and out["close"] == "STUDY_CLOSED", out
+    assert out["evidence_equal_first_access_at_close"] and out["chain"]["chain_consistent"], out
+
+
+def sha_file_bytes(b):
+    import hashlib
+    return hashlib.sha256(b).hexdigest()

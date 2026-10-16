@@ -384,8 +384,15 @@ def _fit_then_open_dev(tmp_path: Path, name: str, dev_year: int = 2022):
     return study, lc
 
 
+def _bypass_oos_governance(monkeypatch) -> None:
+    """These tests exercise multi-arm SCORING on a hand-written OOS partition. That partition has no
+    governed opening (no access record, manifest or seal lineage), so the real OOS access gate rightly
+    refuses it; the gate itself is covered in test_oos_access_latch.py. Stub it here, test-locally."""
+    monkeypatch.setattr(V2Lifecycle, "_oos_analysis_gate", lambda self, plan, *, reads_held_out: None)
+
+
 def _write_oos_partition(study: Path, year: int, n: int = 900) -> None:
-    """An OOS year in the per-year partition layout analyze() reads."""
+    """An OOS year in the per-year partition layout analyze() reads (ungoverned: see _bypass_oos_governance)."""
     rng = np.random.default_rng(11)
     ts = pd.date_range(f"{year}-01-01", f"{year}-12-31 23:00", periods=n, tz="UTC")
     direction = rng.choice([1, -1], size=n)
@@ -434,11 +441,12 @@ def test_freeze_records_every_cell_by_name_and_binds_its_canonical_bytes(tmp_pat
     assert freeze["metrics"]["primary:LONG"]["final_validation"] is not None or freeze["metrics"]["primary:LONG"]["folds"] is not None
 
 
-def test_analyze_scores_every_frozen_cell_on_its_own_subset(tmp_path):
+def test_analyze_scores_every_frozen_cell_on_its_own_subset(tmp_path, monkeypatch):
     """The OOS deliverable must carry a metric per cell, each scored on its own direction slice."""
     study, lc = _fit_then_open_dev(tmp_path, "cell_analyze_probe")
     lc.freeze()
     _write_oos_partition(study, 2022)
+    _bypass_oos_governance(monkeypatch)
     lc.analyze()
 
     out = json.loads((study / "artifacts" / "experiment_analysis_v2.json").read_text(encoding="utf-8"))
@@ -454,12 +462,13 @@ def test_analyze_scores_every_frozen_cell_on_its_own_subset(tmp_path):
     assert {t["name"] for t in out["train_metrics"]} == {"primary:LONG", "primary:SHORT"}
 
 
-def test_analyze_refuses_a_models_artifact_it_cannot_score(tmp_path):
+def test_analyze_refuses_a_models_artifact_it_cannot_score(tmp_path, monkeypatch):
     """An unrecognised experiment_models.json must fail loudly rather than fall through every
     branch and write an OOS deliverable with no metric in it."""
     study, lc = _fit_then_open_dev(tmp_path, "cell_unknown_probe")
     lc.freeze()
     _write_oos_partition(study, 2022)
+    _bypass_oos_governance(monkeypatch)
     (study / "artifacts" / "experiment_models.json").write_text(
         json.dumps({"schema_version": 3, "mode": "train", "models": [], "rows": {}}), encoding="utf-8")
     with pytest.raises(LifecycleV2Error, match="OOS_MODEL_RECORDS_UNRECOGNISED"):
@@ -476,13 +485,14 @@ def test_fit_records_carry_the_cell_subset(tmp_path):
 
 
 
-def test_a_cell_record_without_a_subset_is_refused(tmp_path):
+def test_a_cell_record_without_a_subset_is_refused(tmp_path, monkeypatch):
     """A pre-fix record carries no `subset`. Reading that as "no filter" would score the LONG and
     SHORT models over the identical undirected population and report two plausible, wrong metric
     sets -- so it must raise, exactly as an unnamed or unidentified record does."""
     study, lc = _fit_then_open_dev(tmp_path, "cell_nosubset_probe")
     lc.freeze()
     _write_oos_partition(study, 2022)
+    _bypass_oos_governance(monkeypatch)
     path = study / "artifacts" / "experiment_models.json"
     body = json.loads(path.read_text(encoding="utf-8"))
     for m in body["models"]:
