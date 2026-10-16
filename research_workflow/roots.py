@@ -39,10 +39,11 @@ import os
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 
 DIGEST_METHOD = "sha256(sorted(relpath,size,sha256(bytes)) under <catalog>/data)"
 DATASET_MANIFEST_NAME = "dataset_manifest.json"
+SCOPED_DIGEST_METHOD = "sha256(manifest-ordered (relpath,size,sha256(bytes)) of the data/ files a [start,end] bar query can open)"
 CONFIG_ENV = "NT_RESEARCH_CONFIG"
 DEFAULT_CONFIG_DIR = Path.home() / ".nt_research"
 
@@ -61,6 +62,11 @@ class DuplicateDatasetConflict(RuntimeError):
 
 class DatasetDigestMismatch(RuntimeError):
     """The on-disk dataset manifest digest does not match the committed DatasetSpec digest."""
+
+
+class DatasetScopeRefused(RuntimeError):
+    """The scoped byte check refused before reading any data byte (inconsistent manifest, or a
+    forbidden-period file inside the run window)."""
 
 
 class DatasetFilesDrifted(RuntimeError):
@@ -139,6 +145,11 @@ def _sha256_file(path: Path) -> str:
     return h.hexdigest()
 
 
+def _entries_digest(entries: Iterable[Dict[str, Any]]) -> str:
+    payload = json.dumps([[e["path"], e["size"], e["sha256"]] for e in entries], separators=(",", ":"))
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
 def compute_catalog_digest(catalog_dir: Path) -> Dict[str, Any]:
     """Content digest of an immutable NautilusTrader catalog directory."""
     catalog_dir = Path(catalog_dir).resolve()
@@ -148,8 +159,7 @@ def compute_catalog_digest(catalog_dir: Path) -> Dict[str, Any]:
     entries: List[Dict[str, Any]] = []
     for p in sorted(x for x in data_dir.rglob("*") if x.is_file()):
         entries.append({"path": p.relative_to(catalog_dir).as_posix(), "size": p.stat().st_size, "sha256": _sha256_file(p)})
-    payload = json.dumps([[e["path"], e["size"], e["sha256"]] for e in entries], separators=(",", ":"))
-    return {"logical_digest": hashlib.sha256(payload.encode("utf-8")).hexdigest(), "digest_method": DIGEST_METHOD,
+    return {"logical_digest": _entries_digest(entries), "digest_method": DIGEST_METHOD,
             "file_count": len(entries), "total_bytes": sum(e["size"] for e in entries), "files": entries}
 
 
@@ -189,6 +199,135 @@ def verify_dataset_bytes(catalog_dir: Path, expected_digest: str) -> Dict[str, A
     if digest["logical_digest"] != expected_digest:
         raise DatasetDigestMismatch(f"DATASET_DIGEST_MISMATCH: live bytes digest {digest['logical_digest']} != expected {expected_digest}")
     return digest
+
+
+def utc_year_interval_ns(year: int) -> Tuple[int, int]:
+    """[Jan 1 00:00, Dec 31 23:59:59.999999999] UTC of ``year``: the chronology's year boundary."""
+    a = int(datetime(int(year), 1, 1, tzinfo=timezone.utc).timestamp()) * 1_000_000_000
+    b = int(datetime(int(year) + 1, 1, 1, tzinfo=timezone.utc).timestamp()) * 1_000_000_000 - 1
+    return a, b
+
+
+def bar_file_interval(relpath: str) -> Optional[Tuple[int, int]]:
+    """The ``[first_ts, last_ts]`` NautilusTrader encodes in a catalog data file name, parsed by
+    NautilusTrader's own rule (the rule its queries select files by). None when the name carries no
+    interval -- NautilusTrader then opens the file for EVERY query, so callers must treat it as in scope."""
+    from nautilus_trader.persistence.catalog.parquet import _parse_filename_timestamps
+    try:
+        return _parse_filename_timestamps(relpath)
+    except (ValueError, TypeError, IndexError):
+        return None
+
+
+def _intersects(a: Tuple[int, int], b: Tuple[int, int]) -> bool:
+    return a[0] <= b[1] and b[0] <= a[1]   # closed intervals, as NautilusTrader's _query_intersects_filename
+
+
+def _bar_dir(relpath: str) -> Optional[str]:
+    parts = relpath.split("/")
+    return parts[2] if len(parts) >= 4 and parts[0] == "data" and parts[1] == "bar" else None
+
+
+def verify_dataset_scope(catalog_dir: Path, expected_digest: str, *, windows: Sequence[Tuple[int, int]], bar_types: Sequence[str] = (),
+                         forbidden: Sequence[Tuple[int, int]] = ()) -> Dict[str, Any]:
+    """Prove the bytes that runs over the closed ``windows`` (ns) can open, and only those.
+
+    1. Identity without reading data: the on-disk manifest's own ``(path, size, sha256)`` inventory must
+       re-hash to the committed ``logical_digest`` (so the manifest IS the dataset identity), and the live
+       ``data/`` tree must match that inventory by name and size (missing / extra / resized files refuse).
+    2. Scope: a file is out of scope ONLY when it is a bar file whose filename interval is provably disjoint
+       from every window. Everything else -- unparseable names, non-bar data, overlapping files -- is in scope.
+    3. Authorization: an in-scope bar file overlapping a ``forbidden`` interval, or of unknown interval while
+       any period is forbidden, refuses BEFORE any data byte is read.
+    4. Only in-scope files are opened: bytes re-hashed against the manifest, parquet footer ``ts_init``
+       statistics checked against the filename interval.
+    """
+    catalog_dir = Path(catalog_dir).resolve()
+    manifest = read_dataset_manifest(catalog_dir)
+    if not manifest:
+        raise DatasetScopeRefused(f"DATASET_SCOPE_MANIFEST_MISSING: {catalog_dir / DATASET_MANIFEST_NAME}")
+    entries = list(manifest.get("files") or [])
+    paths = [str(e.get("path")) for e in entries]
+    malformed = [e.get("path") for e in entries if not (str(e.get("path", "")).startswith("data/") and isinstance(e.get("size"), int)
+                                                         and isinstance(e.get("sha256"), str) and len(e["sha256"]) == 64)]
+    if malformed or len(set(paths)) != len(paths):
+        raise DatasetScopeRefused(f"DATASET_SCOPE_MANIFEST_INCONSISTENT: malformed or duplicate entries {(malformed or paths)[:3]}")
+    if manifest.get("logical_digest") != expected_digest or _entries_digest(entries) != expected_digest:
+        raise DatasetScopeRefused(f"DATASET_SCOPE_MANIFEST_INCONSISTENT: inventory re-hashes to {_entries_digest(entries)[:12]}, "
+                                  f"manifest declares {str(manifest.get('logical_digest'))[:12]}, committed {expected_digest[:12]}")
+    verify_dataset_files(catalog_dir, manifest)
+    wins = [(int(a), int(b)) for a, b in windows]
+    if not wins or any(a > b for a, b in wins):
+        raise DatasetScopeRefused(f"DATASET_SCOPE_WINDOW_INVALID: {wins}")
+    intervals = {p: (bar_file_interval(p) if _bar_dir(p) else None) for p in paths}
+    by_dir: Dict[str, List[Tuple[int, int, str]]] = {}
+    for p, iv in intervals.items():
+        if iv is not None:
+            if iv[0] > iv[1]:
+                raise DatasetScopeRefused(f"DATASET_SCOPE_MANIFEST_INCONSISTENT: {p} interval start > end")
+            by_dir.setdefault(_bar_dir(p), []).append((iv[0], iv[1], p))
+    for d, ivs in by_dir.items():
+        ivs.sort()
+        for (_a0, a1, pa), (b0, _b1, pb) in zip(ivs, ivs[1:]):
+            if b0 <= a1:
+                raise DatasetScopeRefused(f"DATASET_SCOPE_MANIFEST_INCONSISTENT: overlapping file intervals in {d}: {pa}, {pb}")
+    scoped, skipped = [], 0
+    for e in entries:
+        iv = intervals[e["path"]]
+        if iv is not None and not any(_intersects(iv, w) for w in wins):
+            skipped += 1
+            continue
+        if _bar_dir(e["path"]) is not None:
+            if iv is None and forbidden:
+                raise DatasetScopeRefused(f"DATASET_SCOPE_UNAUTHORIZED_FILE: {e['path']} carries no interval and would be opened by every query")
+            hit = next((f for f in forbidden if iv is not None and _intersects(iv, f)), None)
+            if hit is not None:
+                raise DatasetScopeRefused(f"DATASET_SCOPE_UNAUTHORIZED_FILE: {e['path']} [{iv[0]}, {iv[1]}] overlaps a forbidden period "
+                                          f"[{hit[0]}, {hit[1]}] and lies inside a run window {[list(w) for w in wins]}")
+        scoped.append((e, iv))
+    for bt in bar_types:
+        if by_dir.get(bt) and not any(_bar_dir(e["path"]) == bt for e, _ in scoped):
+            raise DatasetScopeRefused(f"DATASET_SCOPE_NO_COVERAGE: no {bt} file intersects the run windows {[list(w) for w in wins]}")
+    files: List[Dict[str, Any]] = []
+    for e, iv in scoped:   # the only files opened
+        f = catalog_dir / e["path"]
+        if f.stat().st_size != e["size"] or _sha256_file(f) != e["sha256"]:
+            raise DatasetDigestMismatch(f"DATASET_DIGEST_MISMATCH: {e['path']} bytes differ from the manifest (scoped verification)")
+        footer = _footer_ts_init(f) if iv is not None else None
+        if footer is not None and not (iv[0] <= footer[0] and footer[1] <= iv[1]):
+            raise DatasetScopeRefused(f"DATASET_SCOPE_MANIFEST_INCONSISTENT: {e['path']} ts_init [{footer[0]}, {footer[1]}] outside its filename interval")
+        files.append({"path": e["path"], "size": e["size"], "sha256": e["sha256"], "interval_ns": list(iv) if iv else None,
+                      "footer_ts_init_ns": list(footer) if footer else None})
+    covered: Dict[str, List[List[int]]] = {}
+    for f in files:
+        if f["interval_ns"]:
+            covered.setdefault(_bar_dir(f["path"]), []).append(f["interval_ns"])
+    return {"status": "VERIFIED_SCOPED", "method": SCOPED_DIGEST_METHOD, "logical_digest": expected_digest,
+            "windows_ns": [list(w) for w in wins], "bar_types": list(bar_types), "forbidden_ns": [list(f) for f in forbidden],
+            "scoped_digest": _entries_digest(files), "files": files, "covered_intervals_ns": covered,
+            "file_count": len(files), "total_bytes": sum(f["size"] for f in files), "out_of_scope_file_count": skipped,
+            "inventory_file_count": len(entries)}
+
+
+def _footer_ts_init(path: Path) -> Optional[Tuple[int, int]]:
+    """min/max ``ts_init`` from the parquet footer statistics; None when the file is not parquet or has no stats."""
+    try:
+        import pyarrow.parquet as pq
+        md = pq.ParquetFile(path).metadata
+    except Exception:
+        return None
+    try:
+        idx = md.schema.names.index("ts_init")
+    except ValueError:
+        return None
+    lo = hi = None
+    for i in range(md.num_row_groups):
+        st = md.row_group(i).column(idx).statistics
+        if st is None or not st.has_min_max:
+            return None
+        lo = st.min if lo is None else min(lo, st.min)
+        hi = st.max if hi is None else max(hi, st.max)
+    return None if lo is None else (int(lo), int(hi))
 
 
 def read_dataset_manifest(catalog_dir: Path) -> Optional[Dict[str, Any]]:
@@ -311,4 +450,5 @@ __all__ = [
     "DatasetRootUnresolved", "DuplicateDatasetConflict", "DatasetDigestMismatch", "DatasetFilesDrifted", "ResolvedDataset",
     "load_config", "config_path", "compute_catalog_digest", "write_dataset_manifest", "read_dataset_manifest",
     "resolve_dataset", "committed_dataset_spec_path", "resolve_model_root", "verify_dataset_files", "verify_dataset_bytes",
+    "SCOPED_DIGEST_METHOD", "DatasetScopeRefused", "verify_dataset_scope", "bar_file_interval", "utc_year_interval_ns",
 ]

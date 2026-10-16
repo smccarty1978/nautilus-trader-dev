@@ -363,7 +363,7 @@ independent and always run.
 
 | Check | Proves |
 |---|---|
-| R1 | exact physical dataset identity — declared == `DatasetSpec` == resolved == opened, with warmup-through-run coverage |
+| R1 | exact physical dataset identity — declared == `DatasetSpec` == resolved == opened, with warmup-through-run coverage; bytes proved only for the files the pre-OOS launches open (prohibited/dev-year files in scope refuse) |
 | R2 | 1s / 1m `ts_init - ts_event` contracts on real bounded samples; derived 5m via `CompletedMinuteFiveMinuteAggregator`, no external 5m stream |
 | R3 | loaded bars are precision-compatible with the governed instrument |
 | R4 | callback causal order, via a probe strategy and the existing verifier |
@@ -870,7 +870,23 @@ model_root: ~/.nt_research/models
   fallback (`DATASET_ROOT_UNRESOLVED`). Conflicting digests across roots fail
   (`DUPLICATE_DATASET_CONFLICT`); identical copies in several roots are fine.
 - Without a config the legacy repo-relative `catalog_rel_path` applies unchanged.
-- READINESS R1 additionally proves the opened catalog's on-disk digest equals the committed one.
+- READINESS R1 additionally proves the opened catalog's identity and bytes, **scoped to the files a run opens**
+  (`roots.verify_dataset_scope`, chore `readiness_scoped_dataset_bytes`):
+  1. The manifest's own `(path, size, sha256)` inventory must re-hash to the committed `logical_digest`.
+  2. The live `data/` tree must match that inventory by name and size: no missing, extra or resized file.
+     Nothing is opened for these two checks.
+  3. Only bar files whose NautilusTrader filename interval intersects a launch window `[warmup_start, run_end]`
+     are opened. Their bytes are re-hashed and their parquet footer `ts_init` range is checked against the filename.
+     Unparseable names and non-bar files are always in scope.
+  - **Readiness windows:** every TRAIN partition and the smoke date. Prohibited **and** dev years are forbidden there.
+  - **Launch windows:** each launch verifies its own window (`data_plan.verify_launch_dataset_bytes`, via
+    `host_runner.run_plan_on_catalog`: partitions, smoke, shadow re-attestation). Only prohibited years are forbidden.
+  - **Forbidden file in a window:** refused (`DATASET_SCOPE_UNAUTHORIZED_FILE`) before any byte is read.
+  - **Evidence:** the R1 check and each run's `dataset.bytes_scope` record the windows, files, sha256s and
+    `scoped_digest`. The logical digest is unchanged.
+  - **Whole-catalog re-hash:** only `research data verify <id> --recompute`, an explicit operator audit.
+  - **Consequence:** a whole-year TRAIN partition followed by a dev year has its outcome tail extended into that
+    year (`_partition_bounds`). Its launch therefore opens the held-out year's first file, and readiness refuses it.
 - Receipts and `DataPlan` record `dataset_id` + digest + resolution kind, not the path.
 - `python scripts/research.py data manifest <id>` writes the on-disk manifest and prints the
   digest to commit; `research data verify <id> [--recompute]` proves resolution.
