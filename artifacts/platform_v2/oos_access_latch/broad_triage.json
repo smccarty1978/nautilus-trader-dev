@@ -81,5 +81,15 @@
     ],
     "cause": "freeze()/analyze() derived the OOS identity unconditionally; _plan_dataset KeyError('instruments') on minimal plans",
     "fix": "identity derived only once an access record exists (_oos_check); 3 multi-arm scoring tests stub _oos_analysis_gate test-locally because their hand-written OOS partitions have no governed opening (refusal is the intended G2 behaviour)"
+  },
+  "final_broad_gate": {
+    "head": "a56cfe8d",
+    "ran": 2608,
+    "passed": 2520,
+    "failed": 61,
+    "wall_seconds": 6459,
+    "attributable_new_failures": 0,
+    "method": "failing node ids compared with the 61 ids that fail on main 8404c72e (same ids, re-run on the merge base); the 4 test_multi_arm_modeling regressions of 7f13e4d9 are fixed",
+    "baseline_updated": false
   }
 }

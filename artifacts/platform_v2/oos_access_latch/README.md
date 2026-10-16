@@ -35,7 +35,8 @@
   - **4 were caused by this branch** (`test_multi_arm_modeling`). `freeze()` and `analyze()` derived the OOS identity unconditionally and raised `KeyError('instruments')` on minimal plans.
     - Fix: the identity is derived only once an access record exists (`_oos_check`).
     - 3 of the 4 tests score hand-written OOS partitions that have no governed opening. The gate now refuses those, as intended, so these tests stub `_oos_analysis_gate` test-locally. The gate itself is covered here.
-    - Re-verified by the targeted gate after the fix (`test_delta_targeted_postfix.json`). The broad suite was not re-run.
+    - Re-verified by the targeted gate after the fix (`test_delta_targeted_postfix.json`, 195/195).
+- **Final broad gate at a56cfe8d** (`test_delta_broad_final.json`): 2,608 ran, 2,520 passed, 61 failed. These are exactly the 61 that fail on main 8404c72e, so **0 failures are attributable** to this branch. The failure baseline was not updated.
 
 ## Limits (stated, not hidden)
 
