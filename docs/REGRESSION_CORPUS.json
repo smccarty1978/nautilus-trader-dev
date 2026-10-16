@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "last_updated": "2026-10-08",
+  "last_updated": "2026-10-16",
   "defects": [
     {
       "id": "H4_TRIGGER_PRICE_FILL",
@@ -201,6 +201,16 @@
       "invariant": "OOS partitions pass the TRAIN reconcile population checks plus key equality, interval and plan/seal/dataset/authorization lineage, read from the parquet, before the evidence is pinned or analysed.",
       "detection": "V2Lifecycle._reconcile_oos (OOS_RECONCILE_FAILED, _work/controller/oos_reconcile.json)",
       "regression_test": "research_workflow/tests/test_oos_access_latch.py::test_oos_partition_population_defects_are_refused"
+    },
+    {
+      "id": "DATASET_BYTES_UNSCOPED",
+      "rule_id": "R1-SCOPE",
+      "severity": "HIGH",
+      "name": "Readiness/launch byte verification hashed the whole catalog, including held-out and prohibited years",
+      "root_cause": "compute_catalog_digest re-hashed every file under <catalog>/data at readiness R1 and at every catalog launch (host_runner.run_plan_on_catalog), so a TRAIN-only study read 2024-2026 bytes; scope was independent of the run window.",
+      "invariant": "Identity is proved from the manifest inventory (re-hash of its entries == committed digest; names/sizes match); only files whose filename interval intersects a launch window are opened; a prohibited (launch) or prohibited/dev (readiness) file inside a window refuses before any byte is read.",
+      "detection": "roots.verify_dataset_scope (DATASET_SCOPE_UNAUTHORIZED_FILE / DATASET_SCOPE_MANIFEST_INCONSISTENT / DATASET_DIGEST_MISMATCH)",
+      "regression_test": "research_workflow/tests/test_scoped_dataset_bytes.py::test_forbidden_year_file_inside_the_window_refuses_before_any_byte_is_read"
     }
   ]
 }

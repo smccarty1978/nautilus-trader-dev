@@ -730,18 +730,23 @@ class V2Lifecycle:
     def readiness(self, study: Path | None = None) -> Dict[str, Any]:
         plan = load_plan(self.study)
         checks: List[Dict[str, Any]] = []
-        # R1 dataset identity + bytes (skipped only for an injected synthetic bar source)
+        # R1 dataset identity + bytes (skipped only for an injected synthetic bar source). Identity is proved
+        # from the manifest inventory; bytes only for the files the pre-OOS launches (TRAIN partitions, smoke)
+        # open. A prohibited or held-out year file inside those windows refuses before any byte is read.
         for sym, inst in plan["instruments"].items():
             if self.opts.bar_source is not None:
                 checks.append({"id": f"R1_{sym}", "passed": True, "detail": "SYNTHETIC_BAR_SOURCE: no catalog to resolve"})
                 continue
             try:
-                from research_workflow.roots import resolve_dataset, verify_dataset_bytes
+                from research_workflow.roots import resolve_dataset
                 r = resolve_dataset(inst["dataset_id"], self.repo_root)
                 ok = (inst.get("dataset_digest") in (None, r.logical_digest))
-                digest = verify_dataset_bytes(r.catalog_path, r.logical_digest)["logical_digest"] if r.logical_digest else None
-                checks.append({"id": f"R1_{sym}", "passed": bool(ok and (digest is None or digest == r.logical_digest)),
-                               "detail": f"{inst['dataset_id']} resolved via {r.resolution}; digest {str(r.logical_digest)[:12]} bytes verified"})
+                scope = self._readiness_byte_scope(plan) if (r.logical_digest and inst.get("role") == "execution") else None
+                checks.append({"id": f"R1_{sym}", "passed": bool(ok and (scope is None or scope["status"] == "VERIFIED_SCOPED")),
+                               "detail": (f"{inst['dataset_id']} resolved via {r.resolution}; digest {str(r.logical_digest)[:12]} identity proved from "
+                                          f"its manifest inventory; " + (f"bytes verified for {scope['file_count']} file(s) the pre-OOS launches open, "
+                                          f"{scope['out_of_scope_file_count']} out of scope (not opened)" if scope else "no launch opens this instrument's bars")),
+                               "scope": scope})
             except Exception as exc:
                 checks.append({"id": f"R1_{sym}", "passed": False, "detail": f"{type(exc).__name__}: {exc}"})
         from scripts.lint_host import HOST_DIR, lint_file
@@ -1019,6 +1024,38 @@ class V2Lifecycle:
         s = int(pd.Timestamp(primary_start, tz="UTC").value)
         e = int((pd.Timestamp(primary_end, tz="UTC") + pd.Timedelta(days=1) - pd.Timedelta(nanoseconds=1)).value)
         return {"id": f"{period}-{year}", "year": year, "period": period, "primary_start": primary_start, "primary_end": primary_end, "run_end": run_end, "primary_ns": (s, e)}
+
+    def _readiness_launch_windows(self, plan: Dict[str, Any]) -> List[tuple]:
+        """``(start_date, end_date)`` of every catalog launch the study can make before OOS access: each
+        TRAIN partition (whole year with its outcome tail, or each declared window) and the smoke date --
+        derived by the same bounds functions run_partition and smoke use."""
+        out: List[tuple] = []
+        for y in sorted(int(v) for v in plan["chronology"]["train"]):
+            declared = partition_windows(plan, y)
+            bounds = [self._window_bounds(plan, w, "train") for w in declared] if declared else [self._partition_bounds(plan, y, "train")]
+            out += [(b["primary_start"], b["run_end"]) for b in bounds]
+        smoke = self.opts.smoke_date or ((plan["chronology"].get("authorized_dates") or [None])[0])
+        if smoke:
+            out.append((str(smoke), str(smoke)))
+        return out
+
+    def _readiness_byte_scope(self, plan: Dict[str, Any]) -> Dict[str, Any]:
+        """R1 bytes: one scoped verification over the union of the pre-OOS launch windows, each window being
+        exactly the ``[warmup_start, end]`` its launch hands the engine. Prohibited and held-out (dev) years
+        are forbidden here: readiness precedes any OOS opening."""
+        from research_workflow.host_runner import launch_data_plan, plan_forbidden_years
+        from research_workflow.roots import utc_year_interval_ns, verify_dataset_scope
+        plans = [launch_data_plan(plan, s, e, warmup_days=self._warmup_days(plan), repo_root=self.repo_root)
+                 for s, e in self._readiness_launch_windows(plan)]
+        if not plans:
+            raise LifecycleV2Error("R1_NO_LAUNCH_WINDOWS: the plan declares no TRAIN year and no smoke date")
+        dp = plans[0]
+        forbidden = sorted(set(plan_forbidden_years(plan)) | {int(y) for y in plan["chronology"].get("dev") or []})
+        scope = verify_dataset_scope(dp.catalog_path, dp.dataset_logical_digest,
+                                     windows=[(int(p.warmup_start_dt.value), int(p.end_dt.value)) for p in plans],
+                                     bar_types=sorted({p.bar_type_1s for p in plans} | {p.bar_type_1m for p in plans}),
+                                     forbidden=[utc_year_interval_ns(y) for y in forbidden])
+        return {**scope, "forbidden_years": forbidden, "launch_windows": [list(w) for w in self._readiness_launch_windows(plan)]}
 
     def _window_bounds(self, plan: Dict[str, Any], window: Mapping[str, Any], period: str) -> Dict[str, Any]:
         """Bounds for one declared date window.

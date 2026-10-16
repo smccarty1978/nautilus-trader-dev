@@ -147,18 +147,10 @@ def resolve_dataset_plan(dataset_id: str, start_date: str, end_date: str, *, war
                     dataset_id=dataset_id, dataset_logical_digest=resolved.logical_digest, dataset_resolution=resolved.resolution)
 
 
-def run_plan_on_catalog(plan: Mapping[str, Any], *, start_date: str, end_date: str, repo_root: Optional[Path] = None,
-                        primary_interval: Optional[Tuple[int, int]] = None, warmup_days: int = 5, log_level: str = "ERROR",
-                        session_table_spec: Optional[Mapping[str, Any]] = None, progress_path: Optional[Path] = None,
-                        progress_every_bars: int = 200_000, ledger: bool = False, studies_root: Optional[Path] = None,
-                        chunked_writers: Optional[Tuple[Any, Any]] = None, chunked_flush_every: int = 0,
-                        chunked_flush_bytes: int = 0) -> Dict[str, Any]:
-    """Governed-catalog run for the plan's execution instrument (single instrument this phase)."""
-    from backtests.nt_runtime.data_plan import resolve_catalog_plan, verify_launch_dataset_bytes
-    from backtests.nt_runtime.engine_builder import build_engine
-    from research_workflow.host.strategy import GovernedHostStrategy, GovernedHostStrategyConfig
-
-    repo_root = Path(repo_root) if repo_root else Path(__file__).resolve().parents[2]
+def launch_data_plan(plan: Mapping[str, Any], start_date: str, end_date: str, *, warmup_days: int, repo_root: Path):
+    """The DataPlan a catalog run of ``plan`` over ``[start_date, end_date]`` opens (readiness R1 derives its
+    byte scope from this same function, so the files it proves are the files a launch reads)."""
+    from backtests.nt_runtime.data_plan import resolve_catalog_plan
     exec_symbol = next(sym for sym, f in plan["instruments"].items() if f["role"] == "execution")
     declared = plan["instruments"][exec_symbol]
     if declared.get("dataset_id") and not _is_product_default_dataset(exec_symbol, declared["dataset_id"]):
@@ -169,7 +161,36 @@ def run_plan_on_catalog(plan: Mapping[str, Any], *, start_date: str, end_date: s
         raise RuntimeError(f"WRONG_PHYSICAL_DATASET: plan declares {declared['dataset_id']}, resolver gave {data_plan.dataset_id}")
     if declared.get("dataset_digest") and data_plan.dataset_logical_digest and declared["dataset_digest"] != data_plan.dataset_logical_digest:
         raise RuntimeError("DATASET_DIGEST_MISMATCH: plan digest != resolved catalog digest")
-    bytes_check = verify_launch_dataset_bytes(data_plan)
+    return data_plan
+
+
+def plan_forbidden_years(plan: Mapping[str, Any]) -> List[int]:
+    """Years no catalog run of this plan may open a byte of: the chronology's prohibited years."""
+    return sorted({int(y) for y in ((plan.get("chronology") or {}).get("prohibited") or [])})
+
+
+def _scope_receipt(bytes_check: Mapping[str, Any]) -> Optional[Dict[str, Any]]:
+    scope = bytes_check.get("scope")
+    if not scope:
+        return None
+    return {k: scope[k] for k in ("status", "method", "windows_ns", "scoped_digest", "covered_intervals_ns", "file_count",
+                                  "out_of_scope_file_count")} | {"files": [[f["path"], f["sha256"]] for f in scope["files"]]}
+
+
+def run_plan_on_catalog(plan: Mapping[str, Any], *, start_date: str, end_date: str, repo_root: Optional[Path] = None,
+                        primary_interval: Optional[Tuple[int, int]] = None, warmup_days: int = 5, log_level: str = "ERROR",
+                        session_table_spec: Optional[Mapping[str, Any]] = None, progress_path: Optional[Path] = None,
+                        progress_every_bars: int = 200_000, ledger: bool = False, studies_root: Optional[Path] = None,
+                        chunked_writers: Optional[Tuple[Any, Any]] = None, chunked_flush_every: int = 0,
+                        chunked_flush_bytes: int = 0) -> Dict[str, Any]:
+    """Governed-catalog run for the plan's execution instrument (single instrument this phase)."""
+    from backtests.nt_runtime.data_plan import verify_launch_dataset_bytes
+    from backtests.nt_runtime.engine_builder import build_engine
+    from research_workflow.host.strategy import GovernedHostStrategy, GovernedHostStrategyConfig
+
+    repo_root = Path(repo_root) if repo_root else Path(__file__).resolve().parents[2]
+    data_plan = launch_data_plan(plan, start_date, end_date, warmup_days=warmup_days, repo_root=repo_root)
+    bytes_check = verify_launch_dataset_bytes(data_plan, forbidden_years=plan_forbidden_years(plan))
     engine, _instrument = build_engine(data_plan, log_level=log_level)
     from research_workflow.sessions import resolve_calendar_session_spec
     st_spec = resolve_calendar_session_spec(dict(session_table_spec or plan.get("session") or {"kind": "legacy", "session": "RTH"}), repo_root)
@@ -191,10 +212,10 @@ def run_plan_on_catalog(plan: Mapping[str, Any], *, start_date: str, end_date: s
     ledger_rows = strategy.ledger
     out = {"candidates": candidates, "observations": observations, "stats": stats, "elapsed_s": elapsed,
            "dataset": {"dataset_id": data_plan.dataset_id, "logical_digest": data_plan.dataset_logical_digest,
-                       "bytes_verification": bytes_check.get("status")},
+                       "bytes_verification": bytes_check.get("status"), "bytes_scope": _scope_receipt(bytes_check)},
            "window": {"start": start_date, "end": end_date, "warmup_days": warmup_days}, "ledger": ledger_rows}
     engine.dispose()
     return out
 
 
-__all__ = ["run_plan_on_bars", "run_plan_with_engine", "run_plan_on_catalog", "resolve_dataset_plan", "sort_bars_causal"]
+__all__ = ["run_plan_on_bars", "run_plan_with_engine", "run_plan_on_catalog", "resolve_dataset_plan", "launch_data_plan", "plan_forbidden_years", "sort_bars_causal"]

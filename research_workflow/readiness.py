@@ -197,10 +197,13 @@ def verify_dataset_identity_chain(
                 f"WRONG_PHYSICAL_DATASET: opened catalog digest {(on_disk or {}).get('logical_digest')} != "
                 f"committed DatasetSpec logical_digest {dataset_spec.logical_digest}"
             )
-        from research_workflow.roots import DatasetDigestMismatch, verify_dataset_bytes
+        # Bytes of exactly the files this plan's [warmup_start, run_end] bar queries open (the launch verifier).
+        from research_workflow.roots import DatasetDigestMismatch, DatasetFilesDrifted, DatasetScopeRefused, verify_dataset_scope
         try:
-            verify_dataset_bytes(data_plan.catalog_path, dataset_spec.logical_digest)
-        except DatasetDigestMismatch as exc:
+            verify_dataset_scope(data_plan.catalog_path, dataset_spec.logical_digest,
+                                 windows=[(int(data_plan.warmup_start_dt.value), int(data_plan.end_dt.value))],
+                                 bar_types=[data_plan.bar_type_1s, data_plan.bar_type_1m])
+        except (DatasetDigestMismatch, DatasetFilesDrifted, DatasetScopeRefused) as exc:
             raise WrongPhysicalDatasetError(f"WRONG_PHYSICAL_DATASET: {exc}") from exc
 
     return _result(
