@@ -69,11 +69,11 @@ analysis_ops:
     required_tests: [research/analysis/tests/test_diagnostic_ops.py]
   - id: analysis.gate.population_parity
     version: 1
-    description: STOP GATE - raises unless the population is identical to a frozen reference (declared sha256, total, per-stratum counts, exact key set, per-key instant); aborts the analyze stage before any artifact is written.
+    description: STOP GATE - raises unless the population is identical to a frozen reference (one sha256-pinned parquet, or another study's sealed merged frame pinned by its candidates/observations sha256); checks total and per-stratum counts, null and duplicate keys, the exact key set, per-key instant, and declared timing/membership/outcome/censoring/context columns; typed failure_codes with full counts and bounded examples; aborts the analyze stage before any artifact is written.
     implementation: research.analysis.diagnostic_ops.population_parity_gate
     inputs: []
     needs_context: true
-    parameters: [reference_path, reference_sha256, key, reference_key, expected_total, expected_by, timestamp_column, reference_timestamp_column, value_map]
+    parameters: [reference_path, reference_sha256, reference_frame, key, reference_key, expected_total, expected_by, timestamp_column, reference_timestamp_column, value_map, compare, excluded_session_dates, exclusion_timezone]
     update_cadence: offline_only
     required_tests: [research/analysis/tests/test_diagnostic_ops.py]
   - id: analysis.gate.arm_delta_integrity

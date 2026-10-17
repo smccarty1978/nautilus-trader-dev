@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "last_updated": "2026-10-16",
+  "last_updated": "2026-10-17",
   "defects": [
     {
       "id": "H4_TRIGGER_PRICE_FILL",
@@ -211,6 +211,16 @@
       "invariant": "Identity is proved from the manifest inventory (re-hash of its entries == committed digest; names/sizes match); only files whose filename interval intersects a launch window are opened; a prohibited (launch) or prohibited/dev (readiness) file inside a window refuses before any byte is read.",
       "detection": "roots.verify_dataset_scope (DATASET_SCOPE_UNAUTHORIZED_FILE / DATASET_SCOPE_MANIFEST_INCONSISTENT / DATASET_DIGEST_MISMATCH)",
       "regression_test": "research_workflow/tests/test_scoped_dataset_bytes.py::test_forbidden_year_file_inside_the_window_refuses_before_any_byte_is_read"
+    },
+    {
+      "id": "PARITY_GATE_VALUE_BLIND",
+      "rule_id": "A7-PARITY",
+      "severity": "HIGH",
+      "name": "Population parity proven by key set and counts only",
+      "root_cause": "gate.population_parity compared key SETS, totals and one timestamp: a duplicated key, a changed A1/A2 membership flag, a changed outcome label or censor reason, or a retimed resolution all passed; a cross-study reference had to be a hand-built extract.",
+      "invariant": "Parity against a frozen population requires: sha-pinned reference bytes (a sealed merged frame rebuilt by the analysis-frame join rule, or one parquet), no null or duplicate keys on either side, identical key sets and declared counts, and identical declared timing/membership/outcome/censoring/context values per key (two nulls agree; null vs value differs). Row order is irrelevant. Every failure is typed (failure_codes) with full counts and bounded examples.",
+      "detection": "research.analysis.diagnostic_ops.population_parity_gate (reference_frame, compare)",
+      "regression_test": "research/analysis/tests/test_population_parity_reference.py"
     }
   ]
 }
