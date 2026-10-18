@@ -1,0 +1,53 @@
+{
+ "capability": "tracker.price_level.failed_breakout",
+ "fixture": "synthetic 8-day Globex-like 1m tape (features/tests/test_price_level_failed_breakout.py::_tape)",
+ "oracle": "test-only forward-scan oracle (_oracle_events): own trading-day grouping, own CT RTH clock, own level rebuild from the raw tape; compared per level (every failure) and per bar (primary event)",
+ "passed": true,
+ "runtime_path": "PriceLevelFailedBreakoutBinding.on_bar (GenericPriceLevelProvider levels)",
+ "scenarios": {
+  "seed_11": {
+   "bars": 8280,
+   "by_level": {
+    "onh": 19,
+    "onl": 13,
+    "orh": 29,
+    "orl": 37,
+    "pdh": 1,
+    "pdl": 4
+   },
+   "conflict_bars": 0,
+   "events_sha256": "225b9673047e4e56ce48afd5e68467cffb3eeaa2a746ef64708525dfbe0f2e73",
+   "level_events": 103,
+   "level_mismatches": 0,
+   "multi_bar_episodes": 53,
+   "multi_level_bars": 2,
+   "primary_events": 101,
+   "primary_mismatches": 0,
+   "repeat_events": 86,
+   "rth_bars": 2430,
+   "same_bar_sweeps": 50
+  },
+  "seed_3": {
+   "bars": 8280,
+   "by_level": {
+    "onh": 20,
+    "onl": 15,
+    "orh": 14,
+    "orl": 34,
+    "pdh": 4,
+    "pdl": 0
+   },
+   "conflict_bars": 0,
+   "events_sha256": "00d415384bb9ae422999091f2bf692db9be74537c4570aa156e7afc28836fb9a",
+   "level_events": 87,
+   "level_mismatches": 0,
+   "multi_bar_episodes": 48,
+   "multi_level_bars": 4,
+   "primary_events": 83,
+   "primary_mismatches": 0,
+   "repeat_events": 72,
+   "rth_bars": 2430,
+   "same_bar_sweeps": 39
+  }
+ }
+}

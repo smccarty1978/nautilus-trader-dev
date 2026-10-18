@@ -75,6 +75,16 @@ trackers:
     dependencies: [stream.completed_bar]
     update_cadence: per_source_bar
     required_tests: [features/tests/test_fair_pricing_trackers.py]
+  - id: tracker.price_level.failed_breakout
+    version: 1
+    description: Failed-breakout (sweep and close back) episodes at FINALIZED prior-day / overnight / 30-minute opening-range levels on completed RTH 1m bars, from the canonical PriceLevelTracker; per-level arming, breach episode, max-high/min-low extreme, close-back failure event within max_episode_minutes; the frozen sweep extreme is stop_reference_price for outcome.stop_reference.
+    implementation: features.trackers.price_level_failed_breakout.PriceLevelFailedBreakoutBinding
+    parameters: [min_breach_points, max_episode_minutes, levels]
+    dependencies: [stream.completed_bar]
+    update_cadence: per_source_bar
+    required_tests: [features/tests/test_price_level_failed_breakout.py]
+    proposal: research_workflow/capabilities/proposals/tracker.price_level.failed_breakout.yaml
+    promotion: {parity_artifact: artifacts/parity/price_level_failed_breakout.json, parity_sha256: 7088713d70e8188bd53aa5f3f0cc25efe1b95a3323b9760e07530d881ae6fb73, promoted_at_utc: '2026-10-18T15:55:00.398779+00:00'}
 
 trigger_primitives:
   - id: trigger.population.established_filter
