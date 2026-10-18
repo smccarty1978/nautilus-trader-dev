@@ -558,13 +558,100 @@ def precedence_labels(rows: pd.DataFrame, *, rules: Sequence[Mapping[str, Any]],
 # --------------------------------------------------------------------------- #
 # A7 -- population parity STOP GATE
 # --------------------------------------------------------------------------- #
-def population_parity_gate(rows: pd.DataFrame, *, reference_path: str, reference_sha256: str,
-                           key: Sequence[str], reference_key: Sequence[str],
+# The join rule of the V2 analysis frame (lifecycle_v2.KEY / _train_frame_all_labels): candidates
+# inner-joined with every observation column. A sealed reference frame is rebuilt with the SAME
+# rule, so the gate compares like with like; a test pins the equality with lifecycle_v2.KEY.
+FRAME_JOIN_KEY = ("observation_ts", "regime_start_ns", "checkpoint_index")
+PARITY_COMPARE_CATEGORIES = ("timing", "membership", "outcome", "censoring", "context")
+PARITY_EXAMPLES = 10
+
+
+def _sealed_reference_frame(root: Path, spec: Mapping[str, Any]) -> tuple:
+    """A sealed MERGED frame (``<dir>/candidates.parquet`` + ``observations.parquet``), both files
+    pinned by sha256, joined by the analysis-frame rule. Refuses rather than repairs: a reference
+    whose two halves do not pair one-to-one is not a population."""
+    import hashlib
+    for k in ("dir", "candidates_sha256", "observations_sha256"):
+        if not spec.get(k):
+            raise AnalysisOpError(f"ANALYSIS_PARITY_REFERENCE_FRAME_INCOMPLETE: reference_frame needs {k!r}")
+    base = (root / str(spec["dir"])).resolve()
+    shas: Dict[str, str] = {}
+    parts: Dict[str, pd.DataFrame] = {}
+    for name in ("candidates", "observations"):
+        path = base / f"{name}.parquet"
+        if not path.is_file():
+            raise AnalysisOpError("ANALYSIS_PARITY_REFERENCE_MISSING: " + str(path))
+        actual = hashlib.sha256(path.read_bytes()).hexdigest()
+        if actual != spec[f"{name}_sha256"]:
+            raise AnalysisOpError("ANALYSIS_PARITY_REFERENCE_SHA_MISMATCH: %s expected %s, got %s"
+                                  % (name, spec[f"{name}_sha256"], actual))
+        shas[name] = actual
+        parts[name] = pd.read_parquet(path)
+    c, o = parts["candidates"], parts["observations"]
+    join = [k for k in FRAME_JOIN_KEY if k in c.columns and k in o.columns]
+    if "observation_ts" not in join:
+        raise AnalysisOpError("ANALYSIS_PARITY_REFERENCE_INCONSISTENT: reference halves share no observation_ts")
+    for name, frame in (("candidates", c), ("observations", o)):
+        if frame.duplicated(join).any():
+            raise AnalysisOpError(f"ANALYSIS_PARITY_REFERENCE_INCONSISTENT: duplicate join keys in reference {name}")
+    dup = [col for col in o.columns if col in c.columns and col not in join]
+    frame = c.merge(o.drop(columns=dup), on=join, how="inner")
+    if not (len(frame) == len(c) == len(o)):
+        raise AnalysisOpError("ANALYSIS_PARITY_REFERENCE_INCONSISTENT: candidates %d / observations %d / joined %d"
+                              % (len(c), len(o), len(frame)))
+    frame["_year"] = pd.to_datetime(frame["observation_ts"], unit="ns", utc=True).dt.year
+    return frame, {"dir": str(spec["dir"]), **{f"{k}_sha256": v for k, v in shas.items()}}
+
+
+def _jsonable(value: Any) -> Any:
+    if value is None or (isinstance(value, float) and math.isnan(value)):
+        return None
+    if isinstance(value, np.integer):
+        return int(value)
+    if isinstance(value, np.floating):
+        return None if np.isnan(value) else float(value)
+    if isinstance(value, np.bool_):
+        return bool(value)
+    return value if isinstance(value, (int, float, str, bool)) else str(value)
+
+
+def _changed_values(rows: pd.DataFrame, ref: pd.DataFrame, key: List[str], reference_key: List[str],
+                    columns: Sequence[str], where: str) -> Dict[str, Any]:
+    """Per-column disagreement over the keys both sides hold exactly once. Two nulls agree; a
+    null against a value does not (a NaN-able flag is never cast to bool here)."""
+    _require(rows, columns, where)
+    _require(ref, columns, where + " (reference)")
+    lhs = rows.drop_duplicates(key, keep=False).set_index(key)
+    rhs = ref.drop_duplicates(reference_key, keep=False).set_index(reference_key)
+    rhs.index.names = lhs.index.names
+    common = lhs.index.intersection(rhs.index)
+    lhs, rhs = lhs.loc[common], rhs.loc[common]
+    by_column: Dict[str, int] = {}
+    examples: List[Dict[str, Any]] = []
+    changed_keys: set = set()
+    for col in columns:
+        a, b = lhs[col].astype(object), rhs[col].astype(object)
+        both_null = a.isna().to_numpy() & b.isna().to_numpy()
+        equal = np.array([bool(x == y) if not (pd.isna(x) or pd.isna(y)) else False for x, y in zip(a, b)], dtype=bool)
+        bad = a.index[~(equal | both_null)]
+        if len(bad):
+            by_column[col] = int(len(bad))
+            changed_keys.update(bad)
+            for k in sorted(bad)[: max(0, PARITY_EXAMPLES - len(examples))]:
+                examples.append({"key": [_jsonable(x) for x in (k if isinstance(k, tuple) else (k,))], "column": col,
+                                 "population": _jsonable(a.loc[k]), "reference": _jsonable(b.loc[k])})
+    return {"columns": list(columns), "rows_changed": len(changed_keys), "by_column": by_column, "examples": examples}
+
+
+def population_parity_gate(rows: pd.DataFrame, *, key: Sequence[str], reference_key: Sequence[str],
+                           reference_path: Optional[str] = None, reference_sha256: Optional[str] = None,
+                           reference_frame: Optional[Mapping[str, Any]] = None,
                            expected_total: Optional[int] = None,
                            expected_by: Optional[Mapping[str, Mapping[str, int]]] = None,
                            timestamp_column: Optional[str] = None,
                            reference_timestamp_column: Optional[str] = None,
                            value_map: Optional[Mapping[str, Mapping[str, Any]]] = None,
+                           compare: Optional[Mapping[str, Sequence[str]]] = None,
                            excluded_session_dates: Optional[Sequence[Mapping[str, str]]] = None,
                            exclusion_timezone: str = "UTC",
                            context: Optional[Mapping[str, Any]] = None) -> Dict[str, Any]:
@@ -575,26 +662,48 @@ def population_parity_gate(rows: pd.DataFrame, *, reference_path: str, reference
     runs as an ordinary pipeline step, so placing it immediately after the step that builds the
     population means a failure aborts the analyze stage before ANY declared artifact is written.
 
-    Fails closed on: a missing reference; reference bytes that do not match the declared sha256
-    (so the frozen comparison cannot itself drift); a total or per-stratum count differing from
-    the declared expectation; ANY key present on one side only; and, when a timestamp column is
-    declared, any row resolving at a different instant. Missing and extra keys are reported
-    explicitly, not just counted -- "how many" never says which.
+    The reference is EITHER one parquet (``reference_path`` + ``reference_sha256``) OR another
+    study's sealed merged frame (``reference_frame: {dir, candidates_sha256, observations_sha256}``,
+    rebuilt by the analysis-frame join rule). Either way its bytes are pinned, so the frozen
+    comparison cannot itself drift, and it is resolved against ``studies_root`` read-only.
+
+    Fails closed on: a missing reference; reference bytes that do not match the declared sha256;
+    a total or per-stratum count differing from the declared expectation; a null or DUPLICATED
+    key on either side; ANY key present on one side only; when a timestamp column is declared,
+    any row resolving at a different instant; and, per declared ``compare`` category (timing /
+    membership / outcome / censoring / context), any column whose value differs for a shared key.
+    Row order never matters. Every failure carries a typed code in ``failure_codes``, full counts
+    and at most ten examples; on failure the same report rides on the exception (``.report``)
+    and, as JSON, in its message, so a refusal is machine-readable and not only a sentence.
     """
     import hashlib
+    import json
 
     key, reference_key = list(key), list(reference_key)
     if len(key) != len(reference_key):
         raise AnalysisOpError("ANALYSIS_PARITY_KEY_ARITY: key and reference_key must line up")
+    if (reference_frame is None) == (reference_path is None):
+        raise AnalysisOpError("ANALYSIS_PARITY_REFERENCE_AMBIGUOUS: declare exactly one of reference_path / reference_frame")
+    unknown_categories = sorted(set(compare or {}) - set(PARITY_COMPARE_CATEGORIES))
+    if unknown_categories:
+        raise AnalysisOpError("ANALYSIS_PARITY_COMPARE_CATEGORY_UNKNOWN: %s (known %s)"
+                              % (unknown_categories, list(PARITY_COMPARE_CATEGORIES)))
     root = Path((context or {}).get("studies_root") or ".")
-    path = (root / str(reference_path)).resolve()
-    if not path.is_file():
-        raise AnalysisOpError("ANALYSIS_PARITY_REFERENCE_MISSING: " + str(path))
-    actual_sha = hashlib.sha256(path.read_bytes()).hexdigest()
-    if actual_sha != reference_sha256:
-        raise AnalysisOpError(
-            "ANALYSIS_PARITY_REFERENCE_SHA_MISMATCH: expected %s, got %s" % (reference_sha256, actual_sha))
-    reference = pd.read_parquet(path)
+    actual_sha: Optional[str] = None
+    if reference_frame is not None:
+        reference, reference_identity = _sealed_reference_frame(root, reference_frame)
+    else:
+        if not reference_sha256:
+            raise AnalysisOpError("ANALYSIS_PARITY_REFERENCE_SHA_MISSING: reference_path needs reference_sha256")
+        path = (root / str(reference_path)).resolve()
+        if not path.is_file():
+            raise AnalysisOpError("ANALYSIS_PARITY_REFERENCE_MISSING: " + str(path))
+        actual_sha = hashlib.sha256(path.read_bytes()).hexdigest()
+        if actual_sha != reference_sha256:
+            raise AnalysisOpError(
+                "ANALYSIS_PARITY_REFERENCE_SHA_MISMATCH: expected %s, got %s" % (reference_sha256, actual_sha))
+        reference = pd.read_parquet(path)
+        reference_identity = {"path": str(reference_path), "sha256": actual_sha}
     _require(reference, reference_key, "parity.reference_key")
     _require(rows, key, "parity.key")
 
@@ -650,19 +759,27 @@ def population_parity_gate(rows: pd.DataFrame, *, reference_path: str, reference
                 "either side, so the declaration is stale: %s" % [d["date"] for d in dead])
         rows, ref = rows[keep_l], ref[keep_r]
 
-    report: Dict[str, Any] = {"schema_version": 1, "reference_path": str(reference_path),
-                              "reference_sha256": actual_sha,
+    report: Dict[str, Any] = {"schema_version": 2, "reference_path": (str(reference_path) if reference_path else None),
+                              "reference_sha256": actual_sha, "reference": reference_identity,
                               "reference_rows": int(len(ref)), "population_rows": int(len(rows)),
                               "excluded_session_dates": removed,
                               "compared_after_exclusions": {"population": int(len(rows)), "reference": int(len(ref))}}
     failures: List[str] = []
+    codes: List[str] = []
+
+    def _fail(code: str, message: Optional[str]) -> None:
+        if message is not None:
+            failures.append(message)
+        if code not in codes:
+            codes.append(code)
+
     if expected_total is not None:
         report["expected_total"] = int(expected_total)
         for label, n in (("reference", len(ref)), ("population", len(rows))):
             if int(n) != int(expected_total):
-                failures.append("%s has %d rows, expected %d" % (label, n, expected_total))
+                _fail("PARITY_COUNT_MISMATCH", "%s has %d rows, expected %d" % (label, n, expected_total))
     if expected_by:
-        report["expected_by"] = {c: dict(m) for c, m in expected_by.items()}
+        report["expected_by"] = {c: {str(k): int(v) for k, v in m.items()} for c, m in expected_by.items()}
         report["observed_by"] = {}
         for column, expectation in expected_by.items():
             _require(rows, [column], "parity.expected_by")
@@ -670,34 +787,71 @@ def population_parity_gate(rows: pd.DataFrame, *, reference_path: str, reference
             report["observed_by"][column] = counts
             want = {_case_key(k): int(v) for k, v in expectation.items()}
             if counts != want:
-                failures.append("%s counts %s != expected %s" % (column, counts, want))
+                _fail("PARITY_COUNT_MISMATCH", "%s counts %s != expected %s" % (column, counts, want))
+
+    # A null key cannot identify a row (NaN never equals NaN in a key set), and a repeated key
+    # makes "the same population" undefined: both refuse, on either side.
+    nulls = {"population": int(rows[key].isna().any(axis=1).sum()), "reference": int(ref[reference_key].isna().any(axis=1).sum())}
+    report["null_keys"] = nulls
+    if nulls["population"] or nulls["reference"]:
+        _fail("PARITY_KEY_NULL", "null key(s): population %d, reference %d" % (nulls["population"], nulls["reference"]))
+    dups: Dict[str, Any] = {}
+    for side, frame, cols in (("population", rows, key), ("reference", ref, reference_key)):
+        mask = frame.duplicated(cols, keep=False)
+        dkeys = sorted({tuple(r) for r in frame.loc[mask, cols].itertuples(index=False, name=None)})
+        dups[side] = {"keys": len(dkeys), "rows": int(mask.sum()),
+                      "examples": [[_jsonable(x) for x in k] for k in dkeys[:PARITY_EXAMPLES]]}
+    report["duplicate_keys"] = dups
+    if dups["population"]["keys"] or dups["reference"]["keys"]:
+        _fail("PARITY_DUPLICATE_KEY", "duplicate key(s): population %d, reference %d"
+              % (dups["population"]["keys"], dups["reference"]["keys"]))
 
     left = {tuple(r) for r in rows[key].itertuples(index=False, name=None)}
     right = {tuple(r) for r in ref[reference_key].itertuples(index=False, name=None)}
     missing, extra = sorted(right - left), sorted(left - right)
     report["missing_from_population"] = len(missing)
     report["extra_in_population"] = len(extra)
-    report["missing_examples"] = [list(x) for x in missing[:10]]
-    report["extra_examples"] = [list(x) for x in extra[:10]]
+    report["missing_examples"] = [[_jsonable(x) for x in m] for m in missing[:PARITY_EXAMPLES]]
+    report["extra_examples"] = [[_jsonable(x) for x in m] for m in extra[:PARITY_EXAMPLES]]
     if missing or extra:
         failures.append("%d reference key(s) absent, %d unexpected key(s) present" % (len(missing), len(extra)))
+        if missing:
+            _fail("PARITY_MISSING", None)
+        if extra:
+            _fail("PARITY_EXTRA", None)
 
     if timestamp_column and reference_timestamp_column:
         _require(rows, [timestamp_column], "parity.timestamp_column")
         _require(ref, [reference_timestamp_column], "parity.reference_timestamp_column")
         lhs = {tuple(r[:-1]): r[-1] for r in rows[key + [timestamp_column]].itertuples(index=False, name=None)}
         rhs = {tuple(r[:-1]): r[-1] for r in ref[reference_key + [reference_timestamp_column]].itertuples(index=False, name=None)}
-        drift = [{"key": list(k), "population": int(lhs[k]), "reference": int(rhs[k])}
+        drift = [{"key": [_jsonable(x) for x in k], "population": int(lhs[k]), "reference": int(rhs[k])}
                  for k in sorted(set(lhs) & set(rhs)) if int(lhs[k]) != int(rhs[k])]
         report["timestamp_mismatches"] = len(drift)
-        report["timestamp_mismatch_examples"] = drift[:10]
+        report["timestamp_mismatch_examples"] = drift[:PARITY_EXAMPLES]
         if drift:
-            failures.append("%d key(s) resolve at a different instant than the reference" % len(drift))
+            _fail("PARITY_RETIMED", "%d key(s) resolve at a different instant than the reference" % len(drift))
+
+    report["compared"] = {}
+    for category in PARITY_COMPARE_CATEGORIES:
+        columns = list((compare or {}).get(category) or [])
+        if not columns:
+            continue
+        diff = _changed_values(rows, ref, key, reference_key, columns, f"parity.compare.{category}")
+        report["compared"][category] = diff
+        if diff["rows_changed"]:
+            _fail(f"PARITY_{category.upper()}_CHANGED", "%d key(s) differ in %s columns %s"
+                  % (diff["rows_changed"], category, sorted(diff["by_column"])))
 
     report["failures"] = failures
+    report["failure_codes"] = codes
     report["status"] = "PASS" if not failures else "FAIL"
+    report["verdict"] = "PARITY_PASS" if not failures else "PARITY_FAIL"
     if failures:
-        raise AnalysisOpError("ANALYSIS_POPULATION_PARITY_FAILED: " + "; ".join(failures))
+        exc = AnalysisOpError("ANALYSIS_POPULATION_PARITY_FAILED: " + "; ".join(failures)
+                              + " | report=" + json.dumps(report, sort_keys=True, default=str))
+        exc.report = report
+        raise exc
     return {"frame": rows, "payload": report}
 
 

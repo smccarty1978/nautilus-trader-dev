@@ -1,0 +1,41 @@
+"""MERGE-MECHANICS STRESS input builder (not science). Streams the frozen pilot partition (read-only)
+row group by row group and writes N time-shifted copies into F scratch "partition" dirs:
+copy k shifts observation_ts and regime_start_ns by k*14 days (pilot spans 12 days, so every KEY stays
+unique and the merge's duplicate-key check stays active and passing). Copies are assigned to files in
+REVERSED chronological order (file 0 holds the latest copies) so the merge permutation is non-identity
+across sources, and each file uses a different row-group size. Profile payloads are unchanged.
+usage: build_stress.py <pilot_partition_dir> <out_root> <n_copies> <n_files>"""
+import sys, os, json
+import pyarrow as pa, pyarrow.parquet as pq, pyarrow.compute as pc
+src, root, N, F = sys.argv[1], sys.argv[2], int(sys.argv[3]), int(sys.argv[4])
+SHIFT = 14 * 86400 * 10**9
+RG = [97, 500, 1000, 233, 61, 750]
+# shift scalars are cast to each column's OWN type so the written schema equals the source schema
+per = -(-N // F)
+files = []
+for f in range(F):
+    copies = [k for k in range(N) if (N - 1 - k) // per == f]
+    copies.sort()
+    d = os.path.join(root, f"p{f}"); os.makedirs(d, exist_ok=True)
+    for name in ("candidates.parquet", "observations.parquet"):
+        pf = pq.ParquetFile(os.path.join(src, name))
+        rg = RG[f % len(RG)]
+        with pq.ParquetWriter(os.path.join(d, name), pf.schema_arrow) as w:
+            buf = None
+            for k in copies:
+                for gi in range(pf.metadata.num_row_groups):
+                    t = pf.read_row_group(gi)
+                    i_ts, i_rs = t.schema.get_field_index("observation_ts"), t.schema.get_field_index("regime_start_ns")
+                    for i, nm in ((i_ts, "observation_ts"), (i_rs, "regime_start_ns")):
+                        typ = t.schema.field(i).type
+                        t = t.set_column(i, nm, pc.add(t.column(i), pa.scalar(k * SHIFT, pa.int64()).cast(typ)).cast(typ))
+                    buf = t if buf is None else pa.concat_tables([buf, t])
+                    while buf.num_rows >= rg:
+                        w.write_table(buf.slice(0, rg), row_group_size=rg); buf = buf.slice(rg)
+            if buf is not None and buf.num_rows:
+                w.write_table(buf, row_group_size=buf.num_rows)
+    files.append({"dir": d, "copies": copies, "row_group_rows": rg,
+                  "rows": pq.ParquetFile(os.path.join(d, "candidates.parquet")).metadata.num_rows})
+json.dump({"kind": "MERGE_MECHANICS_STRESS (not science)", "source": src, "n_copies": N, "shift_ns_per_copy": SHIFT, "files": files},
+          open(os.path.join(root, "stress_manifest.json"), "w", encoding="utf-8"), indent=1)
+print(json.dumps(files))

@@ -1,0 +1,18 @@
+"""Evidence harness (not study code): in a SCRATCH staged study only, set the 2022 declared window end
+so time-shifted MECHANICS-STRESS copies stay inside it (the window check stays active and passing), and
+mirror it into the scratch copy of artifacts/experiment_authorization.json (partition_windows) so the
+authorization stays consistent. usage: widen_window.py <scratch_study> <new_end_date>"""
+import sys, json, os
+st = sys.argv[1]
+assert "scratchpad" in os.path.abspath(st).lower(), st
+p = os.path.join(st, "compiled_plan.json")
+plan = json.load(open(p, encoding="utf-8"))
+for w in plan["chronology"]["windows"]:
+    w["end"] = sys.argv[2]
+json.dump(plan, open(p, "w", encoding="utf-8"), indent=2)
+ident = sorted(f"{w['year']}:{w['start']}..{w['end']}" for w in plan["chronology"]["windows"])
+a = os.path.join(st, "artifacts", "experiment_authorization.json")
+auth = json.load(open(a, encoding="utf-8"))
+auth["partition_windows"] = ident
+json.dump(auth, open(a, "w", encoding="utf-8"), indent=2)
+print(json.dumps({"windows": plan["chronology"]["windows"], "authorization.partition_windows": ident}))

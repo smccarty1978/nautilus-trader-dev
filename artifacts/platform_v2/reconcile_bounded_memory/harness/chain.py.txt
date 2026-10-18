@@ -1,0 +1,7 @@
+"""Run evidence jobs strictly sequentially (one heavy job at a time). usage: chain.py <jobs.json>
+jobs.json: [{"label":..., "out_dir":..., "budget_gib":8, "cmd":[...]}]"""
+import sys, json, subprocess, os
+here = os.path.dirname(os.path.abspath(__file__))
+for j in json.load(open(sys.argv[1], encoding="utf-8")):
+    subprocess.run([sys.executable, os.path.join(here, "watch_run.py"), j["label"], j["out_dir"], str(j["budget_gib"]), "--", *j["cmd"]])
+open(sys.argv[1] + ".done", "w").write("done")

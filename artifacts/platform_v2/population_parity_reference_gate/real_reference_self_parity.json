@@ -1,0 +1,283 @@
+{
+  "kind": "real_reference_self_parity",
+  "reference": {
+    "dir": "nq_fair_pricing_reversion/_work/controller/merged",
+    "candidates_sha256": "606a4f4cc126e3300bd8c840259df86a5aeefb9267742355a309129b96ba5873",
+    "observations_sha256": "f1a15a18c33bb3c00698cc9fe49c656b8e2befe6e6aac3611f61096aab2a591e"
+  },
+  "reference_identity_json": {
+    "candidates_sha256": "606a4f4cc126e3300bd8c840259df86a5aeefb9267742355a309129b96ba5873",
+    "observations_sha256": "f1a15a18c33bb3c00698cc9fe49c656b8e2befe6e6aac3611f61096aab2a591e",
+    "candidates_logical_content_sha256": "13e3efb31693154c07e447210d10813786ed6923bd5eb6c8eb44c44a93c6d221",
+    "observations_logical_content_sha256": "5909b35d33b32bcb0772c6bb11a29945cddfd2afa3831e971a1c216f3c2b425b"
+  },
+  "population_source": "V2Lifecycle._train_frame_all_labels over nq_fair_pricing_reversion TRAIN partitions 2021-2023",
+  "partition_sha256": {
+    "2021": {
+      "candidates": "161afc23f76eea7e24b413efd96bf12457ad0c35138161a4d20ce464c59005d1",
+      "observations": "5c8c376efa4469acf5220cd2a3718f3f1f9b81ab1f2c69aafddb1c240252a1fa",
+      "plan_sha256": "9b9b80c640aff865546e9000a8bbed5d5b0ffc4050aece8606f9dec8a442c5cb",
+      "composite_seal_hash": "b80487723b4f6ff3b6475f7482307c7fe00aab2aa5050fe9e6a902dc971bbbf3"
+    },
+    "2022": {
+      "candidates": "3df792acf203174c23e7ec766ccee840761428ddb60f9e423773dea7ce218e41",
+      "observations": "a7d07908376b17e91d8eb6049727e618bdd3a2e0247c31456e6db98b55edc635",
+      "plan_sha256": "9b9b80c640aff865546e9000a8bbed5d5b0ffc4050aece8606f9dec8a442c5cb",
+      "composite_seal_hash": "b80487723b4f6ff3b6475f7482307c7fe00aab2aa5050fe9e6a902dc971bbbf3"
+    },
+    "2023": {
+      "candidates": "bd2253ba6900c961855ba74bf8c73219f435bd5730b3ff0b6b4259dbef369bb9",
+      "observations": "77a35135ff2312c9fcfc2d42902891d724039ae9374539905958771ec9deac02",
+      "plan_sha256": "9b9b80c640aff865546e9000a8bbed5d5b0ffc4050aece8606f9dec8a442c5cb",
+      "composite_seal_hash": "b80487723b4f6ff3b6475f7482307c7fe00aab2aa5050fe9e6a902dc971bbbf3"
+    }
+  },
+  "params": {
+    "reference_frame": {
+      "dir": "nq_fair_pricing_reversion/_work/controller/merged",
+      "candidates_sha256": "606a4f4cc126e3300bd8c840259df86a5aeefb9267742355a309129b96ba5873",
+      "observations_sha256": "f1a15a18c33bb3c00698cc9fe49c656b8e2befe6e6aac3611f61096aab2a591e"
+    },
+    "key": [
+      "observation_ts"
+    ],
+    "reference_key": [
+      "observation_ts"
+    ],
+    "expected_total": 69369,
+    "expected_by": {
+      "_year": {
+        "2021": 23088,
+        "2022": 23196,
+        "2023": 23085
+      }
+    },
+    "compare": {
+      "timing": [
+        "horizon_end_ts",
+        "session_close_ts",
+        "resolved_at_ts",
+        "flip_ts",
+        "observed_seconds",
+        "m25_resolution_seconds",
+        "m50_resolution_seconds",
+        "m75_resolution_seconds",
+        "m100_resolution_seconds",
+        "tp38_sl25_resolution_seconds",
+        "anchor_sl25_resolution_seconds"
+      ],
+      "membership": [
+        "is_displacement",
+        "displacement_dir",
+        "displacement_toward_anchor",
+        "displacement_signal",
+        "is_bos",
+        "bos_dir",
+        "bos_toward_anchor",
+        "bos_signal"
+      ],
+      "outcome": [
+        "regime_direction",
+        "target_flip_within_horizon",
+        "disposition",
+        "m25_label",
+        "m50_label",
+        "m75_label",
+        "m100_label",
+        "tp38_sl25_label",
+        "anchor_sl25_label",
+        "m25_disposition",
+        "m50_disposition",
+        "m75_disposition",
+        "m100_disposition",
+        "tp38_sl25_disposition",
+        "anchor_sl25_disposition"
+      ],
+      "censoring": [
+        "censored",
+        "censor_reason",
+        "m25_censor_reason",
+        "m50_censor_reason",
+        "m75_censor_reason",
+        "m100_censor_reason",
+        "tp38_sl25_censor_reason",
+        "anchor_sl25_censor_reason"
+      ],
+      "context": [
+        "distance_to_level"
+      ]
+    }
+  },
+  "report": {
+    "schema_version": 2,
+    "reference_path": null,
+    "reference_sha256": null,
+    "reference": {
+      "dir": "nq_fair_pricing_reversion/_work/controller/merged",
+      "candidates_sha256": "606a4f4cc126e3300bd8c840259df86a5aeefb9267742355a309129b96ba5873",
+      "observations_sha256": "f1a15a18c33bb3c00698cc9fe49c656b8e2befe6e6aac3611f61096aab2a591e"
+    },
+    "reference_rows": 69369,
+    "population_rows": 69369,
+    "excluded_session_dates": [],
+    "compared_after_exclusions": {
+      "population": 69369,
+      "reference": 69369
+    },
+    "expected_total": 69369,
+    "expected_by": {
+      "_year": {
+        "2021": 23088,
+        "2022": 23196,
+        "2023": 23085
+      }
+    },
+    "observed_by": {
+      "_year": {
+        "2022": 23196,
+        "2021": 23088,
+        "2023": 23085
+      }
+    },
+    "null_keys": {
+      "population": 0,
+      "reference": 0
+    },
+    "duplicate_keys": {
+      "population": {
+        "keys": 0,
+        "rows": 0,
+        "examples": []
+      },
+      "reference": {
+        "keys": 0,
+        "rows": 0,
+        "examples": []
+      }
+    },
+    "missing_from_population": 0,
+    "extra_in_population": 0,
+    "missing_examples": [],
+    "extra_examples": [],
+    "compared": {
+      "timing": {
+        "columns": [
+          "horizon_end_ts",
+          "session_close_ts",
+          "resolved_at_ts",
+          "flip_ts",
+          "observed_seconds",
+          "m25_resolution_seconds",
+          "m50_resolution_seconds",
+          "m75_resolution_seconds",
+          "m100_resolution_seconds",
+          "tp38_sl25_resolution_seconds",
+          "anchor_sl25_resolution_seconds"
+        ],
+        "rows_changed": 0,
+        "by_column": {},
+        "examples": []
+      },
+      "membership": {
+        "columns": [
+          "is_displacement",
+          "displacement_dir",
+          "displacement_toward_anchor",
+          "displacement_signal",
+          "is_bos",
+          "bos_dir",
+          "bos_toward_anchor",
+          "bos_signal"
+        ],
+        "rows_changed": 0,
+        "by_column": {},
+        "examples": []
+      },
+      "outcome": {
+        "columns": [
+          "regime_direction",
+          "target_flip_within_horizon",
+          "disposition",
+          "m25_label",
+          "m50_label",
+          "m75_label",
+          "m100_label",
+          "tp38_sl25_label",
+          "anchor_sl25_label",
+          "m25_disposition",
+          "m50_disposition",
+          "m75_disposition",
+          "m100_disposition",
+          "tp38_sl25_disposition",
+          "anchor_sl25_disposition"
+        ],
+        "rows_changed": 0,
+        "by_column": {},
+        "examples": []
+      },
+      "censoring": {
+        "columns": [
+          "censored",
+          "censor_reason",
+          "m25_censor_reason",
+          "m50_censor_reason",
+          "m75_censor_reason",
+          "m100_censor_reason",
+          "tp38_sl25_censor_reason",
+          "anchor_sl25_censor_reason"
+        ],
+        "rows_changed": 0,
+        "by_column": {},
+        "examples": []
+      },
+      "context": {
+        "columns": [
+          "distance_to_level"
+        ],
+        "rows_changed": 0,
+        "by_column": {},
+        "examples": []
+      }
+    },
+    "failures": [],
+    "failure_codes": [],
+    "status": "PASS",
+    "verdict": "PARITY_PASS"
+  },
+  "real_scale_negative_controls": [
+    {
+      "mutation": "shuffled_order",
+      "verdict": "PARITY_PASS",
+      "failure_codes": []
+    },
+    {
+      "mutation": "drop_one",
+      "verdict": "PARITY_FAIL",
+      "failure_codes": [
+        "PARITY_COUNT_MISMATCH",
+        "PARITY_MISSING"
+      ]
+    },
+    {
+      "mutation": "flip_one_bos_signal",
+      "verdict": "PARITY_FAIL",
+      "failure_codes": [
+        "PARITY_MEMBERSHIP_CHANGED"
+      ]
+    },
+    {
+      "mutation": "one_label_changed",
+      "verdict": "PARITY_FAIL",
+      "failure_codes": [
+        "PARITY_OUTCOME_CHANGED"
+      ]
+    },
+    {
+      "mutation": "one_censor_reason_DATA_END",
+      "verdict": "PARITY_FAIL",
+      "failure_codes": [
+        "PARITY_CENSORING_CHANGED"
+      ]
+    }
+  ]
+}

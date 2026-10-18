@@ -1,0 +1,16 @@
+"""Evidence harness (not study code): prove the footer-only column names / row counts of the NEW reconcile
+equal tuple(pd.read_parquet(path).columns) / len() -- the OLD reconcile's inputs -- on real partition files,
+and record Arrow schema equality between files. usage: names_check.py <code_root> <out_json> <parquet> [...]"""
+import sys, json, gc
+code, out = sys.argv[1], sys.argv[2]
+sys.path.insert(0, code)
+import pandas as pd, pyarrow.parquet as pq
+from research_workflow.lifecycle_v2 import _reconcile_parquet_shape
+res = []
+for p in sys.argv[3:]:
+    names, rows = _reconcile_parquet_shape(p)
+    full = pd.read_parquet(p)
+    res.append({"path": p, "columns": len(names), "rows": rows, "names_equal_pandas": names == tuple(full.columns),
+                "rows_equal_pandas": rows == len(full), "pandas_metadata": pq.read_schema(p).pandas_metadata is not None})
+    del full; gc.collect()
+json.dump(res, open(out, "w", encoding="utf-8"), indent=1); print(json.dumps(res))

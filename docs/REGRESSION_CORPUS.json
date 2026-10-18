@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "last_updated": "2026-10-08",
+  "last_updated": "2026-10-17",
   "defects": [
     {
       "id": "H4_TRIGGER_PRICE_FILL",
@@ -181,6 +181,46 @@
       "invariant": "No agent tool call may create a link, recursively delete a tree, or mutate live data/DatasetSpecs; deletion goes only through scripts/safe_cleanup.py (fails closed on any reparse point or protected path); live catalogs and raw files carry deny-Everyone delete/write ACEs.",
       "detection": "scripts/hooks/data_guard.py (PreToolUse, .claude/settings.json); scripts/protect_live_data.py verify; scripts/safe_cleanup.py",
       "regression_test": "scripts/tests/test_protect_live_data.py::test_incident_reproduction_forced_worktree_removal_through_junction_loses_nothing"
+    },
+    {
+      "id": "OOS_POST_ACCESS_AMENDMENT",
+      "rule_id": "G1",
+      "severity": "CRITICAL",
+      "name": "Study plan amended after the held-out period was opened; OOS re-collected and re-analysed under the new rules",
+      "root_cause": "assert_oos_open bound only the freeze to the authorization; seal/freeze/oos/analyze accepted any re-sealed plan and nothing recorded the first OOS access (HV1 synthetic proof N2: loosened thresholds flipped the class to VALIDATED and overwrote the first-access OOS manifests).",
+      "invariant": "The first OOS opening is recorded once (artifacts/oos_access_record.json) before any held-out bar is read; a different evaluation identity or replaced held-out evidence is refused at seal/freeze/oos/analyze.",
+      "detection": "research_workflow/oos_access.py via V2Lifecycle seal/freeze/oos/analyze (OOS_IDENTITY_CONFLICT, OOS_EVIDENCE_ALTERED, OOS_ACCESS_RECORD_MISSING)",
+      "regression_test": "research_workflow/tests/test_oos_access_latch.py::test_post_oos_amendment_is_refused_at_every_stage_and_evidence_is_untouched"
+    },
+    {
+      "id": "OOS_PARTITION_UNRECONCILED",
+      "rule_id": "G2",
+      "severity": "HIGH",
+      "name": "Held-out partitions analysed without population/lineage reconciliation",
+      "root_cause": "RECONCILE covered TRAIN only; analysis lineage reported the declared years, not the rows' years (HV1 proof N8: a TRAIN-year row in the OOS partition with recomputed manifest hashes was analysed as [2031]).",
+      "invariant": "OOS partitions pass the TRAIN reconcile population checks plus key equality, interval and plan/seal/dataset/authorization lineage, read from the parquet, before the evidence is pinned or analysed.",
+      "detection": "V2Lifecycle._reconcile_oos (OOS_RECONCILE_FAILED, _work/controller/oos_reconcile.json)",
+      "regression_test": "research_workflow/tests/test_oos_access_latch.py::test_oos_partition_population_defects_are_refused"
+    },
+    {
+      "id": "DATASET_BYTES_UNSCOPED",
+      "rule_id": "R1-SCOPE",
+      "severity": "HIGH",
+      "name": "Readiness/launch byte verification hashed the whole catalog, including held-out and prohibited years",
+      "root_cause": "compute_catalog_digest re-hashed every file under <catalog>/data at readiness R1 and at every catalog launch (host_runner.run_plan_on_catalog), so a TRAIN-only study read 2024-2026 bytes; scope was independent of the run window.",
+      "invariant": "Identity is proved from the manifest inventory (re-hash of its entries == committed digest; names/sizes match); only files whose filename interval intersects a launch window are opened; a prohibited (launch) or prohibited/dev (readiness) file inside a window refuses before any byte is read.",
+      "detection": "roots.verify_dataset_scope (DATASET_SCOPE_UNAUTHORIZED_FILE / DATASET_SCOPE_MANIFEST_INCONSISTENT / DATASET_DIGEST_MISMATCH)",
+      "regression_test": "research_workflow/tests/test_scoped_dataset_bytes.py::test_forbidden_year_file_inside_the_window_refuses_before_any_byte_is_read"
+    },
+    {
+      "id": "PARITY_GATE_VALUE_BLIND",
+      "rule_id": "A7-PARITY",
+      "severity": "HIGH",
+      "name": "Population parity proven by key set and counts only",
+      "root_cause": "gate.population_parity compared key SETS, totals and one timestamp: a duplicated key, a changed A1/A2 membership flag, a changed outcome label or censor reason, or a retimed resolution all passed; a cross-study reference had to be a hand-built extract.",
+      "invariant": "Parity against a frozen population requires: sha-pinned reference bytes (a sealed merged frame rebuilt by the analysis-frame join rule, or one parquet), no null or duplicate keys on either side, identical key sets and declared counts, and identical declared timing/membership/outcome/censoring/context values per key (two nulls agree; null vs value differs). Row order is irrelevant. Every failure is typed (failure_codes) with full counts and bounded examples.",
+      "detection": "research.analysis.diagnostic_ops.population_parity_gate (reference_frame, compare)",
+      "regression_test": "research/analysis/tests/test_population_parity_reference.py"
     }
   ]
 }

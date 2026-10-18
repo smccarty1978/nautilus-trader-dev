@@ -1,0 +1,224 @@
+{
+  "kind": "pa_declared_parity_step_on_fpr_population",
+  "pa_plan_sha256": "cb5836ce9df22ec263b7f79ae084da297c0b24b20b1793fdfb749a09172edd3b",
+  "step": {
+    "id": "fpr_population_parity",
+    "inputs": {},
+    "op": "analysis.gate.population_parity",
+    "params": {
+      "compare": {
+        "censoring": [
+          "censored",
+          "censor_reason",
+          "m25_censor_reason",
+          "m50_censor_reason",
+          "m75_censor_reason",
+          "m100_censor_reason",
+          "tp38_sl25_censor_reason",
+          "anchor_sl25_censor_reason"
+        ],
+        "context": [
+          "distance_to_level"
+        ],
+        "membership": [
+          "is_displacement",
+          "displacement_dir",
+          "displacement_toward_anchor",
+          "displacement_signal",
+          "is_bos",
+          "bos_dir",
+          "bos_toward_anchor",
+          "bos_signal"
+        ],
+        "outcome": [
+          "regime_direction",
+          "target_flip_within_horizon",
+          "disposition",
+          "m25_label",
+          "m50_label",
+          "m75_label",
+          "m100_label",
+          "tp38_sl25_label",
+          "anchor_sl25_label",
+          "m25_disposition",
+          "m50_disposition",
+          "m75_disposition",
+          "m100_disposition",
+          "tp38_sl25_disposition",
+          "anchor_sl25_disposition"
+        ],
+        "timing": [
+          "horizon_end_ts",
+          "session_close_ts",
+          "resolved_at_ts",
+          "flip_ts",
+          "observed_seconds",
+          "m25_resolution_seconds",
+          "m50_resolution_seconds",
+          "m75_resolution_seconds",
+          "m100_resolution_seconds",
+          "tp38_sl25_resolution_seconds",
+          "anchor_sl25_resolution_seconds"
+        ]
+      },
+      "expected_by": {
+        "_year": {
+          "2021": 23088,
+          "2022": 23196,
+          "2023": 23085
+        }
+      },
+      "expected_total": 69369,
+      "key": [
+        "observation_ts"
+      ],
+      "reference_frame": {
+        "candidates_sha256": "606a4f4cc126e3300bd8c840259df86a5aeefb9267742355a309129b96ba5873",
+        "dir": "../../Nautilus Trader-nq_fair_pricing_reversion/studies/nq_fair_pricing_reversion/_work/controller/merged",
+        "observations_sha256": "f1a15a18c33bb3c00698cc9fe49c656b8e2befe6e6aac3611f61096aab2a591e"
+      },
+      "reference_key": [
+        "observation_ts"
+      ]
+    },
+    "rows": "frame"
+  },
+  "studies_root": "<Nautilus Trader-nq_fpr_price_action>/studies",
+  "note": "the PA study's compiled step, params verbatim, resolved from the PA studies_root, run over FPR's own sealed TRAIN partitions (stand-in for the PA frame, which is not collected)",
+  "report": {
+    "schema_version": 2,
+    "reference_path": null,
+    "reference_sha256": null,
+    "reference": {
+      "dir": "../../Nautilus Trader-nq_fair_pricing_reversion/studies/nq_fair_pricing_reversion/_work/controller/merged",
+      "candidates_sha256": "606a4f4cc126e3300bd8c840259df86a5aeefb9267742355a309129b96ba5873",
+      "observations_sha256": "f1a15a18c33bb3c00698cc9fe49c656b8e2befe6e6aac3611f61096aab2a591e"
+    },
+    "reference_rows": 69369,
+    "population_rows": 69369,
+    "excluded_session_dates": [],
+    "compared_after_exclusions": {
+      "population": 69369,
+      "reference": 69369
+    },
+    "expected_total": 69369,
+    "expected_by": {
+      "_year": {
+        "2021": 23088,
+        "2022": 23196,
+        "2023": 23085
+      }
+    },
+    "observed_by": {
+      "_year": {
+        "2022": 23196,
+        "2021": 23088,
+        "2023": 23085
+      }
+    },
+    "null_keys": {
+      "population": 0,
+      "reference": 0
+    },
+    "duplicate_keys": {
+      "population": {
+        "keys": 0,
+        "rows": 0,
+        "examples": []
+      },
+      "reference": {
+        "keys": 0,
+        "rows": 0,
+        "examples": []
+      }
+    },
+    "missing_from_population": 0,
+    "extra_in_population": 0,
+    "missing_examples": [],
+    "extra_examples": [],
+    "compared": {
+      "timing": {
+        "columns": [
+          "horizon_end_ts",
+          "session_close_ts",
+          "resolved_at_ts",
+          "flip_ts",
+          "observed_seconds",
+          "m25_resolution_seconds",
+          "m50_resolution_seconds",
+          "m75_resolution_seconds",
+          "m100_resolution_seconds",
+          "tp38_sl25_resolution_seconds",
+          "anchor_sl25_resolution_seconds"
+        ],
+        "rows_changed": 0,
+        "by_column": {},
+        "examples": []
+      },
+      "membership": {
+        "columns": [
+          "is_displacement",
+          "displacement_dir",
+          "displacement_toward_anchor",
+          "displacement_signal",
+          "is_bos",
+          "bos_dir",
+          "bos_toward_anchor",
+          "bos_signal"
+        ],
+        "rows_changed": 0,
+        "by_column": {},
+        "examples": []
+      },
+      "outcome": {
+        "columns": [
+          "regime_direction",
+          "target_flip_within_horizon",
+          "disposition",
+          "m25_label",
+          "m50_label",
+          "m75_label",
+          "m100_label",
+          "tp38_sl25_label",
+          "anchor_sl25_label",
+          "m25_disposition",
+          "m50_disposition",
+          "m75_disposition",
+          "m100_disposition",
+          "tp38_sl25_disposition",
+          "anchor_sl25_disposition"
+        ],
+        "rows_changed": 0,
+        "by_column": {},
+        "examples": []
+      },
+      "censoring": {
+        "columns": [
+          "censored",
+          "censor_reason",
+          "m25_censor_reason",
+          "m50_censor_reason",
+          "m75_censor_reason",
+          "m100_censor_reason",
+          "tp38_sl25_censor_reason",
+          "anchor_sl25_censor_reason"
+        ],
+        "rows_changed": 0,
+        "by_column": {},
+        "examples": []
+      },
+      "context": {
+        "columns": [
+          "distance_to_level"
+        ],
+        "rows_changed": 0,
+        "by_column": {},
+        "examples": []
+      }
+    },
+    "failures": [],
+    "failure_codes": [],
+    "status": "PASS",
+    "verdict": "PARITY_PASS"
+  }
+}

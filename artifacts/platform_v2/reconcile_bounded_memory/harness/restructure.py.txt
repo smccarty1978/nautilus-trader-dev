@@ -1,0 +1,20 @@
+"""Evidence harness (not study code): stream a parquet file row group by row group into a new file with
+a fixed row-group size, optionally dropping every nested (struct/list/map) column (width-scaling point).
+usage: restructure.py <src> <dst> <row_group_rows> [drop_nested]"""
+import sys, json
+import pyarrow as pa, pyarrow.parquet as pq
+src, dst, rg = sys.argv[1], sys.argv[2], int(sys.argv[3]); drop = len(sys.argv) > 4 and sys.argv[4] == "drop_nested"
+pf = pq.ParquetFile(src)
+keep = [f.name for f in pf.schema_arrow if not (drop and pa.types.is_nested(f.type))]
+schema = pa.schema([pf.schema_arrow.field(n) for n in keep], metadata=pf.schema_arrow.metadata)
+with pq.ParquetWriter(dst, schema) as w:
+    buf = None
+    for gi in range(pf.metadata.num_row_groups):
+        t = pf.read_row_group(gi, columns=keep)
+        buf = t if buf is None else pa.concat_tables([buf, t])
+        while buf.num_rows >= rg:
+            w.write_table(buf.slice(0, rg), row_group_size=rg); buf = buf.slice(rg)
+    if buf is not None and buf.num_rows:
+        w.write_table(buf, row_group_size=buf.num_rows)
+md = pq.ParquetFile(dst).metadata
+print(json.dumps({"dst": dst, "rows": md.num_rows, "row_groups": md.num_row_groups, "columns": md.num_columns, "dropped_nested": drop}))

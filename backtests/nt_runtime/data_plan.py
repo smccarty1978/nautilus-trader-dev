@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 import pandas as pd
 
@@ -461,18 +461,25 @@ def resolve_data_plan(
     return plan
 
 
-def verify_launch_dataset_bytes(data_plan: "DataPlan") -> Dict[str, Any]:
-    """Launch-time authority check: recompute the catalog's content digest from the bytes on
-    disk and require it to equal the dataset identity the plan resolved (causal audit pass-02
-    CRITICAL: R1 runs once at readiness; every real collection launch must prove the bytes
-    itself). Returns the recomputed digest record. No-op when the dataset declares no digest.
+def verify_launch_dataset_bytes(data_plan: "DataPlan", *, forbidden_years: Sequence[int] = ()) -> Dict[str, Any]:
+    """Launch-time authority check (causal audit pass-02 CRITICAL: R1 runs once at readiness; every
+    real collection launch must prove the bytes itself). The catalog's committed identity is proved
+    from its manifest inventory, and the bytes of exactly the files the engine's
+    ``[warmup_start_dt, end_dt]`` bar queries can open are re-hashed -- never the rest of the catalog
+    (``research_workflow.roots.verify_dataset_scope``). A file of a ``forbidden_years`` year inside the
+    window refuses before any byte is read. No-op when the dataset declares no digest.
     """
     if not data_plan.dataset_logical_digest:
         return {"status": "NO_DECLARED_DIGEST", "dataset_id": data_plan.dataset_id}
-    from research_workflow.roots import DatasetDigestMismatch, verify_dataset_bytes
+    from research_workflow.roots import (DatasetDigestMismatch, DatasetFilesDrifted, DatasetScopeRefused, utc_year_interval_ns,
+                                         verify_dataset_scope)
     try:
-        digest = verify_dataset_bytes(data_plan.catalog_path, data_plan.dataset_logical_digest)
-    except DatasetDigestMismatch as exc:
+        scope = verify_dataset_scope(data_plan.catalog_path, data_plan.dataset_logical_digest,
+                                     windows=[(int(data_plan.warmup_start_dt.value), int(data_plan.end_dt.value))],
+                                     bar_types=[data_plan.bar_type_1s, data_plan.bar_type_1m],
+                                     forbidden=[utc_year_interval_ns(y) for y in sorted({int(y) for y in forbidden_years})])
+    except (DatasetDigestMismatch, DatasetFilesDrifted, DatasetScopeRefused) as exc:
         raise WrongPhysicalDatasetError(f"WRONG_PHYSICAL_DATASET: launch-time byte verification failed: {exc}") from exc
-    return {"status": "VERIFIED", "dataset_id": data_plan.dataset_id, "logical_digest": digest["logical_digest"], "file_count": digest["file_count"], "total_bytes": digest["total_bytes"]}
+    return {"status": "VERIFIED", "dataset_id": data_plan.dataset_id, "logical_digest": scope["logical_digest"],
+            "file_count": scope["file_count"], "total_bytes": scope["total_bytes"], "scope": scope}
 

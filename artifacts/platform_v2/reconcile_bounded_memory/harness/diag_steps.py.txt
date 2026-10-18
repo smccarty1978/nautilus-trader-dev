@@ -1,0 +1,27 @@
+"""Evidence harness (not study code): per-step RSS of the NEW reconcile's parquet accesses on one file
+(footer parse, read_schema, zero-row to_pandas, KEY-column read). usage: diag_steps.py <parquet>"""
+import sys, os, json, time, threading, gc
+import psutil, pyarrow as pa, pyarrow.parquet as pq, pandas as pd
+p = sys.argv[1]
+proc = psutil.Process(); peak = [0]; stop = [False]
+def sampler():
+    while not stop[0]:
+        r = proc.memory_info().rss
+        if r > peak[0]: peak[0] = r
+        time.sleep(0.005)
+threading.Thread(target=sampler, daemon=True).start()
+steps = []; t0 = [time.time()]
+def mark(name, **kw):
+    g = lambda b: round(b / 1024**3, 3); now = time.time()
+    steps.append({"step": name, "dt_s": round(now - t0[0], 2), "rss_gib": g(proc.memory_info().rss), "peak_since_prev_gib": g(peak[0]),
+                  "arrow_pool_mib": round(pa.total_allocated_bytes() / 2**20, 1), **kw})
+    print(steps[-1], flush=True); t0[0] = now; peak[0] = proc.memory_info().rss
+mark("start", file_bytes=os.path.getsize(p))
+pf = pq.ParquetFile(p); md = pf.metadata; mark("ParquetFile footer", row_groups=md.num_row_groups, leaf_columns=md.num_columns, serialized_footer=md.serialized_size)
+sch = pq.read_schema(p); mark("pq.read_schema")
+names = tuple(sch.empty_table().to_pandas().columns); mark("empty_table.to_pandas")
+del pf, md, sch; gc.collect(); mark("del footer objects")
+k = pd.read_parquet(p, columns=["observation_ts", "regime_start_ns", "checkpoint_index"]); mark("pd.read_parquet KEY", rows=len(k))
+del k; gc.collect(); mark("del")
+pf = pq.ParquetFile(p); t = pf.read(columns=["observation_ts", "regime_start_ns", "checkpoint_index"]); k2 = t.to_pandas(); mark("ParquetFile.read KEY + to_pandas")
+stop[0] = True
