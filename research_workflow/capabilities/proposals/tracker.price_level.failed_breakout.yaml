@@ -1,0 +1,168 @@
+kind: tracker
+name: tracker.price_level.failed_breakout
+semantics: 'Failed-breakout (sweep and close back) episodes at FINALIZED reference
+  levels, on completed 1-minute bars inside RTH. The binding owns the canonical level
+  provider (features.trackers.generic_price_levels.GenericPriceLevelProvider over
+  PriceLevelTracker, fed the same completed 1m bars with the same is_rth_completed_bar_1m
+  rule as the price_level_value features), so level prices are the platform''s own:
+  prior-day high/low (pdh/pdl), overnight high/low final (onh/onl), 30-minute opening-range
+  high/low final (orh/orl).
+
+  Per level L, independently (resistance = pdh/onh/orh, support = pdl/onl/orl; support
+  mirrors resistance):
+
+  * ELIGIBLE: L is available in the provider snapshot taken after the PREVIOUS completed
+  bar (known at or before the current bar''s open). A level that is not yet final
+  (overnight before the first RTH bar has closed; opening range before the bar closing
+  at RTH open + 30 min) or missing is UNAVAILABLE and can neither start nor continue
+  an episode.
+
+  * ARMED: eligible and the previous completed bar closed at or below L (resistance;
+  at or above for support). A level never armed this RTH session, or one whose breakout
+  was accepted, is NOT armed until a completed bar closes at or below L.
+
+  * EPISODE START: an armed level and a completed RTH bar with high >= L + min_breach_points.
+  The breach bar opens the episode (episode_start_ts = its interval open); the episode
+  extreme starts at its high. A close beyond L is NOT required.
+
+  * EPISODE UPDATE: each later completed bar updates extreme = max(extreme, high)
+  BEFORE the failure test, so the extreme includes the failure bar.
+
+  * FAILURE (the event): a completed bar of the active episode, the breach bar included
+  (same-bar sweep), closes strictly below L (close < L). The event is stamped at that
+  bar''s close (event_ts = ts_init = the decision instant T); the stop reference is
+  the frozen episode extreme (max high for resistance -> short; min low for support
+  -> long). The level is immediately re-armed (the failure close is below L).
+
+  * EXPIRY: an episode whose failure bar would close later than episode_start_ts +
+  max_episode_minutes ends ACCEPTED with no event; the level re-arms only after a
+  later completed bar closes at or below L (that close emits nothing).
+
+  * INVALIDATION: the level becoming unavailable or changing price during an episode
+  aborts it (no event); the level must re-arm.
+
+  * Repeated breaches: unlimited; event_seq_level counts this level''s events in the
+  current RTH session (1 = first).
+
+  Per completed bar at most ONE primary event is published. Same-direction simultaneous
+  failures: the first level in the declared `levels` order wins (default pdh, pdl,
+  onh, onl, orh, orl -> prior day > overnight > opening range); n_levels_fired counts
+  every failure on the bar and each level''s own <lvl>_event flag is kept. Opposite
+  directions on one bar: no primary event, conflict = 1.
+
+  '
+availability_rule: 'Every field describes the state after the completed 1m bar closing
+  at ts_init and is readable from that instant (the mux publishes the bar at its close).
+  event / event_* / stop_reference_price hold only on the bar that fired and reset
+  on the next bar. A level used on a bar was published by the provider at or before
+  that bar''s open; nothing at or after the bar''s close, no later high/low/pivot
+  and no outcome is read.
+
+  '
+parameters:
+  min_breach_points: 0.5
+  max_episode_minutes: 5
+  levels:
+  - pdh
+  - pdl
+  - onh
+  - onl
+  - orh
+  - orl
+inputs:
+  bars: stream
+fields:
+- event
+- event_dir
+- event_level
+- event_level_price
+- event_level_available
+- breach_dir
+- episode_start_ts
+- episode_bars
+- episode_extreme
+- stop_reference_price
+- event_ts
+- event_seq_level
+- n_levels_fired
+- conflict
+- last_bar_close_ts
+- pdh_price
+- pdh_available
+- pdh_state
+- pdh_episode_extreme
+- pdh_event
+- pdl_price
+- pdl_available
+- pdl_state
+- pdl_episode_extreme
+- pdl_event
+- onh_price
+- onh_available
+- onh_state
+- onh_episode_extreme
+- onh_event
+- onl_price
+- onl_available
+- onl_state
+- onl_episode_extreme
+- onl_event
+- orh_price
+- orh_available
+- orh_state
+- orh_episode_extreme
+- orh_event
+- orl_price
+- orl_available
+- orl_state
+- orl_episode_extreme
+- orl_event
+events:
+- failed_breakout
+update_cadence: per_source_bar
+dependencies:
+- stream.completed_bar
+serves_studies:
+- nq_pa_failed_breakout_structural
+- nq_pa_opening_range_failure
+closest_existing:
+  id: tracker.candle.displacement_1m
+  why_not: 'No registered tracker keeps a breach episode at a level. displacement_1m
+    and bos_1m are single-bar / pivot detectors without levels; the price_level_*
+    features expose level prices and distances at an epoch but no episode state, and
+    the earlier nq_pa_level_setups SWEEP proxy (rolling_5m_high above the level and
+    the current close below it) has no ordering, no arming, no episode extreme and
+    no frozen stop.
+
+    '
+composition_attempted:
+  spec_fragment: 'fb: {tracker: price_level.failed_breakout, bars: 1m}; outcome.stop_reference:
+    fb.stop_reference_price'
+  compiler_gap: 'MISSING_CAPABILITY: no context tracker exposes a frozen sweep extreme;
+    outcome.stop_reference refuses epoch./const:/features. expressions (it must be
+    a context-tracker field read at T).'
+reset_policy: 'Episodes, arming and event_seq_level reset at every non-RTH completed
+  bar and at the first RTH bar of a trading day (no episode spans the close, a halt
+  or the overnight). Level prices follow the provider (prior day rolls at 17:00 CT;
+  overnight and opening range reset per trading day).
+
+  '
+null_policy: '<lvl>_price is null and <lvl>_available 0 while the provider has no
+  final level; <lvl>_state is UNAVAILABLE then. event_* fields, episode_* and stop_reference_price
+  are null (event 0, event_dir 0) on every bar without a primary event. Never 0 as
+  a stand-in for a price.
+
+  '
+gap_policy: 'No fill of its own. Expiry is wall-clock (episode_start_ts + max_episode_minutes),
+  so a missing minute cannot extend an episode; a missing minute''s high/low is simply
+  not in the extreme (declared, not repaired). A gap of more than one minute between
+  consecutive RTH bars does not reset episodes.
+
+  '
+proposal_sha256: a212496bdf6cc3a11e541e6137d7cae349e164cb8040f3fa2ab055a0af3813af
+status: promoted
+proposed_at_utc: '2026-10-18T15:44:32.921194+00:00'
+scaffold:
+  module: features/trackers/price_level_failed_breakout.py
+  test: features/tests/test_price_level_failed_breakout.py
+  class: PriceLevelFailedBreakoutBinding
