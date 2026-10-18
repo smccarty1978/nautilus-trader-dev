@@ -1066,20 +1066,41 @@ def _resolve_outcome(ctx: _Ctx, population: Mapping[str, Any]) -> Dict[str, Any]
                           "favorable_points": b.get("favorable_points"), "adverse_points": b.get("adverse_points")}]
         has_atr_arm = False
         has_ref_arm = False
+        has_struct_arm = False
         for a in arm_specs:
             hz = a.get("horizon") or b.get("horizon") or o.horizon
             if hz is None:
                 ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"outcome.barrier.{a.get('id')}", "a barrier arm needs a horizon")
                 continue
             unit = str(a.get("unit") or b.get("unit") or "atr")
-            if unit not in ("atr", "points", "reference", "recovery"):
+            if unit not in ("atr", "points", "reference", "recovery", "structural"):
                 ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"outcome.barrier.{a.get('id')}.unit", f"unknown arm unit {unit!r}")
                 continue
             fav_atr = None
             adv_atr = None
             fav_pts = None
             adv_pts = None
-            if unit == "atr":
+            structural: Optional[Dict[str, Any]] = None
+            if unit == "structural":
+                has_struct_arm = True
+                try:
+                    rr = float(a["reward_risk"])
+                    buf = float(a.get("stop_buffer_points") or 0.0)
+                    tick = float(a["tick_size"]) if a.get("tick_size") is not None else None
+                except (KeyError, TypeError, ValueError):
+                    ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"outcome.barrier.{a.get('id')}",
+                            "unit: structural requires a numeric reward_risk (and numeric stop_buffer_points / tick_size when given)")
+                    continue
+                if not (rr > 0) or not (buf >= 0) or (tick is not None and not (tick > 0)):
+                    ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"outcome.barrier.{a.get('id')}",
+                            "unit: structural needs reward_risk > 0, stop_buffer_points >= 0 and tick_size > 0 when given")
+                    continue
+                if any(a.get(k) is not None for k in ("favorable_atr", "adverse_atr", "favorable_points", "adverse_points")):
+                    ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"outcome.barrier.{a.get('id')}",
+                            "unit: structural derives both barriers from stop_reference; ATR/points distances are not allowed")
+                    continue
+                structural = {"reward_risk": rr, "stop_buffer_points": buf, "tick_size": tick}
+            elif unit == "atr":
                 has_atr_arm = True
                 try:
                     fav_atr, adv_atr = float(a["favorable_atr"]), float(a["adverse_atr"])
@@ -1132,15 +1153,30 @@ def _resolve_outcome(ctx: _Ctx, population: Mapping[str, Any]) -> Dict[str, Any]
             expiry = str(a.get("expiry") or b.get("expiry") or "censor")
             if expiry not in ("censor", "negative"):
                 ctx.gap(GapKind.INVALID_PARAMETERIZATION, f"outcome.barrier.{a.get('id')}.expiry", f"unknown expiry policy {expiry!r}")
-            arms.append({"id": str(a["id"]), "unit": unit,
-                         "favorable_atr": fav_atr or 0.0, "adverse_atr": adv_atr or 0.0,
-                         "favorable_points": fav_pts, "adverse_points": adv_pts,
-                         "horizon_ns": duration_seconds(hz) * NS,
-                         "expiry": expiry, "prefix": str(a.get("prefix") or a["id"])})
+            arm_out = {"id": str(a["id"]), "unit": unit,
+                       "favorable_atr": fav_atr or 0.0, "adverse_atr": adv_atr or 0.0,
+                       "favorable_points": fav_pts, "adverse_points": adv_pts,
+                       "horizon_ns": duration_seconds(hz) * NS,
+                       "expiry": expiry, "prefix": str(a.get("prefix") or a["id"])}
+            if structural is not None:   # keys only on structural arms: every other plan compiles byte-identically
+                arm_out.update(structural)
+            arms.append(arm_out)
         primary = b.get("primary") or (arms[0]["id"] if len(arms) == 1 else None)
         if len(arms) > 1 and primary is None:
             ctx.gap(GapKind.SEMANTIC_DECISION_REQUIRED, "outcome.barrier.primary",
                     "a multi-arm barrier outcome must name which arm is the primary label (the legacy label columns)")
+        if has_struct_arm:
+            sref = o.stop_reference
+            if not sref:
+                ctx.gap(GapKind.INVALID_PARAMETERIZATION, "outcome.stop_reference",
+                        "a unit: structural arm needs outcome.stop_reference (a context-tracker field holding the stop price at T)")
+            elif str(sref).startswith(("epoch.", "const:")):
+                ctx.gap(GapKind.INVALID_PARAMETERIZATION, "outcome.stop_reference",
+                        f"{sref!r}: the structural stop must be a context-tracker field known at T, not an epoch price or a constant")
+            else:
+                _validate_ref(ctx, sref, "outcome.stop_reference", allow_epoch=False)
+        elif o.stop_reference is not None:
+            ctx.gap(GapKind.INVALID_PARAMETERIZATION, "outcome.stop_reference", "outcome.stop_reference is only read by unit: structural arms")
         if has_ref_arm and (o.reference is None and not o.recovery):
             ctx.gap(GapKind.INVALID_PARAMETERIZATION, "outcome.reference", "unit: reference or recovery arm requires outcome.reference")
         elif has_ref_arm and o.reference is not None:
@@ -1307,6 +1343,8 @@ def _resolve_outcome(ctx: _Ctx, population: Mapping[str, Any]) -> Dict[str, Any]
         "arms": arms, "primary_arm": primary, "flip": flip, "stream": stream, "label_column": o.label_column or "target_flip_within_horizon",
         "composition": ({"logic": o.composition, "children": [a["id"] for a in arms] + (["event"] if flip else [])} if (arms and flip) else None),
     }
+    if o.stop_reference is not None:
+        contract["stop_reference"] = o.stop_reference
     if o.kind == "trade":
         fm = o.fill_model.model_dump() if o.fill_model else {}
         contract.update({"fill_model": fm, "exits": [it.model_dump() for it in o.items], "precedence": list(o.precedence),
@@ -1318,6 +1356,10 @@ def _resolve_outcome(ctx: _Ctx, population: Mapping[str, Any]) -> Dict[str, Any]
     if len(arms) > 1 or (len(arms) == 1 and primary is None and arms[0]["prefix"] != arms[0]["id"]):
         for a in arms:
             obs += [f"{a['prefix']}_label", f"{a['prefix']}_disposition", f"{a['prefix']}_censor_reason", f"{a['prefix']}_resolution_seconds"]
+    from research_workflow.host.outcomes import STRUCTURAL_ARM_SUFFIXES
+    for a in arms:
+        if a["unit"] == "structural":
+            obs += [f"{a['prefix']}{sfx}" for sfx in STRUCTURAL_ARM_SUFFIXES]
     # A5: every new compile carries observed_seconds = (resolved_at_ts - T)/1e9 (the analysis harness's own
     # terminal-minus-anchor definition). A contract field, not a legacy column: sealed plans replay unchanged.
     contract["observed_seconds"] = True

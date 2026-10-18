@@ -88,9 +88,32 @@ class BarrierArm:
     horizon_ns: int
     expiry: str                 # "censor" | "negative"
     prefix: str                 # output column prefix (per-arm columns)
-    unit: str = "atr"           # "atr" | "points" | "reference" | "recovery"
+    unit: str = "atr"           # "atr" | "points" | "reference" | "recovery" | "structural"
     favorable_points: Optional[float] = None
     adverse_points: Optional[float] = None
+    # unit: structural (stop = contract.stop_ref price frozen at T, moved stop_buffer_points away from the entry;
+    # target = entry + d * reward_risk * risk; both rounded away from the entry to tick_size when declared)
+    reward_risk: Optional[float] = None
+    stop_buffer_points: float = 0.0
+    tick_size: Optional[float] = None
+
+
+# Per-arm outcome columns of a unit: structural arm (after the four per-arm label columns, compiler order).
+STRUCTURAL_ARM_SUFFIXES = ("_stop_price", "_target_price", "_risk_points", "_reward_risk_effective", "_ambiguous_same_bar")
+
+
+def _round_away(price: float, tick: Optional[float], direction: int, side: str) -> float:
+    """Round a barrier price to the tick grid AWAY from the entry (conservative on both barriers).
+
+    side 'stop': a long stop rounds down, a short stop up; side 'target': a long target rounds up, a short
+    target down. A price already on the grid (within 1e-9 ticks) is kept exactly.
+    """
+    if tick is None:
+        return price
+    q = price / tick
+    up = (direction > 0) == (side == "target")
+    k = math.ceil(q - 1e-9) if up else math.floor(q + 1e-9)  # host-constant: tick-grid tolerance (1e-9 ticks) so on-grid prices stay exact
+    return round(k * tick, 10)  # host-constant: decimal places that remove float noise from k * tick
 
 
 @dataclass(frozen=True)
@@ -150,6 +173,7 @@ class LabelOutcomeContract:
     # study (`outcome.entry_observation: true`); plans that do not request it replay unchanged.
     entry_observation: bool = False
     reference_ref: Optional[str] = None
+    stop_ref: Optional[str] = None
     session_cutoff: Optional[Mapping[str, Any]] = None
     entry_cutoff: Optional[Mapping[str, Any]] = None
 
@@ -163,7 +187,10 @@ class LabelOutcomeContract:
                                 str(a.get("expiry", "censor")), str(a.get("prefix", a["id"])),
                                 unit=str(a.get("unit", "atr")),
                                 favorable_points=(float(a["favorable_points"]) if a.get("favorable_points") is not None else None),
-                                adverse_points=(float(a["adverse_points"]) if a.get("adverse_points") is not None else None))
+                                adverse_points=(float(a["adverse_points"]) if a.get("adverse_points") is not None else None),
+                                reward_risk=(float(a["reward_risk"]) if a.get("reward_risk") is not None else None),
+                                stop_buffer_points=float(a.get("stop_buffer_points") or 0.0),
+                                tick_size=(float(a["tick_size"]) if a.get("tick_size") is not None else None))
                      for a in spec.get("arms") or ())
         flip = spec.get("flip")
         return cls(kernel=str(spec["kernel"]), direction_ref=str(spec["direction"]), atr_ref=spec.get("atr"),
@@ -184,6 +211,7 @@ class LabelOutcomeContract:
                                          if spec.get("cost_points_per_side") is not None else None),
                    data_end_lookahead_ns=(int(spec["data_end_lookahead_ns"]) if spec.get("data_end_lookahead_ns") is not None else None),
                    reference_ref=(str(spec["reference"]) if spec.get("reference") is not None else None),
+                   stop_ref=(str(spec["stop_reference"]) if spec.get("stop_reference") is not None else None),
                    session_cutoff=spec.get("session_cutoff"),
                    entry_cutoff=spec.get("entry_cutoff"))
 
@@ -221,7 +249,10 @@ class TradeExecutionContract:
                                 str(a.get("expiry", "censor")), str(a.get("prefix", a["id"])),
                                 unit=str(a.get("unit", "atr")),
                                 favorable_points=(float(a["favorable_points"]) if a.get("favorable_points") is not None else None),
-                                adverse_points=(float(a["adverse_points"]) if a.get("adverse_points") is not None else None))
+                                adverse_points=(float(a["adverse_points"]) if a.get("adverse_points") is not None else None),
+                                reward_risk=(float(a["reward_risk"]) if a.get("reward_risk") is not None else None),
+                                stop_buffer_points=float(a.get("stop_buffer_points") or 0.0),
+                                tick_size=(float(a["tick_size"]) if a.get("tick_size") is not None else None))
                      for a in spec.get("arms") or ())
         return cls(direction_ref=str(spec["direction"]), atr_ref=spec.get("atr"),
                    entry_reference=str(spec.get("entry_reference", "next_bar_open")),
@@ -240,6 +271,16 @@ def compile_outcome_contract(spec: Mapping[str, Any]):
     raise OutcomeContractError(f"UNKNOWN_OUTCOME_CONTRACT: {kind!r}")
 
 
+def _finite_or_none(x: Any) -> Optional[float]:
+    if x is None:
+        return None
+    try:
+        v = float(x)
+    except (TypeError, ValueError):
+        return None
+    return v if math.isfinite(v) else None
+
+
 # --------------------------------------------------------------------------- #
 # pending state (scalar; one record per candidate)
 # --------------------------------------------------------------------------- #
@@ -249,11 +290,12 @@ class _Pending:
                  "arm_truncated",
                  "flip_end", "flip_state", "flip_at", "flip_reason", "flip_ts", "opened_at",
                  "exit_ts", "exit_price", "exit_reason",
-                 "reference_price", "decision_price")
+                 "reference_price", "decision_price", "stop_price", "arm_risk", "arm_amb")
 
     def __init__(self, identity: Dict[str, Any], T: int, direction: int, atr: float, session_close: Optional[int],
                  n_arms: int, flip_end: Optional[int], prevailing: int,
-                 reference_price: Optional[float] = None, decision_price: Optional[float] = None) -> None:
+                 reference_price: Optional[float] = None, decision_price: Optional[float] = None,
+                 stop_price: Optional[float] = None) -> None:
         self.identity = identity
         self.T = T
         self.direction = direction
@@ -288,6 +330,9 @@ class _Pending:
         self.exit_reason: Optional[str] = None
         self.reference_price = reference_price
         self.decision_price = decision_price
+        self.stop_price = stop_price            # unit: structural -- frozen at T, never re-read
+        self.arm_risk = [None] * n_arms         # effective entry-to-stop distance after rounding
+        self.arm_amb = [False] * n_arms         # the resolving bar touched both barriers
 
 
 # --------------------------------------------------------------------------- #
@@ -325,6 +370,9 @@ class LabelOutcomeKernel:
         # buffers from THIS list, so a column the compiler declares but the kernel omits is emitted
         # into the row dict and then silently dropped on the way to parquet. Placed BEFORE
         # observed_seconds so A5's invariant (observed_seconds is the last column) still holds.
+        for arm in self.arms:
+            if arm.unit == "structural":
+                self.observation_columns += [f"{arm.prefix}{sfx}" for sfx in STRUCTURAL_ARM_SUFFIXES]
         if contract.terminal_outcome:
             self.observation_columns += TERMINAL_OBSERVATION_COLUMNS
         if contract.entry_observation:
@@ -340,7 +388,8 @@ class LabelOutcomeKernel:
 
     # -- opening ------------------------------------------------------------------
     def open(self, identity: Dict[str, Any], T: int, direction: int, atr: Optional[float],
-             reference_price: Optional[float] = None, decision_price: Optional[float] = None) -> None:
+             reference_price: Optional[float] = None, decision_price: Optional[float] = None,
+             stop_price: Optional[float] = None) -> None:
         if self.c.kernel == "recovery":
             if reference_price is None or not math.isfinite(float(reference_price)):
                 raise OutcomeContractError("RECOVERY_REFERENCE_PRICE_MISSING: recovery outcome needs reference price at T")
@@ -363,7 +412,8 @@ class LabelOutcomeKernel:
         flip_end = (T + self.c.flip.horizon_ns) if self.c.flip is not None else None
         p = _Pending(identity, T, int(direction) * self.c.direction_sign, float(atr or 0.0), session_close, self.n_arms, flip_end, int(direction),
                      reference_price=float(reference_price) if reference_price is not None else None,
-                     decision_price=float(decision_price) if decision_price is not None else None)
+                     decision_price=float(decision_price) if decision_price is not None else None,
+                     stop_price=_finite_or_none(stop_price))
         self.pending.append(p)
         if self.c.kernel == "flip":
             self._flip_queue.append(p)
@@ -508,6 +558,22 @@ class LabelOutcomeKernel:
                             if (d > 0 and ep >= p_ref) or (d < 0 and ep <= p_ref):
                                 self._resolve_arm(p, i, CENSORED, p.entry_ts, "ANCHOR_ALREADY_CROSSED")
                                 continue
+                        elif arm.unit == "structural":
+                            # Risk is measured from the EXECUTABLE entry ep (next_bar_open), never the signal close.
+                            if p.stop_price is None:
+                                self._resolve_arm(p, i, CENSORED, p.entry_ts, "STRUCTURAL_STOP_MISSING")
+                                continue
+                            stop = _round_away(p.stop_price - d * arm.stop_buffer_points, arm.tick_size, d, "stop")
+                            p.arm_bad[i] = stop
+                            risk = d * (ep - stop)
+                            if abs(risk) <= 1e-9:  # host-constant: float zero-risk tolerance
+                                self._resolve_arm(p, i, CENSORED, p.entry_ts, "STRUCTURAL_STOP_ZERO_RISK")
+                                continue
+                            if risk < 0:
+                                self._resolve_arm(p, i, CENSORED, p.entry_ts, "STRUCTURAL_STOP_WRONG_SIDE")
+                                continue
+                            p.arm_good[i] = _round_away(ep + d * arm.reward_risk * risk, arm.tick_size, d, "target")
+                            p.arm_risk[i] = risk
                         else:  # arm.unit == "atr"
                             p.arm_good[i] = ep + d * arm.favorable_atr * atr
                             p.arm_bad[i] = ep - d * arm.adverse_atr * atr
@@ -582,6 +648,7 @@ class LabelOutcomeKernel:
                         hit_good = hi >= good if d > 0 else lo <= good
                         hit_bad = lo <= bad if d > 0 else hi >= bad
                         if hit_good and hit_bad:
+                            p.arm_amb[i] = True
                             adverse_first = self.c.same_bar_rule == "adverse_first"
                             self._resolve_arm(p, i, NEGATIVE if adverse_first else CENSORED, ts, None if adverse_first else "AMBIGUOUS_SAME_BAR_TOUCH")
                         elif hit_good:
@@ -602,6 +669,7 @@ class LabelOutcomeKernel:
                     hit_good = hi >= good if d > 0 else lo <= good
                     hit_bad = lo <= bad if d > 0 else hi >= bad
                     if hit_good and hit_bad:
+                        p.arm_amb[i] = True
                         if self.c.same_bar_rule == "adverse_first":
                             self._resolve_arm(p, i, NEGATIVE, ts, None)
                         else:
@@ -832,6 +900,16 @@ class LabelOutcomeKernel:
                 row[f"{arm.prefix}_disposition"] = st
                 row[f"{arm.prefix}_censor_reason"] = rr
                 row[f"{arm.prefix}_resolution_seconds"] = res_s
+        for i, arm in enumerate(self.arms):
+            if arm.unit != "structural":
+                continue
+            placed = p.entry_resolved and p.arm_risk[i] is not None
+            stop_known = p.entry_resolved and p.stop_price is not None and p.arm_reason[i] not in ("ENTRY_PAST_CUTOFF", "GAP")
+            row[f"{arm.prefix}_stop_price"] = p.arm_bad[i] if (placed or stop_known) else None
+            row[f"{arm.prefix}_target_price"] = p.arm_good[i] if placed else None
+            row[f"{arm.prefix}_risk_points"] = p.arm_risk[i] if placed else None
+            row[f"{arm.prefix}_reward_risk_effective"] = (p.direction * (p.arm_good[i] - p.entry_price) / p.arm_risk[i]) if placed else None
+            row[f"{arm.prefix}_ambiguous_same_bar"] = bool(p.arm_amb[i])
         self.rows.append(row)
 
     def _compute_cutoff_ts(self, epoch_t: int, cutoff_spec: Optional[Mapping[str, Any]]) -> Optional[int]:

@@ -201,6 +201,7 @@ class HostCore:
             self.flip_source = contract.flip.source if contract.flip is not None else None
             self.atr_ref = contract.atr_ref
             self.reference_ref = contract.reference_ref
+            self.stop_ref = contract.stop_ref
             self.atr_through_ts = str(self.plan["outcome"].get("atr_availability", "at_decision_delivery")) == "through_decision_ts"
         self._deferred_opens: List[Tuple[Dict[str, Any], int, int, EpochView]] = []
 
@@ -269,7 +270,8 @@ class HostCore:
             if before_ts is None or T < before_ts:
                 atr = self.resolve(self.atr_ref, epoch) if self.atr_ref else None
                 ref_px = self.resolve(self.reference_ref, epoch) if getattr(self, "reference_ref", None) else None
-                self.kernel.open(identity, T, direction, atr, reference_price=ref_px, decision_price=epoch.price)
+                self.kernel.open(identity, T, direction, atr, reference_price=ref_px, decision_price=epoch.price,
+                                 stop_price=(self.resolve(self.stop_ref, epoch) if getattr(self, "stop_ref", None) else None))
             else:
                 keep.append((identity, T, direction, epoch))
         self._deferred_opens = keep
@@ -426,7 +428,8 @@ class HostCore:
         else:
             atr = self.resolve(self.atr_ref, epoch) if self.atr_ref else None
             ref_px = self.resolve(self.reference_ref, epoch) if getattr(self, "reference_ref", None) else None
-            self.kernel.open(identity, T, direction, atr, reference_price=ref_px, decision_price=epoch.price)
+            self.kernel.open(identity, T, direction, atr, reference_price=ref_px, decision_price=epoch.price,
+                                 stop_price=(self.resolve(self.stop_ref, epoch) if getattr(self, "stop_ref", None) else None))
         self.sink.record("candidate", T, (row["regime_start_ns"], row["checkpoint_index"]), {"direction": direction})
 
     # -- end -------------------------------------------------------------------------------------

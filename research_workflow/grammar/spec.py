@@ -141,11 +141,17 @@ class FeaturesSpec(_Strict):
 
 class BarrierArmSpec(_Strict):
     id: str
-    unit: Literal["atr", "points", "reference", "recovery"] = "atr"
+    unit: Literal["atr", "points", "reference", "recovery", "structural"] = "atr"
     favorable_atr: Optional[float] = Field(default=None, gt=0)
     adverse_atr: Optional[float] = Field(default=None, gt=0)
     favorable_points: Optional[float] = Field(default=None, gt=0)
     adverse_points: Optional[float] = Field(default=None, gt=0)
+    # unit: structural -- stop at outcome.stop_reference (frozen at T) moved stop_buffer_points away from the
+    # entry; target at reward_risk x the executable entry-to-stop distance; both rounded AWAY from the entry
+    # to tick_size when given.
+    reward_risk: Optional[float] = Field(default=None, gt=0)
+    stop_buffer_points: Optional[float] = Field(default=None, ge=0)
+    tick_size: Optional[float] = Field(default=None, gt=0)
     horizon: Optional[str] = None
     expiry: Literal["censor", "negative"] = "censor"
 
@@ -207,6 +213,7 @@ class OutcomeSpec(_Strict):
     # economics are emitted as explicitly unavailable (null) rather than guessed.
     recovery: Optional[Dict[str, Any]] = None     # {reference, milestones: [...], horizon?, expiry?}
     reference: Optional[str] = None                # target reference price, e.g. anchor level or price_level_tracker.rth_open_price
+    stop_reference: Optional[str] = None           # unit: structural -- absolute stop price, a context-tracker field read at T
     cost_points_per_side: Optional[float] = None
     # Opt-in causal executable-entry observation: executable_entry_ts / executable_entry_price /
     # executable_entry_unavailable_reason, published whenever the entry is known, independent of any
