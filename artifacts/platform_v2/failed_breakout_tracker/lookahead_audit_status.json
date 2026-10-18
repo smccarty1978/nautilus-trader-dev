@@ -1,0 +1,34 @@
+{
+  "audit_type": "causal",
+  "pass": 1,
+  "worktree": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-failed_breakout_tracker",
+  "branch": "chore/failed_breakout_tracker",
+  "scope_files": [
+    "features/trackers/price_level_failed_breakout.py",
+    "research_workflow/capabilities/proposals/tracker.price_level.failed_breakout.yaml",
+    "features/tests/test_price_level_failed_breakout.py"
+  ],
+  "context_files_read": [
+    "features/trackers/generic_price_levels.py",
+    "features/trackers/price_levels.py",
+    "utils/session_boundaries.py",
+    "research_workflow/host/interfaces.py",
+    "research_workflow/host/outcomes.py"
+  ],
+  "verdict": "PASS_WITH_NOTES",
+  "critical": 0,
+  "warning": 0,
+  "note": 1,
+  "checklist_items_covered": [
+    "1_level_known_before_bar_open",
+    "2_on_or_final_not_usable_same_bar",
+    "3_stop_reference_extreme_includes_failure_bar_resets_next_bar",
+    "4_session_reset_no_episode_spans_close",
+    "5_oracle_independence",
+    "6_ts_event_vs_ts_init_and_deadline_off_by_one"
+  ],
+  "notes": [
+    "F2: first-RTH-bar same-bar arm+breach+fail can be driven by a pre-RTH close (price_level_failed_breakout.py:105-118,190-194); causally valid (no future info), not independently tested either direction against contract reset_policy wording."
+  ],
+  "report_path": "C:\\Users\\SCOTTM~1\\AppData\\Local\\Temp\\claude\\C--Users-Scott-McCarty-Projects-Nautilus-Trader\\26f8edd5-f033-4103-85ad-5b27d8130135\\scratchpad\\fb_audit\\pass_01.md"
+}

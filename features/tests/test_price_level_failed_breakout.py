@@ -248,6 +248,19 @@ def test_opening_range_is_usable_only_after_its_final_bar():
     assert (tr[-1]["event"], tr[-1]["event_level"], tr[-1]["stop_reference_price"]) == (1, "orh", 100.75)
 
 
+def test_first_rth_bar_arms_from_the_last_pre_rth_close():
+    """Declared reset_policy: the reset clears state, not the arming input -- the first RTH bar arms on the last
+    pre-RTH close. Prior-day high 92 (day 1); pre-RTH closes 91 (armed) vs 93 (not armed)."""
+    day1 = _day(2030, 1, 7, pre=[(90, 91, 89, 90)] * 3, rth=[(90, 92, 88, 90)] * 3, prev_day=(2030, 1, 6))
+    for pre_close, expect in ((91.0, 1), (93.0, 0)):
+        day2 = _day(2030, 1, 8, pre=[(91, 91.5, 90.5, 91), (91, 93.5, 90.5, pre_close)],
+                    rth=[(pre_close, 92.75, 90.75, 91.5)])          # sweeps PDH by 0.75, closes back below
+        tr = _feed(_fb(levels=["pdh"]), day1 + day2)
+        assert tr[-1]["event"] == expect, (pre_close, tr[-1])
+        if expect:
+            assert (tr[-1]["stop_reference_price"], tr[-1]["episode_start_ts"]) == (92.75, _ts(2030, 1, 8, 8, 30))
+
+
 def test_episodes_do_not_survive_the_rth_close_or_the_next_session():
     pre = [(98, 100, 97, 99)] * 2
     rth_close = _ts(2030, 1, 8, 15, 14)

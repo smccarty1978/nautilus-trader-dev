@@ -144,7 +144,11 @@ composition_attempted:
 reset_policy: 'Episodes, arming and event_seq_level reset at every non-RTH completed
   bar and at the first RTH bar of a trading day (no episode spans the close, a halt
   or the overnight). Level prices follow the provider (prior day rolls at 17:00 CT;
-  overnight and opening range reset per trading day).
+  overnight and opening range reset per trading day). The reset clears episodes and
+  arming STATE only: the arming test on the first RTH bar reads the previous completed
+  bar''s close as on every bar, i.e. the last pre-RTH close (a real, already-closed
+  bar), so a level eligible at the open (prior day; overnight and opening range are not
+  yet final there) can arm, be swept and fail on the first RTH bar.
 
   '
 null_policy: '<lvl>_price is null and <lvl>_available 0 while the provider has no
@@ -159,7 +163,7 @@ gap_policy: 'No fill of its own. Expiry is wall-clock (episode_start_ts + max_ep
   consecutive RTH bars does not reset episodes.
 
   '
-proposal_sha256: a212496bdf6cc3a11e541e6137d7cae349e164cb8040f3fa2ab055a0af3813af
+proposal_sha256: c8332d7f28f6a097edd05dfe56df7ed69a0e1e42a36037eea59285d5e2188678
 status: promoted
 proposed_at_utc: '2026-10-18T15:44:32.921194+00:00'
 scaffold:
