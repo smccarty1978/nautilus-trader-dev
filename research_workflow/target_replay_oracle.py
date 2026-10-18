@@ -16,6 +16,7 @@ independent of the runtime's.
 """
 from __future__ import annotations
 
+from decimal import ROUND_CEILING, ROUND_FLOOR, ROUND_HALF_EVEN, Decimal
 from typing import Iterable, Mapping
 
 NS = 1_000_000_000
@@ -60,6 +61,36 @@ def _contract_barrier(contract: Mapping, candidate: Mapping | None = None) -> tu
     return barrier, entry_reference, session_end_censoring, max_gap_seconds
 
 
+def _grid(value: float, tick: float | None, rounding: str) -> float:
+    """Independent tick rounding in decimal arithmetic: quantize to 1e-9 points, then floor/ceil to the grid."""
+    if tick is None:
+        return float(value)
+    v = Decimal(repr(float(value))).quantize(Decimal("1e-9"), rounding=ROUND_HALF_EVEN)
+    t = Decimal(repr(float(tick)))
+    return float((v / t).to_integral_value(rounding=rounding) * t)
+
+
+def _structural_levels(barrier: Mapping, stop_ref: float | None, entry_price: float, direction: int):
+    """(stop, target, risk, censor_reason) for a unit: structural barrier, derived from first principles."""
+    if stop_ref is None or stop_ref != stop_ref or stop_ref in (float("inf"), float("-inf")):
+        return None, None, None, "STRUCTURAL_STOP_MISSING"
+    tick = barrier.get("tick_size")
+    buffer = float(barrier.get("stop_buffer_points") or 0.0)
+    if direction > 0:   # long: stop under the structure, target above the entry
+        stop = _grid(float(stop_ref) - buffer, tick, ROUND_FLOOR)
+        risk = entry_price - stop
+    else:               # short: stop over the structure, target below the entry
+        stop = _grid(float(stop_ref) + buffer, tick, ROUND_CEILING)
+        risk = stop - entry_price
+    if Decimal(repr(risk)).quantize(Decimal("1e-9"), rounding=ROUND_HALF_EVEN) == 0:
+        return stop, None, None, "STRUCTURAL_STOP_ZERO_RISK"
+    if risk < 0:
+        return stop, None, None, "STRUCTURAL_STOP_WRONG_SIDE"
+    reward = float(barrier["reward_risk"]) * risk
+    target = _grid(entry_price + reward, tick, ROUND_CEILING) if direction > 0 else _grid(entry_price - reward, tick, ROUND_FLOOR)
+    return stop, target, risk, None
+
+
 def replay(contract: Mapping, candidate: Mapping, events: Iterable[Mapping]) -> dict:
     primitive = contract.get("primitive")
     if primitive != "ordered_barrier":
@@ -80,12 +111,15 @@ def replay(contract: Mapping, candidate: Mapping, events: Iterable[Mapping]) -> 
     truncate = str((barrier or {}).get("session_end_rule",
                    candidate.get("session_end_rule",
                    contract.get("session_end_rule", "censor")))) == "truncate"
-    atr = float(candidate["atr"])
-    if not (atr > 0):
-        return {"disposition": "CENSORED", "label": None, "censor_reason": "FROZEN_ATR_NONPOSITIVE"}
+    structural = bool(barrier) and barrier.get("unit") == "structural"
     direction = int(candidate.get("direction", candidate.get("regime_direction", 1)))
-    fav = float(barrier["favorable_atr"]) if barrier else float(candidate["favorable_atr"])
-    adv = float(barrier["adverse_atr"]) if barrier else float(candidate["adverse_atr"])
+    if not structural:
+        atr = float(candidate["atr"])
+        if not (atr > 0):
+            return {"disposition": "CENSORED", "label": None, "censor_reason": "FROZEN_ATR_NONPOSITIVE"}
+        fav = float(barrier["favorable_atr"]) if barrier else float(candidate["favorable_atr"])
+        adv = float(barrier["adverse_atr"]) if barrier else float(candidate["adverse_atr"])
+    stop_first = structural and str(barrier.get("same_bar_rule", candidate.get("same_bar_rule", "ambiguous_censor"))) == "adverse_first"
     horizon_s = (
         int(barrier["horizon_seconds"]) if barrier
         else int(candidate.get("horizon_seconds", 0))
@@ -115,6 +149,24 @@ def replay(contract: Mapping, candidate: Mapping, events: Iterable[Mapping]) -> 
         entry_ts = T
         horizon_end_ts = int(candidate["horizon_end_ts"])
 
+    extra: dict = {}
+    if structural:
+        if not independent:
+            raise ValueError("ORACLE_STRUCTURAL_NEEDS_TAPE: a structural barrier derives its risk from the tape entry")
+        stop_ref = candidate.get("stop_price")
+        stop, target, risk, bad_reason = _structural_levels(barrier, None if stop_ref is None else float(stop_ref),
+                                                            entry_price, direction)
+        extra = {"stop_price": stop, "target_price": target, "risk_points": risk,
+                 "reward_risk_effective": (abs(target - entry_price) / risk) if risk else None, "ambiguous_same_bar": False}
+        if bad_reason is not None:
+            return {"disposition": "CENSORED", "label": None, "censor_reason": bad_reason, **extra}
+
+    def _out(disposition: str, label, reason, ambiguous: bool = False) -> dict:
+        res = {"disposition": disposition, "label": label, "censor_reason": reason}
+        if structural:
+            res.update(extra, ambiguous_same_bar=ambiguous)
+        return res
+
     truncated = False
     if session_close_ts is not None and horizon_end_ts > int(session_close_ts):
         if not truncate:
@@ -123,8 +175,11 @@ def replay(contract: Mapping, candidate: Mapping, events: Iterable[Mapping]) -> 
         # resolves the arm at its own first-passage bar; reaching it untouched is SESSION_END.
         horizon_end_ts, truncated = int(session_close_ts), True
 
-    good = entry_price + direction * fav * atr
-    bad = entry_price - direction * adv * atr
+    if structural:
+        good, bad = extra["target_price"], extra["stop_price"]
+    else:
+        good = entry_price + direction * fav * atr
+        bad = entry_price - direction * adv * atr
 
     prev_ts = entry_ts
     end_rule = str((barrier or {}).get("horizon_end_rule", candidate.get("horizon_end_rule", "strict")))
@@ -141,7 +196,7 @@ def replay(contract: Mapping, candidate: Mapping, events: Iterable[Mapping]) -> 
             # spanning the horizon end can otherwise manufacture a directional label from
             # zero price observation over the whole interval (C-B).
             if not truncate and session_close_ts is not None and ts > int(session_close_ts):
-                return {"disposition": "CENSORED", "label": None, "censor_reason": "SESSION_END"}
+                return _out("CENSORED", None, "SESSION_END")
             # Under truncate the close is already `horizon_end_ts`; a bar past it is out of session
             # and never touch-eligible, so `first_bar_at_or_after` degrades to `strict` there.
             if end_rule != "first_bar_at_or_after" or truncated:
@@ -153,30 +208,32 @@ def replay(contract: Mapping, candidate: Mapping, events: Iterable[Mapping]) -> 
                 # irrelevant to this barrier).
                 unobserved = horizon_end_ts - prev_ts
                 if max_gap_ns is not None and unobserved > max_gap_ns:
-                    return {"disposition": "CENSORED", "label": None, "censor_reason": "GAP"}
+                    return _out("CENSORED", None, "GAP")
                 break
             # first_bar_at_or_after: this bar IS the resolution observation, so the raw
             # bar-to-bar gap to it is what must be judged reliable before it is trusted for
             # a touch, then the arm expires.
             if e.get("gap") or (max_gap_ns is not None and ts - prev_ts > max_gap_ns):
-                return {"disposition": "CENSORED", "label": None, "censor_reason": "GAP"}
+                return _out("CENSORED", None, "GAP")
             hi, lo = e.get("high"), e.get("low")
             if hi is not None and lo is not None:
                 hit_good = float(hi) >= good if direction > 0 else float(lo) <= good
                 hit_bad = float(lo) <= bad if direction > 0 else float(hi) >= bad
                 if hit_good and hit_bad:
-                    return {"disposition": "CENSORED", "label": None, "censor_reason": "AMBIGUOUS_SAME_BAR_TOUCH"}
+                    if stop_first:
+                        return _out("NEGATIVE", 0, None, ambiguous=True)
+                    return _out("CENSORED", None, "AMBIGUOUS_SAME_BAR_TOUCH", ambiguous=True)
                 if hit_good:
-                    return {"disposition": "POSITIVE", "label": 1, "censor_reason": None}
+                    return _out("POSITIVE", 1, None)
                 if hit_bad:
-                    return {"disposition": "NEGATIVE", "label": 0, "censor_reason": None}
+                    return _out("NEGATIVE", 0, None)
             break
         if ts >= horizon_end_ts:
             reached_horizon = True
         if not truncate and session_close_ts is not None and ts > int(session_close_ts):
-            return {"disposition": "CENSORED", "label": None, "censor_reason": "SESSION_END"}
+            return _out("CENSORED", None, "SESSION_END")
         if e.get("gap") or (max_gap_ns is not None and ts - prev_ts > max_gap_ns):
-            return {"disposition": "CENSORED", "label": None, "censor_reason": "GAP"}
+            return _out("CENSORED", None, "GAP")
         prev_ts = ts
         hi, lo = e.get("high"), e.get("low")
         if hi is None or lo is None:
@@ -185,11 +242,13 @@ def replay(contract: Mapping, candidate: Mapping, events: Iterable[Mapping]) -> 
         hit_good = hi >= good if direction > 0 else lo <= good
         hit_bad = lo <= bad if direction > 0 else hi >= bad
         if hit_good and hit_bad:
-            return {"disposition": "CENSORED", "label": None, "censor_reason": "AMBIGUOUS_SAME_BAR_TOUCH"}
+            if stop_first:
+                return _out("NEGATIVE", 0, None, ambiguous=True)
+            return _out("CENSORED", None, "AMBIGUOUS_SAME_BAR_TOUCH", ambiguous=True)
         if hit_good:
-            return {"disposition": "POSITIVE", "label": 1, "censor_reason": None}
+            return _out("POSITIVE", 1, None)
         if hit_bad:
-            return {"disposition": "NEGATIVE", "label": 0, "censor_reason": None}
+            return _out("NEGATIVE", 0, None)
         if ts >= horizon_end_ts:
             # The bar closing exactly at the horizon end is touch-eligible (checked above)
             # AND resolves the arm right there if it is not a touch -- mirrors the kernel's
@@ -200,18 +259,18 @@ def replay(contract: Mapping, candidate: Mapping, events: Iterable[Mapping]) -> 
     if not reached_horizon:
         # W-2: the tape ran out before the horizon elapsed -- an unresolved tail must never
         # manufacture a directional/expiry label; the kernel already censors this DATA_END.
-        return {"disposition": "CENSORED", "label": None, "censor_reason": "DATA_END"}
+        return _out("CENSORED", None, "DATA_END")
     if truncated:
         # The window was cut short by the close, so the horizon-expiry policy never applies: the
         # arm did not get its declared horizon. Mirrors LabelOutcomeKernel._expire_arm.
-        return {"disposition": "CENSORED", "label": None, "censor_reason": "SESSION_END"}
+        return _out("CENSORED", None, "SESSION_END")
     policy = str(
         barrier.get("horizon_expiry_policy", candidate.get("horizon_expiry_policy", "censor")) if barrier
         else candidate.get("horizon_expiry_policy", "censor")
     ).lower()
     if policy == "censor":
-        return {"disposition": "CENSORED", "label": None, "censor_reason": "TIMEOUT"}
-    return {"disposition": "NEGATIVE", "label": 0, "censor_reason": None}
+        return _out("CENSORED", None, "TIMEOUT")
+    return _out("NEGATIVE", 0, None)
 
 
 # --- composite target expression -----------------------------------------------------

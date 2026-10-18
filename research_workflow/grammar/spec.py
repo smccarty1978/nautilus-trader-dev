@@ -141,8 +141,17 @@ class FeaturesSpec(_Strict):
 
 class BarrierArmSpec(_Strict):
     id: str
-    favorable_atr: float = Field(..., gt=0)
-    adverse_atr: float = Field(..., gt=0)
+    unit: Literal["atr", "points", "reference", "recovery", "structural"] = "atr"
+    favorable_atr: Optional[float] = Field(default=None, gt=0)
+    adverse_atr: Optional[float] = Field(default=None, gt=0)
+    favorable_points: Optional[float] = Field(default=None, gt=0)
+    adverse_points: Optional[float] = Field(default=None, gt=0)
+    # unit: structural -- stop at outcome.stop_reference (frozen at T) moved stop_buffer_points away from the
+    # entry; target at reward_risk x the executable entry-to-stop distance; both rounded AWAY from the entry
+    # to tick_size when given.
+    reward_risk: Optional[float] = Field(default=None, gt=0)
+    stop_buffer_points: Optional[float] = Field(default=None, ge=0)
+    tick_size: Optional[float] = Field(default=None, gt=0)
     horizon: Optional[str] = None
     expiry: Literal["censor", "negative"] = "censor"
 
@@ -150,8 +159,11 @@ class BarrierArmSpec(_Strict):
 class OutcomeItemSpec(_Strict):
     id: str
     kind: Literal["barrier", "event", "horizon", "stop_move", "trail"]
+    unit: Literal["atr", "points", "reference"] = "atr"
     favorable_atr: Optional[float] = None
     adverse_atr: Optional[float] = None
+    favorable_points: Optional[float] = None
+    adverse_points: Optional[float] = None
     when: Optional[str] = None
     horizon: Optional[str] = None
     expiry: Literal["censor", "negative"] = "censor"
@@ -177,6 +189,8 @@ class OutcomeSpec(_Strict):
     horizon: Optional[str] = None                  # default horizon for items without their own
     session_end: Literal["censor", "ignore", "truncate"] = "censor"
     session: Optional[str] = None                  # censoring session (default: population.session)
+    session_cutoff: Optional[str] = None           # HH:MM:SS TimeZone, e.g. '11:30:00 America/New_York'
+    entry_cutoff: Optional[str] = None             # HH:MM:SS TimeZone, e.g. '11:00:00 America/New_York'
     max_gap: Optional[str] = None
     same_bar_rule: Literal["ambiguous_censor", "adverse_first"] = "ambiguous_censor"
     # strict: no bar closing after the horizon end is ever evaluated (a bar closing exactly at the end is).
@@ -197,6 +211,9 @@ class OutcomeSpec(_Strict):
     # C1: per-side friction in POINTS for the canonical lifecycle terminal. Omitted means the
     # research contract supplies no cost assumption -- gross economics stay canonical and net
     # economics are emitted as explicitly unavailable (null) rather than guessed.
+    recovery: Optional[Dict[str, Any]] = None     # {reference, milestones: [...], horizon?, expiry?}
+    reference: Optional[str] = None                # target reference price, e.g. anchor level or price_level_tracker.rth_open_price
+    stop_reference: Optional[str] = None           # unit: structural -- absolute stop price, a context-tracker field read at T
     cost_points_per_side: Optional[float] = None
     # Opt-in causal executable-entry observation: executable_entry_ts / executable_entry_price /
     # executable_entry_unavailable_reason, published whenever the entry is known, independent of any

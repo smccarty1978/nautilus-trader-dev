@@ -59,7 +59,22 @@ trackers:
     update_cadence: per_source_bar
     required_tests: [features/tests/test_volume_profile_rolling.py]
     proposal: research_workflow/capabilities/proposals/tracker.volume_profile.rolling.yaml
-    promotion: {parity_artifact: artifacts/parity/volume_profile_rolling.json, parity_sha256: 8389924a43638655018fcebd7f92cc2655dc07fcb1dd0063eff52cd8f723bdc8, promoted_at_utc: '2026-10-07T18:27:27.840716+00:00'}
+  - id: tracker.candle.displacement_1m
+    version: 1
+    description: 1-minute displacement candle detector (opposite color, body expansion over prior body, close beyond prior wick extreme, toward anchor reference price).
+    implementation: features.trackers.displacement_candle.DisplacementCandleBinding
+    parameters: [reference]
+    dependencies: [stream.completed_bar]
+    update_cadence: per_source_bar
+    required_tests: [features/tests/test_fair_pricing_trackers.py]
+  - id: tracker.structure.bos_1m
+    version: 1
+    description: 1-minute 3-bar swing pivot confirmation and Break-of-Structure (BOS) tracker, evaluating structural breaks toward anchor reference price.
+    implementation: features.trackers.structure_bos.StructureBosBinding
+    parameters: [reference]
+    dependencies: [stream.completed_bar]
+    update_cadence: per_source_bar
+    required_tests: [features/tests/test_fair_pricing_trackers.py]
 
 trigger_primitives:
   - id: trigger.population.established_filter
