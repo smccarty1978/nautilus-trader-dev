@@ -1,0 +1,56 @@
+{
+ "totals": {
+  "ran": 3083,
+  "passed": 2981,
+  "failed": 74,
+  "wall_s": 3209.6071063999552
+ },
+ "pending": [],
+ "known_63_hit": 63,
+ "not_in_known_63": [
+  [
+   "broad_0.json",
+   "scripts/tests/test_supervisor_blackbox.py::test_capability_merged_offline_is_detected_from_git"
+  ],
+  [
+   "broad_0.json",
+   "scripts/tests/test_supervisor_blackbox.py::test_collect_study_runs_to_frame_register_with_no_owner_intervention"
+  ],
+  [
+   "broad_0.json",
+   "scripts/tests/test_supervisor_blackbox.py::test_crash_and_resume_derives_from_artifacts"
+  ],
+  [
+   "broad_0.json",
+   "scripts/tests/test_supervisor_blackbox.py::test_detached_loop_argv_ticks_and_stop_kills_only_the_loop"
+  ],
+  [
+   "broad_0.json",
+   "scripts/tests/test_supervisor_blackbox.py::test_stale_controller_card_forces_reseal_never_an_audit[spec]"
+  ],
+  [
+   "broad_0.json",
+   "scripts/tests/test_supervisor_blackbox.py::test_stale_worker_result_is_refused"
+  ],
+  [
+   "broad_0.json",
+   "scripts/tests/test_supervisor_blackbox.py::test_study_side_gap_the_design_worker_cannot_fix_reaches_the_capability_flow"
+  ],
+  [
+   "broad_2.json",
+   "research_workflow/tests/test_chunked_writer.py::test_declared_metadata_types_reads_tracker_field_types"
+  ],
+  [
+   "broad_3.json",
+   "scripts/tests/test_antigravity_identity.py::test_launcher_generates_a_fresh_uuid_per_launch_and_never_a_static_one"
+  ],
+  [
+   "broad_3.json",
+   "scripts/tests/test_capabilities.py::test_committed_registry_is_current"
+  ],
+  [
+   "broad_4.json",
+   "research_workflow/tests/test_docs_v2.py::test_generated_reference_and_registry_are_current"
+  ]
+ ]
+}

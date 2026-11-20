@@ -1,0 +1,4113 @@
+{
+  "STATUS": "NEW_FAILURES",
+  "baseline": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-autonomous_explore\\config\\test_failure_baseline.json",
+  "baseline_commit": "c480d8af0068c69d19669497c53747efa187b5dd",
+  "head": "600e7c71",
+  "baseline_issues": [
+    "BASELINE_COMMIT_MISMATCH",
+    "BASELINE_ENVIRONMENT_MISMATCH"
+  ],
+  "pytest_exit_code": 1,
+  "wall_seconds": 2753.6766385000665,
+  "per_test_timings": {
+    "research_workflow/tests/test_lifecycle_v2.py::test_sha_helper_streams_and_matches_whole_file_digest": {
+      "seconds": 0.03474780009128153,
+      "phases": {
+        "setup": 0.01102309999987483,
+        "call": 0.02309390006121248,
+        "teardown": 0.0006308000301942229
+      }
+    },
+    "research_workflow/tests/test_lifecycle_v2.py::test_controller_runs_a_fresh_v2_study_end_to_end": {
+      "seconds": 1161.8394338000799,
+      "phases": {
+        "setup": 2.725022600032389,
+        "call": 1159.1141915000044,
+        "teardown": 0.00021970004308968782
+      }
+    },
+    "research_workflow/tests/test_lifecycle_v2.py::test_controller_runs_a_descriptive_outcome_none_study_end_to_end": {
+      "seconds": 987.6942173999269,
+      "phases": {
+        "setup": 0.002127799903973937,
+        "call": 987.6916611000197,
+        "teardown": 0.0004285000031813979
+      }
+    },
+    "research_workflow/tests/test_lifecycle_v2.py::test_controller_reports_typed_capability_gap": {
+      "seconds": 2.3791691000806168,
+      "phases": {
+        "setup": 0.003580999909900129,
+        "call": 2.3751772000687197,
+        "teardown": 0.00041090010199695826
+      }
+    },
+    "research_workflow/tests/test_lifecycle_v2.py::test_second_controller_on_a_live_study_is_refused": {
+      "seconds": 27.622726299916394,
+      "phases": {
+        "setup": 0.004751799977384508,
+        "call": 27.617543200030923,
+        "teardown": 0.0004312999080866575
+      }
+    },
+    "research_workflow/tests/test_lifecycle_v2.py::test_tuning_adapter_is_bounded_walk_forward_and_persists_a_ledger": {
+      "seconds": 0.8753948000958189,
+      "phases": {
+        "setup": 0.004643399966880679,
+        "call": 0.8650291000958532,
+        "teardown": 0.005722300033085048
+      }
+    },
+    "scripts/tests/test_deliverables_and_generated_contracts.py::test_collect_mode_declares_only_what_collect_produces": {
+      "seconds": 0.00806640018709004,
+      "phases": {
+        "setup": 0.005204800050705671,
+        "call": 0.00028220005333423615,
+        "teardown": 0.002579400083050132
+      }
+    },
+    "scripts/tests/test_deliverables_and_generated_contracts.py::test_declaring_an_unreachable_deliverable_is_refused_at_compile_time": {
+      "seconds": 0.007185300113633275,
+      "phases": {
+        "setup": 0.004588400013744831,
+        "call": 0.0003875000402331352,
+        "teardown": 0.0022094000596553087
+      }
+    },
+    "scripts/tests/test_deliverables_and_generated_contracts.py::test_declaring_an_artifact_with_no_producer_is_refused": {
+      "seconds": 0.008038800093345344,
+      "phases": {
+        "setup": 0.004659100086428225,
+        "call": 0.000382099999114871,
+        "teardown": 0.002997600007802248
+      }
+    },
+    "scripts/tests/test_deliverables_and_generated_contracts.py::test_unknown_mode_is_refused": {
+      "seconds": 0.007912800065241754,
+      "phases": {
+        "setup": 0.005008799955248833,
+        "call": 0.0003928000805899501,
+        "teardown": 0.0025112000294029713
+      }
+    },
+    "scripts/tests/test_deliverables_and_generated_contracts.py::test_unauthorized_mode_cannot_be_queried": {
+      "seconds": 0.00698880001436919,
+      "phases": {
+        "setup": 0.004188299993984401,
+        "call": 0.000368200009688735,
+        "teardown": 0.0024323000106960535
+      }
+    },
+    "scripts/tests/test_deliverables_and_generated_contracts.py::test_every_declared_artifact_maps_to_its_own_mode": {
+      "seconds": 0.007791800075210631,
+      "phases": {
+        "setup": 0.005053000058978796,
+        "call": 0.00024259998463094234,
+        "teardown": 0.0024962000316008925
+      }
+    },
+    "scripts/tests/test_deliverables_and_generated_contracts.py::test_modes_are_derived_from_the_operation_kind": {
+      "seconds": 0.009122599847614765,
+      "phases": {
+        "setup": 0.006232099956832826,
+        "call": 0.0002250999677926302,
+        "teardown": 0.002665399922989309
+      }
+    },
+    "scripts/tests/test_deliverables_and_generated_contracts.py::test_contract_records_a_producer_and_location_for_each_artifact": {
+      "seconds": 0.008175199967809021,
+      "phases": {
+        "setup": 0.004525299998931587,
+        "call": 0.0002517999382689595,
+        "teardown": 0.003398100030608475
+      }
+    },
+    "scripts/tests/test_deliverables_and_generated_contracts.py::test_generated_tests_contain_no_literal_self_comparison": {
+      "seconds": 7.968262400012463,
+      "phases": {
+        "setup": 7.951053899945691,
+        "call": 0.014037000015377998,
+        "teardown": 0.003171500051394105
+      }
+    },
+    "scripts/tests/test_deliverables_and_generated_contracts.py::test_generated_tests_load_real_artifacts": {
+      "seconds": 0.006582800066098571,
+      "phases": {
+        "setup": 0.003836599993519485,
+        "call": 0.0005715000443160534,
+        "teardown": 0.0021747000282630324
+      }
+    },
+    "scripts/tests/test_deliverables_and_generated_contracts.py::test_generated_tests_pass_on_the_freshly_compiled_study": {
+      "seconds": 8.421810700092465,
+      "phases": {
+        "setup": 0.004606600035913289,
+        "call": 8.415621599997394,
+        "teardown": 0.00158250005915761
+      }
+    },
+    "scripts/tests/test_deliverables_and_generated_contracts.py::test_generated_tests_detect_artifact_drift[feature_list]": {
+      "seconds": 6.089658500044607,
+      "phases": {
+        "setup": 0.004542500013485551,
+        "call": 6.083541100029834,
+        "teardown": 0.0015749000012874603
+      }
+    },
+    "scripts/tests/test_deliverables_and_generated_contracts.py::test_generated_tests_detect_artifact_drift[horizon]": {
+      "seconds": 6.063138799974695,
+      "phases": {
+        "setup": 0.006443000049330294,
+        "call": 6.0537672999780625,
+        "teardown": 0.0029284999473020434
+      }
+    },
+    "scripts/tests/test_deliverables_and_generated_contracts.py::test_generated_tests_detect_artifact_drift[session]": {
+      "seconds": 5.684444400016218,
+      "phases": {
+        "setup": 0.004953499999828637,
+        "call": 5.677972899982706,
+        "teardown": 0.0015180000336840749
+      }
+    },
+    "scripts/tests/test_deliverables_and_generated_contracts.py::test_generated_tests_detect_artifact_drift[chronology]": {
+      "seconds": 6.088401900022291,
+      "phases": {
+        "setup": 0.00559449999127537,
+        "call": 6.080342600005679,
+        "teardown": 0.0024648000253364444
+      }
+    },
+    "scripts/tests/test_deliverables_and_generated_contracts.py::test_generated_tests_detect_a_deleted_config_artifact": {
+      "seconds": 5.9157519998261705,
+      "phases": {
+        "setup": 0.007571899914182723,
+        "call": 5.906798799987882,
+        "teardown": 0.0013812999241054058
+      }
+    },
+    "scripts/tests/test_deliverables_and_generated_contracts.py::test_generated_study_spec_md_matches_the_deliverables_contract": {
+      "seconds": 0.004214100074023008,
+      "phases": {
+        "setup": 0.002587100025266409,
+        "call": 0.00047149998135864735,
+        "teardown": 0.001155500067397952
+      }
+    },
+    "scripts/tests/test_deliverables_and_generated_contracts.py::test_compile_study_materializes_standalone_deliverables_contract": {
+      "seconds": 13.640554300043732,
+      "phases": {
+        "setup": 0.0047842999920248985,
+        "call": 13.621469200006686,
+        "teardown": 0.014300800045020878
+      }
+    },
+    "research_workflow/tests/test_autonomous_explore.py::test_explore_study_runs_compile_to_closed_isolated_with_a_delivered_result": {
+      "seconds": 196.6536788000958,
+      "phases": {
+        "setup": 2.76092290005181,
+        "call": 193.88041870004963,
+        "teardown": 0.01233719999436289
+      }
+    },
+    "research_workflow/tests/test_autonomous_explore.py::test_a_leaky_observer_is_refused_at_compile_and_the_controller_does_not_advance": {
+      "seconds": 1.9844864001497626,
+      "phases": {
+        "setup": 0.003040799987502396,
+        "call": 1.9795226000715047,
+        "teardown": 0.0019230000907555223
+      }
+    },
+    "research_workflow/tests/test_autonomous_explore.py::test_explore_grammar_refuses_oos_and_unregistered_decisions[over0-EXPLORE_NO_OOS]": {
+      "seconds": 0.00699480006005615,
+      "phases": {
+        "setup": 0.003028100007213652,
+        "call": 0.0033736000768840313,
+        "teardown": 0.0005930999759584665
+      }
+    },
+    "research_workflow/tests/test_autonomous_explore.py::test_explore_grammar_refuses_oos_and_unregistered_decisions[over1-EXPLORE_SPEC_INCOMPLETE]": {
+      "seconds": 0.005462799919769168,
+      "phases": {
+        "setup": 0.0026717999717220664,
+        "call": 0.002244099974632263,
+        "teardown": 0.0005468999734148383
+      }
+    },
+    "research_workflow/tests/test_autonomous_explore.py::test_reserved_confirmation_data_is_refused_before_any_bar": {
+      "seconds": 141.90871729992796,
+      "phases": {
+        "setup": 0.0026496999198570848,
+        "call": 141.901615699986,
+        "teardown": 0.0044519000221043825
+      }
+    },
+    "research_workflow/tests/test_autonomous_explore.py::test_a_semantic_change_cannot_reseal_on_an_earlier_clear_audit[outcome_session_end]": {
+      "seconds": 5.372004099888727,
+      "phases": {
+        "setup": 0.0024874999653548002,
+        "call": 5.369336699950509,
+        "teardown": 0.00017989997286349535
+      }
+    },
+    "research_workflow/tests/test_autonomous_explore.py::test_a_semantic_change_cannot_reseal_on_an_earlier_clear_audit[population]": {
+      "seconds": 5.338029700098559,
+      "phases": {
+        "setup": 0.002804199932143092,
+        "call": 5.3348645000951365,
+        "teardown": 0.00036100007127970457
+      }
+    },
+    "research_workflow/tests/test_autonomous_explore.py::test_a_semantic_change_cannot_reseal_on_an_earlier_clear_audit[chronology]": {
+      "seconds": 5.7025106000946835,
+      "phases": {
+        "setup": 0.005040799966081977,
+        "call": 5.6972467000596225,
+        "teardown": 0.00022310006897896528
+      }
+    },
+    "research_workflow/tests/test_autonomous_explore.py::test_a_code_change_stales_the_audit_and_a_reseal_keeps_exposure_history": {
+      "seconds": 0.03679720009677112,
+      "phases": {
+        "setup": 0.002659599995240569,
+        "call": 0.03376580006442964,
+        "teardown": 0.00037180003710091114
+      }
+    },
+    "research_workflow/tests/test_autonomous_explore.py::test_a_new_study_id_does_not_make_seen_data_unseen_and_claims_are_computed": {
+      "seconds": 0.040073800133541226,
+      "phases": {
+        "setup": 0.004134900053031743,
+        "call": 0.03198760002851486,
+        "teardown": 0.003951300051994622
+      }
+    },
+    "features/tests/test_feature_definition_boundary.py::test_golden_resolution": {
+      "seconds": 13.353119799983688,
+      "phases": {
+        "setup": 0.0017118999967351556,
+        "call": 13.351211500004865,
+        "teardown": 0.00019639998208731413
+      }
+    },
+    "features/tests/test_feature_definition_boundary.py::test_resolver_does_not_statically_import_any_definition_module": {
+      "seconds": 0.0173107999144122,
+      "phases": {
+        "setup": 0.001728000002913177,
+        "call": 0.01541899994481355,
+        "teardown": 0.00016379996668547392
+      }
+    },
+    "features/tests/test_feature_definition_boundary.py::test_no_consumer_reaches_a_definition_module[research_workflow/provider_host.py]": {
+      "seconds": 0.0942142999265343,
+      "phases": {
+        "setup": 0.001399099943228066,
+        "call": 0.09263830003328621,
+        "teardown": 0.00017689995002001524
+      }
+    },
+    "features/tests/test_feature_definition_boundary.py::test_no_consumer_reaches_a_definition_module[research_workflow/forward_outcomes/guard.py]": {
+      "seconds": 0.15075249993242323,
+      "phases": {
+        "setup": 0.0014900999376550317,
+        "call": 0.14908909995574504,
+        "teardown": 0.00017330003902316093
+      }
+    },
+    "features/tests/test_feature_definition_boundary.py::test_no_consumer_reaches_a_definition_module[research_workflow/output_manager.py]": {
+      "seconds": 0.1546002000104636,
+      "phases": {
+        "setup": 0.006169200059957802,
+        "call": 0.14824599993880838,
+        "teardown": 0.00018500001169741154
+      }
+    },
+    "features/tests/test_feature_definition_boundary.py::test_no_consumer_reaches_a_definition_module[backtests/nt_runtime/modes/collect.py]": {
+      "seconds": 0.4193858999060467,
+      "phases": {
+        "setup": 0.00405339989811182,
+        "call": 0.41515279992017895,
+        "teardown": 0.0001797000877559185
+      }
+    },
+    "features/tests/test_feature_definition_boundary.py::test_no_consumer_reaches_a_definition_module[research_workflow/generic_collector.py]": {
+      "seconds": 0.3940319998655468,
+      "phases": {
+        "setup": 0.0015217999462038279,
+        "call": 0.39231959998141974,
+        "teardown": 0.00019059993792325258
+      }
+    },
+    "features/tests/test_feature_definition_boundary.py::test_no_consumer_reaches_a_definition_module[research_workflow/grammar/compiler.py]": {
+      "seconds": 0.5380889000371099,
+      "phases": {
+        "setup": 0.003155600046738982,
+        "call": 0.5347495999885723,
+        "teardown": 0.00018370000179857016
+      }
+    },
+    "features/tests/test_feature_definition_boundary.py::test_no_consumer_reaches_a_definition_module[research_workflow/phase0.py]": {
+      "seconds": 0.2900309998076409,
+      "phases": {
+        "setup": 0.001656399923376739,
+        "call": 0.28818139992654324,
+        "teardown": 0.00019319995772093534
+      }
+    },
+    "features/tests/test_feature_definition_boundary.py::test_definition_modules_are_reachable_only_through_the_index": {
+      "seconds": 6.18241169990506,
+      "phases": {
+        "setup": 0.0029818000039085746,
+        "call": 6.1791026999708265,
+        "teardown": 0.0003271999303251505
+      }
+    },
+    "features/tests/test_feature_definition_boundary.py::test_declared_modules_match_the_definition_files": {
+      "seconds": 0.04021659994032234,
+      "phases": {
+        "setup": 0.0028292000060901046,
+        "call": 0.037073499988764524,
+        "teardown": 0.0003138999454677105
+      }
+    },
+    "features/tests/test_feature_definition_boundary.py::test_generated_registry_carries_the_definition_modules": {
+      "seconds": 0.02091129997279495,
+      "phases": {
+        "setup": 0.0027806999860331416,
+        "call": 0.0179764999775216,
+        "teardown": 0.00015410000924021006
+      }
+    },
+    "features/tests/test_feature_definition_boundary.py::test_compiler_closure_still_covers_every_definition_module": {
+      "seconds": 0.17191040003672242,
+      "phases": {
+        "setup": 0.0012769000604748726,
+        "call": 0.17046329996082932,
+        "teardown": 0.0001702000154182315
+      }
+    },
+    "features/tests/test_feature_definition_boundary.py::test_an_empty_or_unreadable_index_fails_closed": {
+      "seconds": 0.004711900022812188,
+      "phases": {
+        "setup": 0.0024085999466478825,
+        "call": 0.0021516999695450068,
+        "teardown": 0.00015160010661929846
+      }
+    },
+    "features/tests/test_feature_definition_boundary.py::test_definition_catalogues_are_still_reachable_by_their_historical_names": {
+      "seconds": 0.008014999912120402,
+      "phases": {
+        "setup": 0.0013942999066784978,
+        "call": 0.006452600006014109,
+        "teardown": 0.0001680999994277954
+      }
+    },
+    "features/tests/test_feature_definition_boundary.py::test_a_definition_module_declaring_nothing_is_refused": {
+      "seconds": 0.01904480007942766,
+      "phases": {
+        "setup": 0.002675499999895692,
+        "call": 0.016181200044229627,
+        "teardown": 0.00018810003530234098
+      }
+    },
+    "features/tests/test_feature_definition_boundary.py::test_an_unimportable_definition_module_is_refused": {
+      "seconds": 0.01563540007919073,
+      "phases": {
+        "setup": 0.002867500064894557,
+        "call": 0.012591400067321956,
+        "teardown": 0.0001764999469742179
+      }
+    },
+    "research_workflow/tests/test_golden_fixture.py::test_barrier_plan_matches_independent_expectations": {
+      "seconds": 5.504367399960756,
+      "phases": {
+        "setup": 2.4188066999195144,
+        "call": 3.0853705999907106,
+        "teardown": 0.00019010005053132772
+      }
+    },
+    "research_workflow/tests/test_golden_fixture.py::test_barrier_plan_oracle_agrees": {
+      "seconds": 3.9826918998733163,
+      "phases": {
+        "setup": 0.0016735999379307032,
+        "call": 3.9808199999388307,
+        "teardown": 0.00019829999655485153
+      }
+    },
+    "research_workflow/tests/test_golden_fixture.py::test_flip_plan_matches_independent_expectations": {
+      "seconds": 2.856309299939312,
+      "phases": {
+        "setup": 0.001663199975155294,
+        "call": 2.8544579000445083,
+        "teardown": 0.0001881999196484685
+      }
+    },
+    "research_workflow/tests/test_golden_fixture.py::test_watch_plan_trigger_graph": {
+      "seconds": 3.172013000003062,
+      "phases": {
+        "setup": 0.002231899998150766,
+        "call": 3.169591199955903,
+        "teardown": 0.00018990004900842905
+      }
+    },
+    "research_workflow/tests/test_golden_fixture.py::test_add_to_winner_is_a_typed_gap": {
+      "seconds": 0.48173050000332296,
+      "phases": {
+        "setup": 0.0016290000639855862,
+        "call": 0.47989650000818074,
+        "teardown": 0.00020499993115663528
+      }
+    },
+    "research_workflow/tests/test_golden_fixture.py::test_engine_run_equals_pure_python_run": {
+      "seconds": 4.268580399919301,
+      "phases": {
+        "setup": 0.0016733999364078045,
+        "call": 4.266693799989298,
+        "teardown": 0.00021319999359548092
+      }
+    },
+    "research_workflow/tests/test_multi_arm_modeling.py::test_bare_arm_list_is_refused": {
+      "seconds": 0.38088349997997284,
+      "phases": {
+        "setup": 0.003931800019927323,
+        "call": 0.3767709999810904,
+        "teardown": 0.00018069997895509005
+      }
+    },
+    "research_workflow/tests/test_multi_arm_modeling.py::test_declared_arms_compile_and_carry_their_own_features": {
+      "seconds": 2.8604843000648543,
+      "phases": {
+        "setup": 0.0029824000084772706,
+        "call": 2.857298200018704,
+        "teardown": 0.00020370003767311573
+      }
+    },
+    "research_workflow/tests/test_multi_arm_modeling.py::test_arm_naming_a_feature_outside_the_surface_is_refused": {
+      "seconds": 0.35315119998995215,
+      "phases": {
+        "setup": 0.0033030000049620867,
+        "call": 0.3494975999929011,
+        "teardown": 0.0003505999920889735
+      }
+    },
+    "research_workflow/tests/test_multi_arm_modeling.py::test_cell_filtering_on_an_unemitted_column_is_refused": {
+      "seconds": 0.34286150010302663,
+      "phases": {
+        "setup": 0.0029113999335095286,
+        "call": 0.33975870010908693,
+        "teardown": 0.0001914000604301691
+      }
+    },
+    "research_workflow/tests/test_multi_arm_modeling.py::test_month_folds_are_derived_at_compile_time": {
+      "seconds": 2.8044879999943078,
+      "phases": {
+        "setup": 0.003381800022907555,
+        "call": 2.800932200043462,
+        "teardown": 0.00017399992793798447
+      }
+    },
+    "research_workflow/tests/test_multi_arm_modeling.py::test_every_month_fold_fits_strictly_before_it_validates": {
+      "seconds": 3.244850300019607,
+      "phases": {
+        "setup": 0.006430800072848797,
+        "call": 3.238226899993606,
+        "teardown": 0.00019259995315223932
+      }
+    },
+    "research_workflow/tests/test_multi_arm_modeling.py::test_reference_models_compile_alongside_trained_arms": {
+      "seconds": 2.8455594999250025,
+      "phases": {
+        "setup": 0.003059700015000999,
+        "call": 2.842306699953042,
+        "teardown": 0.000193099956959486
+      }
+    },
+    "research_workflow/tests/test_multi_arm_modeling.py::test_reference_model_with_a_foreign_label_is_refused": {
+      "seconds": 0.3683402999304235,
+      "phases": {
+        "setup": 0.0033448999747633934,
+        "call": 0.3648134999675676,
+        "teardown": 0.0001818999880924821
+      }
+    },
+    "research_workflow/tests/test_multi_arm_modeling.py::test_reference_model_id_must_be_a_store_sha256": {
+      "seconds": 0.3884607999352738,
+      "phases": {
+        "setup": 0.0030583000043407083,
+        "call": 0.3848515999270603,
+        "teardown": 0.0005509000038728118
+      }
+    },
+    "research_workflow/tests/test_multi_arm_modeling.py::test_month_folds_may_not_walk_a_dev_year": {
+      "seconds": 0.3684551998740062,
+      "phases": {
+        "setup": 0.00497209990862757,
+        "call": 0.36330019996967167,
+        "teardown": 0.00018289999570697546
+      }
+    },
+    "research_workflow/tests/test_multi_arm_modeling.py::test_arms_x_cells_train_independently": {
+      "seconds": 1.188656899961643,
+      "phases": {
+        "setup": 0.003067700075916946,
+        "call": 1.1853084999602288,
+        "teardown": 0.00028069992549717426
+      }
+    },
+    "research_workflow/tests/test_multi_arm_modeling.py::test_cells_partition_the_population": {
+      "seconds": 0.5564727000892162,
+      "phases": {
+        "setup": 0.00516780000180006,
+        "call": 0.551032500108704,
+        "teardown": 0.0002723999787122011
+      }
+    },
+    "research_workflow/tests/test_multi_arm_modeling.py::test_monthly_folds_execute_and_report_effective_sample_size": {
+      "seconds": 0.3525744001381099,
+      "phases": {
+        "setup": 0.005404600058682263,
+        "call": 0.3468567000236362,
+        "teardown": 0.0003131000557914376
+      }
+    },
+    "research_workflow/tests/test_multi_arm_modeling.py::test_train_derived_thresholds_come_from_the_fit_window": {
+      "seconds": 0.33143299992661923,
+      "phases": {
+        "setup": 0.011703999945893884,
+        "call": 0.3194624000461772,
+        "teardown": 0.00026659993454813957
+      }
+    },
+    "research_workflow/tests/test_multi_arm_modeling.py::test_single_arm_keeps_the_historical_artifact_shape": {
+      "seconds": 0.14615159993991256,
+      "phases": {
+        "setup": 0.005611100001260638,
+        "call": 0.1402706999797374,
+        "teardown": 0.00026979995891451836
+      }
+    },
+    "research_workflow/tests/test_multi_arm_modeling.py::test_paired_deltas_are_computed_per_fold_against_the_baseline_arm": {
+      "seconds": 0.0034397999988868833,
+      "phases": {
+        "setup": 0.0028652000473812222,
+        "call": 0.00033790001180022955,
+        "teardown": 0.00023669993970543146
+      }
+    },
+    "research_workflow/tests/test_multi_arm_modeling.py::test_a_row_count_mismatch_is_reported_unpaired_not_differenced": {
+      "seconds": 0.0033475999953225255,
+      "phases": {
+        "setup": 0.002864300040528178,
+        "call": 0.0002356999320909381,
+        "teardown": 0.0002476000227034092
+      }
+    },
+    "research_workflow/tests/test_multi_arm_modeling.py::test_no_baseline_arm_yields_no_paired_comparison": {
+      "seconds": 0.003339200047776103,
+      "phases": {
+        "setup": 0.0028973000589758158,
+        "call": 0.00021139997988939285,
+        "teardown": 0.0002305000089108944
+      }
+    },
+    "research_workflow/tests/test_multi_arm_modeling.py::test_deltas_are_kept_separate_per_cell": {
+      "seconds": 0.003847300074994564,
+      "phases": {
+        "setup": 0.0033535000402480364,
+        "call": 0.00025939999613910913,
+        "teardown": 0.00023440003860741854
+      }
+    },
+    "research_workflow/tests/test_multi_arm_modeling.py::test_freeze_records_every_cell_by_name_and_binds_its_canonical_bytes": {
+      "seconds": 0.27433280006516725,
+      "phases": {
+        "setup": 0.005012699984945357,
+        "call": 0.26904150005429983,
+        "teardown": 0.00027860002592206
+      }
+    },
+    "research_workflow/tests/test_multi_arm_modeling.py::test_analyze_scores_every_frozen_cell_on_its_own_subset": {
+      "seconds": 0.42725239985156804,
+      "phases": {
+        "setup": 0.005524099920876324,
+        "call": 0.4214737999718636,
+        "teardown": 0.0002544999588280916
+      }
+    },
+    "research_workflow/tests/test_multi_arm_modeling.py::test_analyze_refuses_a_models_artifact_it_cannot_score": {
+      "seconds": 0.3409148999489844,
+      "phases": {
+        "setup": 0.004926200024783611,
+        "call": 0.3357969999779016,
+        "teardown": 0.0001916999462991953
+      }
+    },
+    "research_workflow/tests/test_multi_arm_modeling.py::test_fit_records_carry_the_cell_subset": {
+      "seconds": 0.22006259998306632,
+      "phases": {
+        "setup": 0.003583699930459261,
+        "call": 0.21615390002261847,
+        "teardown": 0.0003250000299885869
+      }
+    },
+    "research_workflow/tests/test_multi_arm_modeling.py::test_a_cell_record_without_a_subset_is_refused": {
+      "seconds": 0.38865029986482114,
+      "phases": {
+        "setup": 0.01249409990850836,
+        "call": 0.37596119998488575,
+        "teardown": 0.0001949999714270234
+      }
+    },
+    "scripts/tests/test_data_plan_resolver.py::test_governed_catalog_resolves_successfully": {
+      "seconds": 0.00026080000679939985,
+      "phases": {
+        "setup": 0.00011639995500445366,
+        "teardown": 0.0001444000517949462
+      }
+    },
+    "scripts/tests/test_data_plan_resolver.py::test_missing_governed_catalog_fails_closed": {
+      "seconds": 0.007634200039319694,
+      "phases": {
+        "setup": 0.004735100083053112,
+        "call": 0.0018022999865934253,
+        "teardown": 0.0010967999696731567
+      }
+    },
+    "scripts/tests/test_data_plan_resolver.py::test_cwd_fallback_cannot_select_an_alternate_catalog": {
+      "seconds": 0.008120000129565597,
+      "phases": {
+        "setup": 0.004589000018313527,
+        "call": 0.002342900028452277,
+        "teardown": 0.0011881000827997923
+      }
+    },
+    "scripts/tests/test_data_plan_resolver.py::test_declared_dataset_spec_path_equals_resolver_path_for_real_study": {
+      "seconds": 0.00021850003395229578,
+      "phases": {
+        "setup": 0.00010489998385310173,
+        "teardown": 0.00011360005009919405
+      }
+    },
+    "scripts/tests/test_data_plan_resolver.py::test_drifted_dataset_spec_catalog_path_is_rejected": {
+      "seconds": 0.0001946999691426754,
+      "phases": {
+        "setup": 8.87999776750803e-05,
+        "teardown": 0.0001058999914675951
+      }
+    },
+    "scripts/tests/test_data_plan_resolver.py::test_two_catalogs_same_bar_query_do_not_cross_contaminate_cache": {
+      "seconds": 0.006374400109052658,
+      "phases": {
+        "setup": 0.004120200057514012,
+        "call": 0.0011817000340670347,
+        "teardown": 0.0010725000174716115
+      }
+    },
+    "scripts/tests/test_data_plan_resolver.py::test_warmup_coverage_missing_fails": {
+      "seconds": 0.00019200006499886513,
+      "phases": {
+        "setup": 9.059999138116837e-05,
+        "teardown": 0.00010140007361769676
+      }
+    },
+    "scripts/tests/test_data_plan_resolver.py::test_warmup_and_run_coverage_present_passes": {
+      "seconds": 0.0001868999097496271,
+      "phases": {
+        "setup": 8.079991675913334e-05,
+        "teardown": 0.00010609999299049377
+      }
+    },
+    "scripts/tests/test_data_plan_resolver.py::test_unauthorized_chronology_reported_before_coverage_gap": {
+      "seconds": 0.00017849996220320463,
+      "phases": {
+        "setup": 7.90000194683671e-05,
+        "teardown": 9.949994273483753e-05
+      }
+    },
+    "scripts/tests/test_data_plan_resolver.py::test_stale_compiled_study_with_edited_dataset_id_is_rejected": {
+      "seconds": 0.4594647999620065,
+      "phases": {
+        "setup": 0.004390800022520125,
+        "call": 0.4537850000197068,
+        "teardown": 0.0012889999197795987
+      }
+    },
+    "scripts/tests/test_data_plan_resolver.py::test_recompiling_after_dataset_id_edit_restores_parity": {
+      "seconds": 9.082477800082415,
+      "phases": {
+        "setup": 0.004730400047264993,
+        "call": 9.076400400022976,
+        "teardown": 0.0013470000121742487
+      }
+    },
+    "scripts/tests/test_registry_universe_output_contract.py::test_resolve_source_universe_matches_phase0_authentication": {
+      "seconds": 0.015541599947027862,
+      "phases": {
+        "setup": 0.0031734000658616424,
+        "call": 0.011027699918486178,
+        "teardown": 0.0013404999626800418
+      }
+    },
+    "scripts/tests/test_registry_universe_output_contract.py::test_exact_formerly_rejected_aliases_are_in_the_single_canonical_universe": {
+      "seconds": 0.005081900046207011,
+      "phases": {
+        "setup": 0.0033183000050485134,
+        "call": 0.0004379000747576356,
+        "teardown": 0.0013256999664008617
+      }
+    },
+    "scripts/tests/test_registry_universe_output_contract.py::test_exact_formerly_rejected_aliases_are_admitted_by_output_manager": {
+      "seconds": 0.014962499961256981,
+      "phases": {
+        "setup": 0.00559900002554059,
+        "call": 0.00797389994841069,
+        "teardown": 0.0013895999873057008
+      }
+    },
+    "scripts/tests/test_registry_universe_output_contract.py::test_compiler_and_runtime_use_the_same_canonical_universe": {
+      "seconds": 6.413414500071667,
+      "phases": {
+        "setup": 0.003240399993956089,
+        "call": 6.408649699995294,
+        "teardown": 0.0015244000824168324
+      }
+    },
+    "scripts/tests/test_registry_universe_output_contract.py::test_resolve_source_universe_none_is_a_noop": {
+      "seconds": 0.004510300001129508,
+      "phases": {
+        "setup": 0.0032358000753447413,
+        "call": 0.0001406999072059989,
+        "teardown": 0.0011338000185787678
+      }
+    },
+    "scripts/tests/test_registry_universe_output_contract.py::test_resolve_source_universe_unknown_fails_closed": {
+      "seconds": 0.005473999888636172,
+      "phases": {
+        "setup": 0.004137899959459901,
+        "call": 0.00022689998149871826,
+        "teardown": 0.0011091999476775527
+      }
+    },
+    "scripts/tests/test_registry_universe_output_contract.py::test_valid_registry_feature_candidate_persists": {
+      "seconds": 0.06332240009214729,
+      "phases": {
+        "setup": 0.005587400053627789,
+        "call": 0.05624319997150451,
+        "teardown": 0.0014918000670149922
+      }
+    },
+    "scripts/tests/test_registry_universe_output_contract.py::test_all_declared_registry_features_can_be_represented": {
+      "seconds": 0.0576844000024721,
+      "phases": {
+        "setup": 0.004924600012600422,
+        "call": 0.05148279992863536,
+        "teardown": 0.001277000061236322
+      }
+    },
+    "scripts/tests/test_registry_universe_output_contract.py::test_non_registry_column_still_fails_unexpected_output_column": {
+      "seconds": 0.013653300004079938,
+      "phases": {
+        "setup": 0.005272399983368814,
+        "call": 0.007144699920900166,
+        "teardown": 0.001236200099810958
+      }
+    },
+    "scripts/tests/test_registry_universe_output_contract.py::test_registered_but_out_of_universe_feature_still_fails": {
+      "seconds": 0.013189699966460466,
+      "phases": {
+        "setup": 0.005192299955524504,
+        "call": 0.006830599973909557,
+        "teardown": 0.0011668000370264053
+      }
+    },
+    "scripts/tests/test_registry_universe_output_contract.py::test_no_declared_source_does_not_widen_allowed_columns": {
+      "seconds": 0.009406799916177988,
+      "phases": {
+        "setup": 0.004710199893452227,
+        "call": 0.0034082999918609858,
+        "teardown": 0.0012883000308647752
+      }
+    },
+    "scripts/tests/test_registry_universe_output_contract.py::test_required_metadata_passes_with_declared_contract": {
+      "seconds": 0.040880999877117574,
+      "phases": {
+        "setup": 0.004899799940176308,
+        "call": 0.03472130000591278,
+        "teardown": 0.0012598999310284853
+      }
+    },
+    "scripts/tests/test_registry_universe_output_contract.py::test_undeclared_metadata_column_still_rejected": {
+      "seconds": 0.013176199863664806,
+      "phases": {
+        "setup": 0.00520169991068542,
+        "call": 0.0067813999485224485,
+        "teardown": 0.0011931000044569373
+      }
+    },
+    "scripts/tests/test_registry_universe_output_contract.py::test_clean_flip_study_declares_metadata_columns_in_contract": {
+      "seconds": 0.008848600089550018,
+      "phases": {
+        "setup": 0.0031343000009655952,
+        "call": 0.0045847001019865274,
+        "teardown": 0.0011295999865978956
+      }
+    },
+    "scripts/tests/test_registry_universe_output_contract.py::test_collector_no_longer_hardcodes_its_own_metadata_list": {
+      "seconds": 0.004694600007496774,
+      "phases": {
+        "setup": 0.0032899000216275454,
+        "call": 0.00036800000816583633,
+        "teardown": 0.0010366999777033925
+      }
+    },
+    "scripts/tests/test_registry_universe_output_contract.py::test_collect_mode_wires_metadata_columns_generically": {
+      "seconds": 0.004148400039412081,
+      "phases": {
+        "setup": 0.0028508000541478395,
+        "call": 0.00030880002304911613,
+        "teardown": 0.0009887999622151256
+      }
+    },
+    "scripts/tests/test_registry_universe_output_contract.py::test_real_collector_empty_candidates_dataframe_uses_config_schema": {
+      "seconds": 0.23094849998597056,
+      "phases": {
+        "setup": 0.002862400026060641,
+        "call": 0.22678729996550828,
+        "teardown": 0.0012987999944016337
+      }
+    },
+    "scripts/tests/test_registry_universe_output_contract.py::test_candidate_key_still_required_alongside_registry_features": {
+      "seconds": 0.014916099957190454,
+      "phases": {
+        "setup": 0.005385300028137863,
+        "call": 0.008312599966302514,
+        "teardown": 0.0012181999627500772
+      }
+    },
+    "scripts/tests/test_registry_universe_output_contract.py::test_zero_row_registry_universe_study_still_structurally_strict": {
+      "seconds": 0.012987899943254888,
+      "phases": {
+        "setup": 0.005288499989546835,
+        "call": 0.006482199998572469,
+        "teardown": 0.0012171999551355839
+      }
+    },
+    "scripts/tests/test_registry_universe_output_contract.py::test_zero_row_registry_universe_study_passes_with_correct_schema": {
+      "seconds": 0.0471976000117138,
+      "phases": {
+        "setup": 0.005364699987694621,
+        "call": 0.04053520003799349,
+        "teardown": 0.001297699986025691
+      }
+    },
+    "scripts/tests/test_registry_universe_output_contract.py::test_clean_flip_frozen_feature_list_still_unset": {
+      "seconds": 0.009246300207450986,
+      "phases": {
+        "setup": 0.003293900052085519,
+        "call": 0.004687800072133541,
+        "teardown": 0.001264600083231926
+      }
+    },
+    "scripts/tests/test_registry_universe_output_contract.py::test_frozen_feature_list_strict_order_check_unaffected_by_collection_universe": {
+      "seconds": 0.013212100020609796,
+      "phases": {
+        "setup": 0.00515300000552088,
+        "call": 0.006940299994312227,
+        "teardown": 0.001118800020776689
+      }
+    },
+    "scripts/tests/test_registry_universe_output_contract.py::test_compiled_study_spec_hash_matches_recompiled_study_yaml": {
+      "seconds": 0.22411749989259988,
+      "phases": {
+        "setup": 0.0030396999791264534,
+        "call": 0.21973359992261976,
+        "teardown": 0.0013441999908536673
+      }
+    },
+    "research_workflow/tests/test_train_provenance_attestation.py::test_gitattributes_protects_booster_bytes_from_eol_conversion": {
+      "seconds": 0.030726500088348985,
+      "phases": {
+        "setup": 0.002829600009135902,
+        "call": 0.02771210006903857,
+        "teardown": 0.00018480001017451286
+      }
+    },
+    "research_workflow/tests/test_train_provenance_attestation.py::test_committed_boosters_are_byte_identical_in_the_working_tree": {
+      "seconds": 0.09872959996573627,
+      "phases": {
+        "setup": 0.0023648999631404877,
+        "call": 0.09617149992845953,
+        "teardown": 0.00019320007413625717
+      }
+    },
+    "research_workflow/tests/test_train_provenance_attestation.py::test_the_known_bad_booster_record_is_preserved_not_rewritten": {
+      "seconds": 0.0032553999917581677,
+      "phases": {
+        "setup": 0.002467299927957356,
+        "call": 0.0006422000005841255,
+        "teardown": 0.00014590006321668625
+      }
+    },
+    "research_workflow/tests/test_train_provenance_attestation.py::test_a_mismatched_native_booster_is_still_rejected": {
+      "seconds": 0.01093730004504323,
+      "phases": {
+        "setup": 0.004206800018437207,
+        "call": 0.006551600061357021,
+        "teardown": 0.00017889996524900198
+      }
+    },
+    "research_workflow/tests/test_train_provenance_attestation.py::test_missing_provenance_with_no_attestation_is_rejected": {
+      "seconds": 0.013690299936570227,
+      "phases": {
+        "setup": 0.00441509997472167,
+        "call": 0.00910020002629608,
+        "teardown": 0.00017499993555247784
+      }
+    },
+    "research_workflow/tests/test_train_provenance_attestation.py::test_a_valid_exact_bound_attestation_is_accepted": {
+      "seconds": 1.3292495999485254,
+      "phases": {
+        "setup": 0.0042140999576076865,
+        "call": 1.3248427000362426,
+        "teardown": 0.000192799954675138
+      }
+    },
+    "research_workflow/tests/test_train_provenance_attestation.py::test_a_freeze_that_declares_train_only_needs_no_attestation": {
+      "seconds": 0.014433399890549481,
+      "phases": {
+        "setup": 0.004518199944868684,
+        "call": 0.009712399914860725,
+        "teardown": 0.0002028000308200717
+      }
+    },
+    "research_workflow/tests/test_train_provenance_attestation.py::test_every_broken_binding_fails_closed[<lambda>-FREEZE_MISMATCH0]": {
+      "seconds": 1.3474246001569554,
+      "phases": {
+        "setup": 0.005040200077928603,
+        "call": 1.3421739999903366,
+        "teardown": 0.0002104000886902213
+      }
+    },
+    "research_workflow/tests/test_train_provenance_attestation.py::test_every_broken_binding_fails_closed[<lambda>-FREEZE_MISMATCH1]": {
+      "seconds": 1.2550019000191242,
+      "phases": {
+        "setup": 0.0048220999306067824,
+        "call": 1.2499710000120103,
+        "teardown": 0.00020880007650703192
+      }
+    },
+    "research_workflow/tests/test_train_provenance_attestation.py::test_every_broken_binding_fails_closed[<lambda>-None]": {
+      "seconds": 1.2453003999544308,
+      "phases": {
+        "setup": 0.004192300024442375,
+        "call": 1.240906999912113,
+        "teardown": 0.00020110001787543297
+      }
+    },
+    "research_workflow/tests/test_train_provenance_attestation.py::test_every_broken_binding_fails_closed[<lambda>-MALFORMED0]": {
+      "seconds": 1.2822790999198332,
+      "phases": {
+        "setup": 0.003055799985304475,
+        "call": 1.2790264999493957,
+        "teardown": 0.00019679998513311148
+      }
+    },
+    "research_workflow/tests/test_train_provenance_attestation.py::test_every_broken_binding_fails_closed[<lambda>-MODEL_ARTIFACT_MISMATCH0]": {
+      "seconds": 1.2829268000787124,
+      "phases": {
+        "setup": 0.003181900014169514,
+        "call": 1.27951840008609,
+        "teardown": 0.00022649997845292091
+      }
+    },
+    "research_workflow/tests/test_train_provenance_attestation.py::test_every_broken_binding_fails_closed[<lambda>-MODEL_ARTIFACT_MISMATCH1]": {
+      "seconds": 1.361562900012359,
+      "phases": {
+        "setup": 0.0031780999852344394,
+        "call": 1.3581381000112742,
+        "teardown": 0.00024670001585036516
+      }
+    },
+    "research_workflow/tests/test_train_provenance_attestation.py::test_every_broken_binding_fails_closed[<lambda>-PREPROCESSING_MISMATCH]": {
+      "seconds": 1.3740754999453202,
+      "phases": {
+        "setup": 0.004203599994070828,
+        "call": 1.3696931999875233,
+        "teardown": 0.0001786999637261033
+      }
+    },
+    "research_workflow/tests/test_train_provenance_attestation.py::test_every_broken_binding_fails_closed[<lambda>-EXECUTION_COMPOSITE_MISMATCH]": {
+      "seconds": 1.5273888998199254,
+      "phases": {
+        "setup": 0.002711899927817285,
+        "call": 1.5244598999852315,
+        "teardown": 0.00021709990687668324
+      }
+    },
+    "research_workflow/tests/test_train_provenance_attestation.py::test_every_broken_binding_fails_closed[<lambda>-AUDIT_EVIDENCE_MISSING0]": {
+      "seconds": 1.3201368001755327,
+      "phases": {
+        "setup": 0.003315500100143254,
+        "call": 1.3166095000924543,
+        "teardown": 0.0002117999829351902
+      }
+    },
+    "research_workflow/tests/test_train_provenance_attestation.py::test_every_broken_binding_fails_closed[<lambda>-AUDIT_EVIDENCE_MISSING1]": {
+      "seconds": 1.2562462999485433,
+      "phases": {
+        "setup": 0.003188899951055646,
+        "call": 1.2528377999551594,
+        "teardown": 0.0002196000423282385
+      }
+    },
+    "research_workflow/tests/test_train_provenance_attestation.py::test_every_broken_binding_fails_closed[<lambda>-STUDY_MISMATCH]": {
+      "seconds": 1.3502493001287803,
+      "phases": {
+        "setup": 0.003143400070257485,
+        "call": 1.346888600033708,
+        "teardown": 0.00021730002481490374
+      }
+    },
+    "research_workflow/tests/test_train_provenance_attestation.py::test_every_broken_binding_fails_closed[<lambda>-MALFORMED1]": {
+      "seconds": 1.2352238000603393,
+      "phases": {
+        "setup": 0.0031754999654367566,
+        "call": 1.2318411000305787,
+        "teardown": 0.00020720006432384253
+      }
+    },
+    "research_workflow/tests/test_train_provenance_attestation.py::test_every_broken_binding_fails_closed[<lambda>-MALFORMED2]": {
+      "seconds": 1.3202944999793544,
+      "phases": {
+        "setup": 0.0030870999908074737,
+        "call": 1.3168954000575468,
+        "teardown": 0.0003119999310001731
+      }
+    },
+    "research_workflow/tests/test_train_provenance_attestation.py::test_a_tampered_or_foreign_attestation_fails_closed": {
+      "seconds": 1.3921136000426486,
+      "phases": {
+        "setup": 0.0035312999971210957,
+        "call": 1.3882730000186712,
+        "teardown": 0.0003093000268563628
+      }
+    },
+    "research_workflow/tests/test_train_provenance_attestation.py::test_the_generator_refuses_a_freeze_that_is_not_train_only": {
+      "seconds": 1.2301867998903617,
+      "phases": {
+        "setup": 0.0032245999900624156,
+        "call": 1.2267676999326795,
+        "teardown": 0.00019449996761977673
+      }
+    },
+    "research_workflow/tests/test_train_provenance_attestation.py::test_attestation_fields_are_refused_on_a_model_id_binding": {
+      "seconds": 0.0020718000596389174,
+      "phases": {
+        "setup": 0.0016795999836176634,
+        "call": 0.0002631000243127346,
+        "teardown": 0.00012910005170851946
+      }
+    },
+    "research_workflow/tests/test_train_provenance_attestation.py::test_attestation_fields_must_be_declared_together": {
+      "seconds": 0.010610300116240978,
+      "phases": {
+        "setup": 0.0025507000973448157,
+        "call": 0.007877100026234984,
+        "teardown": 0.0001824999926611781
+      }
+    },
+    "research_workflow/tests/test_train_provenance_attestation.py::test_real_parent_freeze_bytes_are_unchanged_and_still_unstamped": {
+      "seconds": 0.05255669995676726,
+      "phases": {
+        "setup": 0.0016024999786168337,
+        "call": 0.05075529997702688,
+        "teardown": 0.00019890000112354755
+      }
+    },
+    "research_workflow/tests/test_train_provenance_attestation.py::test_real_attestation_is_reproducible_and_binds_the_real_artifacts": {
+      "seconds": 0.0029578000539913774,
+      "phases": {
+        "setup": 0.0018364000134170055,
+        "call": 0.0009648000122979283,
+        "teardown": 0.00015660002827644348
+      }
+    },
+    "research_workflow/tests/test_train_provenance_attestation.py::test_the_default_null_policy_still_refuses_to_score_a_null_input": {
+      "seconds": 0.02945130004081875,
+      "phases": {
+        "setup": 0.0026562000857666135,
+        "call": 0.026433999999426305,
+        "teardown": 0.0003610999556258321
+      }
+    },
+    "research_workflow/tests/test_train_provenance_attestation.py::test_model_native_reproduces_the_estimator_on_missing_inputs_exactly": {
+      "seconds": 0.03376759996172041,
+      "phases": {
+        "setup": 0.0055568000534549356,
+        "call": 0.02788359997794032,
+        "teardown": 0.0003271999303251505
+      }
+    },
+    "research_workflow/tests/test_train_provenance_attestation.py::test_a_score_over_missing_inputs_is_never_anonymous": {
+      "seconds": 0.030990200000815094,
+      "phases": {
+        "setup": 0.00533670000731945,
+        "call": 0.025309200049377978,
+        "teardown": 0.0003442999441176653
+      }
+    },
+    "research_workflow/tests/test_train_provenance_attestation.py::test_model_native_on_a_family_without_missing_support_fails_closed": {
+      "seconds": 0.017388599924743176,
+      "phases": {
+        "setup": 0.00542860000859946,
+        "call": 0.011782399960793555,
+        "teardown": 0.0001775999553501606
+      }
+    },
+    "research_workflow/tests/test_train_provenance_attestation.py::test_a_row_with_nothing_observed_never_produces_a_score": {
+      "seconds": 0.034518999978899956,
+      "phases": {
+        "setup": 0.0030482999281957746,
+        "call": 0.031120299943722785,
+        "teardown": 0.0003504001069813967
+      }
+    },
+    "scripts/tests/test_session_efficiency.py::test_session_step_1_compile_gap_writes_handoff_and_stops": {
+      "seconds": 0.4023889999371022,
+      "phases": {
+        "setup": 0.007861499907448888,
+        "call": 0.39326669997535646,
+        "teardown": 0.0012608000542968512
+      }
+    },
+    "scripts/tests/test_session_efficiency.py::test_cli_compile_emits_handoff_card": {
+      "seconds": 7.861868700012565,
+      "phases": {
+        "setup": 0.004272699938155711,
+        "call": 7.854625800042413,
+        "teardown": 0.0029702000319957733
+      }
+    },
+    "scripts/tests/test_session_efficiency.py::test_capability_step_chore_ownership_overlap_refused_disjoint_ok": {
+      "seconds": 0.34305309993214905,
+      "phases": {
+        "setup": 0.20294440002180636,
+        "call": 0.13870859995950013,
+        "teardown": 0.0014000999508425593
+      }
+    },
+    "scripts/tests/test_session_efficiency.py::test_resume_from_handoff_cards_without_rediscovery": {
+      "seconds": 2.0337284000124782,
+      "phases": {
+        "setup": 0.004735699971206486,
+        "call": 2.0262250000378117,
+        "teardown": 0.0027677000034600496
+      }
+    },
+    "scripts/tests/test_session_efficiency.py::test_test_delta_classifies_against_committed_baseline": {
+      "seconds": 2.655845299945213,
+      "phases": {
+        "setup": 0.006888599949888885,
+        "call": 2.645736699923873,
+        "teardown": 0.003220000071451068
+      }
+    },
+    "scripts/tests/test_session_efficiency.py::test_committed_baseline_exists_and_is_well_formed": {
+      "seconds": 0.006553299957886338,
+      "phases": {
+        "setup": 0.002868599956855178,
+        "call": 0.001955999992787838,
+        "teardown": 0.0017287000082433224
+      }
+    },
+    "scripts/tests/test_session_efficiency.py::test_study_skeleton_declares_autonomy_decisions": {
+      "seconds": 0.37130800005979836,
+      "phases": {
+        "setup": 0.18446200003381819,
+        "call": 0.18550959997810423,
+        "teardown": 0.0013364000478759408
+      }
+    },
+    "scripts/tests/test_workspace.py::test_study_new_creates_branch_worktree_scaffold_and_lease": {
+      "seconds": 0.3853347001131624,
+      "phases": {
+        "setup": 0.1670496000442654,
+        "call": 0.21244899998418987,
+        "teardown": 0.005836100084707141
+      }
+    },
+    "scripts/tests/test_workspace.py::test_second_writer_for_same_worktree_is_refused": {
+      "seconds": 0.43181879993062466,
+      "phases": {
+        "setup": 0.2388045999687165,
+        "call": 0.19172669993713498,
+        "teardown": 0.0012875000247731805
+      }
+    },
+    "scripts/tests/test_workspace.py::test_duplicate_study_branch_or_worktree_refused": {
+      "seconds": 0.3311280000489205,
+      "phases": {
+        "setup": 0.15689830004703254,
+        "call": 0.17285159998573363,
+        "teardown": 0.0013781000161543489
+      }
+    },
+    "scripts/tests/test_workspace.py::test_dirty_source_worktree_refused": {
+      "seconds": 0.21476220001932234,
+      "phases": {
+        "setup": 0.15924980002455413,
+        "call": 0.05417899996973574,
+        "teardown": 0.0013334000250324607
+      }
+    },
+    "scripts/tests/test_workspace.py::test_ws_list_reports_worktrees_owners_and_lease_states": {
+      "seconds": 0.5730229000328109,
+      "phases": {
+        "setup": 0.1547658999916166,
+        "call": 0.4168552999617532,
+        "teardown": 0.0014017000794410706
+      }
+    },
+    "scripts/tests/test_workspace.py::test_invalid_study_id": {
+      "seconds": 0.1530847999965772,
+      "phases": {
+        "setup": 0.15146989992354065,
+        "call": 0.0004520000657066703,
+        "teardown": 0.0011629000073298812
+      }
+    },
+    "scripts/tests/test_workspace.py::test_v2_skeleton_compiles_statically_without_study_python": {
+      "seconds": 2.9011355999391526,
+      "phases": {
+        "setup": 0.15419939998537302,
+        "call": 2.745662699919194,
+        "teardown": 0.0012735000345855951
+      }
+    },
+    "scripts/tests/test_workspace.py::test_ws_list_reclaim_clears_only_stale_and_dead_leases": {
+      "seconds": 0.7192792999558151,
+      "phases": {
+        "setup": 0.15148899995256215,
+        "call": 0.5665492999833077,
+        "teardown": 0.0012410000199452043
+      }
+    },
+    "scripts/tests/test_decision_selection_mode_gate.py::test_study_broader_than_its_contract_is_refused[none]": {
+      "seconds": 0.9190494000213221,
+      "phases": {
+        "setup": 0.004388100001960993,
+        "call": 0.913466400001198,
+        "teardown": 0.0011949000181630254
+      }
+    },
+    "scripts/tests/test_decision_selection_mode_gate.py::test_study_broader_than_its_contract_is_refused[pre_frozen]": {
+      "seconds": 0.9135754001326859,
+      "phases": {
+        "setup": 0.003962600021623075,
+        "call": 0.9082800000905991,
+        "teardown": 0.0013328000204637647
+      }
+    },
+    "scripts/tests/test_decision_selection_mode_gate.py::test_study_broader_than_its_contract_is_refused[train_only]": {
+      "seconds": 0.005198200000450015,
+      "phases": {
+        "setup": 0.004038200015202165,
+        "call": 0.00014819996431469917,
+        "teardown": 0.0010118000209331512
+      }
+    },
+    "scripts/tests/test_decision_selection_mode_gate.py::test_study_narrower_than_its_contract_is_permitted[none]": {
+      "seconds": 0.8801040999824181,
+      "phases": {
+        "setup": 0.003652299987152219,
+        "call": 0.8752385000698268,
+        "teardown": 0.0012132999254390597
+      }
+    },
+    "scripts/tests/test_decision_selection_mode_gate.py::test_study_narrower_than_its_contract_is_permitted[pre_frozen]": {
+      "seconds": 0.8831819000188261,
+      "phases": {
+        "setup": 0.004040500032715499,
+        "call": 0.8778693000786006,
+        "teardown": 0.0012720999075099826
+      }
+    },
+    "scripts/tests/test_decision_selection_mode_gate.py::test_study_narrower_than_its_contract_is_permitted[train_only]": {
+      "seconds": 0.8501674002036452,
+      "phases": {
+        "setup": 0.004277900094166398,
+        "call": 0.8446613000705838,
+        "teardown": 0.001228200038895011
+      }
+    },
+    "scripts/tests/test_decision_selection_mode_gate.py::test_matching_modes_are_permitted": {
+      "seconds": 0.8734407001174986,
+      "phases": {
+        "setup": 0.0038605000590905547,
+        "call": 0.868189400061965,
+        "teardown": 0.0013907999964430928
+      }
+    },
+    "scripts/tests/test_decision_selection_mode_gate.py::test_unknown_selection_mode_fails_closed": {
+      "seconds": 0.8407031000824645,
+      "phases": {
+        "setup": 0.004248599987477064,
+        "call": 0.835249499999918,
+        "teardown": 0.0012050000950694084
+      }
+    },
+    "scripts/tests/test_decision_selection_mode_gate.py::test_real_studies_still_pass_the_tightened_gate": {
+      "seconds": 2.6342982000205666,
+      "phases": {
+        "setup": 0.0024895999813452363,
+        "call": 2.630506500019692,
+        "teardown": 0.0013021000195294619
+      }
+    },
+    "features/tests/test_volume_profile_snapshot_timing.py::test_boundary_bar_publishes_its_own_minute_at_that_bar_and_nothing_later": {
+      "seconds": 2.3941691999789327,
+      "phases": {
+        "setup": 2.3659687000326812,
+        "call": 0.028007099987007678,
+        "teardown": 0.00019339995924383402
+      }
+    },
+    "features/tests/test_volume_profile_snapshot_timing.py::test_missing_boundary_bar_keeps_the_prior_minute_until_the_first_later_bar": {
+      "seconds": 0.042020399938337505,
+      "phases": {
+        "setup": 0.0019105999963358045,
+        "call": 0.039900199975818396,
+        "teardown": 0.0002095999661833048
+      }
+    },
+    "features/tests/test_volume_profile_snapshot_timing.py::test_host_row_keeps_observation_time_and_snapshot_time_distinct[False]": {
+      "seconds": 0.00678150006569922,
+      "phases": {
+        "setup": 0.00590430002193898,
+        "call": 0.0007158000953495502,
+        "teardown": 0.00016139994841068983
+      }
+    },
+    "features/tests/test_volume_profile_snapshot_timing.py::test_host_row_keeps_observation_time_and_snapshot_time_distinct[True]": {
+      "seconds": 0.005917700007557869,
+      "phases": {
+        "setup": 0.005139100016094744,
+        "call": 0.0005769999697804451,
+        "teardown": 0.00020160002168267965
+      }
+    },
+    "features/tests/test_volume_profile_snapshot_timing.py::test_parity_join_must_use_profile_snapshot_ts_not_observation_ts": {
+      "seconds": 0.041362800053320825,
+      "phases": {
+        "setup": 0.004687700071372092,
+        "call": 0.03643590002320707,
+        "teardown": 0.0002391999587416649
+      }
+    },
+    "research_workflow/tests/test_controller_stages_v2.py::test_stage_order_covers_the_whole_lifecycle": {
+      "seconds": 0.002883899840526283,
+      "phases": {
+        "setup": 0.0025617999490350485,
+        "call": 0.00016179995145648718,
+        "teardown": 0.00016029994003474712
+      }
+    },
+    "research_workflow/tests/test_controller_stages_v2.py::test_all_late_stages_run_in_order_with_receipts_and_resume": {
+      "seconds": 0.3153141000075266,
+      "phases": {
+        "setup": 0.006241300026886165,
+        "call": 0.3088965000351891,
+        "teardown": 0.00017629994545131922
+      }
+    },
+    "research_workflow/tests/test_controller_stages_v2.py::test_stage_by_stage_states": {
+      "seconds": 0.36735469987615943,
+      "phases": {
+        "setup": 0.0029775999719277024,
+        "call": 0.3641812999267131,
+        "teardown": 0.0001957999775186181
+      }
+    },
+    "research_workflow/tests/test_controller_stages_v2.py::test_close_is_terminal_and_never_rerun": {
+      "seconds": 0.21218919998500496,
+      "phases": {
+        "setup": 0.003102299990132451,
+        "call": 0.2089118999429047,
+        "teardown": 0.00017500005196779966
+      }
+    },
+    "research_workflow/tests/test_controller_stages_v2.py::test_corrupt_receipt_reruns_only_that_stage": {
+      "seconds": 0.17790249991230667,
+      "phases": {
+        "setup": 0.002866499940864742,
+        "call": 0.1748706999933347,
+        "teardown": 0.00016529997810721397
+      }
+    },
+    "research_workflow/tests/test_controller_stages_v2.py::test_missing_leaf_is_a_capability_blocker": {
+      "seconds": 0.0752136999508366,
+      "phases": {
+        "setup": 0.0029015999753028154,
+        "call": 0.0721311999950558,
+        "teardown": 0.00018089998047798872
+      }
+    },
+    "research_workflow/tests/test_controller_stages_v2.py::test_duplicate_orchestrators_are_deprecated_shims[run_research_workflow.py]": {
+      "seconds": 0.7232663999311626,
+      "phases": {
+        "setup": 0.001753699965775013,
+        "call": 0.7213112999452278,
+        "teardown": 0.00020140002015978098
+      }
+    },
+    "research_workflow/tests/test_controller_stages_v2.py::test_duplicate_orchestrators_are_deprecated_shims[run_partitioned_train_collection.py]": {
+      "seconds": 0.687297800090164,
+      "phases": {
+        "setup": 0.0021059000864624977,
+        "call": 0.6849970000330359,
+        "teardown": 0.00019489997066557407
+      }
+    },
+    "research_workflow/tests/test_controller_stages_v2.py::test_duplicate_orchestrators_are_deprecated_shims[reconcile_study_capabilities.py]": {
+      "seconds": 0.7678102002246305,
+      "phases": {
+        "setup": 0.0019523000810295343,
+        "call": 0.7654668000759557,
+        "teardown": 0.00039110006764531136
+      }
+    },
+    "research_workflow/tests/test_controller_stages_v2.py::test_production_close_requires_operator_decision": {
+      "seconds": 0.01006119989324361,
+      "phases": {
+        "setup": 0.006174399983137846,
+        "call": 0.0036752999294549227,
+        "teardown": 0.0002114999806508422
+      }
+    },
+    "research_workflow/tests/test_controller_stages_v2.py::test_label_column_is_declared_or_explicit_never_guessed": {
+      "seconds": 0.039888300001621246,
+      "phases": {
+        "setup": 0.005942500079981983,
+        "call": 0.03351440001279116,
+        "teardown": 0.00043139990884810686
+      }
+    },
+    "research_workflow/tests/test_controller_stages_v2.py::test_train_matrix_uses_declared_features_and_train_rows_only": {
+      "seconds": 0.06541930011007935,
+      "phases": {
+        "setup": 0.005084400065243244,
+        "call": 0.06013440003152937,
+        "teardown": 0.00020050001330673695
+      }
+    },
+    "research/analysis/tests/test_contrast_ops.py::test_registered_and_context": {
+      "seconds": 0.003008000086992979,
+      "phases": {
+        "setup": 0.002549600088968873,
+        "call": 0.00028309994377195835,
+        "teardown": 0.00017530005425214767
+      }
+    },
+    "research/analysis/tests/test_contrast_ops.py::test_bh_matches_textbook_and_statsmodels_style_values": {
+      "seconds": 0.0022480000043287873,
+      "phases": {
+        "setup": 0.001856899936683476,
+        "call": 0.0002445999998599291,
+        "teardown": 0.00014650006778538227
+      }
+    },
+    "research/analysis/tests/test_contrast_ops.py::test_bh_ties_get_identical_q": {
+      "seconds": 0.0019861998734995723,
+      "phases": {
+        "setup": 0.0016892999410629272,
+        "call": 0.00015239999629557133,
+        "teardown": 0.0001444999361410737
+      }
+    },
+    "research/analysis/tests/test_contrast_ops.py::test_bh_ordering_invariance": {
+      "seconds": 0.004867000039666891,
+      "phases": {
+        "setup": 0.0017178000416606665,
+        "call": 0.0029984000138938427,
+        "teardown": 0.00015079998411238194
+      }
+    },
+    "research/analysis/tests/test_contrast_ops.py::test_bh_null_policies": {
+      "seconds": 0.00206389999948442,
+      "phases": {
+        "setup": 0.001741899992339313,
+        "call": 0.00018159998580813408,
+        "teardown": 0.0001404000213369727
+      }
+    },
+    "research/analysis/tests/test_contrast_ops.py::test_bh_all_pass_none_pass_and_boundary": {
+      "seconds": 0.030361299985088408,
+      "phases": {
+        "setup": 0.001603499986231327,
+        "call": 0.02857099997345358,
+        "teardown": 0.0001868000254034996
+      }
+    },
+    "research/analysis/tests/test_contrast_ops.py::test_real_effect_is_nominated_and_null_cells_are_not": {
+      "seconds": 0.028688999940641224,
+      "phases": {
+        "setup": 0.0019523999653756618,
+        "call": 0.026555399992503226,
+        "teardown": 0.00018119998276233673
+      }
+    },
+    "research/analysis/tests/test_contrast_ops.py::test_frozen_n_gates": {
+      "seconds": 0.03850840008817613,
+      "phases": {
+        "setup": 0.0019708999898284674,
+        "call": 0.03635970002505928,
+        "teardown": 0.0001778000732883811
+      }
+    },
+    "research/analysis/tests/test_contrast_ops.py::test_materiality_gates_each_bind": {
+      "seconds": 0.11071799998171628,
+      "phases": {
+        "setup": 0.0025369999930262566,
+        "call": 0.10782050003763288,
+        "teardown": 0.00036049995105713606
+      }
+    },
+    "research/analysis/tests/test_contrast_ops.py::test_significance_alone_never_qualifies": {
+      "seconds": 0.1411476000212133,
+      "phases": {
+        "setup": 0.0019290000200271606,
+        "call": 0.1390376000199467,
+        "teardown": 0.00018099998123943806
+      }
+    },
+    "research/analysis/tests/test_contrast_ops.py::test_parameters_are_not_hard_coded": {
+      "seconds": 0.026832400006242096,
+      "phases": {
+        "setup": 0.0019389999797567725,
+        "call": 0.02471319993492216,
+        "teardown": 0.0001802000915631652
+      }
+    },
+    "research/analysis/tests/test_contrast_ops.py::test_ordering_invariance_of_the_whole_op": {
+      "seconds": 0.03729439992457628,
+      "phases": {
+        "setup": 0.002063399995677173,
+        "call": 0.035057000000961125,
+        "teardown": 0.00017399992793798447
+      }
+    },
+    "research/analysis/tests/test_contrast_ops.py::test_not_ranked_by_value": {
+      "seconds": 0.025641499902121723,
+      "phases": {
+        "setup": 0.0018788999877870083,
+        "call": 0.023583499947562814,
+        "teardown": 0.00017909996677190065
+      }
+    },
+    "research/analysis/tests/test_contrast_ops.py::test_clustered_stat_compatibility_with_clustered_mean": {
+      "seconds": 0.04106409987434745,
+      "phases": {
+        "setup": 0.001914000022225082,
+        "call": 0.03895709989592433,
+        "teardown": 0.00019299995619803667
+      }
+    },
+    "research/analysis/tests/test_contrast_ops.py::test_precomputed_mode_gates_a_statistics_frame": {
+      "seconds": 0.004118499928154051,
+      "phases": {
+        "setup": 0.0019664999563246965,
+        "call": 0.0019890000112354755,
+        "teardown": 0.00016299996059387922
+      }
+    },
+    "research/analysis/tests/test_contrast_ops.py::test_excluded_child_values_and_censored_rows": {
+      "seconds": 0.026607599924318492,
+      "phases": {
+        "setup": 0.0017842999659478664,
+        "call": 0.024660900002345443,
+        "teardown": 0.0001623999560251832
+      }
+    },
+    "research/analysis/tests/test_contrast_ops.py::test_invalid_configuration_refused": {
+      "seconds": 0.016000600066035986,
+      "phases": {
+        "setup": 0.0018201000057160854,
+        "call": 0.013997800066135824,
+        "teardown": 0.00018269999418407679
+      }
+    },
+    "research/analysis/tests/test_contrast_ops.py::test_scorecard_replicated": {
+      "seconds": 0.07340859994292259,
+      "phases": {
+        "setup": 0.0558045000070706,
+        "call": 0.017405399936251342,
+        "teardown": 0.00019869999960064888
+      }
+    },
+    "research/analysis/tests/test_contrast_ops.py::test_scorecard_contradicted_sign_reversal": {
+      "seconds": 0.0460456000873819,
+      "phases": {
+        "setup": 0.028878199984319508,
+        "call": 0.01696430006995797,
+        "teardown": 0.0002031000331044197
+      }
+    },
+    "research/analysis/tests/test_contrast_ops.py::test_scorecard_not_replicated_and_directionally_consistent": {
+      "seconds": 0.15291330008767545,
+      "phases": {
+        "setup": 0.11920790001749992,
+        "call": 0.033520900062285364,
+        "teardown": 0.00018450000789016485
+      }
+    },
+    "research/analysis/tests/test_contrast_ops.py::test_rule_order_is_configuration": {
+      "seconds": 0.05043980001937598,
+      "phases": {
+        "setup": 0.0032390999840572476,
+        "call": 0.047015000018291175,
+        "teardown": 0.0001857000170275569
+      }
+    },
+    "research/analysis/tests/test_contrast_ops.py::test_scorecard_underpowered": {
+      "seconds": 0.033501500030979514,
+      "phases": {
+        "setup": 0.029034500010311604,
+        "call": 0.00427889998536557,
+        "teardown": 0.00018810003530234098
+      }
+    },
+    "research/analysis/tests/test_contrast_ops.py::test_scorecard_fallback_class_is_retained": {
+      "seconds": 0.0578994998941198,
+      "phases": {
+        "setup": 0.003418099950067699,
+        "call": 0.054299799958243966,
+        "teardown": 0.00018159998580813408
+      }
+    },
+    "research/analysis/tests/test_contrast_ops.py::test_scorecard_refuses_a_changed_claim_file": {
+      "seconds": 0.05406359990593046,
+      "phases": {
+        "setup": 0.029087599948979914,
+        "call": 0.02476669999305159,
+        "teardown": 0.00020929996389895678
+      }
+    },
+    "research/analysis/tests/test_contrast_ops.py::test_scorecard_cannot_add_or_drop_claims": {
+      "seconds": 0.06551129976287484,
+      "phases": {
+        "setup": 0.0034448999213054776,
+        "call": 0.06189129990525544,
+        "teardown": 0.00017509993631392717
+      }
+    },
+    "research/analysis/tests/test_contrast_ops.py::test_scorecard_uses_the_frozen_spec_not_parameters": {
+      "seconds": 0.05101290007587522,
+      "phases": {
+        "setup": 0.03756200009956956,
+        "call": 0.013258100021630526,
+        "teardown": 0.000192799954675138
+      }
+    },
+    "research/analysis/tests/test_contrast_ops.py::test_scorecard_missing_column_is_an_error_not_a_drop": {
+      "seconds": 0.044647099915891886,
+      "phases": {
+        "setup": 0.02925569994840771,
+        "call": 0.015191499958746135,
+        "teardown": 0.00019990000873804092
+      }
+    },
+    "research/analysis/tests/test_contrast_ops.py::test_scorecard_path_must_stay_in_the_study": {
+      "seconds": 0.05842260003555566,
+      "phases": {
+        "setup": 0.02904239995405078,
+        "call": 0.02918050007428974,
+        "teardown": 0.00019970000721514225
+      }
+    },
+    "research/analysis/tests/test_contrast_ops.py::test_discovery_values_are_immutable_in_the_scorecard": {
+      "seconds": 0.049621400074101985,
+      "phases": {
+        "setup": 0.02978470001835376,
+        "call": 0.01960620004683733,
+        "teardown": 0.0002305000089108944
+      }
+    },
+    "research/analysis/tests/test_contrast_ops.py::test_several_parent_specs_form_one_bh_family": {
+      "seconds": 0.07312050019390881,
+      "phases": {
+        "setup": 0.0035698000574484468,
+        "call": 0.0693589000729844,
+        "teardown": 0.00019180006347596645
+      }
+    },
+    "research/analysis/tests/test_contrast_ops.py::test_frame_common_matches_diagnostic_ops": {
+      "seconds": 0.006605600123293698,
+      "phases": {
+        "setup": 0.002011600066907704,
+        "call": 0.004433599999174476,
+        "teardown": 0.0001604000572115183
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_loader_refuses_non_explicit_run_identity[latest]": {
+      "seconds": 0.006018300075083971,
+      "phases": {
+        "setup": 0.004625600064173341,
+        "call": 0.00023340003099292517,
+        "teardown": 0.001159299979917705
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_loader_refuses_non_explicit_run_identity[LATEST]": {
+      "seconds": 0.005104199983179569,
+      "phases": {
+        "setup": 0.003957799985073507,
+        "call": 0.00014869996812194586,
+        "teardown": 0.0009977000299841166
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_loader_refuses_non_explicit_run_identity[last]": {
+      "seconds": 0.004750499967485666,
+      "phases": {
+        "setup": 0.0036151999374851584,
+        "call": 0.0001721000298857689,
+        "teardown": 0.0009632000001147389
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_loader_refuses_non_explicit_run_identity[newest]": {
+      "seconds": 0.005130199948325753,
+      "phases": {
+        "setup": 0.003991099889390171,
+        "call": 0.0001463000662624836,
+        "teardown": 0.000992799992673099
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_loader_refuses_non_explicit_run_identity[*]": {
+      "seconds": 0.004789400030858815,
+      "phases": {
+        "setup": 0.0035698000574484468,
+        "call": 0.00014320004265755415,
+        "teardown": 0.0010763999307528138
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_loader_refuses_non_explicit_run_identity[]": {
+      "seconds": 0.005219200160354376,
+      "phases": {
+        "setup": 0.003975900006480515,
+        "call": 0.00015930004883557558,
+        "teardown": 0.0010840001050382853
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_loader_raises_missing_artifact_for_unknown_run": {
+      "seconds": 0.005742100067436695,
+      "phases": {
+        "setup": 0.0040417000418528914,
+        "call": 0.0006215000757947564,
+        "teardown": 0.0010788999497890472
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_identity_is_stable_and_changes_with_content": {
+      "seconds": 0.10047129995655268,
+      "phases": {
+        "setup": 0.004109799978323281,
+        "call": 0.09525030001532286,
+        "teardown": 0.0011111999629065394
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_identity_mismatch_when_spec_pins_a_different_collection": {
+      "seconds": 0.1371524998685345,
+      "phases": {
+        "setup": 0.00417059997562319,
+        "call": 0.13178219995461404,
+        "teardown": 0.0011996999382972717
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_study_id_mismatch_is_identity_failure": {
+      "seconds": 0.04934060014784336,
+      "phases": {
+        "setup": 0.0040707000298425555,
+        "call": 0.04410200007259846,
+        "teardown": 0.001167900045402348
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_artifact_hash_mismatch_detected": {
+      "seconds": 0.0583426000084728,
+      "phases": {
+        "setup": 0.004163000034168363,
+        "call": 0.053072999930009246,
+        "teardown": 0.0011066000442951918
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_unsealed_collection_blocked_by_default_and_allowed_when_declared": {
+      "seconds": 0.06704059999901801,
+      "phases": {
+        "setup": 0.004089999943971634,
+        "call": 0.06172380002681166,
+        "teardown": 0.0012268000282347202
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_collection_status_must_be_success": {
+      "seconds": 0.05615279998164624,
+      "phases": {
+        "setup": 0.004402999999001622,
+        "call": 0.05054029996972531,
+        "teardown": 0.0012095000129193068
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_stale_compiled_study_is_distinct_from_spec_drift": {
+      "seconds": 0.06212929997127503,
+      "phases": {
+        "setup": 0.004261299967765808,
+        "call": 0.05674249993171543,
+        "teardown": 0.0011255000717937946
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_spec_drift_when_run_was_built_from_another_contract": {
+      "seconds": 0.057462999946437776,
+      "phases": {
+        "setup": 0.003912799991667271,
+        "call": 0.05232859996613115,
+        "teardown": 0.0012215999886393547
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_stale_compiled_study_can_be_explicitly_accepted": {
+      "seconds": 0.04833560006227344,
+      "phases": {
+        "setup": 0.004392600036226213,
+        "call": 0.0428107000188902,
+        "teardown": 0.0011323000071570277
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_feature_order_drift_detected": {
+      "seconds": 0.06426510005258024,
+      "phases": {
+        "setup": 0.004115100018680096,
+        "call": 0.058841299964115024,
+        "teardown": 0.001308700069785118
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_surplus_column_detected": {
+      "seconds": 0.060663699987344444,
+      "phases": {
+        "setup": 0.004452599911019206,
+        "call": 0.05507080000825226,
+        "teardown": 0.0011403000680729747
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_feature_hash_binding_to_spec": {
+      "seconds": 0.04607649997342378,
+      "phases": {
+        "setup": 0.004095599986612797,
+        "call": 0.04085200000554323,
+        "teardown": 0.0011288999812677503
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_clean_synthetic_collection_passes_everything": {
+      "seconds": 0.051139399874955416,
+      "phases": {
+        "setup": 0.004103599931113422,
+        "call": 0.045921499957330525,
+        "teardown": 0.0011142999865114689
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_empty_observations_reported_not_silently_joined": {
+      "seconds": 0.05887599987909198,
+      "phases": {
+        "setup": 0.0040874999249354005,
+        "call": 0.05369039997458458,
+        "teardown": 0.0010980999795719981
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_missing_target_column_detected": {
+      "seconds": 0.06293060001917183,
+      "phases": {
+        "setup": 0.004157599993050098,
+        "call": 0.05759610002860427,
+        "teardown": 0.0011768999975174665
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_duplicate_join_keys_detected": {
+      "seconds": 0.06857879995368421,
+      "phases": {
+        "setup": 0.004322499968111515,
+        "call": 0.06313419993966818,
+        "teardown": 0.0011221000459045172
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_join_row_loss_detected": {
+      "seconds": 0.05557550000958145,
+      "phases": {
+        "setup": 0.004028599942103028,
+        "call": 0.05032300006132573,
+        "teardown": 0.0012239000061526895
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_join_key_is_derived_per_study_not_hardcoded": {
+      "seconds": 0.05655730003491044,
+      "phases": {
+        "setup": 0.0042007999727502465,
+        "call": 0.05124900001101196,
+        "teardown": 0.0011075000511482358
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_partition_of_year_uses_declared_chronology": {
+      "seconds": 0.003460400039330125,
+      "phases": {
+        "setup": 0.0025140000507235527,
+        "call": 0.00011669995728880167,
+        "teardown": 0.0008297000313177705
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_prohibited_partition_rows_are_a_load_failure_not_a_filter": {
+      "seconds": 0.06207799992989749,
+      "phases": {
+        "setup": 0.003554099937900901,
+        "call": 0.05743760010227561,
+        "teardown": 0.0010862998897209764
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_partition_mixing_rejected": {
+      "seconds": 0.04803519998677075,
+      "phases": {
+        "setup": 0.004219199996441603,
+        "call": 0.04256490000989288,
+        "teardown": 0.0012510999804362655
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_dev_requires_unlock_token": {
+      "seconds": 0.08445450011640787,
+      "phases": {
+        "setup": 0.0045640000607818365,
+        "call": 0.078677500016056,
+        "teardown": 0.0012130000395700336
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_warmup_leakage_detected": {
+      "seconds": 0.0698915000539273,
+      "phases": {
+        "setup": 0.004453600035049021,
+        "call": 0.06421560002490878,
+        "teardown": 0.0012222999939695
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_cross_study_pooling_rejected": {
+      "seconds": 0.13068770000245422,
+      "phases": {
+        "setup": 0.004426599945873022,
+        "call": 0.12509770004544407,
+        "teardown": 0.0011634000111371279
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_extraction_requires_validation": {
+      "seconds": 0.044605799950659275,
+      "phases": {
+        "setup": 0.004097700002603233,
+        "call": 0.03943769994657487,
+        "teardown": 0.0010704000014811754
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_extraction_refuses_when_validation_failed": {
+      "seconds": 0.04998320003505796,
+      "phases": {
+        "setup": 0.004157199990004301,
+        "call": 0.044647400034591556,
+        "teardown": 0.0011786000104621053
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_extraction_returns_ordered_features_target_and_metadata": {
+      "seconds": 0.07492169993929565,
+      "phases": {
+        "setup": 0.0047623999416828156,
+        "call": 0.0662605999968946,
+        "teardown": 0.003898700000718236
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_extraction_rejects_outcome_columns_requested_as_features": {
+      "seconds": 0.060475700069218874,
+      "phases": {
+        "setup": 0.007572000031359494,
+        "call": 0.0516975000500679,
+        "teardown": 0.0012061999877914786
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_dataset_identity_written_and_complete": {
+      "seconds": 0.06995509983971715,
+      "phases": {
+        "setup": 0.004417499992996454,
+        "call": 0.06436669989489019,
+        "teardown": 0.0011708999518305063
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_real_fixture_a_loads_and_validates": {
+      "seconds": 0.00022109993733465672,
+      "phases": {
+        "setup": 0.00010659999679774046,
+        "teardown": 0.00011449994053691626
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_real_fixture_b_has_three_key_join_and_fallback_metadata": {
+      "seconds": 0.0001873000292107463,
+      "phases": {
+        "setup": 8.690007962286472e-05,
+        "teardown": 0.00010039994958788157
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_real_fixture_b_is_the_stale_compiled_study_case": {
+      "seconds": 0.00018049997743219137,
+      "phases": {
+        "setup": 8.17000400274992e-05,
+        "teardown": 9.879993740469217e-05
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_real_negative_fixture_has_empty_observations": {
+      "seconds": 0.00018239999189972878,
+      "phases": {
+        "setup": 7.680000271648169e-05,
+        "teardown": 0.00010559998918324709
+      }
+    },
+    "scripts/tests/test_analysis_loader.py::test_real_fixtures_are_different_studies_and_cannot_pool": {
+      "seconds": 0.00019420008175075054,
+      "phases": {
+        "setup": 9.109999518841505e-05,
+        "teardown": 0.00010310008656233549
+      }
+    },
+    "scripts/tests/test_research_preflight.py::test_preflight_clean_study": {
+      "seconds": 2.281452899915166,
+      "phases": {
+        "setup": 0.004331399919465184,
+        "call": 2.275883199996315,
+        "teardown": 0.0012382999993860722
+      }
+    },
+    "scripts/tests/test_research_preflight.py::test_preflight_blocked_by_causal_leak": {
+      "seconds": 0.7374468999914825,
+      "phases": {
+        "setup": 0.004467300022952259,
+        "call": 0.7318898999365047,
+        "teardown": 0.0010897000320255756
+      }
+    },
+    "scripts/tests/test_test_delta.py::test_new_missing_file_import_path_is_never_automatic_environment[FileNotFoundError: missing.py]": {
+      "seconds": 0.003788800095207989,
+      "phases": {
+        "setup": 0.0027196999872103333,
+        "call": 0.00014190003275871277,
+        "teardown": 0.0009272000752389431
+      }
+    },
+    "scripts/tests/test_test_delta.py::test_new_missing_file_import_path_is_never_automatic_environment[ModuleNotFoundError: missing]": {
+      "seconds": 0.0037959000328555703,
+      "phases": {
+        "setup": 0.0026769000105559826,
+        "call": 0.00014100002590566874,
+        "teardown": 0.000977999996393919
+      }
+    },
+    "scripts/tests/test_test_delta.py::test_new_missing_file_import_path_is_never_automatic_environment[is not a directory]": {
+      "seconds": 0.003921499941498041,
+      "phases": {
+        "setup": 0.0027849000180140138,
+        "call": 0.0001330999657511711,
+        "teardown": 0.0010034999577328563
+      }
+    },
+    "scripts/tests/test_test_delta.py::test_changed_failure_at_known_node_is_new": {
+      "seconds": 0.0043533999705687165,
+      "phases": {
+        "setup": 0.0026857999619096518,
+        "call": 0.0006397999823093414,
+        "teardown": 0.0010278000263497233
+      }
+    },
+    "scripts/tests/test_test_delta.py::test_entry_scope_precedes_exact_node": {
+      "seconds": 0.004234000109136105,
+      "phases": {
+        "setup": 0.0030175000429153442,
+        "call": 0.00015550001990050077,
+        "teardown": 0.0010610000463202596
+      }
+    },
+    "scripts/tests/test_test_delta.py::test_baseline_commit_and_environment_are_matching_conditions[platform_commit-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb]": {
+      "seconds": 0.003787199966609478,
+      "phases": {
+        "setup": 0.0027144000632688403,
+        "call": 0.00013569998554885387,
+        "teardown": 0.0009370999177917838
+      }
+    },
+    "scripts/tests/test_test_delta.py::test_baseline_commit_and_environment_are_matching_conditions[environment-value1]": {
+      "seconds": 0.0038666001055389643,
+      "phases": {
+        "setup": 0.002721400000154972,
+        "call": 0.00013420009054243565,
+        "teardown": 0.0010110000148415565
+      }
+    },
+    "scripts/tests/test_test_delta.py::test_pytest_error_return_code_is_enforced_even_with_parsed_pass": {
+      "seconds": 0.020644000032916665,
+      "phases": {
+        "setup": 0.004379000049084425,
+        "call": 0.014961600070819259,
+        "teardown": 0.0013033999130129814
+      }
+    },
+    "scripts/tests/test_test_delta.py::test_exact_unchanged_compatible_failure_remains_known": {
+      "seconds": 0.004450700129382312,
+      "phases": {
+        "setup": 0.0030134000116959214,
+        "call": 0.00021860003471374512,
+        "teardown": 0.0012187000829726458
+      }
+    },
+    "scripts/tests/test_test_delta.py::test_empty_legacy_signature_is_not_evidence": {
+      "seconds": 0.004333400051109493,
+      "phases": {
+        "setup": 0.003128300071693957,
+        "call": 0.00015580002218484879,
+        "teardown": 0.0010492999572306871
+      }
+    },
+    "scripts/tests/test_test_delta.py::test_scope_is_path_boundary_not_prefix": {
+      "seconds": 0.0046172000002115965,
+      "phases": {
+        "setup": 0.0032444000244140625,
+        "call": 0.00015089998487383127,
+        "teardown": 0.0012218999909237027
+      }
+    },
+    "scripts/tests/test_test_delta.py::test_real_capture_keeps_full_failure_and_per_test_timings": {
+      "seconds": 1.2216225998708978,
+      "phases": {
+        "setup": 0.004246099968440831,
+        "call": 1.2163320999825373,
+        "teardown": 0.0010443999199196696
+      }
+    },
+    "scripts/tests/test_test_delta.py::test_real_collection_error_is_not_a_passing_result": {
+      "seconds": 1.3495639999164268,
+      "phases": {
+        "setup": 0.00393220002297312,
+        "call": 1.3444208999862894,
+        "teardown": 0.0012108999071642756
+      }
+    },
+    "scripts/tests/test_test_delta.py::test_invalid_explicit_reference_cannot_fall_back": {
+      "seconds": 0.003929699771106243,
+      "phases": {
+        "setup": 0.0028788999188691378,
+        "call": 0.00012809992767870426,
+        "teardown": 0.0009226999245584011
+      }
+    },
+    "scripts/tests/test_test_delta.py::test_subprocess_env_has_no_empty_pythonpath_entry": {
+      "seconds": 0.009671000065281987,
+      "phases": {
+        "setup": 0.004128100001253188,
+        "call": 0.004465300007723272,
+        "teardown": 0.0010776000563055277
+      }
+    },
+    "scripts/tests/test_test_delta.py::test_portable_signature_normalises_only_machine_local_tokens": {
+      "seconds": 0.0039543998427689075,
+      "phases": {
+        "setup": 0.0027197999879717827,
+        "call": 0.00024669989943504333,
+        "teardown": 0.0009878999553620815
+      }
+    },
+    "scripts/tests/test_test_delta.py::test_known_failure_matches_across_worktrees_but_a_changed_hash_or_line_is_still_new": {
+      "seconds": 0.004052699892781675,
+      "phases": {
+        "setup": 0.002739099902100861,
+        "call": 0.000291000003926456,
+        "teardown": 0.0010225999867543578
+      }
+    },
+    "research_workflow/tests/test_globex_calendar_authority.py::test_globex_product_calendar_is_primary_and_floor_calendar_is_refused": {
+      "seconds": 0.003101699985563755,
+      "phases": {
+        "setup": 0.002062499988824129,
+        "call": 0.0008879000088199973,
+        "teardown": 0.00015129998791962862
+      }
+    },
+    "research_workflow/tests/test_globex_calendar_authority.py::test_equity_index_holiday_eve_early_close_is_1215_ct": {
+      "seconds": 0.07021779986098409,
+      "phases": {
+        "setup": 0.06538399995770305,
+        "call": 0.0046700999373570085,
+        "teardown": 0.00016369996592402458
+      }
+    },
+    "research_workflow/tests/test_globex_calendar_authority.py::test_2024_07_03_last_completed_1s_bar_is_consistent_with_tape": {
+      "seconds": 0.03328830003738403,
+      "phases": {
+        "setup": 0.0019017000449821353,
+        "call": 0.0312113999389112,
+        "teardown": 0.00017520005349069834
+      }
+    },
+    "research_workflow/tests/test_globex_calendar_authority.py::test_tape_reconciliation_rejects_floor_close_and_accepts_globex_close": {
+      "seconds": 0.05045790015719831,
+      "phases": {
+        "setup": 0.0022410000674426556,
+        "call": 0.04802600003313273,
+        "teardown": 0.00019090005662292242
+      }
+    },
+    "research_workflow/tests/test_globex_calendar_authority.py::test_normal_day_close_and_eth_boundary": {
+      "seconds": 0.03499539999756962,
+      "phases": {
+        "setup": 0.0021289000287652016,
+        "call": 0.03268559998832643,
+        "teardown": 0.00018089998047798872
+      }
+    },
+    "research_workflow/tests/test_globex_calendar_authority.py::test_dst_transitions_resolve_in_chicago_wall_clock": {
+      "seconds": 0.007724900031462312,
+      "phases": {
+        "setup": 0.002162700053304434,
+        "call": 0.005395799991674721,
+        "teardown": 0.00016639998648315668
+      }
+    },
+    "research_workflow/tests/test_globex_calendar_authority.py::test_holiday_reopen_and_holiday_table": {
+      "seconds": 0.030540599953383207,
+      "phases": {
+        "setup": 0.0020253999391570687,
+        "call": 0.028333500027656555,
+        "teardown": 0.00018169998656958342
+      }
+    },
+    "research_workflow/tests/test_globex_calendar_authority.py::test_mourning_day_override_applies_and_records_tape_evidence": {
+      "seconds": 0.040140500059351325,
+      "phases": {
+        "setup": 0.0020958000095561147,
+        "call": 0.037865899968892336,
+        "teardown": 0.00017880008090287447
+      }
+    },
+    "research_workflow/tests/test_globex_calendar_authority.py::test_override_table_is_well_formed_and_every_entry_is_live": {
+      "seconds": 0.14634490001481026,
+      "phases": {
+        "setup": 0.002093799994327128,
+        "call": 0.14407360006589442,
+        "teardown": 0.00017749995458871126
+      }
+    },
+    "research_workflow/tests/test_globex_calendar_authority.py::test_redundant_or_malformed_override_fails_closed": {
+      "seconds": 0.1870156000368297,
+      "phases": {
+        "setup": 0.003361999988555908,
+        "call": 0.18346309999469668,
+        "teardown": 0.00019050005357712507
+      }
+    },
+    "research_workflow/tests/test_globex_calendar_authority.py::test_pre_2021_halt_is_a_product_rule": {
+      "seconds": 0.052034099819138646,
+      "phases": {
+        "setup": 0.002004699897952378,
+        "call": 0.049809399992227554,
+        "teardown": 0.000219999928958714
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_gate_blocks_untracked_py_inside_fixture_closure": {
+      "seconds": 0.007230599992908537,
+      "phases": {
+        "setup": 0.0059556999476626515,
+        "call": 0.00016240007244050503,
+        "teardown": 0.0011124999728053808
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_gate_does_not_block_untracked_py_outside_every_closure": {
+      "seconds": 0.006481799995526671,
+      "phases": {
+        "setup": 0.004704699967987835,
+        "call": 0.000175100052729249,
+        "teardown": 0.001601999974809587
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_gate_allows_allowlisted_untracked_py": {
+      "seconds": 0.006023199995979667,
+      "phases": {
+        "setup": 0.004825899959541857,
+        "call": 0.00015620002523064613,
+        "teardown": 0.0010411000112071633
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_module_shadowing_a_closure_import_is_caught": {
+      "seconds": 0.010473499889485538,
+      "phases": {
+        "setup": 0.004179999930784106,
+        "call": 0.005154099897481501,
+        "teardown": 0.0011394000612199306
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_gate_records_dirty_worktree_without_blocking": {
+      "seconds": 0.005917200003750622,
+      "phases": {
+        "setup": 0.004704899969510734,
+        "call": 0.0001615999499335885,
+        "teardown": 0.0010507000843062997
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_non_py_untracked_files_never_block": {
+      "seconds": 0.005727600073441863,
+      "phases": {
+        "setup": 0.004481800016947091,
+        "call": 0.0001577000366523862,
+        "teardown": 0.0010881000198423862
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_w4_resolved_config_snapshot_materialises_all_inherited_fields": {
+      "seconds": 0.015057099983096123,
+      "phases": {
+        "setup": 0.002920400002039969,
+        "call": 0.007733199978247285,
+        "teardown": 0.004403500002808869
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_score_fanning_resolved_config_records_the_import_failure_honestly": {
+      "seconds": 0.022433699923567474,
+      "phases": {
+        "setup": 0.008841399918310344,
+        "call": 0.009901299956254661,
+        "teardown": 0.0036910000490024686
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_fill_evidence_is_explicit_for_both_fixtures": {
+      "seconds": 0.012917699990794063,
+      "phases": {
+        "setup": 0.008972899988293648,
+        "call": 0.00029090000316500664,
+        "teardown": 0.003653899999335408
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_status_vocabulary_is_exactly_the_four_defined_statuses": {
+      "seconds": 0.009680700022727251,
+      "phases": {
+        "setup": 0.006669300026260316,
+        "call": 0.0001498000929132104,
+        "teardown": 0.0028615999035537243
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_no_year_derived_status_exists_in_module": {
+      "seconds": 0.009013299946673214,
+      "phases": {
+        "setup": 0.005842300015501678,
+        "call": 0.0008475999347865582,
+        "teardown": 0.0023233999963849783
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_classify_target_matrix[False-False-True-None-h1-None-100.0-produced_by_current_run]": {
+      "seconds": 0.007530400180257857,
+      "phases": {
+        "setup": 0.0058330000611022115,
+        "call": 0.00017390004359185696,
+        "teardown": 0.0015235000755637884
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_classify_target_matrix[False-False-False-None-None-None-None-expected_absent_verified]": {
+      "seconds": 0.006627100054174662,
+      "phases": {
+        "setup": 0.003865000093355775,
+        "call": 0.0001460999483242631,
+        "teardown": 0.0026160000124946237
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_classify_target_matrix[True-True-False-h0-None-50.0-None-expected_absent_verified]": {
+      "seconds": 0.007812399882823229,
+      "phases": {
+        "setup": 0.005901700002141297,
+        "call": 0.0001574999187141657,
+        "teardown": 0.0017531999619677663
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_classify_target_matrix[True-True-True-h0-h1-50.0-100.0-produced_by_current_run]": {
+      "seconds": 0.005223499960266054,
+      "phases": {
+        "setup": 0.003795500029809773,
+        "call": 0.00014809996355324984,
+        "teardown": 0.0012798999669030309
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_classify_target_matrix[True-False-False-h0-None-50.0-None-expected_absent_unverified_due_to_preexisting_target]": {
+      "seconds": 0.005421000067144632,
+      "phases": {
+        "setup": 0.0040828000055626035,
+        "call": 0.00014540005940943956,
+        "teardown": 0.0011928000021725893
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_classify_target_matrix[True-False-True-h0-h1-50.0-100.0-produced_by_current_run]": {
+      "seconds": 0.004882599925622344,
+      "phases": {
+        "setup": 0.003640500013716519,
+        "call": 0.00013609998859465122,
+        "teardown": 0.001105999923311174
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_classify_target_matrix[True-False-True-h0-h0-50.0-100.0-expected_absent_unverified_due_to_preexisting_target]": {
+      "seconds": 0.004734699963591993,
+      "phases": {
+        "setup": 0.0035152999917045236,
+        "call": 0.00013689999468624592,
+        "teardown": 0.0010824999772012234
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_classify_target_matrix[True-False-True-h0-h0-50.0-50.0-expected_absent_unverified_due_to_preexisting_target]": {
+      "seconds": 0.004481200128793716,
+      "phases": {
+        "setup": 0.003264700062572956,
+        "call": 0.00012880004942417145,
+        "teardown": 0.001087700016796589
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_modification_time_is_not_evidence_of_production": {
+      "seconds": 0.003995900042355061,
+      "phases": {
+        "setup": 0.0028301000129431486,
+        "call": 0.00012850004713982344,
+        "teardown": 0.0010372999822720885
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_untouched_preexisting_file_is_not_attributed_to_the_run": {
+      "seconds": 0.00402860005851835,
+      "phases": {
+        "setup": 0.0029084000270813704,
+        "call": 0.00012630003038793802,
+        "teardown": 0.0009939000010490417
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_absent_target_is_copied_to_evidence_then_removed": {
+      "seconds": 0.030509200179949403,
+      "phases": {
+        "setup": 0.004580900073051453,
+        "call": 0.024610700085759163,
+        "teardown": 0.0013176000211387873
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_preexisting_target_overwritten_is_restored_exactly": {
+      "seconds": 0.03413330006878823,
+      "phases": {
+        "setup": 0.004694200004450977,
+        "call": 0.02828100009355694,
+        "teardown": 0.001158099970780313
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_preexisting_conditional_target_is_quarantined_and_restored": {
+      "seconds": 0.030651200213469565,
+      "phases": {
+        "setup": 0.004750400083139539,
+        "call": 0.024690500111319125,
+        "teardown": 0.0012103000190109015
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_untouched_produced_target_fails_the_fixture": {
+      "seconds": 0.022378099849447608,
+      "phases": {
+        "setup": 0.005070899962447584,
+        "call": 0.016045199939981103,
+        "teardown": 0.0012619999470189214
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_stale_unmanaged_files_are_recorded_and_left_in_place": {
+      "seconds": 0.020728199859149754,
+      "phases": {
+        "setup": 0.005119999987073243,
+        "call": 0.014407499926164746,
+        "teardown": 0.001200699945911765
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_r5_target_is_conditional_with_code_grounded_absence_cause": {
+      "seconds": 0.004183399956673384,
+      "phases": {
+        "setup": 0.0030199000611901283,
+        "call": 0.0001395998988300562,
+        "teardown": 0.0010238999966531992
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_r25_target_is_expected_produced": {
+      "seconds": 0.004130400018766522,
+      "phases": {
+        "setup": 0.00297520007006824,
+        "call": 0.0001324999611824751,
+        "teardown": 0.0010226999875158072
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_w4_parity_is_conditional_on_parity_logs_not_on_year": {
+      "seconds": 0.004193099914118648,
+      "phases": {
+        "setup": 0.002977499971166253,
+        "call": 0.00015029998030513525,
+        "teardown": 0.0010652999626472592
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_w4_stale_glob_catches_other_year_parity_files": {
+      "seconds": 0.004555499996058643,
+      "phases": {
+        "setup": 0.003353400039486587,
+        "call": 0.00014119991101324558,
+        "teardown": 0.0010609000455588102
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_w4_primary_outputs_declared": {
+      "seconds": 0.004496900015510619,
+      "phases": {
+        "setup": 0.0031886999495327473,
+        "call": 0.00015700003132224083,
+        "teardown": 0.0011512000346556306
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_normalized_identity_ignores_volatile_columns_and_row_order": {
+      "seconds": 0.04171610006596893,
+      "phases": {
+        "setup": 0.005031800013966858,
+        "call": 0.03546839999035001,
+        "teardown": 0.0012159000616520643
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_normalized_identity_detects_value_change": {
+      "seconds": 0.031051199999637902,
+      "phases": {
+        "setup": 0.004868500051088631,
+        "call": 0.025087199988774955,
+        "teardown": 0.0010954999597743154
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_normalized_identity_detects_row_count_change": {
+      "seconds": 0.03363379987422377,
+      "phases": {
+        "setup": 0.0045056999661028385,
+        "call": 0.028021899983286858,
+        "teardown": 0.0011061999248340726
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_compare_normalized_reports_float_tolerance_is_not_row_level": {
+      "seconds": 0.004037200007587671,
+      "phases": {
+        "setup": 0.002967200009152293,
+        "call": 0.00012779992539435625,
+        "teardown": 0.0009422000730410218
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_source_change_during_run_invalidates_capture": {
+      "seconds": 0.03135810000821948,
+      "phases": {
+        "setup": 0.004205100005492568,
+        "call": 0.026081199990585446,
+        "teardown": 0.0010718000121414661
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_stable_source_yields_success": {
+      "seconds": 0.01911890006158501,
+      "phases": {
+        "setup": 0.0048479000106453896,
+        "call": 0.013117199996486306,
+        "teardown": 0.0011538000544533134
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_nonzero_returncode_marks_failed_unmodified": {
+      "seconds": 0.017475900007411838,
+      "phases": {
+        "setup": 0.004706099978648126,
+        "call": 0.011650700005702674,
+        "teardown": 0.001119100023061037
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_closure_follows_repo_local_imports_only": {
+      "seconds": 0.010797999915666878,
+      "phases": {
+        "setup": 0.0045662999618798494,
+        "call": 0.005122800008393824,
+        "teardown": 0.0011088999453932047
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_closure_includes_ancestor_package_inits": {
+      "seconds": 0.0942512999754399,
+      "phases": {
+        "setup": 0.0045680999755859375,
+        "call": 0.08856229996308684,
+        "teardown": 0.0011209000367671251
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_closure_follows_nested_transitive_imports": {
+      "seconds": 0.01914670004043728,
+      "phases": {
+        "setup": 0.004550599958747625,
+        "call": 0.013450400088913739,
+        "teardown": 0.001145699992775917
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_closure_handles_from_package_import_module": {
+      "seconds": 0.021064799977466464,
+      "phases": {
+        "setup": 0.004938900005072355,
+        "call": 0.014871999970637262,
+        "teardown": 0.001253900001756847
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_closure_captures_dynamically_resolved_strategy_modules": {
+      "seconds": 0.025263299932703376,
+      "phases": {
+        "setup": 0.006386199966073036,
+        "call": 0.017573800054378808,
+        "teardown": 0.001303299912251532
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_closure_ignores_dotted_strings_that_are_not_repo_modules": {
+      "seconds": 0.024082999909296632,
+      "phases": {
+        "setup": 0.005123300012201071,
+        "call": 0.017788799945265055,
+        "teardown": 0.0011708999518305063
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_real_fixture_closures_are_complete_and_provenanced": {
+      "seconds": 0.04359460005071014,
+      "phases": {
+        "setup": 0.003626900026574731,
+        "call": 0.038805700023658574,
+        "teardown": 0.0011620000004768372
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_every_closure_entry_has_a_discovery_reason": {
+      "seconds": 0.040537400054745376,
+      "phases": {
+        "setup": 0.002935500000603497,
+        "call": 0.03652800002600998,
+        "teardown": 0.0010739000281319022
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_dry_run_plan_executes_nothing_and_reports_provability": {
+      "seconds": 0.021922299987636507,
+      "phases": {
+        "setup": 0.004550299956463277,
+        "call": 0.016260300064459443,
+        "teardown": 0.0011116999667137861
+      }
+    },
+    "scripts/tests/test_capture_baseline_fixtures.py::test_real_fixture_dry_run_plans_resolve": {
+      "seconds": 0.04282029997557402,
+      "phases": {
+        "setup": 0.0027851000195369124,
+        "call": 0.0388559999410063,
+        "teardown": 0.0011792000150308013
+      }
+    },
+    "research_workflow/tests/test_ohlcv_window_features.py::test_every_committed_ohlcv_alias_renders_exactly": {
+      "seconds": 0.5217237001052126,
+      "phases": {
+        "setup": 0.0023947000736370683,
+        "call": 0.5191561001120135,
+        "teardown": 0.00017289991956204176
+      }
+    },
+    "research_workflow/tests/test_ohlcv_window_features.py::test_window_is_part_of_the_physical_identity[5s]": {
+      "seconds": 0.008551899925805628,
+      "phases": {
+        "setup": 0.004783199983648956,
+        "call": 0.003576999995857477,
+        "teardown": 0.0001916999462991953
+      }
+    },
+    "research_workflow/tests/test_ohlcv_window_features.py::test_window_is_part_of_the_physical_identity[30s]": {
+      "seconds": 0.005035900045186281,
+      "phases": {
+        "setup": 0.002172500011511147,
+        "call": 0.00270690000616014,
+        "teardown": 0.00015650002751499414
+      }
+    },
+    "research_workflow/tests/test_ohlcv_window_features.py::test_window_is_part_of_the_physical_identity[60s]": {
+      "seconds": 0.005005800048820674,
+      "phases": {
+        "setup": 0.0020558000542223454,
+        "call": 0.002805700059980154,
+        "teardown": 0.00014429993461817503
+      }
+    },
+    "research_workflow/tests/test_ohlcv_window_features.py::test_window_is_part_of_the_physical_identity[300s]": {
+      "seconds": 0.004741500015370548,
+      "phases": {
+        "setup": 0.001880600000731647,
+        "call": 0.002710800035856664,
+        "teardown": 0.00015009997878223658
+      }
+    },
+    "research_workflow/tests/test_ohlcv_window_features.py::test_four_windows_yield_four_distinct_aliases": {
+      "seconds": 0.012125800014473498,
+      "phases": {
+        "setup": 0.0019006000366061926,
+        "call": 0.010059299995191395,
+        "teardown": 0.00016589998267591
+      }
+    },
+    "research_workflow/tests/test_ohlcv_window_features.py::test_regime_and_rth_contexts_keep_their_spelling": {
+      "seconds": 0.0077998999040573835,
+      "phases": {
+        "setup": 0.002138499985449016,
+        "call": 0.0054984999587759376,
+        "teardown": 0.00016289995983242989
+      }
+    },
+    "research_workflow/tests/test_ohlcv_window_features.py::test_pullback_spelling_of_range_atr_is_untouched": {
+      "seconds": 0.007244900101795793,
+      "phases": {
+        "setup": 0.0020411000587046146,
+        "call": 0.005047100014053285,
+        "teardown": 0.00015670002903789282
+      }
+    },
+    "research_workflow/tests/test_ohlcv_window_features.py::test_default_windows_and_pairs_are_unchanged": {
+      "seconds": 0.0022012999979779124,
+      "phases": {
+        "setup": 0.001922899973578751,
+        "call": 0.00015380000695586205,
+        "teardown": 0.0001246000174432993
+      }
+    },
+    "research_workflow/tests/test_ohlcv_window_features.py::test_default_pair_values_are_the_historical_formulas": {
+      "seconds": 0.007029599975794554,
+      "phases": {
+        "setup": 0.0018179999897256494,
+        "call": 0.005051300046034157,
+        "teardown": 0.00016029994003474712
+      }
+    },
+    "research_workflow/tests/test_ohlcv_window_features.py::test_requested_pairs_are_computed": {
+      "seconds": 0.0048383999383077025,
+      "phases": {
+        "setup": 0.0022450999822467566,
+        "call": 0.002442499971948564,
+        "teardown": 0.00015079998411238194
+      }
+    },
+    "research_workflow/tests/test_ohlcv_window_features.py::test_explicitly_requested_pair_without_its_windows_fails_closed": {
+      "seconds": 0.002619100036099553,
+      "phases": {
+        "setup": 0.00224760000128299,
+        "call": 0.0002266999799758196,
+        "teardown": 0.00014480005484074354
+      }
+    },
+    "research_workflow/tests/test_ohlcv_window_features.py::test_unknown_pair_kind_fails_closed": {
+      "seconds": 0.002304999972693622,
+      "phases": {
+        "setup": 0.0019429000094532967,
+        "call": 0.00022379995789378881,
+        "teardown": 0.00013830000534653664
+      }
+    },
+    "research_workflow/tests/test_ohlcv_window_features.py::test_acceleration_is_this_window_minus_the_preceding_equal_window": {
+      "seconds": 0.005140599911101162,
+      "phases": {
+        "setup": 0.002010999945923686,
+        "call": 0.0029664000030606985,
+        "teardown": 0.0001631999621167779
+      }
+    },
+    "research_workflow/tests/test_ohlcv_window_features.py::test_acceleration_is_direction_normalized": {
+      "seconds": 0.004883599933236837,
+      "phases": {
+        "setup": 0.0018563999328762293,
+        "call": 0.0028759000124409795,
+        "teardown": 0.00015129998791962862
+      }
+    },
+    "research_workflow/tests/test_ohlcv_window_features.py::test_acceleration_without_the_doubled_window_fails_closed": {
+      "seconds": 0.004042100044898689,
+      "phases": {
+        "setup": 0.002088499953970313,
+        "call": 0.001806700020097196,
+        "teardown": 0.00014690007083117962
+      }
+    },
+    "research_workflow/tests/test_ohlcv_window_features.py::test_acceleration_rejects_an_absent_prevailing_direction": {
+      "seconds": 0.0041186000453308225,
+      "phases": {
+        "setup": 0.0020378000335767865,
+        "call": 0.001930900034494698,
+        "teardown": 0.0001498999772593379
+      }
+    },
+    "research_workflow/tests/test_ohlcv_window_features.py::test_acceleration_is_not_the_misnamed_minus_scaled_feature": {
+      "seconds": 0.00506870006211102,
+      "phases": {
+        "setup": 0.0020938999950885773,
+        "call": 0.00281360000371933,
+        "teardown": 0.00016120006330311298
+      }
+    },
+    "research_workflow/tests/test_ohlcv_window_features.py::test_volume_participation_surface_binds_and_emits": {
+      "seconds": 0.005271699978038669,
+      "phases": {
+        "setup": 0.002177499933168292,
+        "call": 0.002940300037153065,
+        "teardown": 0.00015390000771731138
+      }
+    },
+    "research_workflow/tests/test_ohlcv_window_features.py::test_adapter_routes_each_window_to_its_own_value": {
+      "seconds": 0.005057999980635941,
+      "phases": {
+        "setup": 0.002095600008033216,
+        "call": 0.0028204999398440123,
+        "teardown": 0.00014190003275871277
+      }
+    },
+    "research_workflow/tests/test_ohlcv_window_features.py::test_direction_normalized_and_passthrough_instances_coexist": {
+      "seconds": 0.006264699972234666,
+      "phases": {
+        "setup": 0.0021030999487265944,
+        "call": 0.004027600050903857,
+        "teardown": 0.00013399997260421515
+      }
+    },
+    "research_workflow/tests/test_ohlcv_window_features.py::test_absent_direction_nulls_only_the_direction_normalized_instances": {
+      "seconds": 0.004622000036761165,
+      "phases": {
+        "setup": 0.0018695000326260924,
+        "call": 0.0026024000253528357,
+        "teardown": 0.00015009997878223658
+      }
+    },
+    "research_workflow/tests/test_ohlcv_window_features.py::test_regime_and_rth_contexts_stay_unbound_rather_than_wrong": {
+      "seconds": 0.002105399966239929,
+      "phases": {
+        "setup": 0.0018679999047890306,
+        "call": 0.0001167000737041235,
+        "teardown": 0.00012069998774677515
+      }
+    },
+    "research_workflow/tests/test_ohlcv_window_features.py::test_declared_windowed_names_match_the_tracker_vocabulary": {
+      "seconds": 0.002955000032670796,
+      "phases": {
+        "setup": 0.001677399966865778,
+        "call": 0.0011520000407472253,
+        "teardown": 0.00012560002505779266
+      }
+    },
+    "research_workflow/tests/test_redteam_pass2_acceptance.py::test_rt2_01_conflicting_composite_session_policy_rejected_or_child_owned": {
+      "seconds": 0.002064600121229887,
+      "phases": {
+        "setup": 0.0016330000944435596,
+        "call": 0.0003131000557914376,
+        "teardown": 0.00011849997099488974
+      }
+    },
+    "research_workflow/tests/test_redteam_pass2_acceptance.py::test_rt2_02_mixed_child_gap_thresholds_execute_independently": {
+      "seconds": 0.002110599889419973,
+      "phases": {
+        "setup": 0.001601399970240891,
+        "call": 0.00031209993176162243,
+        "teardown": 0.0001970999874174595
+      }
+    },
+    "research_workflow/tests/test_redteam_pass2_acceptance.py::test_rt2_03_oracle_catches_shared_gap_defect": {
+      "seconds": 0.002430699998512864,
+      "phases": {
+        "setup": 0.002042899955995381,
+        "call": 0.0002559999702498317,
+        "teardown": 0.00013180007226765156
+      }
+    },
+    "research_workflow/tests/test_redteam_pass2_acceptance.py::test_rt2_04_horizon_zero_rejects": {
+      "seconds": 0.00213039992377162,
+      "phases": {
+        "setup": 0.0018403000431135297,
+        "call": 0.0001634999644011259,
+        "teardown": 0.0001265999162569642
+      }
+    },
+    "research_workflow/tests/test_redteam_pass2_acceptance.py::test_rt2_05_negative_horizon_rejects": {
+      "seconds": 0.0020108999451622367,
+      "phases": {
+        "setup": 0.0017245999770238996,
+        "call": 0.0001601999392732978,
+        "teardown": 0.00012610002886503935
+      }
+    },
+    "research_workflow/tests/test_redteam_pass2_acceptance.py::test_rt2_06_single_primitive_ordered_barrier_binds_referenced_barrier": {
+      "seconds": 0.0022483000066131353,
+      "phases": {
+        "setup": 0.0017021000385284424,
+        "call": 0.0004156999057158828,
+        "teardown": 0.00013050006236881018
+      }
+    },
+    "research_workflow/tests/test_redteam_pass2_acceptance.py::test_rt2_07_primitive_ordered_barrier_parity_verified": {
+      "seconds": 0.0019116000039502978,
+      "phases": {
+        "setup": 0.0016549000283703208,
+        "call": 0.00013960001524537802,
+        "teardown": 0.00011709996033459902
+      }
+    },
+    "research_workflow/tests/test_redteam_pass2_acceptance.py::test_rt2_08_unsupported_atr_source_rejects": {
+      "seconds": 0.0018434999510645866,
+      "phases": {
+        "setup": 0.0015805000439286232,
+        "call": 0.00014429993461817503,
+        "teardown": 0.00011869997251778841
+      }
+    },
+    "research_workflow/tests/test_redteam_pass2_acceptance.py::test_rt2_09_unknown_confirmation_key_rejects": {
+      "seconds": 0.001865800004452467,
+      "phases": {
+        "setup": 0.0015990999527275562,
+        "call": 0.00014100002590566874,
+        "teardown": 0.000125700025819242
+      }
+    },
+    "research_workflow/tests/test_redteam_pass2_acceptance.py::test_rt2_10_allowlist_table_sha_mismatch_rejects": {
+      "seconds": 0.009480500011704862,
+      "phases": {
+        "setup": 0.0032612000359222293,
+        "call": 0.006039799889549613,
+        "teardown": 0.00017950008623301983
+      }
+    },
+    "research_workflow/tests/test_redteam_pass2_acceptance.py::test_rt2_11_undeclared_indirect_modeling_helper_fails": {
+      "seconds": 0.01946499990299344,
+      "phases": {
+        "setup": 0.0039594999980181456,
+        "call": 0.015326799941249192,
+        "teardown": 0.0001786999637261033
+      }
+    },
+    "research_workflow/tests/test_redteam_pass2_acceptance.py::test_rt2_12_undeclared_modeling_subprocess_entrypoint_fails": {
+      "seconds": 0.04205749987158924,
+      "phases": {
+        "setup": 0.003912499989382923,
+        "call": 0.03797019994817674,
+        "teardown": 0.00017479993402957916
+      }
+    },
+    "research_workflow/tests/test_redteam_pass2_acceptance.py::test_rt2_13_unassessed_model_cannot_be_derived_causal_input": {
+      "seconds": 0.0025868999073281884,
+      "phases": {
+        "setup": 0.0021090999944135547,
+        "call": 0.000332399969920516,
+        "teardown": 0.00014539994299411774
+      }
+    },
+    "research_workflow/tests/test_redteam_pass2_acceptance.py::test_rt2_14_registry_status_never_authorizes_without_the_closure": {
+      "seconds": 0.002269200049340725,
+      "phases": {
+        "setup": 0.001988000003620982,
+        "call": 0.00014340004418045282,
+        "teardown": 0.00013780000153928995
+      }
+    },
+    "research_workflow/tests/test_redteam_pass2_acceptance.py::test_rt2_15_native_booster_recovery_real_bind_path": {
+      "seconds": 0.07681509992107749,
+      "phases": {
+        "setup": 0.0032760000322014093,
+        "call": 0.07323099998757243,
+        "teardown": 0.00030809990130364895
+      }
+    },
+    "research_workflow/tests/test_redteam_pass2_acceptance.py::test_rt2_16_tampered_authority_makes_stage16_invalid_or_stale": {
+      "seconds": 0.07763530011288822,
+      "phases": {
+        "setup": 0.025699099991470575,
+        "call": 0.05163990007713437,
+        "teardown": 0.00029630004428327084
+      }
+    },
+    "research_workflow/tests/test_redteam_pass2_acceptance.py::test_rt2_17_stale_stage16_makes_stage17_stale": {
+      "seconds": 0.06729859998449683,
+      "phases": {
+        "setup": 0.006190399988554418,
+        "call": 0.06092620000708848,
+        "teardown": 0.00018199998885393143
+      }
+    },
+    "research_workflow/tests/test_redteam_pass2_acceptance.py::test_rt2_18_stale_or_tampered_terminal_evidence_prevents_study_closed": {
+      "seconds": 0.02880160021595657,
+      "phases": {
+        "setup": 0.003922100062482059,
+        "call": 0.024688500096090138,
+        "teardown": 0.00019100005738437176
+      }
+    },
+    "research_workflow/tests/test_redteam_pass2_acceptance.py::test_rt2_19_historical_closed_artifact_preserved": {
+      "seconds": 0.27422410005237907,
+      "phases": {
+        "setup": 0.0023915000492706895,
+        "call": 0.27164739998988807,
+        "teardown": 0.0001852000132203102
+      }
+    },
+    "research_workflow/tests/test_redteam_pass2_acceptance.py::test_rt2_20_current_180s_study_outputs_unmodified": {
+      "seconds": 0.011120700044557452,
+      "phases": {
+        "setup": 0.003927999990992248,
+        "call": 0.00701239996124059,
+        "teardown": 0.00018030009232461452
+      }
+    },
+    "research_workflow/tests/test_oos_analysis_lineage.py::test_fresh_after_generation": {
+      "seconds": 0.08705119986552745,
+      "phases": {
+        "setup": 0.0041380999609827995,
+        "call": 0.0827027999330312,
+        "teardown": 0.00021029997151345015
+      }
+    },
+    "research_workflow/tests/test_oos_analysis_lineage.py::test_none_when_no_artifact": {
+      "seconds": 0.023912300006486475,
+      "phases": {
+        "setup": 0.004207200021483004,
+        "call": 0.019513600040227175,
+        "teardown": 0.00019149994477629662
+      }
+    },
+    "research_workflow/tests/test_oos_analysis_lineage.py::test_identity_block_has_the_required_bindings": {
+      "seconds": 0.0356100999051705,
+      "phases": {
+        "setup": 0.003951699938625097,
+        "call": 0.03146650001872331,
+        "teardown": 0.00019189994782209396
+      }
+    },
+    "research_workflow/tests/test_oos_analysis_lineage.py::test_stale_when_train_freeze_bytes_change": {
+      "seconds": 0.05278040003031492,
+      "phases": {
+        "setup": 0.004033300094306469,
+        "call": 0.048570899991318583,
+        "teardown": 0.00017619994468986988
+      }
+    },
+    "research_workflow/tests/test_oos_analysis_lineage.py::test_stale_when_modeling_closure_moves": {
+      "seconds": 0.061978799873031676,
+      "phases": {
+        "setup": 0.003985299961641431,
+        "call": 0.05780369997955859,
+        "teardown": 0.0001897999318316579
+      }
+    },
+    "research_workflow/tests/test_oos_analysis_lineage.py::test_invalid_when_freeze_deleted": {
+      "seconds": 0.04266969999298453,
+      "phases": {
+        "setup": 0.003921100054867566,
+        "call": 0.03855399996973574,
+        "teardown": 0.00019459996838122606
+      }
+    },
+    "research_workflow/tests/test_oos_analysis_lineage.py::test_invalid_when_identity_block_edited": {
+      "seconds": 0.05079850007314235,
+      "phases": {
+        "setup": 0.004209800041280687,
+        "call": 0.04641690000426024,
+        "teardown": 0.00017180002760142088
+      }
+    },
+    "research_workflow/tests/test_oos_analysis_lineage.py::test_workflow_state_surfaces_the_classification": {
+      "seconds": 0.0617838999023661,
+      "phases": {
+        "setup": 0.0038964999839663506,
+        "call": 0.05769649997819215,
+        "teardown": 0.0001908999402076006
+      }
+    },
+    "research_workflow/tests/test_oos_analysis_lineage.py::test_workflow_state_none_without_analysis": {
+      "seconds": 0.03647000005003065,
+      "phases": {
+        "setup": 0.004001700086519122,
+        "call": 0.03229040000587702,
+        "teardown": 0.0001778999576345086
+      }
+    },
+    "research_workflow/tests/test_oos_analysis_lineage.py::test_stage17_empty_bound_lineage_is_invalid": {
+      "seconds": 0.10487959999591112,
+      "phases": {
+        "setup": 0.0035695000551640987,
+        "call": 0.10112050001043826,
+        "teardown": 0.0001895999303087592
+      }
+    },
+    "research_workflow/tests/test_oos_analysis_lineage.py::test_train_only_stage17_missing_required_anchor_is_invalid": {
+      "seconds": 0.03510089998599142,
+      "phases": {
+        "setup": 0.003881599986925721,
+        "call": 0.031032899976707995,
+        "teardown": 0.00018640002235770226
+      }
+    },
+    "research_workflow/tests/test_oos_analysis_lineage.py::test_train_only_stage17_with_minimum_anchors_is_fresh": {
+      "seconds": 0.043929500272497535,
+      "phases": {
+        "setup": 0.0038516001077368855,
+        "call": 0.03988640010356903,
+        "teardown": 0.00019150006119161844
+      }
+    },
+    "research_workflow/tests/test_oos_analysis_lineage.py::test_train_only_stage17_goes_stale_when_train_freeze_rewritten": {
+      "seconds": 0.04127749998588115,
+      "phases": {
+        "setup": 0.004143300000578165,
+        "call": 0.036934299976564944,
+        "teardown": 0.00019990000873804092
+      }
+    },
+    "research_workflow/tests/test_supervisor_closure_validity.py::test_invalid_closure_is_not_terminal": {
+      "seconds": 0.09403469995595515,
+      "phases": {
+        "setup": 0.0045316999312490225,
+        "call": 0.08929100004024804,
+        "teardown": 0.00021199998445808887
+      }
+    },
+    "research_workflow/tests/test_supervisor_closure_validity.py::test_analysis_decided_carries_the_vocabulary_check": {
+      "seconds": 0.08328499982599169,
+      "phases": {
+        "setup": 0.004206999903544784,
+        "call": 0.0788679999532178,
+        "teardown": 0.00020999996922910213
+      }
+    },
+    "research_workflow/tests/test_supervisor_closure_validity.py::test_core_routes_undeclared_decision_to_a_contract_conflict_card_and_recovers_a_declared_one": {
+      "seconds": 0.12021150009240955,
+      "phases": {
+        "setup": 0.004117900040000677,
+        "call": 0.1158918000292033,
+        "teardown": 0.00020180002320557833
+      }
+    },
+    "research_workflow/tests/test_supervisor_closure_validity.py::test_analysis_packet_names_the_declared_vocabulary": {
+      "seconds": 0.18772900011390448,
+      "phases": {
+        "setup": 0.0050691000651568174,
+        "call": 0.1824327000649646,
+        "teardown": 0.00022719998378306627
+      }
+    },
+    "scripts/tests/test_output_manager_zero_row.py::test_empty_candidates_with_required_columns_is_structurally_valid": {
+      "seconds": 0.03314309997949749,
+      "phases": {
+        "setup": 0.007475699996575713,
+        "call": 0.0204479000531137,
+        "teardown": 0.00521949992980808
+      }
+    },
+    "scripts/tests/test_output_manager_zero_row.py::test_empty_candidates_missing_metadata_column_fails": {
+      "seconds": 0.029426799970678985,
+      "phases": {
+        "setup": 0.01624129991978407,
+        "call": 0.008279800065793097,
+        "teardown": 0.004905699985101819
+      }
+    },
+    "scripts/tests/test_output_manager_zero_row.py::test_empty_candidates_missing_candidate_key_field_fails": {
+      "seconds": 0.02425690006930381,
+      "phases": {
+        "setup": 0.015301000094041228,
+        "call": 0.006589500000700355,
+        "teardown": 0.0023663999745622277
+      }
+    },
+    "scripts/tests/test_output_manager_zero_row.py::test_empty_observations_missing_observation_key_fails": {
+      "seconds": 0.01614390010945499,
+      "phases": {
+        "setup": 0.009492799988947809,
+        "call": 0.004177800030447543,
+        "teardown": 0.002473300090059638
+      }
+    },
+    "scripts/tests/test_output_manager_zero_row.py::test_reconcile_empty_observations_missing_key_directly": {
+      "seconds": 0.007742999936453998,
+      "phases": {
+        "setup": 0.00500490004196763,
+        "call": 0.00098209991119802,
+        "teardown": 0.0017559999832883477
+      }
+    },
+    "scripts/tests/test_output_manager_zero_row.py::test_zero_candidates_zero_observations_correct_schema_reconciles": {
+      "seconds": 0.029917299980297685,
+      "phases": {
+        "setup": 0.008926799986511469,
+        "call": 0.01972169999498874,
+        "teardown": 0.0012687999987974763
+      }
+    },
+    "scripts/tests/test_output_manager_zero_row.py::test_reconcile_zero_and_zero_with_correct_schema_passes_directly": {
+      "seconds": 0.0056084999814629555,
+      "phases": {
+        "setup": 0.0035204000305384398,
+        "call": 0.0009223000379279256,
+        "teardown": 0.0011657999129965901
+      }
+    },
+    "scripts/tests/test_output_manager_zero_row.py::test_zero_candidates_malformed_empty_observations_fails_at_persist": {
+      "seconds": 0.010594899882562459,
+      "phases": {
+        "setup": 0.00586559996008873,
+        "call": 0.0034640999510884285,
+        "teardown": 0.0012651999713853002
+      }
+    },
+    "scripts/tests/test_output_manager_zero_row.py::test_reconcile_zero_candidates_malformed_observations_fails_directly": {
+      "seconds": 0.005399700021371245,
+      "phases": {
+        "setup": 0.003501800005324185,
+        "call": 0.0007407000521197915,
+        "teardown": 0.001157199963927269
+      }
+    },
+    "scripts/tests/test_output_manager_zero_row.py::test_nonempty_candidate_key_does_not_shrink_via_intersection": {
+      "seconds": 0.0047258001286536455,
+      "phases": {
+        "setup": 0.0031551000429317355,
+        "call": 0.0005257000448182225,
+        "teardown": 0.0010450000409036875
+      }
+    },
+    "scripts/tests/test_output_manager_zero_row.py::test_nonempty_reconciliation_still_passes_with_full_key_present": {
+      "seconds": 0.0066717000445351005,
+      "phases": {
+        "setup": 0.004185000085271895,
+        "call": 0.0013986999401822686,
+        "teardown": 0.001088000019080937
+      }
+    },
+    "scripts/tests/test_output_manager_zero_row.py::test_zero_row_duplicate_candidate_columns_fail": {
+      "seconds": 0.00985130004119128,
+      "phases": {
+        "setup": 0.005394100095145404,
+        "call": 0.003203999949619174,
+        "teardown": 0.0012531999964267015
+      }
+    },
+    "scripts/tests/test_output_manager_zero_row.py::test_zero_row_duplicate_observation_columns_fail": {
+      "seconds": 0.012429800000973046,
+      "phases": {
+        "setup": 0.006254800013266504,
+        "call": 0.004966099979355931,
+        "teardown": 0.0012089000083506107
+      }
+    },
+    "scripts/tests/test_output_manager_zero_row.py::test_real_smoke_zero_candidate_guard_lives_only_in_validate_smoke": {
+      "seconds": 0.0047845999943092465,
+      "phases": {
+        "setup": 0.0033054000232368708,
+        "call": 0.0004401999758556485,
+        "teardown": 0.0010389999952167273
+      }
+    },
+    "scripts/tests/test_output_manager_zero_row.py::test_output_manager_never_requires_nonzero_candidates": {
+      "seconds": 0.025169000029563904,
+      "phases": {
+        "setup": 0.004937399993650615,
+        "call": 0.019000700092874467,
+        "teardown": 0.0012308999430388212
+      }
+    },
+    "scripts/tests/test_output_manager_zero_row.py::test_nonempty_unexpected_output_column_still_rejected": {
+      "seconds": 0.011206300114281476,
+      "phases": {
+        "setup": 0.005673200008459389,
+        "call": 0.004291500081308186,
+        "teardown": 0.0012416000245139003
+      }
+    },
+    "scripts/tests/test_output_manager_zero_row.py::test_nonempty_declared_features_still_required_in_full_and_order": {
+      "seconds": 0.011521899956278503,
+      "phases": {
+        "setup": 0.006243899930268526,
+        "call": 0.00394710002001375,
+        "teardown": 0.0013309000059962273
+      }
+    },
+    "research_workflow/tests/test_multiple_derived_inputs.py::test_all_declared_scores_filled_in_order": {
+      "seconds": 0.0030565999913960695,
+      "phases": {
+        "setup": 0.0027320999652147293,
+        "call": 0.0001799999736249447,
+        "teardown": 0.00014450005255639553
+      }
+    },
+    "research_workflow/tests/test_multiple_derived_inputs.py::test_null_input_yields_null_column_not_missing": {
+      "seconds": 0.0024668999249115586,
+      "phases": {
+        "setup": 0.0021885999012738466,
+        "call": 0.0001401000190526247,
+        "teardown": 0.0001382000045850873
+      }
+    },
+    "research_workflow/tests/test_multiple_derived_inputs.py::test_no_undeclared_score_column_written": {
+      "seconds": 0.002961499965749681,
+      "phases": {
+        "setup": 0.002341900020837784,
+        "call": 0.00031299993861466646,
+        "teardown": 0.0003066000062972307
+      }
+    },
+    "research_workflow/tests/test_multiple_derived_inputs.py::test_zero_scorers_is_a_noop": {
+      "seconds": 0.0036527999909594655,
+      "phases": {
+        "setup": 0.003355500055477023,
+        "call": 0.0001498999772593379,
+        "teardown": 0.00014739995822310448
+      }
+    },
+    "research_workflow/tests/test_multiple_derived_inputs.py::test_two_external_models_both_bind": {
+      "seconds": 0.11761049984488636,
+      "phases": {
+        "setup": 0.004673599964007735,
+        "call": 0.11276429996360093,
+        "teardown": 0.00017259991727769375
+      }
+    },
+    "research_workflow/tests/test_multiple_derived_inputs.py::test_missing_scorer_binding_fails_preflight": {
+      "seconds": 0.04780290008056909,
+      "phases": {
+        "setup": 0.004045300069265068,
+        "call": 0.04357710003387183,
+        "teardown": 0.00018049997743219137
+      }
+    },
+    "research_workflow/tests/test_multiple_derived_inputs.py::test_duplicate_derived_names_fail_preflight": {
+      "seconds": 0.0778369999025017,
+      "phases": {
+        "setup": 0.004191900021396577,
+        "call": 0.0734376999316737,
+        "teardown": 0.00020739994943141937
+      }
+    },
+    "scripts/tests/test_study_run_containment.py::test_study_run_directories_are_isolated": {
+      "seconds": 0.012225499958731234,
+      "phases": {
+        "setup": 0.005892900051549077,
+        "call": 0.00505969999358058,
+        "teardown": 0.0012728999136015773
+      }
+    },
+    "scripts/tests/test_study_run_containment.py::test_output_path_derived_deterministically": {
+      "seconds": 0.009853100054897368,
+      "phases": {
+        "setup": 0.0055698000360280275,
+        "call": 0.0030103999888524413,
+        "teardown": 0.0012729000300168991
+      }
+    },
+    "scripts/tests/test_study_run_containment.py::test_explicit_output_dir_override_works": {
+      "seconds": 0.009751800098456442,
+      "phases": {
+        "setup": 0.005621700081974268,
+        "call": 0.0029365000082179904,
+        "teardown": 0.001193600008264184
+      }
+    },
+    "scripts/tests/test_study_run_containment.py::test_ignored_run_data_does_not_affect_identity": {
+      "seconds": 0.0102066999534145,
+      "phases": {
+        "setup": 0.005453099962323904,
+        "call": 0.0034866000059992075,
+        "teardown": 0.0012669999850913882
+      }
+    },
+    "research_workflow/tests/test_experiment.py::test_authorization_materializes_disjoint_periods": {
+      "seconds": 0.01967429998330772,
+      "phases": {
+        "setup": 0.004714300041086972,
+        "call": 0.014766199979931116,
+        "teardown": 0.00019379996228963137
+      }
+    },
+    "research_workflow/tests/test_experiment.py::test_runtime_authorization_is_exact_and_rejects_tampering": {
+      "seconds": 0.03557279997039586,
+      "phases": {
+        "setup": 0.00445949996355921,
+        "call": 0.030909999972209334,
+        "teardown": 0.00020330003462731838
+      }
+    },
+    "research_workflow/tests/test_experiment.py::test_oos_locked_until_train_freeze": {
+      "seconds": 0.04941460001282394,
+      "phases": {
+        "setup": 0.004759300034493208,
+        "call": 0.044472499983385205,
+        "teardown": 0.00018279999494552612
+      }
+    },
+    "research_workflow/tests/test_experiment.py::test_deciles_and_first_crossing_are_deterministic": {
+      "seconds": 0.006377200013957918,
+      "phases": {
+        "setup": 0.0023059999803081155,
+        "call": 0.0039166000206023455,
+        "teardown": 0.00015460001304745674
+      }
+    },
+    "features/tests/test_feature_system_v2.py::test_completed_calendar_instance_defaults_to_completed_semantics": {
+      "seconds": 0.0025201000971719623,
+      "phases": {
+        "setup": 0.0022566000698134303,
+        "call": 0.00013870000839233398,
+        "teardown": 0.00012480001896619797
+      }
+    },
+    "features/tests/test_feature_system_v2.py::test_event_anchored_timeframe_feature_without_bar_state_schema_is_idempotent": {
+      "seconds": 0.0023529999889433384,
+      "phases": {
+        "setup": 0.002081400016322732,
+        "call": 0.00014209991786628962,
+        "teardown": 0.0001295000547543168
+      }
+    },
+    "features/tests/test_feature_system_v2.py::test_instances_require_declared_legacy_compatible_parameter_combinations_before_cutover": {
+      "seconds": 0.002515799948014319,
+      "phases": {
+        "setup": 0.002029599971137941,
+        "call": 0.0003529000096023083,
+        "teardown": 0.00013329996727406979
+      }
+    },
+    "features/tests/test_feature_system_v2.py::test_live_legacy_provider_does_not_advertise_generic_timeframes_before_cutover": {
+      "seconds": 0.0023892999161034822,
+      "phases": {
+        "setup": 0.0019959999481216073,
+        "call": 0.0002324999077245593,
+        "teardown": 0.00016080006025731564
+      }
+    },
+    "features/tests/test_feature_system_v2.py::test_ambiguous_high_frequency_calendar_request_fails_closed": {
+      "seconds": 0.0024648000253364444,
+      "phases": {
+        "setup": 0.002104799961671233,
+        "call": 0.00021600001491606236,
+        "teardown": 0.00014400004874914885
+      }
+    },
+    "features/tests/test_feature_system_v2.py::test_regime_geometry_does_not_advertise_unimplemented_forming_support": {
+      "seconds": 0.002521399990655482,
+      "phases": {
+        "setup": 0.002141500008292496,
+        "call": 0.0002269999822601676,
+        "teardown": 0.000152900000102818
+      }
+    },
+    "features/tests/test_feature_system_v2.py::test_forming_calendar_snapshot_excludes_future_completed_second": {
+      "seconds": 0.0025403000181540847,
+      "phases": {
+        "setup": 0.0022336000110954046,
+        "call": 0.00015430001076310873,
+        "teardown": 0.00015239999629557133
+      }
+    },
+    "features/tests/test_feature_system_v2.py::test_rolling_window_is_not_a_forming_calendar_bar": {
+      "seconds": 0.0026300998870283365,
+      "phases": {
+        "setup": 0.0023154999362304807,
+        "call": 0.0001639999682083726,
+        "teardown": 0.00015059998258948326
+      }
+    },
+    "features/tests/test_feature_system_v2.py::test_cross_timeframe_instances_validate_each_bar_state_and_derive_both_completed_streams": {
+      "seconds": 0.0025127000408247113,
+      "phases": {
+        "setup": 0.0021371999755501747,
+        "call": 0.00022879999596625566,
+        "teardown": 0.00014670006930828094
+      }
+    },
+    "features/tests/test_feature_system_v2.py::test_rolling_instance_rejects_unsupported_update_cadence": {
+      "seconds": 0.002452900051139295,
+      "phases": {
+        "setup": 0.002090199966914952,
+        "call": 0.00022010004613548517,
+        "teardown": 0.00014260003808885813
+      }
+    },
+    "features/tests/test_feature_system_v2.py::test_legacy_aliases_and_new_window_alias_are_deterministic": {
+      "seconds": 0.002685300074517727,
+      "phases": {
+        "setup": 0.0023745999205857515,
+        "call": 0.00016600009985268116,
+        "teardown": 0.0001447000540792942
+      }
+    },
+    "features/tests/test_feature_system_v2.py::test_canonical_temporal_name_is_rejected_without_exception": {
+      "seconds": 0.0024910999927669764,
+      "phases": {
+        "setup": 0.0021161999320611358,
+        "call": 0.00022980000358074903,
+        "teardown": 0.00014510005712509155
+      }
+    },
+    "features/tests/test_feature_system_v2.py::test_canonical_period_name_is_rejected_without_exception": {
+      "seconds": 0.0024226000532507896,
+      "phases": {
+        "setup": 0.002117200056090951,
+        "call": 0.00016089994460344315,
+        "teardown": 0.00014450005255639553
+      }
+    },
+    "features/tests/test_feature_system_v2.py::test_explicit_instances_and_collection_universe_share_canonical_status": {
+      "seconds": 0.009325999766588211,
+      "phases": {
+        "setup": 0.0020501998951658607,
+        "call": 0.00709669990465045,
+        "teardown": 0.00017909996677190065
+      }
+    },
+    "features/tests/test_feature_system_v2.py::test_collection_resolver_is_deterministic_and_not_cache_backed": {
+      "seconds": 0.008072700002230704,
+      "phases": {
+        "setup": 0.002452199929393828,
+        "call": 0.005469200084917247,
+        "teardown": 0.00015129998791962862
+      }
+    },
+    "research_workflow/tests/test_merge_nested_schema.py::test_pre_fix_pandas_round_trip_fails_on_a_nested_int64_child": {
+      "seconds": 0.036722199991345406,
+      "phases": {
+        "setup": 0.003949199919588864,
+        "call": 0.03256219998002052,
+        "teardown": 0.00021080009173601866
+      }
+    },
+    "research_workflow/tests/test_merge_nested_schema.py::test_nested_merge_keeps_population_order_values_and_types": {
+      "seconds": 0.04273230012040585,
+      "phases": {
+        "setup": 0.0039317000191658735,
+        "call": 0.03862520004622638,
+        "teardown": 0.000175400055013597
+      }
+    },
+    "research_workflow/tests/test_merge_nested_schema.py::test_non_nested_merge_is_byte_identical_to_the_previous_path": {
+      "seconds": 0.051810999982990324,
+      "phases": {
+        "setup": 0.004128700005821884,
+        "call": 0.04748870001640171,
+        "teardown": 0.0001935999607667327
+      }
+    },
+    "research_workflow/tests/test_merge_nested_schema.py::test_nested_partitions_with_different_schemas_fail_closed": {
+      "seconds": 0.0174933000234887,
+      "phases": {
+        "setup": 0.004382099956274033,
+        "call": 0.012925900053232908,
+        "teardown": 0.00018530001398175955
+      }
+    },
+    "research_workflow/tests/test_partitioning.py::test_year_partitions_are_authorized_and_disjoint": {
+      "seconds": 0.024997000000439584,
+      "phases": {
+        "setup": 0.0024401999544352293,
+        "call": 0.0223904000595212,
+        "teardown": 0.00016639998648315668
+      }
+    },
+    "research_workflow/tests/test_partitioning.py::test_merge_rejects_overlapping_primary_keys": {
+      "seconds": 0.015323099913075566,
+      "phases": {
+        "setup": 0.002314699930138886,
+        "call": 0.012842900003306568,
+        "teardown": 0.00016549997963011265
+      }
+    },
+    "research_workflow/tests/test_partitioning.py::test_merge_is_deterministic_and_preserves_schema": {
+      "seconds": 0.015561399981379509,
+      "phases": {
+        "setup": 0.0023178999545052648,
+        "call": 0.013093899935483932,
+        "teardown": 0.00014960009139031172
+      }
+    },
+    "research_workflow/tests/test_partitioning.py::test_target_crossing_partition_boundary_stays_on_primary_row": {
+      "seconds": 0.015433199936524034,
+      "phases": {
+        "setup": 0.002151499968022108,
+        "call": 0.013112999964505434,
+        "teardown": 0.00016870000399649143
+      }
+    },
+    "research_workflow/tests/test_ordered_barrier_entry_reference.py::test_1_checkpoint_grid_ordered_barrier_reaches_a_resolved_observation": {
+      "seconds": 0.00283109990414232,
+      "phases": {
+        "setup": 0.0023521999828517437,
+        "call": 0.0003274999326094985,
+        "teardown": 0.00015139998868107796
+      }
+    },
+    "research_workflow/tests/test_ordered_barrier_entry_reference.py::test_4_candidate_close_is_not_substituted_for_next_bar_open": {
+      "seconds": 0.0026586998719722033,
+      "phases": {
+        "setup": 0.0023132999194785953,
+        "call": 0.00020160002168267965,
+        "teardown": 0.00014379993081092834
+      }
+    },
+    "research_workflow/tests/test_ordered_barrier_entry_reference.py::test_2_and_12_population_type_does_not_change_target_semantics": {
+      "seconds": 0.0025599001673981547,
+      "phases": {
+        "setup": 0.0021884000161662698,
+        "call": 0.00022700009867548943,
+        "teardown": 0.00014450005255639553
+      }
+    },
+    "research_workflow/tests/test_ordered_barrier_entry_reference.py::test_3_entry_reference_bar_is_strictly_after_T": {
+      "seconds": 0.002748599974438548,
+      "phases": {
+        "setup": 0.0024004000006243587,
+        "call": 0.00018890004139393568,
+        "teardown": 0.00015929993242025375
+      }
+    },
+    "research_workflow/tests/test_ordered_barrier_entry_reference.py::test_5_atr_is_frozen_at_T_not_at_entry_reference_time": {
+      "seconds": 0.0025054001016542315,
+      "phases": {
+        "setup": 0.0021816000808030367,
+        "call": 0.00018089998047798872,
+        "teardown": 0.00014290004037320614
+      }
+    },
+    "research_workflow/tests/test_ordered_barrier_entry_reference.py::test_5b_nonpositive_frozen_atr_fails_closed": {
+      "seconds": 0.0024565999628975987,
+      "phases": {
+        "setup": 0.0021545999916270375,
+        "call": 0.0001639999682083726,
+        "teardown": 0.00013800000306218863
+      }
+    },
+    "research_workflow/tests/test_ordered_barrier_entry_reference.py::test_5c_target_atr_is_the_T_frozen_value_not_the_feature_normalization_atr": {
+      "seconds": 0.0025112000294029713,
+      "phases": {
+        "setup": 0.00216480006929487,
+        "call": 0.0001935999607667327,
+        "teardown": 0.00015279999934136868
+      }
+    },
+    "research_workflow/tests/test_ordered_barrier_entry_reference.py::test_6_long_orientation": {
+      "seconds": 0.002361500053666532,
+      "phases": {
+        "setup": 0.002044399967417121,
+        "call": 0.00017910008318722248,
+        "teardown": 0.00013800000306218863
+      }
+    },
+    "research_workflow/tests/test_ordered_barrier_entry_reference.py::test_7_short_orientation": {
+      "seconds": 0.0026989999460056424,
+      "phases": {
+        "setup": 0.0023114000214263797,
+        "call": 0.00022829999215900898,
+        "teardown": 0.00015929993242025375
+      }
+    },
+    "research_workflow/tests/test_ordered_barrier_entry_reference.py::test_8_timeout_when_neither_barrier_is_touched": {
+      "seconds": 0.0037652001483365893,
+      "phases": {
+        "setup": 0.0022431000834330916,
+        "call": 0.0013256999664008617,
+        "teardown": 0.00019640009850263596
+      }
+    },
+    "research_workflow/tests/test_ordered_barrier_entry_reference.py::test_9_session_end_censoring": {
+      "seconds": 0.0030580000020563602,
+      "phases": {
+        "setup": 0.002470899955369532,
+        "call": 0.00044450000859797,
+        "teardown": 0.00014260003808885813
+      }
+    },
+    "research_workflow/tests/test_ordered_barrier_entry_reference.py::test_9b_horizon_that_fits_before_close_is_labeled_not_censored": {
+      "seconds": 0.003441500011831522,
+      "phases": {
+        "setup": 0.0021077999845147133,
+        "call": 0.0011605999898165464,
+        "teardown": 0.00017310003750026226
+      }
+    },
+    "research_workflow/tests/test_ordered_barrier_entry_reference.py::test_10c_horizon_is_the_compiled_barrier_horizon_not_cfg_fallback": {
+      "seconds": 0.0024597999872639775,
+      "phases": {
+        "setup": 0.0021603000350296497,
+        "call": 0.00016359996516257524,
+        "teardown": 0.00013589998707175255
+      }
+    },
+    "research_workflow/tests/test_ordered_barrier_entry_reference.py::test_10_touch_exactly_on_the_horizon_boundary_is_a_touch": {
+      "seconds": 0.003235899959690869,
+      "phases": {
+        "setup": 0.0020930999889969826,
+        "call": 0.0010018999455496669,
+        "teardown": 0.0001409000251442194
+      }
+    },
+    "research_workflow/tests/test_ordered_barrier_entry_reference.py::test_10b_touch_one_second_past_the_horizon_does_not_count": {
+      "seconds": 0.003966299933381379,
+      "phases": {
+        "setup": 0.0027471999637782574,
+        "call": 0.0010218999814242125,
+        "teardown": 0.00019719998817890882
+      }
+    },
+    "research_workflow/tests/test_ordered_barrier_entry_reference.py::test_11_runtime_matches_independent_replay_oracle[success-1]": {
+      "seconds": 0.0029709000373259187,
+      "phases": {
+        "setup": 0.0024892999790608883,
+        "call": 0.00033680000342428684,
+        "teardown": 0.00014480005484074354
+      }
+    },
+    "research_workflow/tests/test_ordered_barrier_entry_reference.py::test_11_runtime_matches_independent_replay_oracle[success--1]": {
+      "seconds": 0.002740000025369227,
+      "phases": {
+        "setup": 0.0022896999726071954,
+        "call": 0.00031150004360824823,
+        "teardown": 0.00013880000915378332
+      }
+    },
+    "research_workflow/tests/test_ordered_barrier_entry_reference.py::test_11_runtime_matches_independent_replay_oracle[failure-1]": {
+      "seconds": 0.0024788998998701572,
+      "phases": {
+        "setup": 0.0020880999509245157,
+        "call": 0.00026240001898258924,
+        "teardown": 0.00012839992996305227
+      }
+    },
+    "research_workflow/tests/test_ordered_barrier_entry_reference.py::test_11_runtime_matches_independent_replay_oracle[failure--1]": {
+      "seconds": 0.002360499929636717,
+      "phases": {
+        "setup": 0.0019733000081032515,
+        "call": 0.00025589996948838234,
+        "teardown": 0.00013129995204508305
+      }
+    },
+    "research_workflow/tests/test_ordered_barrier_entry_reference.py::test_11_runtime_matches_independent_replay_oracle[timeout-1]": {
+      "seconds": 0.003388499957509339,
+      "phases": {
+        "setup": 0.0021561000030487776,
+        "call": 0.001084199990145862,
+        "teardown": 0.00014819996431469917
+      }
+    },
+    "research_workflow/tests/test_ordered_barrier_entry_reference.py::test_11_runtime_matches_independent_replay_oracle[timeout--1]": {
+      "seconds": 0.0036054998636245728,
+      "phases": {
+        "setup": 0.002282499917782843,
+        "call": 0.0011657999129965901,
+        "teardown": 0.0001572000328451395
+      }
+    },
+    "research_workflow/tests/test_ordered_barrier_entry_reference.py::test_11b_oracle_is_independent_of_pre_populated_entry_price": {
+      "seconds": 0.002520599984563887,
+      "phases": {
+        "setup": 0.002228699973784387,
+        "call": 0.0001444000517949462,
+        "teardown": 0.00014749995898455381
+      }
+    },
+    "research_workflow/tests/test_diagnostic_period_authorization.py::test_diagnostic_authorization_inherits_parent_open_year_and_rejects_prohibited": {
+      "seconds": 0.03716800000984222,
+      "phases": {
+        "setup": 0.0039352000458166,
+        "call": 0.03305329999420792,
+        "teardown": 0.000179499969817698
+      }
+    },
+    "research_workflow/tests/test_target_session_policy_fidelity.py::test_plain_flip_default_is_true_historical": {
+      "seconds": 0.0026482000248506665,
+      "phases": {
+        "setup": 0.00233189994469285,
+        "call": 0.00015269999857991934,
+        "teardown": 0.00016360008157789707
+      }
+    },
+    "research_workflow/tests/test_target_session_policy_fidelity.py::test_plain_flip_authored_false_is_false": {
+      "seconds": 0.002326900023035705,
+      "phases": {
+        "setup": 0.0020628999918699265,
+        "call": 0.0001385000068694353,
+        "teardown": 0.00012550002429634333
+      }
+    },
+    "research_workflow/tests/test_target_session_policy_fidelity.py::test_plain_flip_authored_true_is_true": {
+      "seconds": 0.002331299940124154,
+      "phases": {
+        "setup": 0.002077599987387657,
+        "call": 0.00012909993529319763,
+        "teardown": 0.0001246000174432993
+      }
+    },
+    "research_workflow/tests/test_target_session_policy_fidelity.py::test_composite_derives_from_forward_outcomes": {
+      "seconds": 0.003323699929751456,
+      "phases": {
+        "setup": 0.00185629993211478,
+        "call": 0.0013294999953359365,
+        "teardown": 0.0001379000023007393
+      }
+    },
+    "research_workflow/tests/test_target_session_policy_fidelity.py::test_unset_field_is_hash_neutral": {
+      "seconds": 0.0024666000390425324,
+      "phases": {
+        "setup": 0.0019078999757766724,
+        "call": 0.0004284000024199486,
+        "teardown": 0.0001303000608459115
+      }
+    },
+    "research_workflow/tests/test_target_session_policy_fidelity.py::test_collector_kwarg_is_false_when_contract_says_false": {
+      "seconds": 0.0023345998488366604,
+      "phases": {
+        "setup": 0.002026099944487214,
+        "call": 0.00014109991025179625,
+        "teardown": 0.00016739999409765005
+      }
+    },
+    "research_workflow/tests/test_target_session_policy_fidelity.py::test_collector_kwarg_is_true_when_contract_says_true": {
+      "seconds": 0.0023244001204147935,
+      "phases": {
+        "setup": 0.002022800035774708,
+        "call": 0.00015920004807412624,
+        "teardown": 0.00014240003656595945
+      }
+    },
+    "research_workflow/tests/test_target_session_policy_fidelity.py::test_collector_kwarg_falls_back_to_censoring_policy_for_legacy_contract": {
+      "seconds": 0.0024302999954670668,
+      "phases": {
+        "setup": 0.002145300037227571,
+        "call": 0.00014239992015063763,
+        "teardown": 0.00014260003808885813
+      }
+    },
+    "research_workflow/tests/test_target_session_policy_fidelity.py::test_flip_runtime_does_not_censor_when_session_close_absent": {
+      "seconds": 0.0024483000161126256,
+      "phases": {
+        "setup": 0.0021385999862104654,
+        "call": 0.00016419996973127127,
+        "teardown": 0.0001455000601708889
+      }
+    },
+    "research_workflow/tests/test_target_session_policy_fidelity.py::test_flip_runtime_censors_when_session_close_present_and_exceeded": {
+      "seconds": 0.0038823001086711884,
+      "phases": {
+        "setup": 0.0036093000089749694,
+        "call": 0.00013619998935610056,
+        "teardown": 0.0001368001103401184
+      }
+    },
+    "research_workflow/tests/test_redteam_pass2_target_semantics.py::test_child_session_policy_is_not_overridden_by_composite_convenience[AND]": {
+      "seconds": 0.002621500054374337,
+      "phases": {
+        "setup": 0.002238200046122074,
+        "call": 0.00024770002346485853,
+        "teardown": 0.00013559998478740454
+      }
+    },
+    "research_workflow/tests/test_redteam_pass2_target_semantics.py::test_child_session_policy_is_not_overridden_by_composite_convenience[OR]": {
+      "seconds": 0.0024128000950440764,
+      "phases": {
+        "setup": 0.002047200105153024,
+        "call": 0.0002294000005349517,
+        "teardown": 0.00013619998935610056
+      }
+    },
+    "research_workflow/tests/test_redteam_pass2_target_semantics.py::test_mixed_child_gap_thresholds_are_independent_and_old_shared_gap_fails_parity[AND]": {
+      "seconds": 0.002750999992713332,
+      "phases": {
+        "setup": 0.002237799926660955,
+        "call": 0.00031560007482767105,
+        "teardown": 0.00019759999122470617
+      }
+    },
+    "research_workflow/tests/test_redteam_pass2_target_semantics.py::test_mixed_child_gap_thresholds_are_independent_and_old_shared_gap_fails_parity[OR]": {
+      "seconds": 0.0030889000045135617,
+      "phases": {
+        "setup": 0.0025742000434547663,
+        "call": 0.0003217000048607588,
+        "teardown": 0.00019299995619803667
+      }
+    },
+    "research_workflow/tests/test_redteam_pass2_target_semantics.py::test_horizons_are_none_only_defaulted_and_nonpositive_rejected[None-True]": {
+      "seconds": 0.0028730001067742705,
+      "phases": {
+        "setup": 0.002580700092948973,
+        "call": 0.0001503999810665846,
+        "teardown": 0.00014190003275871277
+      }
+    },
+    "research_workflow/tests/test_redteam_pass2_target_semantics.py::test_horizons_are_none_only_defaulted_and_nonpositive_rejected[0-False]": {
+      "seconds": 0.0026351999258622527,
+      "phases": {
+        "setup": 0.0022958999034017324,
+        "call": 0.00018450000789016485,
+        "teardown": 0.00015480001457035542
+      }
+    },
+    "research_workflow/tests/test_redteam_pass2_target_semantics.py::test_horizons_are_none_only_defaulted_and_nonpositive_rejected[-1-False]": {
+      "seconds": 0.0025582999223843217,
+      "phases": {
+        "setup": 0.002241399954073131,
+        "call": 0.00017380004283040762,
+        "teardown": 0.00014309992548078299
+      }
+    },
+    "research_workflow/tests/test_redteam_pass2_target_semantics.py::test_horizons_are_none_only_defaulted_and_nonpositive_rejected[12-True]": {
+      "seconds": 0.0024880999699234962,
+      "phases": {
+        "setup": 0.0022061000345274806,
+        "call": 0.00013729999773204327,
+        "teardown": 0.00014469993766397238
+      }
+    },
+    "research_workflow/tests/test_redteam_pass2_target_semantics.py::test_single_ordered_barrier_binds_referenced_identity_not_list_position": {
+      "seconds": 0.0028163999086245894,
+      "phases": {
+        "setup": 0.002284899936057627,
+        "call": 0.0003784999717026949,
+        "teardown": 0.00015300000086426735
+      }
+    },
+    "research_workflow/tests/test_redteam_pass2_target_semantics.py::test_closed_confirmation_and_atr_source_reject_unknown_behavior": {
+      "seconds": 0.0027740999357774854,
+      "phases": {
+        "setup": 0.002377500059083104,
+        "call": 0.00020739994943141937,
+        "teardown": 0.00018919992726296186
+      }
+    },
+    "research_workflow/tests/test_redteam_pass2_target_semantics.py::test_preflight_atr_binding_is_independent_and_fails_closed": {
+      "seconds": 0.002902099979110062,
+      "phases": {
+        "setup": 0.0025228000013157725,
+        "call": 0.00023550004698336124,
+        "teardown": 0.00014379993081092834
+      }
+    },
+    "research_workflow/tests/test_first_passage_oracle_parity.py::test_first_passage_oracle_parity_and_terminal_preserved": {
+      "seconds": 0.015683299978263676,
+      "phases": {
+        "setup": 0.00233070005197078,
+        "call": 0.013174199964851141,
+        "teardown": 0.0001783999614417553
+      }
+    },
+    "research_workflow/tests/test_bare_flip_independent_parity.py::test_positive_agrees": {
+      "seconds": 0.002831399906426668,
+      "phases": {
+        "setup": 0.0025179999647662044,
+        "call": 0.00017300003673881292,
+        "teardown": 0.0001403999049216509
+      }
+    },
+    "research_workflow/tests/test_bare_flip_independent_parity.py::test_negative_agrees": {
+      "seconds": 0.0025565000250935555,
+      "phases": {
+        "setup": 0.0022514999145641923,
+        "call": 0.00016920000780373812,
+        "teardown": 0.00013580010272562504
+      }
+    },
+    "research_workflow/tests/test_bare_flip_independent_parity.py::test_session_end_censor_agrees": {
+      "seconds": 0.002377700060606003,
+      "phases": {
+        "setup": 0.002097400021739304,
+        "call": 0.00014830008149147034,
+        "teardown": 0.0001319999573752284
+      }
+    },
+    "research_workflow/tests/test_bare_flip_independent_parity.py::test_corrupted_runtime_flip_window_is_detected": {
+      "seconds": 0.0023247001226991415,
+      "phases": {
+        "setup": 0.002033500000834465,
+        "call": 0.00016430008690804243,
+        "teardown": 0.00012690003495663404
+      }
+    },
+    "research_workflow/tests/test_bare_flip_independent_parity.py::test_corrupted_runtime_ignoring_session_close_is_detected": {
+      "seconds": 0.0022986000403761864,
+      "phases": {
+        "setup": 0.0020186000037938356,
+        "call": 0.00015079998411238194,
+        "teardown": 0.0001292000524699688
+      }
+    },
+    "research_workflow/tests/test_bare_flip_independent_parity.py::test_validator_bare_flip_branch_does_not_call_flip_runtime_terminal": {
+      "seconds": 0.0022180998930707574,
+      "phases": {
+        "setup": 0.001934399944730103,
+        "call": 0.00015549990348517895,
+        "teardown": 0.00012820004485547543
+      }
+    },
+    "research_workflow/tests/test_price_level_adapter.py::test_price_level_adapter_can_emit": {
+      "seconds": 0.002203300013206899,
+      "phases": {
+        "setup": 0.0019564999965950847,
+        "call": 0.00012069998774677515,
+        "teardown": 0.00012610002886503935
+      }
+    },
+    "research_workflow/tests/test_price_level_adapter.py::test_price_level_adapter_snapshot": {
+      "seconds": 0.005587499821558595,
+      "phases": {
+        "setup": 0.0018662998918443918,
+        "call": 0.0007308999774977565,
+        "teardown": 0.0029902999522164464
+      }
+    }
+  },
+  "ran": 506,
+  "passed": 483,
+  "failed": 9,
+  "counts": {
+    "NEW_FAILURE": 9,
+    "NEW_FAILURE_OUTSIDE_BASELINE_SCOPE": 0,
+    "KNOWN_BASELINE_FAILURE": 0,
+    "BASELINE_FAILURE_NOW_FIXED": 0,
+    "ENVIRONMENTAL_MISSING_ARTIFACT": 0
+  },
+  "NEW_FAILURE": [
+    {
+      "node_id": "features/tests/test_feature_system_v2.py::test_explicit_instances_and_collection_universe_share_canonical_status",
+      "message": "call: def test_explicit_instances_and_collection_universe_share_canonical_status():\n        aliases = resolve_source_universe(\"canonical_verified_definition_universe\")\n        instances = (\n            FeatureInstance(\"regime_efficiency\", {\"timeframe\": \"1m\", \"context\": \"prior\"}),\n            FeatureInstance(\"regime_efficiency\", {\"timeframe\": \"5m\", \"context\": \"prior\"}),\n        )\n        from features.registry import canonical_definition_status\n        if canonical_definition_status(\"regime_efficiency\") == \"verified\":\n            resolved = resolve_feature_instances(\"canonical_verified_definition_universe\", instances)\n            assert [item[\"physical_alias\"] for item in resolved] == [\"prior_1m_regime_efficiency\", \"prior_5m_regime_efficiency\"]\n            assert {item[\"canonical_name\"] for item in resolved} <= set(aliases)\n        else:\n            # A provider edit invalidates its old hash-pinned promotion evidence;\n            # the resolver must refuse to reuse that approval.\n>           with pytest.raises(FeatureInstanceError, match=\"UNVERIFIED_CANONICAL_FEATURE\"):\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE           Failed: DID NOT RAISE <class 'features.feature_types.FeatureInstanceError'>\n\nfeatures\\tests\\test_feature_system_v2.py:132: Failed",
+      "reason": "BASELINE_COMMIT_MISMATCH,BASELINE_ENVIRONMENT_MISMATCH"
+    },
+    {
+      "node_id": "research_workflow/tests/test_ordered_barrier_entry_reference.py::test_10b_touch_one_second_past_the_horizon_does_not_count",
+      "message": "call: def test_10b_touch_one_second_past_the_horizon_does_not_count():\n        obj = _collector(session_end_censoring=False)\n        T = T0\n        obj._track_pending(_checkpoint_cand(T, atr=10.0), T)\n        bars = [(T + s * NS, 20000.0, 20000.5, 19999.5) for s in range(1, HORIZON + 1)]\n        bars.append((T + (HORIZON + 1) * NS, 20000.0, 25000.0, 15000.0))   # huge, but too late\n        obs = _run(obj, T, bars)\n>       assert obs[\"disposition\"] == \"LABELED_NEGATIVE\"\nE       AssertionError: assert 'CENSORED' == 'LABELED_NEGATIVE'\nE         \nE         - LABELED_NEGATIVE\nE         + CENSORED\n\nresearch_workflow\\tests\\test_ordered_barrier_entry_reference.py:319: AssertionError",
+      "reason": "BASELINE_COMMIT_MISMATCH,BASELINE_ENVIRONMENT_MISMATCH"
+    },
+    {
+      "node_id": "research_workflow/tests/test_ordered_barrier_entry_reference.py::test_8_timeout_when_neither_barrier_is_touched",
+      "message": "call: def test_8_timeout_when_neither_barrier_is_touched():\n        obj = _collector()\n        T = T0\n        obj._track_pending(_checkpoint_cand(T, atr=10.0), T)\n        bars = [(T + s * NS, 20000.0, 20000.5, 19999.5) for s in range(1, HORIZON + 2)]\n        obs = _run(obj, T, bars)\n>       assert obs[\"disposition\"] == \"LABELED_NEGATIVE\"\nE       AssertionError: assert 'CENSORED' == 'LABELED_NEGATIVE'\nE         \nE         - LABELED_NEGATIVE\nE         + CENSORED\n\nresearch_workflow\\tests\\test_ordered_barrier_entry_reference.py:248: AssertionError",
+      "reason": "BASELINE_COMMIT_MISMATCH,BASELINE_ENVIRONMENT_MISMATCH"
+    },
+    {
+      "node_id": "research_workflow/tests/test_ordered_barrier_entry_reference.py::test_9b_horizon_that_fits_before_close_is_labeled_not_censored",
+      "message": "call: def test_9b_horizon_that_fits_before_close_is_labeled_not_censored():\n        import pandas as pd\n        from research_workflow.generic_collector import session_close_ns\n    \n        obj = _collector(session=\"RTH\", session_end_censoring=True)\n        close = session_close_ns(int(pd.Timestamp(\"2023-03-03 10:00\", tz=\"America/Chicago\").tz_convert(\"UTC\").value), \"RTH\")\n        T = close - 5 * 60 * NS\n        obj._track_pending(_checkpoint_cand(T, atr=10.0), T)\n        obs = _run(obj, T, [(T + s * NS, 20000.0, 20000.2, 19999.8) for s in range(1, HORIZON + 2)])\n>       assert obs[\"disposition\"] == \"LABELED_NEGATIVE\"\nE       AssertionError: assert 'CENSORED' == 'LABELED_NEGATIVE'\nE         \nE         - LABELED_NEGATIVE\nE         + CENSORED\n\nresearch_workflow\\tests\\test_ordered_barrier_entry_reference.py:279: AssertionError",
+      "reason": "BASELINE_COMMIT_MISMATCH,BASELINE_ENVIRONMENT_MISMATCH"
+    },
+    {
+      "node_id": "research_workflow/tests/test_redteam_pass2_acceptance.py::test_rt2_02_mixed_child_gap_thresholds_execute_independently",
+      "message": "call: def test_rt2_02_mixed_child_gap_thresholds_execute_independently():\n        contract = {\n            \"primitive\": \"composite\", \"condition_logic\": \"AND\", \"horizon_seconds\": 10,\n            \"conditions\": [\n                {\"id\": \"a\", \"kind\": \"ordered_barrier\", \"forward_outcome_id\": \"a_fo\", \"barrier_id\": \"a\"},\n                {\"id\": \"b\", \"kind\": \"ordered_barrier\", \"forward_outcome_id\": \"b_fo\", \"barrier_id\": \"b\"},\n            ],\n            \"required_forward_outcomes\": [\n                {\"id\": \"a_fo\", \"entry_reference\": \"next_bar_open\", \"horizon_seconds\": 1,\n                 \"session_end_censoring\": False, \"max_gap_seconds\": 1,\n                 \"atr_source\": ATR, \"atr_frozen_at\": \"decision_ts\",\n                 \"ordered_barriers\": [{\"id\": \"a\", \"favorable_atr\": 100., \"adverse_atr\": 100., \"horizon_seconds\": 1}]},\n                {\"id\": \"b_fo\", \"entry_reference\": \"next_bar_open\", \"horizon_seconds\": 10,\n                 \"session_end_censoring\": False, \"max_gap_seconds\": 10,\n                 \"atr_source\": ATR, \"atr_frozen_at\": \"decision_ts\",\n                 \"ordered_barriers\": [{\"id\": \"b\", \"favorable_atr\": 100., \"adverse_atr\": 100., \"horizon_seconds\": 10}]},\n            ],\n        }\n        rt = resolve_target_runtime(contract)\n        p = rt.open_pending({\"observation_ts\": 0, \"regime_direction\": 1, \"atr\": 1., \"atr_source\": ATR})\n        tape = [\n            {\"ts\": NS, \"open\": 100., \"high\": 100.1, \"low\": 99.9, \"gap\": False},\n            {\"ts\": 6 * NS, \"open\": 100., \"high\": 100.1, \"low\": 99.9, \"gap\": False},\n            {\"ts\": 11 * NS, \"open\": 100., \"high\": 100.1, \"low\": 99.9, \"gap\": False},\n        ]\n        for event in tape:\n            rt.ingest_bar(p, event)\n        result = rt.terminal(p, final=True, now_ts=11 * NS)\n>       assert (result.disposition, result.label) == (\"NEGATIVE\", 0)\nE       AssertionError: assert ('CENSORED', None) == ('NEGATIVE', 0)\nE         \nE         At index 0 diff: 'CENSORED' != 'NEGATIVE'\nE         Use -v to get more diff\n\nresearch_workflow\\tests\\test_redteam_pass2_acceptance.py:99: AssertionError",
+      "reason": "BASELINE_COMMIT_MISMATCH,BASELINE_ENVIRONMENT_MISMATCH"
+    },
+    {
+      "node_id": "research_workflow/tests/test_redteam_pass2_target_semantics.py::test_mixed_child_gap_thresholds_are_independent_and_old_shared_gap_fails_parity[AND]",
+      "message": "call: logic = 'AND'\n\n    @pytest.mark.parametrize(\"logic\", [\"AND\", \"OR\"])\n    def test_mixed_child_gap_thresholds_are_independent_and_old_shared_gap_fails_parity(logic):\n        contract = _two_barriers(logic=logic, a_session=False, b_session=False, a_gap=1, b_gap=10)\n        rt = resolve_target_runtime(contract)\n        p = rt.open_pending({\"observation_ts\": 0, \"regime_direction\": 1, \"atr\": 1., \"atr_source\": ATR})\n        # Child A expires before the five-second raw gap; B remains observable under 10s.\n        tape = [\n            {\"ts\": NS, \"open\": 100., \"high\": 100.1, \"low\": 99.9, \"gap\": False},\n            {\"ts\": 6 * NS, \"open\": 100., \"high\": 100.1, \"low\": 99.9, \"gap\": False},\n            {\"ts\": 11 * NS, \"open\": 100., \"high\": 100.1, \"low\": 99.9, \"gap\": False},\n        ]\n        for event in tape:\n            rt.ingest_bar(p, event)\n        result = rt.terminal(p, final=True, now_ts=11 * NS)\n>       assert (result.disposition, result.label) == (\"NEGATIVE\", 0)\nE       AssertionError: assert ('CENSORED', None) == ('NEGATIVE', 0)\nE         \nE         At index 0 diff: 'CENSORED' != 'NEGATIVE'\nE         Use -v to get more diff\n\nresearch_workflow\\tests\\test_redteam_pass2_target_semantics.py:62: AssertionError",
+      "reason": "BASELINE_COMMIT_MISMATCH,BASELINE_ENVIRONMENT_MISMATCH"
+    },
+    {
+      "node_id": "research_workflow/tests/test_redteam_pass2_target_semantics.py::test_mixed_child_gap_thresholds_are_independent_and_old_shared_gap_fails_parity[OR]",
+      "message": "call: logic = 'OR'\n\n    @pytest.mark.parametrize(\"logic\", [\"AND\", \"OR\"])\n    def test_mixed_child_gap_thresholds_are_independent_and_old_shared_gap_fails_parity(logic):\n        contract = _two_barriers(logic=logic, a_session=False, b_session=False, a_gap=1, b_gap=10)\n        rt = resolve_target_runtime(contract)\n        p = rt.open_pending({\"observation_ts\": 0, \"regime_direction\": 1, \"atr\": 1., \"atr_source\": ATR})\n        # Child A expires before the five-second raw gap; B remains observable under 10s.\n        tape = [\n            {\"ts\": NS, \"open\": 100., \"high\": 100.1, \"low\": 99.9, \"gap\": False},\n            {\"ts\": 6 * NS, \"open\": 100., \"high\": 100.1, \"low\": 99.9, \"gap\": False},\n            {\"ts\": 11 * NS, \"open\": 100., \"high\": 100.1, \"low\": 99.9, \"gap\": False},\n        ]\n        for event in tape:\n            rt.ingest_bar(p, event)\n        result = rt.terminal(p, final=True, now_ts=11 * NS)\n>       assert (result.disposition, result.label) == (\"NEGATIVE\", 0)\nE       AssertionError: assert ('CENSORED', None) == ('NEGATIVE', 0)\nE         \nE         At index 0 diff: 'CENSORED' != 'NEGATIVE'\nE         Use -v to get more diff\n\nresearch_workflow\\tests\\test_redteam_pass2_target_semantics.py:62: AssertionError",
+      "reason": "BASELINE_COMMIT_MISMATCH,BASELINE_ENVIRONMENT_MISMATCH"
+    },
+    {
+      "node_id": "scripts/tests/test_registry_universe_output_contract.py::test_exact_formerly_rejected_aliases_are_in_the_single_canonical_universe",
+      "message": "call: def test_exact_formerly_rejected_aliases_are_in_the_single_canonical_universe():\n>       assert len(LEGACY_FEATURE_INSTANCE_OVERRIDES) == 35\nE       AssertionError: assert 36 == 35\nE        +  where 36 = len({'current_1m_move_outside_completed_5m_range': FeatureInstance(canonical_name='move_outside_completed_range', paramete...me_mfe_atr', parameters={'timeframe': '5m', 'context': 'current', 'bar_state': 'completed'}, physical_alias=None), ...})\n\nscripts\\tests\\test_registry_universe_output_contract.py:128: AssertionError",
+      "reason": "BASELINE_COMMIT_MISMATCH,BASELINE_ENVIRONMENT_MISMATCH"
+    },
+    {
+      "node_id": "scripts/tests/test_session_efficiency.py::test_test_delta_classifies_against_committed_baseline",
+      "message": "call: tmp_path = WindowsPath('C:/Users/Scott McCarty/AppData/Local/Temp/pytest-of-Scott McCarty/pytest-4929/test_test_delta_classifies_aga0')\n\n    def test_test_delta_classifies_against_committed_baseline(tmp_path: Path):\n        scope = ROOT / \"scratch\" / f\"_delta_scope_{uuid.uuid4().hex[:8]}\"\n        scope.mkdir(parents=True)\n        try:\n            (scope / \"test_delta_fixture.py\").write_text(\n                \"def test_known_failure():\\n    assert 1 == 2\\n\\n\"\n                \"def test_new_failure():\\n    assert 'new' == 'regression'\\n\\n\"\n                \"def test_now_fixed():\\n    assert True\\n\\n\"\n                \"def test_environmental():\\n    open('C:/definitely/missing/artifact.parquet')\\n\\n\"\n                \"def test_passes():\\n    assert True\\n\", encoding=\"utf-8\")\n            rel = scope.relative_to(ROOT).as_posix()\n            node = lambda name: f\"{rel}/test_delta_fixture.py::{name}\"\n            baseline = tmp_path / \"baseline.json\"\n            baseline.write_text(json.dumps({\"schema_version\": 1, \"platform_commit\": \"deadbeef\", \"scopes\": [rel],\n                                            \"expected_failures\": [{\"node_id\": node(\"test_known_failure\"), \"classification\": \"pre_existing\", \"reason\": \"fixture\"},\n                                                                  {\"node_id\": node(\"test_now_fixed\"), \"classification\": \"pre_existing\", \"reason\": \"fixed since\"}]}), encoding=\"utf-8\")\n            r = subprocess.run([sys.executable, str(ROOT / \"scripts\" / \"test_delta.py\"), rel, \"--baseline\", str(baseline), \"--json\"],\n                               cwd=str(ROOT), capture_output=True, text=True, encoding=\"utf-8\")\n            card = json.loads(r.stdout)\n            assert r.returncode == 1 and card[\"STATUS\"] == \"NEW_FAILURES\", card\n>           assert [e[\"node_id\"] for e in card[\"NEW_FAILURE\"]] == [node(\"test_new_failure\")]\nE           AssertionError: assert ['scratch/_de..._new_failure'] == ['scratch/_de..._new_failure']\nE             \nE             At index 0 diff: 'scratch/_delta_scope_e8b992b6/test_delta_fixture.py::test_environmental' != 'scratch/_delta_scope_e8b992b6/test_delta_fixture.py::test_new_failure'\nE             Left contains one more item: 'scratch/_delta_scope_e8b992b6/test_delta_fixture.py::test_new_failure'\nE             Use -v to get more diff\n\nscripts\\tests\\test_session_efficiency.py:189: AssertionError",
+      "reason": "BASELINE_COMMIT_MISMATCH,BASELINE_ENVIRONMENT_MISMATCH"
+    }
+  ],
+  "NEW_FAILURE_OUTSIDE_BASELINE_SCOPE": [],
+  "BASELINE_FAILURE_NOW_FIXED": [],
+  "ENVIRONMENTAL_MISSING_ARTIFACT": [],
+  "KNOWN_BASELINE_FAILURE": [],
+  "merge_tier": null
+}

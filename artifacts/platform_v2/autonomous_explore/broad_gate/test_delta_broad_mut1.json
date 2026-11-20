@@ -1,0 +1,174 @@
+{
+  "STATUS": "OK",
+  "baseline": "C:\\Users\\Scott McCarty\\Projects\\NT-ae-mut1\\config\\test_failure_baseline.json",
+  "baseline_commit": "c480d8af0068c69d19669497c53747efa187b5dd",
+  "head": "600e7c71",
+  "baseline_issues": [
+    "BASELINE_COMMIT_MISMATCH",
+    "BASELINE_ENVIRONMENT_MISMATCH"
+  ],
+  "pytest_exit_code": 0,
+  "wall_seconds": 391.15443100000266,
+  "per_test_timings": {
+    "scripts/tests/test_round2_invariants.py::test_independent_ast_closure_subset_of_manifest": {
+      "seconds": 6.0048506000312045,
+      "phases": {
+        "setup": 0.13229099998716265,
+        "call": 5.871154800057411,
+        "teardown": 0.0014047999866306782
+      }
+    },
+    "scripts/tests/test_round2_invariants.py::test_manifest_resolves_dynamic_and_alternate_strategy": {
+      "seconds": 0.020212900009937584,
+      "phases": {
+        "setup": 0.003765900037251413,
+        "call": 0.015089499996975064,
+        "teardown": 0.0013574999757111073
+      }
+    },
+    "scripts/tests/test_round2_invariants.py::test_transitive_level2_dependency_discovery": {
+      "seconds": 0.2938659000210464,
+      "phases": {
+        "setup": 0.003825400024652481,
+        "call": 0.2887144999112934,
+        "teardown": 0.0013260000851005316
+      }
+    },
+    "scripts/tests/test_round2_invariants.py::test_seal_fails_closed_on_authority_and_governance_tampering[research/schemas/study_spec.py]": {
+      "seconds": 43.503138699918054,
+      "phases": {
+        "setup": 0.005407599965110421,
+        "call": 43.496333099901676,
+        "teardown": 0.001398000051267445
+      }
+    },
+    "scripts/tests/test_round2_invariants.py::test_seal_fails_closed_on_authority_and_governance_tampering[scripts/generate_oos_unlock.py]": {
+      "seconds": 41.31015149992891,
+      "phases": {
+        "setup": 0.0035829999251291156,
+        "call": 41.30533020000439,
+        "teardown": 0.0012382999993860722
+      }
+    },
+    "scripts/tests/test_round2_invariants.py::test_seal_fails_closed_on_authority_and_governance_tampering[scripts/compile_study.py]": {
+      "seconds": 40.76572859985754,
+      "phases": {
+        "setup": 0.0033496998948976398,
+        "call": 40.76117319997866,
+        "teardown": 0.001205699983984232
+      }
+    },
+    "scripts/tests/test_round2_invariants.py::test_seal_fails_closed_on_authority_and_governance_tampering[research/engines/population_engine.py]": {
+      "seconds": 42.5056000999175,
+      "phases": {
+        "setup": 0.0031784999882802367,
+        "call": 42.501031199935824,
+        "teardown": 0.0013903999933972955
+      }
+    },
+    "scripts/tests/test_round2_invariants.py::test_seal_fails_closed_on_authority_and_governance_tampering[research/engines/feature_binding_engine.py]": {
+      "seconds": 44.039251799928024,
+      "phases": {
+        "setup": 0.003341000061482191,
+        "call": 44.03464879991952,
+        "teardown": 0.0012619999470189214
+      }
+    },
+    "scripts/tests/test_round2_invariants.py::test_seal_fails_closed_on_authority_and_governance_tampering[research/engines/timestamp_engine.py]": {
+      "seconds": 44.870799600030296,
+      "phases": {
+        "setup": 0.0052507000509649515,
+        "call": 44.8642185999779,
+        "teardown": 0.0013303000014275312
+      }
+    },
+    "scripts/tests/test_round2_invariants.py::test_full_stage_rejects_missing_smoke_acceptance": {
+      "seconds": 33.516328800003976,
+      "phases": {
+        "setup": 0.0032788999378681183,
+        "call": 33.51014460006263,
+        "teardown": 0.002905300003476441
+      }
+    },
+    "scripts/tests/test_round2_invariants.py::test_full_stage_rejects_stale_smoke_acceptance": {
+      "seconds": 31.414627899997868,
+      "phases": {
+        "setup": 0.0047839999897405505,
+        "call": 31.40838709997479,
+        "teardown": 0.001456800033338368
+      }
+    },
+    "scripts/tests/test_round2_invariants.py::test_full_stage_accepts_valid_smoke_acceptance": {
+      "seconds": 30.319455399992876,
+      "phases": {
+        "setup": 0.0030369999585673213,
+        "call": 30.3151178000262,
+        "teardown": 0.0013006000081077218
+      }
+    },
+    "scripts/tests/test_round2_invariants.py::test_gate_rejects_contradictory_acceptance": {
+      "seconds": 28.267267199931666,
+      "phases": {
+        "setup": 0.002882799948565662,
+        "call": 28.263202699949034,
+        "teardown": 0.0011817000340670347
+      }
+    },
+    "scripts/tests/test_round2_invariants.py::test_warmup_cannot_enter_locked_dev_year": {
+      "seconds": 0.16070069989655167,
+      "phases": {
+        "setup": 0.0020110999466851354,
+        "call": 0.1576505999546498,
+        "teardown": 0.0010389999952167273
+      }
+    },
+    "scripts/tests/test_round2_invariants.py::test_audit_status_requires_real_auditor_artifact": {
+      "seconds": 0.02138559997547418,
+      "phases": {
+        "setup": 0.0035151999909430742,
+        "call": 0.01686350000090897,
+        "teardown": 0.0010068999836221337
+      }
+    },
+    "scripts/tests/test_round2_invariants.py::test_empirical_catalog_timestamp_semantics": {
+      "seconds": 0.0031088999239727855,
+      "phases": {
+        "setup": 0.002003900008276105,
+        "call": 0.00017499993555247784,
+        "teardown": 0.0009299999801442027
+      }
+    },
+    "scripts/tests/test_round2_invariants.py::test_agent_tool_grants_match_policy": {
+      "seconds": 0.022828200017102063,
+      "phases": {
+        "setup": 0.002144400030374527,
+        "call": 0.0196577999740839,
+        "teardown": 0.0010260000126436353
+      }
+    },
+    "scripts/tests/test_round2_invariants.py::test_baseline_substitution_attack_detected": {
+      "seconds": 0.06098899990320206,
+      "phases": {
+        "setup": 0.004378600046038628,
+        "call": 0.055427599931135774,
+        "teardown": 0.0011827999260276556
+      }
+    }
+  },
+  "ran": 18,
+  "passed": 18,
+  "failed": 0,
+  "counts": {
+    "NEW_FAILURE": 0,
+    "NEW_FAILURE_OUTSIDE_BASELINE_SCOPE": 0,
+    "KNOWN_BASELINE_FAILURE": 0,
+    "BASELINE_FAILURE_NOW_FIXED": 0,
+    "ENVIRONMENTAL_MISSING_ARTIFACT": 0
+  },
+  "NEW_FAILURE": [],
+  "NEW_FAILURE_OUTSIDE_BASELINE_SCOPE": [],
+  "BASELINE_FAILURE_NOW_FIXED": [],
+  "ENVIRONMENTAL_MISSING_ARTIFACT": [],
+  "KNOWN_BASELINE_FAILURE": [],
+  "merge_tier": null
+}
