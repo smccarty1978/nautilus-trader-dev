@@ -1,0 +1,217 @@
+kind: tracker
+name: tracker.volume_clock.developing
+semantics: "Session-calibrated RTH volume clock on completed native 1-second bars,\
+  \ published while each bar DEVELOPS,\nplus rolling time-clock volume from the same\
+  \ rows with the same causal denominator. Re-expresses the frozen\nvc_v1 Stage C\
+  \ engine (research/nq_adaptive_volume_clock, VOLUME_CLOCK_CONTRACT_FROZEN.md sections\
+  \ 2-4)\nas a streaming platform tracker. Input rows: ts_event = second open, ts_init\
+  \ = second close (= availability);\nonly native rows exist (a missing second is\
+  \ no row).\n\n* SESSIONS. From the dataset's hash-verified Globex `sessions` reference\
+  \ table, schedule columns only\n  (session_date, close_ns; never the tape-derived\
+  \ coverage columns) and the `rolls` table. RTH = 08:30-15:15\n  CT on session_date.\
+  \ Classes: NO_RTH (scheduled close <= 08:30 CT; ignored), FULL (close >= 15:15 CT),\n\
+  \  SHORT_RTH (close 12:15 CT; RTH 08:30-close), HOLIDAY_ABBREV (any other early\
+  \ close; never built).\n  A session's RTH rows are those with ts_event in [rth_start,\
+  \ rth_end).\n\n* CALIBRATION of session D at its first RTH row, for D in {FULL,\
+  \ SHORT_RTH} with >= 5 eligible sessions seen:\n  target_exact = scale_k * mean(RTH\
+  \ volume of the 5 most recent eligible sessions strictly before D) / 405\n  (float64\
+  \ mean of the integer volumes, never from a rounded value); T = ceil(target_exact)\
+  \ contracts.\n  ELIGIBLE = a finished session whose final class is FULL. At D's\
+  \ close: if D is FULL, lies in the 5 Globex\n  sessions before a roll session, and\
+  \ its RTH volume / median(last 20 eligible volumes) < 0.75 (median needs\n  >= 10\
+  \ eligible), D becomes ROLL_TRANSITION and is NOT eligible. D's own volume only\
+  \ affects LATER sessions.\n  A scheduled session with no RTH row is never opened\
+  \ and never eligible (vc_v1 MISSING_DATA).\n\n* BARS. Bar n of a calibrated session\
+  \ = the contract interval ((n-1)T, nT] of the session's cumulative RTH\n  volume.\
+  \ It completes in the first row whose cumulative volume reaches nT (end_ts = that\
+  \ row's ts_event) and\n  is available at that row's close (avail_ts = end_ts + 1\
+  \ s = ts_init). The completing row's surplus (the carry)\n  belongs to bar n+1.\
+  \ Several completions in one row: the later ones are COLLAPSED (no geometry). dur_raw\
+  \ =\n  (avail_ts - previous avail_ts) // 1 s (bar 1: from rth_start); duration_s\
+  \ = max(dur_raw, 1). Geometry of a\n  completed bar: open = previous bar close (bar\
+  \ 1: open of the first RTH row with volume); high/low = extremes\n  of the open\
+  \ and of the rows from the row holding contract (n-1)T+1 through end; close = close\
+  \ of the end row.\n  The session residual (< T) never completes; it is reported\
+  \ at the session close. Event `bar_completed`.\n\n* DEVELOPING STATE (the published\
+  \ fields at t, after consuming the row closing at t, its completions included):\n\
+  \  consumed = cum_volume - n_completed * T; frac = consumed / T in [0, 1); bar_seq\
+  \ = n_completed + 1;\n  carry_contracts = the carry the developing bar received\
+  \ at its origin; bar_origin_ts = availability of the\n  previous completion (rth_start\
+  \ for bar 1); elapsed_s = (t - bar_origin_ts) // 1 s; internal_contracts =\n  consumed\
+  \ - carry_contracts (contracts in rows after the origin); rate_since_open = internal_contracts\
+  \ /\n  elapsed_s; rate_last_<w>s = contracts of rows with ts_init in (t - min(w,\
+  \ elapsed_s), t] / min(w, elapsed_s);\n  bar_open_price, bar_high, bar_low = the\
+  \ developing bar's open and running extremes (the open included);\n  bar_start_ts\
+  \ = ts_event of the first row contributing a contract; prev_bar_duration_s, prev_bar_avail_ts.\n\
+  \  Checkpoints (default 0.25 / 0.50 / 0.75): the row in which a bar's frac first\
+  \ reaches q. Per row:\n  k<q>_crossed = number of bars crossing q in this row, k<q>_developing\
+  \ = 1 when the crossing bar is still the\n  developing bar after the row (not completed\
+  \ in it), multi_cross = 1 when the row crosses more than one\n  (bar, level) pair.\
+  \ Every crossing is also an event `checkpoint` (bar_seq, level, ts, completed_in_row,\n\
+  \  collapsed, multi_cross). A crossing by the carry is stamped at the completing\
+  \ row.\n\n* EXPECTED RATE AND ROLLING CONTROLS (same rows, same denominator). r_exp(t)\
+  \ = mean volume of RTH minute\n  m(t) over the 5 calibration sessions / 60 (contracts\
+  \ per second), m(t) = the minute holding the second\n  [t - 1 s, t); identity sum_m\
+  \ r_exp * 60 = 405 * target_exact / scale_k. vol_<w>s = RTH volume of rows with\n\
+  \  ts_init in (t - w, t]; rv_<w>s = vol_<w>s / (w * r_exp(t)). Default windows 15,\
+  \ 30, 60, 120, 300 s.\n\n* PRICE REFERENCE. last_close = P(t) = close of the last\
+  \ row with ts_init <= t; d60_points = P(t) - P(t - 60 s)\n  (P(t - 60 s) = close\
+  \ of the last row with ts_init <= t - 60 s, any session segment); dir_d60 = its\
+  \ sign.\n"
+availability_rule: 'Every field at t is a function of rows with ts_init <= t and of
+  the schedule tables only. The host publishes
+
+  the 1s row at its close, so an observation epoch at t sees the row closing at t:
+  a bar completed by that row
+
+  is already counted (n_completed), and the published developing state is the NEXT
+  bar (elapsed_s = 0, frac =
+
+  carry / T, rates null). The row closing at t is never visible before t. No field
+  uses the eventual duration,
+
+  range, direction or volume of the developing bar, the session''s later volume, or
+  any later row.
+
+  '
+parameters:
+  dataset: required
+  scale_k: 1
+inputs:
+  bars: stream
+fields:
+- in_rth
+- session_date
+- rth_class
+- session_open_ns
+- session_close_ns
+- session_elapsed_s
+- secs_left
+- calibrated
+- calibration_history_n
+- roll_rule_ready
+- T
+- target_exact
+- cal_source_dates
+- cum_volume
+- n_completed
+- bar_seq
+- consumed
+- frac
+- carry_contracts
+- internal_contracts
+- elapsed_s
+- bar_origin_ts
+- bar_start_ts
+- bar_open_price
+- bar_high
+- bar_low
+- prev_bar_duration_s
+- prev_bar_avail_ts
+- rate_since_open
+- tod_minute
+- r_exp
+- last_close
+- d60_points
+- dir_d60
+- multi_cross
+- rate_last_10s
+- rate_last_15s
+- rate_last_30s
+- vol_15s
+- vol_30s
+- vol_60s
+- vol_120s
+- vol_300s
+- rv_15s
+- rv_30s
+- rv_60s
+- rv_120s
+- rv_300s
+- k25_crossed
+- k25_developing
+- k50_crossed
+- k50_developing
+- k75_crossed
+- k75_developing
+events:
+- session_opened
+- session_closed
+- bar_completed
+- checkpoint
+update_cadence: per_source_bar
+dependencies:
+- stream.completed_bar
+serves_studies:
+- nq_developing_volume_clock
+- nq_adaptive_volume_clock (vc_v1 Stage C engine, re-expressed; parity oracle)
+- nq_volume_burst_momentum (completed V1 bars and onsets; study-local port today)
+closest_existing:
+  id: feature.relative_volume
+  why_not: 'No registered primitive keeps a volume-denominated clock. feature.relative_volume
+    / volume_trend /
+
+    volume_per_second are per-source-bar time-clock ratios with minute baselines;
+    tracker.volume_profile.rolling
+
+    aggregates price-by-volume, not cumulative-volume thresholds. None calibrates
+    a per-session threshold from
+
+    prior eligible sessions, carries surplus volume across bars, or exposes a developing
+    bar''s consumption, and
+
+    none gives a second-window rolling volume with a time-of-day expected-rate denominator.
+
+    '
+composition_attempted:
+  spec_fragment: 'vclock: {tracker: "unresolved:volume_clock.developing ..."}; population.cadence.anchor:
+    vclock.session_open_ns; population.direction: vclock.dir_d60; features.metadata:
+    vc_frac: vclock.frac, tc_rv30: vclock.rv_30s, ...'
+  compiler_gap: MISSING_CAPABILITY at context.vclock (studies/nq_developing_volume_clock
+    @ 5fb6e087) plus 24 UNSUPPORTED_COMPOSITION references to its fields
+reset_policy: 'Developing state, rolling buffers and checkpoints reset at the first
+  RTH row of every session; the price buffer
+
+  (P(t - 60 s)) is continuous. Calibration history persists across sessions (bounded:
+  20 volumes, 5 dates and 5
+
+  minute profiles). A session is closed (session_closed, eligibility, ROLL_TRANSITION
+  test) when the first row at
+
+  or after its RTH end, or of another session, arrives.
+
+  '
+null_policy: 'Outside RTH, and in RTH sessions that are not calibrated (fewer than
+  5 eligible sessions, HOLIDAY_ABBREV), every
+
+  developing and rolling field is null and calibrated = false. bar_open_price / bar_high
+  / bar_low / bar_start_ts
+
+  are null until bar 1''s first contract. rate_* are null when elapsed_s = 0. vol_<w>s
+  / rv_<w>s are null until
+
+  t - w >= rth_start; rv_<w>s is null when r_exp = 0. dir_d60 / d60_points are null
+  without a row at or before
+
+  t - 60 s. Never 0 as a stand-in for an unavailable value.
+
+  '
+gap_policy: 'No fill. A missing second contributes no volume and no price; elapsed_s
+  and the rolling windows are wall-clock,
+
+  so a gap lengthens elapsed time and empties windows. Rows must arrive in strictly
+  increasing ts_event order
+
+  (refused otherwise); volume must be a non-negative integer; the input must be a
+  1-second stream (refused
+
+  otherwise).
+
+  '
+proposal_sha256: 24b3fab56c81250cecbf36fee1bf25fc1abdbed27d270726d3770bd337d83f5f
+status: scaffolded
+proposed_at_utc: '2026-11-20T02:18:53.191026+00:00'
+scaffold:
+  module: features/trackers/volume_clock_developing.py
+  test: features/tests/test_volume_clock_developing.py
+  class: VolumeClockDevelopingBinding
