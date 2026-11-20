@@ -442,8 +442,39 @@ class DeliverableSpec(_Strict):
     producer: str = Field(..., min_length=1)
 
 
+class ResultPrimarySpec(_Strict):
+    """Pointer to the ONE pre-registered comparison: a ``differences`` row of an ``analysis.uncertainty.clustered_mean``
+    artifact (mean(a) - mean(b), session-clustered CI)."""
+    artifact: str = Field(..., min_length=1)
+    difference: str = Field(..., min_length=1)
+    column: Optional[str] = None
+
+
+class ResultSpec(_Strict):
+    """The pre-registered decision rule of a ``tier: explore`` study. It is part of the plan (hashed before any outcome
+    exists), so the verdict is computed, never chosen after the numbers are seen:
+    SUPPORTED     CI excludes 0 in ``expected_sign`` and n_clusters >= min_clusters;
+    UNSUPPORTED   CI excludes 0 in the opposite sign, or the whole CI lies below ``min_effect`` in the expected sign;
+    INCONCLUSIVE  anything else (CI straddles 0 and admits min_effect, too few clusters, no estimate)."""
+    hypothesis: str = Field(..., min_length=1)
+    primary: ResultPrimarySpec
+    expected_sign: Literal["positive", "negative"]
+    min_effect: float = Field(0.0, ge=0.0)
+    min_clusters: int = Field(20, ge=2)
+    control: str = Field(..., min_length=1)          # what side b of the difference is, in words (for the card)
+
+
 class StudySpecV2(_Strict):
     study: StudySection
+    # `explore` (autonomous_explore): an exploratory study the controller runs compile -> close without packets or
+    # --execute-authorized. Deterministic causal/contract checks replace external audits; no dev/OOS years, no model,
+    # no execution claim; the claim level is computed from the research ledger (never above EXPLORATORY here).
+    tier: Literal["governed", "explore"] = "governed"
+    family: Optional[str] = Field(None, pattern=r"^[a-z][a-z0-9_]{0,63}$")
+    result: Optional[ResultSpec] = None
+    # Declared study-local targeted tests (studies/<id>/tests/test_*.py). Hashed into the plan, run by the `tests` stage,
+    # exempt from ZERO_STUDY_PYTHON only while the plan declares them. Undeclared study Python still fails.
+    study_tests: List[str] = Field(default_factory=list)
     # Which lifecycle stage this spec is for. `research` (default) is the full claim lifecycle.
     # `collect` produces an immutable frame: it runs through merge under a causal-only frame seal,
     # fits no model, declares no OOS and no analysis, and is registered with `research frame register`.
@@ -467,6 +498,22 @@ class StudySpecV2(_Strict):
         execution = [s for s in self.streams if s.role == "execution"]
         if len(execution) != 1:
             raise ValueError("exactly one stream must carry role: execution (the first stream by default)")
+        if self.tier == "explore":
+            missing = [k for k in ("family", "result", "analysis") if getattr(self, k) is None]
+            if missing:
+                raise ValueError(f"EXPLORE_SPEC_INCOMPLETE: tier: explore requires {missing} (family = experiment family for the "
+                                 "ledger; result = the pre-registered decision rule; analysis = the declared pipeline)")
+            if self.chronology.dev:
+                raise ValueError("EXPLORE_NO_OOS: tier: explore declares no dev/OOS years; confirmation is a governed study")
+            if self.model != "none":
+                raise ValueError("EXPLORE_NO_MODEL: tier: explore fits no model (model: none)")
+            if self.stage != "research" or self.outcome == "none":
+                raise ValueError("EXPLORE_NEEDS_OUTCOME: tier: explore is a research study with a registered outcome")
+            if self.result.primary.artifact not in [a.name for a in self.analysis.artifacts]:
+                raise ValueError(f"EXPLORE_RESULT_ARTIFACT_UNDECLARED: result.primary.artifact {self.result.primary.artifact!r} "
+                                 "is not a declared analysis artifact")
+        elif self.family is not None or self.result is not None:
+            raise ValueError("EXPLORE_FIELDS_WITHOUT_TIER: family / result belong to tier: explore")
         return self
 
     @model_validator(mode="before")

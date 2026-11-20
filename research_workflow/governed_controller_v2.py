@@ -81,6 +81,125 @@ class V2StudyController(GovernedStudyController):
         except Exception:
             return False
 
+    # -- tier: explore (autonomous_explore) ------------------------------------------
+    def _is_explore(self) -> bool:
+        """Declared in study.yaml (hashed into the plan). Read from the spec so it exists before the first compile; the
+        grammar guarantees an explore spec has no dev/OOS years, no model, a registered outcome and a pre-registered rule."""
+        try:
+            import yaml
+            data = yaml.safe_load((self.study / "study.yaml").read_text(encoding="utf-8")) or {}
+            return isinstance(data, dict) and data.get("tier") == "explore"
+        except Exception:
+            return False
+
+    def _plan(self) -> dict[str, Any]:
+        return _read(self.study / "compiled_plan.json")
+
+    def _dataset_digests(self, plan: dict[str, Any]) -> dict[str, Any]:
+        return {str(v.get("dataset_id")): v.get("dataset_digest") for v in (plan.get("instruments") or {}).values() if v.get("dataset_id")}
+
+    def _explore_checks(self, kind: str, fp: dict[str, str | None]) -> list[dict[str, Any]]:
+        """Deterministic replacements for the external audits on an EXPLORE study. Each check is mechanical and names
+        what it vouches for; anything they cannot decide is NOT in scope of an explore study (escalate to governed)."""
+        from research_workflow import research_ledger as RL
+        plan = self._plan()
+        checks: list[dict[str, Any]] = [{"name": "plan_is_current_explore", "passed": bool(plan.get("explore")) and plan.get("plan_sha256") == fp.get("plan_sha256")}]
+        if kind == "causal":
+            locals_ = [p for p in plan.get("binding_proof") or [] if isinstance(p, dict) and p.get("study_local")]
+            checks.append({"name": "observer_causality_harness", "passed": all((p.get("observer_check") or {}).get("passed") for p in locals_),
+                           "observers": [p.get("id") for p in locals_]})
+            avail = plan.get("availability") or {}
+            checks.append({"name": "availability_table_declared", "passed": bool(avail.get("rows")) and bool(avail.get("same_timestamp_rule"))})
+            from research_workflow.forward_outcomes.guard import is_outcome_column
+            feats = set(((plan.get("features") or {}).get("aliases") or [])) | {f for t in plan.get("trackers") or [] for f in t.get("fields") or []}
+            labels = set(RL._label_columns(plan))
+            leaked = sorted(c for c in feats if c in labels or is_outcome_column(c))
+            checks.append({"name": "labels_never_features", "passed": not leaked, "leaked": leaked})
+            from scripts.causal_lint import scan_file
+            crit = []
+            for p in sorted(self.study.glob("observers/*.py")) + sorted(self.study.glob("tests/*.py")):
+                crit += [str(getattr(f, "message", f)) for f in scan_file(p) if getattr(f, "severity", "").upper() == "CRITICAL"]
+            checks.append({"name": "causal_lint_study_code", "passed": not crit, "critical": crit[:5]})
+            t = _read(self.work / "test_summary.json")
+            checks.append({"name": "targeted_tests_passed", "passed": t.get("status") == "PASS" and t.get("execution_composite_sha256") == fp.get("execution_composite"),
+                           "counts": t.get("counts")})
+        else:
+            ch = plan.get("chronology") or {}
+            checks.append({"name": "no_protected_oos", "passed": not ch.get("dev")})
+            checks.append({"name": "train_disjoint_from_prohibited", "passed": not (set(ch.get("train") or []) & set(ch.get("prohibited") or []))})
+            try:
+                RL.check_reserved(plan)
+                checks.append({"name": "reserved_data_untouched", "passed": True, "reserved_windows": len(RL.reserved_windows())})
+            except RL.LedgerError as exc:
+                checks.append({"name": "reserved_data_untouched", "passed": False, "error": str(exc)})
+            py, _exc = self.lifecycle._zero_study_python()
+            checks.append({"name": "zero_undeclared_study_python", "passed": not py, "files": py})
+            checks.append({"name": "no_model_no_execution_claim", "passed": not plan.get("model")})
+            rule = (plan.get("explore") or {}).get("result") or {}
+            names = [a.get("name") for a in (plan.get("analysis") or {}).get("artifacts") or []]
+            checks.append({"name": "pre_registered_rule_bound", "passed": bool(rule) and (rule.get("primary") or {}).get("artifact") in names})
+        return checks
+
+    def _autonomous_audit(self, stage: str, fp: dict[str, str | None]) -> dict[str, Any] | None:
+        if not self._is_explore():
+            return None
+        from research_workflow.lifecycle_v2 import ingest_audit_report
+        kind = "causal" if stage == "causal_audit" else "contract"
+        self._packet(kind, fp)                                  # the packet names the plan these checks reviewed
+        checks = self._explore_checks(kind, fp)
+        failed = [c["name"] for c in checks if not c["passed"]]
+        audit = self.study / "audit"
+        audit.mkdir(parents=True, exist_ok=True)
+        stem = "pass" if kind == "causal" else "contract_pass"
+        n = max([int(p.stem.split("_")[-1]) for p in audit.glob(f"{stem}_*.md") if p.stem.split("_")[-1].isdigit()] or [0]) + 1
+        block = {"verdict": "BLOCKED" if failed else "CLEAR", "audit_type": kind, "study": self.study.name,
+                 "auditor": f"research_workflow.explore_deterministic_{kind}_checks", "audited_execution_composite_sha256": fp.get("execution_composite"),
+                 "audited_plan_sha256": fp.get("plan_sha256"), "critical": len(failed), "warning": 0, "note": 0}
+        report = audit / f"{stem}_{n:02d}.md"
+        report.write_text(f"# tier: explore deterministic {kind} checks\n\n```json\n{json.dumps(checks, indent=2, default=str)}\n```\n\n"
+                          f"<!-- AUDIT_SUMMARY_V2_START -->\n{json.dumps(block)}\n<!-- AUDIT_SUMMARY_V2_END -->\n", encoding="utf-8")
+        ingest_audit_report(self.study, kind, report)
+        return {"verdict": block["verdict"], "report": str(report), "failed": failed}
+
+    def _before_stage(self, stage: str, fp: dict[str, str | None]) -> dict[str, Any] | None:
+        if not self._is_explore() or stage not in ("smoke", "close"):
+            return None
+        from research_workflow import research_ledger as RL
+        plan = self._plan()
+        try:
+            if stage == "smoke":
+                # first data access of this attempt: the exposure is recorded BEFORE any outcome-bearing row exists
+                ev = RL.record_exposure(self.study, plan, self._dataset_digests(plan))
+                _json(self.work / "explore_exposure.json", {"event_id": ev["event_id"], "new": ev["new"], "attempt_id": ev["event"]["attempt_id"]})
+                return None
+            from research_workflow.lifecycle_v2 import DELIVERABLES
+            analysis = _read(self.study / "artifacts" / Path(DELIVERABLES["analyze"][0]).name) or {}
+            lineage = analysis.get("declared_analysis") or {}
+            q = (plan.get("population") or {}).get("qualify")
+            q = q.get("text") if isinstance(q, dict) else q
+            pop = {"description": f"qualify `{q}`, cadence {(plan.get('population') or {}).get('cadence')}, session {(plan.get('session') or {}).get('session')}",
+                   "rows": lineage.get("rows"), "exclusions": "rows outside the declared session/qualify; censored outcomes excluded by the analysis op"}
+            harness = [p.get("observer_check", {}).get("checks") for p in plan.get("binding_proof") or [] if isinstance(p, dict) and p.get("study_local")]
+            validation = {"observer_harness": "PASS" if harness else "NONE", "deterministic_causal_checks": _read(self.study / "audit/status.json").get("verdict"),
+                          "deterministic_contract_checks": _read(self.study / "audit/contract_status.json").get("verdict"),
+                          "targeted_tests": _read(self.work / "test_summary.json").get("counts"),
+                          "smoke": _read(self.study / "artifacts/smoke_acceptance.json").get("status"),
+                          "reconcile": "PASS" if self._receipt_current("reconcile", fp) else "NOT_CURRENT"}
+            rec = RL.write_result(self.study, plan, dataset_digests=self._dataset_digests(plan),
+                                  analysis_identity=lineage.get("analysis_identity_sha256"), population=pop, validation=validation)
+            # every attempt keeps its own write-once copy: a later attempt never overwrites an earlier one
+            snap = self.study / "artifacts" / "attempts" / rec["attempt_id"]
+            snap.mkdir(parents=True, exist_ok=True)
+            for src in (self.study / "artifacts" / "result.json", self.study / "RESULT_CARD.md"):
+                if not (snap / src.name).exists():
+                    (snap / src.name).write_bytes(src.read_bytes())
+            self.options.closure = {"outcome": rec["result"]["verdict"], "terminal_decision": rec["recommendation"]}
+            return None
+        except RL.LedgerError as exc:
+            card = self._card(_STAGE_STATE[stage], stage, blocker=BlockerType.SEMANTIC_BLOCKER, reason=str(exc), last=None)
+            card["blocker_code"] = exc.code
+            return card
+
     def _current_study_spec_sha256(self) -> str | None:
         from research_workflow.lifecycle_v2 import spec_sha256
         return spec_sha256(self.study)
@@ -91,7 +210,12 @@ class V2StudyController(GovernedStudyController):
     def _audit_current(self, path: Path, fp: dict[str, str | None]) -> bool:
         frozen = fp.get("execution_composite")
         st = _read(path)
-        return bool(frozen and st.get("verdict") == "CLEAR" and st.get("audited_execution_composite_sha256") == frozen and fp.get("current_execution_composite") == frozen)
+        # An audit vouches for a CODE closure (composite) AND a SCIENTIFIC definition (plan_sha256: population, outcome,
+        # session-end/censoring, labels, availability, model, chronology). A plan-only change keeps the composite but
+        # stales the audit; a status without audited_plan_sha256 (pre-fix) is stale (fail-closed).
+        return bool(frozen and st.get("verdict") == "CLEAR" and st.get("audited_execution_composite_sha256") == frozen
+                    and fp.get("current_execution_composite") == frozen
+                    and fp.get("plan_sha256") and st.get("audited_plan_sha256") == fp.get("plan_sha256"))
 
     def _receipt_current(self, stage: str, fp: dict[str, str | None], *, require_partitions: bool = False) -> bool:
         """A stage receipt is current only for the plan it ran against (a receipt with no plan_sha256 is not)."""
@@ -133,7 +257,11 @@ class V2StudyController(GovernedStudyController):
             return p.get("status") == "CLEAR" and p.get("execution_composite_sha256") == fp.get("execution_composite") and plan_bound(p)
         if stage == "tests":
             t = _read(self.work / "test_summary.json")
-            return t.get("status") == "PASS" and t.get("execution_composite_sha256") == fp.get("execution_composite")
+            # code-only evidence stays composite-keyed; declared study tests are bound by their own hash
+            st = (_read(self.study / "compiled_plan.json").get("study_tests") or [])
+            st_sha = hashlib.sha256(json.dumps(st, sort_keys=True).encode()).hexdigest()
+            return (t.get("status") == "PASS" and t.get("execution_composite_sha256") == fp.get("execution_composite")
+                    and (not st or t.get("study_tests_sha256") == st_sha))
         if stage == "causal_audit":
             return self._audit_current(self.study / "audit/status.json", fp)
         if stage == "contract_audit":
@@ -256,6 +384,12 @@ class V2StudyController(GovernedStudyController):
                               last=None, dry_run=bool(inspect or dry_run))
             card["blocker_code"] = "COLLECT_STAGE_NOT_APPLICABLE"
             return card
+        # tier: explore carries its own execution authority: the spec (hashed into the plan) declares an exploratory,
+        # TRAIN-role-only, no-model, no-OOS study, so the post-seal stages run without --execute-authorized. Every
+        # scientific gate still runs; the card records where the authority came from.
+        explore = self._is_explore()
+        if explore and not (inspect or dry_run):
+            self.options.execute = True
         # --execute-authorized is the real execution gate: every stage after "seal" (smoke..close)
         # is refused before the lock is even acquired unless options.execute is True. --inspect and
         # --dry-run are read-only and are never gated.
@@ -287,10 +421,21 @@ class V2StudyController(GovernedStudyController):
                 card["blocker_code"] = "STUDY_RUN_ALREADY_LIVE"
                 return card
         try:
-            return self._run_locked(through=through, inspect=inspect, dry_run=dry_run)
+            card = self._run_locked(through=through, inspect=inspect, dry_run=dry_run)
         finally:
             if not (inspect or dry_run):
                 self._release_run_lock()
+        if explore:
+            card["execution_authority"] = "tier: explore (study.yaml, hashed into the plan)"
+            res = _read(self.study / "artifacts" / "result.json")
+            if res and card.get("state") == ControllerState.STUDY_CLOSED.value:
+                # delivered with the completion itself: the card a researcher sees IS the result
+                card["terminal"] = "CLOSED_ISOLATED"
+                card["result"] = {"verdict": res["result"]["verdict"], "estimate": res["result"]["estimate"],
+                                  "ci": [res["result"]["ci_low"], res["result"]["ci_high"]], "n_clusters": res["result"]["n_clusters"],
+                                  "claim_level": res["claim_level"], "recommendation": res["recommendation"],
+                                  "attempt_id": res["attempt_id"], "result_card": str(self.study / "RESULT_CARD.md")}
+        return card
 
     def _run_locked(self, *, through: str, inspect: bool, dry_run: bool) -> dict[str, Any]:
         # typed capability gaps are a first-class blocker, never a runtime failure

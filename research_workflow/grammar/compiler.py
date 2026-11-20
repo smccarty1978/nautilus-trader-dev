@@ -484,7 +484,9 @@ def _resolve_trackers(ctx: _Ctx) -> None:
                     subscriptions.append({"from": binding["tracker"], "input": key, "events": events})
         if local is not None:
             from research_workflow import study_observers as SO
-            check = SO.causality_check(cls, params)
+            upstream = {k: (ctx.tracker_meta[b["tracker"]], next(t["params"] for t in ctx.trackers if t["id"] == b["tracker"]))
+                        for k, b in inputs.items() if "tracker" in b}
+            check = SO.causality_check(cls, params, upstream)
             ctx.observer_checks[name] = check
             if not check["passed"]:
                 ctx.gap(GapKind.INVALID_PARAMETERIZATION, where, f"study-local observer {cap!r} failed the generated causality harness: "
@@ -2317,6 +2319,7 @@ def compile_study(spec_data: Any, *, repo_root: Path = REPO_ROOT, registry: Opti
     analysis = _resolve_analysis(ctx, chronology, columns)
     _resolve_collect_stage(ctx, population, triggers, chronology, model, analysis)
     deliverables = _resolve_deliverables(ctx, model, analysis)
+    study_tests = _resolve_study_tests(ctx)
     if not ctx.gaps.ok:
         return CompileOutcome(None, ctx.gaps)
     closure = _resolve_closure(ctx, model)
@@ -2329,8 +2332,38 @@ def compile_study(spec_data: Any, *, repo_root: Path = REPO_ROOT, registry: Opti
         spec_sha256=spec_sha, registry_sha256=str(registry.get("content_sha256", "")), notes=list(ctx.notes),
         analysis=analysis, deliverables=deliverables,
         stage=("collect" if spec.stage == "collect" else None),
+        explore=({"tier": "explore", "family": spec.family, "result": spec.result.model_dump(mode="json")}
+                 if spec.tier == "explore" else None),
+        study_tests=study_tests or None,
     ).seal()
     return CompileOutcome(plan, None)
+
+
+_STUDY_TEST_RE = re.compile(r"^tests/test_[a-z0-9_]{1,64}\.py$")
+_STUDY_TEST_FORBIDDEN = ("sys.path", "importlib", "from studies", "import studies", "ParquetDataCatalog", "data/catalog", "read_parquet",
+                         "subprocess", "os.system", "shutil.rmtree")
+
+
+def _resolve_study_tests(ctx: "_Ctx") -> List[Dict[str, str]]:
+    """Declared study-local targeted tests: exact path shape, present, hashed, and isolated (no other study, no catalog,
+    no process or path manipulation). A violation is a study-side INVALID_PARAMETERIZATION, never a platform gap."""
+    out: List[Dict[str, str]] = []
+    for rel in ctx.spec.study_tests or []:
+        where = f"study_tests[{rel}]"
+        if not _STUDY_TEST_RE.match(rel):
+            ctx.gap(GapKind.INVALID_PARAMETERIZATION, where, f"{rel!r} must be tests/test_<name>.py inside the study")
+            continue
+        p = Path(ctx.study_dir) / rel
+        if not p.is_file():
+            ctx.gap(GapKind.INVALID_PARAMETERIZATION, where, f"{p} does not exist")
+            continue
+        text = p.read_text(encoding="utf-8")
+        bad = [t for t in _STUDY_TEST_FORBIDDEN if t in text]
+        if bad:
+            ctx.gap(GapKind.INVALID_PARAMETERIZATION, where, f"study test uses forbidden surface {bad}")
+            continue
+        out.append({"path": rel, "sha256": hashlib.sha256(p.read_bytes()).hexdigest()})
+    return out
 
 
 __all__ = ["compile_study", "load_spec", "CompileOutcome", "REPO_ROOT"]

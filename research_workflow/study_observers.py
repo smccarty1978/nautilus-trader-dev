@@ -7,7 +7,13 @@ loads ``studies/<study_id>/observers/<module>.py`` instead of a registered track
   same HostCore event loop as every registered tracker and sees only completed bars in ``ts_init`` order;
 * declares ``AVAILABILITY = "bar_close"``: every field is published at the ``ts_init`` of the last ingested bar;
 * declares ``MAX_STATE_ITEMS``: an explicit bound on the number of container items it keeps;
-* consumes streams only (``INPUTS`` of kind ``stream``), never another tracker, a file or a dataset;
+* consumes at least one stream (``INPUTS`` of kind ``stream``) and, optionally, declared context trackers (kind
+  ``tracker``, e.g. ``atr: regime_1m``). A tracker input is handed over as a READ-ONLY view of that tracker's declared
+  ``FIELDS`` (:class:`ReadOnlyTrackerView`): no private state, no mutation. Upstream trackers update first on the same
+  bar (plan order), exactly as for registered trackers. Never a file or a dataset;
+* may set ``SESSION = True`` to receive ``inputs["session"]``: a read-only :class:`SessionView` of the PUBLISHED
+  exchange schedule (population-session window, trading-day window, in-session test). The schedule is known in
+  advance; it carries no price, volume or outcome;
 * imports only the allow-list below. No pandas / polars / pyarrow, no file or OS access, no ``importlib`` or ``sys``,
   no ``studies.*`` imports, no relative imports, no ``open`` / ``eval`` / ``exec`` / ``__import__``;
 * passes the generated causality harness (:func:`causality_check`) at compile time: determinism, prefix invariance,
@@ -120,9 +126,13 @@ def load_observer(path: Path, study_id: str, name: str) -> type:
         raise ObserverError("OBSERVER_STATE_UNBOUNDED", f"{cls.__name__}.MAX_STATE_ITEMS must be a positive int")
     if not cls.FIELDS:
         raise ObserverError("OBSERVER_CLASS_INVALID", f"{cls.__name__} declares no FIELDS")
-    non_stream = [k for k, v in cls.INPUTS.items() if v.rstrip("?") != "stream"]
-    if non_stream or not cls.INPUTS:
-        raise ObserverError("OBSERVER_INPUTS_INVALID", f"{cls.__name__} must consume streams only (got {dict(cls.INPUTS)})")
+    kinds = {k: str(v).rstrip("?") for k, v in cls.INPUTS.items()}
+    bad_kinds = [k for k, v in kinds.items() if v not in ("stream", "tracker")]
+    if bad_kinds or "stream" not in kinds.values() or "session" in kinds:
+        raise ObserverError("OBSERVER_INPUTS_INVALID", f"{cls.__name__} must consume >= 1 stream plus optional context trackers; "
+                            f"'session' is reserved for SESSION = True (got {dict(cls.INPUTS)})")
+    if not isinstance(getattr(cls, "SESSION", False), bool):
+        raise ObserverError("OBSERVER_CLASS_INVALID", f"{cls.__name__}.SESSION must be a bool")
     if cls.EVENTS or cls.SUBSCRIBES or cls.EPOCH_FIELDS or getattr(cls, "NEEDS_STUDIES_ROOT", False):
         raise ObserverError("OBSERVER_CLASS_INVALID", "an observer publishes FIELDS only (no EVENTS / SUBSCRIBES / EPOCH_FIELDS / studies_root)")
     return cls
@@ -172,6 +182,75 @@ def bound_observer_files(study_dir: Path, plan: Mapping[str, Any]) -> set:
     return out
 
 
+# --------------------------------------------------------------------------- read-only inputs
+class ObserverFieldError(ObserverError, AttributeError):
+    """An undeclared attribute of a read-only view (an AttributeError, so ``hasattr`` stays well-behaved)."""
+
+
+class ReadOnlyTrackerView:
+    """What an observer sees of a context tracker: its declared FIELDS, read at call time, nothing else."""
+    __slots__ = ("_t", "_f")
+
+    def __init__(self, tracker: Any, fields: Any) -> None:
+        object.__setattr__(self, "_t", tracker)
+        object.__setattr__(self, "_f", frozenset(fields))
+
+    def __getattr__(self, name: str) -> Any:
+        if name in object.__getattribute__(self, "_f"):
+            v = getattr(object.__getattribute__(self, "_t"), name, None)
+            if isinstance(v, (int, float, bool, str)) or v is None:
+                return v
+            raise ObserverError("OBSERVER_TRACKER_FIELD_NOT_SCALAR", f"tracker field {name!r} is not a scalar")
+        raise ObserverFieldError("OBSERVER_TRACKER_FIELD_UNDECLARED", f"{name!r} is not a declared FIELD of the input tracker")
+
+    def __setattr__(self, name: str, value: Any) -> None:
+        raise ObserverError("OBSERVER_TRACKER_VIEW_READ_ONLY", "a tracker input is read-only")
+
+
+class SessionView:
+    """Read-only view of the published schedule. ``session_window(ts)`` / ``trading_day_window(ts)`` return the
+    ``(open_ns, close_ns)`` row whose (open, close] window contains ``ts`` (None outside one, or when the table has no
+    explicit rows); ``in_session(ts)``. Rows come from the dataset's hash-verified reference calendar."""
+    __slots__ = ("_g", "_d", "name")
+
+    def __init__(self, table: Any) -> None:
+        object.__setattr__(self, "_g", table)
+        object.__setattr__(self, "_d", getattr(table, "trading_day", None))
+        object.__setattr__(self, "name", getattr(table, "name", None))
+
+    @staticmethod
+    def _window(tab: Any, ts: int) -> Optional[Tuple[int, int]]:
+        if tab is None or not hasattr(tab, "_opens"):
+            return None
+        i = tab._row(int(ts))
+        if i is None or not (tab._opens[i] < int(ts) <= tab._closes[i]):
+            return None
+        return (int(tab._opens[i]), int(tab._closes[i]))
+
+    def session_window(self, ts: int) -> Optional[Tuple[int, int]]:
+        return self._window(object.__getattribute__(self, "_g"), ts)
+
+    def trading_day_window(self, ts: int) -> Optional[Tuple[int, int]]:
+        return self._window(object.__getattribute__(self, "_d"), ts)
+
+    def in_session(self, ts: int) -> bool:
+        g = object.__getattribute__(self, "_g")
+        return bool(g is not None and g.in_session(int(ts)))
+
+    def __setattr__(self, name: str, value: Any) -> None:
+        raise ObserverError("OBSERVER_SESSION_VIEW_READ_ONLY", "the session view is read-only")
+
+
+def observer_inputs(cls: type, resolved: Mapping[str, Any], session_table: Any) -> Dict[str, Any]:
+    """Host + harness: wrap tracker inputs read-only and inject the session view. Stream inputs pass through as keys."""
+    out: Dict[str, Any] = {}
+    for k, v in resolved.items():
+        out[k] = v if isinstance(v, str) else ReadOnlyTrackerView(v, getattr(type(v), "FIELDS", ()))
+    if getattr(cls, "SESSION", False):
+        out["session"] = SessionView(session_table)
+    return out
+
+
 # --------------------------------------------------------------------------- generated causality harness
 def synthetic_tape(n_sessions: int = 3, seconds: int = 1500, seed: int = 20261120, stream: str = "obs") -> list:
     """Deterministic 1 s tape: sessions separated by an overnight gap, irregular intra-session gaps, zero-volume rows,
@@ -208,8 +287,8 @@ def _perturb(bars: list, cut: int, seed: int) -> list:
 
 
 def _items(obj: Any, depth: int = 0) -> int:
-    if depth > 6:
-        return 0
+    if depth > 6 or isinstance(obj, (ReadOnlyTrackerView, SessionView)):
+        return 0                                   # injected read-only inputs are not the observer's own state
     if isinstance(obj, Mapping):
         return len(obj) + sum(_items(v, depth + 1) for v in obj.values())
     if isinstance(obj, (list, tuple, set, frozenset)) or type(obj).__name__ == "deque":
@@ -225,12 +304,41 @@ def _norm(v: Any) -> Any:
     return v
 
 
-def _run(cls: type, params: Mapping[str, Any], bars: list, every: int = 1) -> Tuple[List[tuple], int]:
-    inputs = {k: "obs" for k in cls.INPUTS}
-    obj = cls(dict(params), inputs)
-    key = next(iter(cls.INPUTS))
+def synthetic_sessions(bars: list) -> Any:
+    """The harness calendar: one session per contiguous block of the tape (the overnight gap separates them)."""
+    from research_workflow.sessions import CalendarSessionTable
+    rows: List[Tuple[int, int]] = []
+    start = prev = None
+    for b in bars:
+        if start is None:
+            start = b.ts_init - NS
+        elif b.ts_init - prev > 3600 * NS:
+            rows.append((start, prev))
+            start = b.ts_init - NS
+        prev = b.ts_init
+    if start is not None:
+        rows.append((start, prev))
+    table = CalendarSessionTable(rows, name="SYNTHETIC")
+    table.trading_day = CalendarSessionTable([(a - 3600 * NS, b + 1800 * NS) for a, b in rows], name="TRADING_DAY")
+    return table
+
+
+def _stream_keys(cls: type) -> List[str]:
+    return [k for k, kind in cls.INPUTS.items() if str(kind).rstrip("?") == "stream"]
+
+
+def _run(cls: type, params: Mapping[str, Any], bars: list, every: int = 1,
+         upstream: Optional[Mapping[str, Tuple[type, Mapping[str, Any]]]] = None) -> Tuple[List[tuple], int]:
+    ups = {k: ucls(dict(uparams), {ik: "obs" for ik in _stream_keys(ucls)}) for k, (ucls, uparams) in (upstream or {}).items()}
+    resolved: Dict[str, Any] = {k: "obs" for k in _stream_keys(cls)}
+    resolved.update({k: ups[k] for k in cls.INPUTS if k in ups})
+    obj = cls(dict(params), observer_inputs(cls, resolved, synthetic_sessions(bars) if bars else None))
+    key = _stream_keys(cls)[0]
     snaps, peak = [], 0
     for i, b in enumerate(bars):
+        for u in ups.values():                     # upstream first, as in the host (plan order)
+            for ik in _stream_keys(type(u)):
+                u.on_bar(ik, b)
         obj.on_bar(key, b)
         snaps.append(tuple(_norm(getattr(obj, f, None)) for f in cls.FIELDS))
         if i % every == 0:
@@ -238,14 +346,23 @@ def _run(cls: type, params: Mapping[str, Any], bars: list, every: int = 1) -> Tu
     return snaps, peak
 
 
-def causality_check(cls: type, params: Mapping[str, Any]) -> Dict[str, Any]:
+def causality_check(cls: type, params: Mapping[str, Any],
+                    upstream: Optional[Mapping[str, Tuple[type, Mapping[str, Any]]]] = None) -> Dict[str, Any]:
     """Generated harness every study-local observer must pass at compile time. Returns a compact JSON-able report;
-    ``passed`` is False with the first failing check named."""
+    ``passed`` is False with the first failing check named. ``upstream`` maps each tracker input to the REAL bound
+    tracker class + params; the harness rebuilds that chain on the tape, so the perturbation covers the composition."""
     tape = synthetic_tape()
-    report: Dict[str, Any] = {"bars": len(tape), "checks": {}, "passed": False}
+    report: Dict[str, Any] = {"bars": len(tape), "checks": {}, "passed": False, "upstream": sorted(upstream or {})}
+    for k, (ucls, _p) in (upstream or {}).items():
+        if any(str(kind).rstrip("?") != "stream" for kind in ucls.INPUTS.values()):
+            report["failure"] = f"OBSERVER_HARNESS_UNSUPPORTED_UPSTREAM: input {k!r} ({ucls.__name__}) itself consumes trackers"
+            return report
+
+    def run(bars: list, every: int) -> Tuple[List[tuple], int]:
+        return _run(cls, params, bars, every, upstream)
     try:
-        full, peak = _run(cls, params, tape, every=25)
-        again, _ = _run(cls, params, tape, every=10**9)
+        full, peak = run(tape, 25)
+        again, _ = run(tape, 10**9)
     except Exception as exc:  # the observer crashed on ordinary input
         report["failure"] = f"OBSERVER_RUNTIME_ERROR: {type(exc).__name__}: {exc}"
         return report
@@ -256,9 +373,9 @@ def causality_check(cls: type, params: Mapping[str, Any]) -> Dict[str, Any]:
     prefix_ok, future_ok = True, True
     for j, frac in enumerate((0.2, 0.5, 0.8)):
         cut = int(len(tape) * frac)
-        pre, _ = _run(cls, params, tape[:cut + 1], every=10**9)
+        pre, _ = run(tape[:cut + 1], 10**9)
         prefix_ok &= pre == full[:cut + 1]
-        pert, _ = _run(cls, params, _perturb(tape, cut, seed=j + 1), every=10**9)
+        pert, _ = run(_perturb(tape, cut, seed=j + 1), 10**9)
         future_ok &= pert[:cut + 1] == full[:cut + 1]
     report["checks"]["prefix_invariance"] = prefix_ok
     report["checks"]["future_perturbation"] = future_ok
@@ -277,4 +394,5 @@ def causality_check(cls: type, params: Mapping[str, Any]) -> Dict[str, Any]:
 
 
 __all__ = ["PREFIX", "ObserverError", "observer_name", "observer_file", "static_violations", "load_observer",
-           "implementation_ref", "resolve_implementation", "bound_observer_files", "synthetic_tape", "causality_check"]
+           "implementation_ref", "resolve_implementation", "bound_observer_files", "synthetic_tape", "causality_check",
+           "ReadOnlyTrackerView", "SessionView", "observer_inputs", "synthetic_sessions"]

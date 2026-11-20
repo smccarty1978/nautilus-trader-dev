@@ -135,6 +135,10 @@ class HostCore:
             params = dict(t.get("params") or {})
             if getattr(cls, "NEEDS_STUDIES_ROOT", False):
                 params.setdefault("studies_root", self.studies_root)
+            if str(t["implementation"]).startswith("study_local:"):
+                # a study-local observer sees tracker inputs read-only (declared FIELDS) and, if it asks, the schedule
+                from research_workflow.study_observers import observer_inputs
+                inputs_resolved = observer_inputs(cls, inputs_resolved, self.session_table)
             obj = cls(params, inputs_resolved)
             obj.tracker_id = t["id"]                 # a binding's runtime errors name the plan's tracker
             self.trackers[t["id"]] = obj

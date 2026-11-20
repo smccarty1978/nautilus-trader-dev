@@ -107,8 +107,10 @@ def test_observer_must_live_in_its_own_study_and_declare_availability_and_bound(
         _load(tmp_path, OBSERVER.replace('    AVAILABILITY = "bar_close"\n', ""), study="c")
     with pytest.raises(SO.ObserverError, match="OBSERVER_STATE_UNBOUNDED"):
         _load(tmp_path, OBSERVER.replace("    MAX_STATE_ITEMS = 128\n", ""), study="d")
-    with pytest.raises(SO.ObserverError, match="OBSERVER_INPUTS_INVALID"):
-        _load(tmp_path, OBSERVER.replace('INPUTS = {"bars": "stream"}', 'INPUTS = {"bars": "stream", "regime": "tracker"}'), study="e")
+    # tracker inputs are allowed (read-only views); a stream is still required, unknown kinds and "session" are refused
+    for i, bad in enumerate(('{"regime": "tracker"}', '{"bars": "stream", "x": "file"}', '{"bars": "stream", "session": "stream"}')):
+        with pytest.raises(SO.ObserverError, match="OBSERVER_INPUTS_INVALID"):
+            _load(tmp_path, OBSERVER.replace('INPUTS = {"bars": "stream"}', f"INPUTS = {bad}"), study=f"e{i}")
 
 
 def test_host_refuses_a_study_local_implementation_for_another_study(tmp_path):
