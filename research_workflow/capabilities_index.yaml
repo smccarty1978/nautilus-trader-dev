@@ -166,8 +166,11 @@ trackers:
   update_cadence: per_source_bar
   required_tests:
   - features/tests/test_volume_clock_developing.py
-  status_override: candidate
   proposal: research_workflow/capabilities/proposals/tracker.volume_clock.developing.yaml
+  promotion:
+    parity_artifact: artifacts\parity\volume_clock_developing.json
+    parity_sha256: ffc1e6d06c43e5ef475c42aadb8bed4c7f76c9bfdd57305ce66e81b693042bf0
+    promoted_at_utc: '2026-11-20T08:08:47.135468+00:00'
 trigger_primitives:
 - id: trigger.population.established_filter
   version: 1
