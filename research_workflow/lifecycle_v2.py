@@ -678,7 +678,17 @@ class V2Lifecycle:
         is a reject unless the study id has a platform-sanctioned exception. Returns
         (python_files, exception_reason_or_None)."""
         from research_workflow.policy import STUDY_PYTHON_EXCEPTIONS, scan_study_python
-        py_files = scan_study_python(self.study)
+        from research_workflow.study_observers import bound_observer_files
+        # WORKFLOW.md §Q / golden rule 7: an observers/<name>.py that the compiled plan binds as a study-local observer
+        # (static isolation check + generated causality harness passed at compile, file hashed into the closure) is the
+        # one sanctioned kind of study Python. Any other file -- including an observer the plan does not bind -- still fails.
+        plan_p = self.study / PLAN_NAME
+        plan_d = _read(plan_p) if plan_p.is_file() else {}
+        bound = bound_observer_files(self.study, plan_d)
+        # declared study-local targeted tests are exempt only while the plan declares them AND their bytes still match
+        bound |= {t["path"] for t in (plan_d.get("study_tests") or [])
+                  if (self.study / t["path"]).is_file() and _sha(self.study / t["path"]) == t.get("sha256")}
+        py_files = [f for f in scan_study_python(self.study) if f not in bound]
         return py_files, (STUDY_PYTHON_EXCEPTIONS.get(self.study.name) if py_files else None)
 
     def _seal_identities(self) -> Dict[str, str]:
@@ -829,6 +839,14 @@ class V2Lifecycle:
     def tests(self, study: Path | None = None) -> Dict[str, Any]:
         frozen = _read(self.audit / "frozen_execution_manifest.json").get("frozen_execution_composite_sha256")
         files = [str(self.repo_root / t) for t in PLATFORM_TESTS if (self.repo_root / t).is_file()]
+        # declared study-local targeted tests (hash-checked: an edited test is a new plan, never a silently different run)
+        plan_d = load_plan(self.study)
+        study_tests = plan_d.get("study_tests") or []
+        for t in study_tests:
+            p = self.study / t["path"]
+            if not p.is_file() or _sha(p) != t.get("sha256"):
+                raise LifecycleV2Error(f"STUDY_TEST_CHANGED: {t['path']} no longer matches the compiled plan; recompile")
+            files.append(str(p))
         r = subprocess.run([sys.executable, "-m", "pytest", "-q", "-p", "no:cacheprovider", *files], cwd=str(self.repo_root),
                            capture_output=True, text=True)
         tail = (r.stdout + r.stderr)[-3000:]
@@ -836,7 +854,8 @@ class V2Lifecycle:
         m = re.search(r"(\d+) passed", tail); f = re.search(r"(\d+) failed", tail)
         counts = {"passed": int(m.group(1)) if m else 0, "failed": int(f.group(1)) if f else 0}
         status = "PASS" if r.returncode == 0 else "FAIL"
-        path = _write(self.work / "test_summary.json", {"status": status, "counts": counts, "files": files, "execution_composite_sha256": frozen, "tail": tail})
+        path = _write(self.work / "test_summary.json", {"status": status, "counts": counts, "files": files, "execution_composite_sha256": frozen, "tail": tail,
+                                                        "study_tests_sha256": hashlib.sha256(json.dumps(study_tests, sort_keys=True).encode()).hexdigest()})
         if status != "PASS":
             raise LifecycleV2Error(f"PLATFORM_TESTS_FAILED: {counts}")
         return {"status": "PASS", "outputs": [str(path)]}
@@ -856,6 +875,9 @@ class V2Lifecycle:
             st = _read(self.audit / name)
             if st.get("verdict") != "CLEAR" or st.get("audited_execution_composite_sha256") != frozen:
                 raise LifecycleV2Error(f"AUDIT_NOT_CLEAR_OR_STALE: {kind}")
+            if st.get("audited_plan_sha256") != plan.get("plan_sha256"):
+                # the audit reviewed another scientific definition (or predates plan binding): never inherit it
+                raise LifecycleV2Error(f"AUDIT_NOT_CLEAR_OR_STALE: {kind} audited plan {st.get('audited_plan_sha256')} != sealed plan {plan.get('plan_sha256')}")
             audits[kind] = {"auditor": st.get("auditor"), "report_sha256": st.get("audit_report_sha256"), "status_sha256": _sha(self.audit / name)}
         body = {"schema_version": 2, "platform": "v2", "study_id": plan["study"]["id"], "plan_sha256": plan["plan_sha256"],
                 "execution_manifest_composite_sha256": frozen, "audits": audits, "registry_sha256": plan.get("registry_sha256"), "sealed_at_utc": _now()}
@@ -2357,6 +2379,15 @@ class V2Lifecycle:
                 bound[key] = binding
         body = {"schema_version": 1, "study_id": self.study.name, "status": "CLOSED", "outcome": str(closure["outcome"]), "terminal_decision": str(closure["terminal_decision"]),
                 "platform": "v2", "plan_sha256": load_plan(self.study).get("plan_sha256"), "closed_at_utc": _now(), "bound_evidence": bound}
+        if load_plan(self.study).get("explore"):
+            # tier: explore closes ISOLATED, and only with its delivered result (card + machine record + ledger event)
+            res, card = self.artifacts / "result.json", self.study / "RESULT_CARD.md"
+            if not (res.is_file() and card.is_file()) or _read(res).get("plan_sha256") != body["plan_sha256"]:
+                raise LifecycleV2Error("EXPLORE_RESULT_REQUIRED: an explore study closes only with artifacts/result.json + RESULT_CARD.md for this plan")
+            body["isolation"] = "CLOSED_ISOLATED"
+            body["explore_result"] = {"path": "artifacts/result.json", "artifact_file_sha256": _sha(res), "card_sha256": _sha(card),
+                                      "attempt_id": _read(res).get("attempt_id"), "claim_level": _read(res).get("claim_level"),
+                                      "not_implied": ["shared-code promotion", "platform merge", "production readiness", "permission to trade"]}
         # DEV-08: validate BEFORE the closure persists, and never leave a rejected closure on disk -- a rejected
         # closure that remained was later honoured as the study's terminal authority.
         from research_workflow.study_closure import _validate_terminal_decision, load_study_closure
@@ -2398,7 +2429,14 @@ def ingest_audit_report(study: Path, audit_type: str, report: Path, author: Opti
     verdict = summary["verdict"]
     if verdict == "CLEAR" and counts["critical"] > 0:
         verdict = "BLOCKED"
+    # The scientific definition the auditor reviewed: the packet's plan (or the current plan). A report that names a
+    # different plan was written for another definition and is refused (autonomous_explore, D1).
+    from scripts.run_preexec_audits import audited_plan_sha256
+    reviewed = audited_plan_sha256(study, audit_type)
+    if summary.get("audited_plan_sha256") and summary["audited_plan_sha256"] != reviewed:
+        raise LifecycleV2Error(f"AUDIT_PLAN_STALE: the report names plan {summary['audited_plan_sha256']}, the packet/plan is {reviewed}")
     body = {"audit_type": audit_type, "auditor": auditor, "verdict": verdict, **counts, "audited_execution_composite_sha256": frozen,
+            "audited_plan_sha256": reviewed,
             "audit_report_sha256": _sha(report), "audit_report_path": str(report.relative_to(study)) if study in report.parents else str(report),
             "derived_by_parser": "research_workflow.lifecycle_v2.ingest_audit_report", "platform": "v2", "issued_at_utc": _now()}
     path = _write(study / "audit" / name, body)

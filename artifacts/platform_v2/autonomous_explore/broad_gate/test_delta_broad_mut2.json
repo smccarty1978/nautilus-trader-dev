@@ -1,0 +1,813 @@
+{
+  "STATUS": "NEW_FAILURES",
+  "baseline": "C:\\Users\\Scott McCarty\\Projects\\NT-ae-mut2\\config\\test_failure_baseline.json",
+  "baseline_commit": "c480d8af0068c69d19669497c53747efa187b5dd",
+  "head": "600e7c71",
+  "baseline_issues": [
+    "BASELINE_COMMIT_MISMATCH",
+    "BASELINE_ENVIRONMENT_MISMATCH"
+  ],
+  "pytest_exit_code": 1,
+  "wall_seconds": 313.27626989991404,
+  "per_test_timings": {
+    "scripts/tests/test_rt_final_blockers.py::test_rt2b1_every_alias_that_executes_enters_the_closure[from_dot_import_a_b]": {
+      "seconds": 0.9048113998724148,
+      "phases": {
+        "setup": 0.08250699995551258,
+        "call": 0.8210684999357909,
+        "teardown": 0.001235899981111288
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt2b1_every_alias_that_executes_enters_the_closure[from_dotdot_import_a_b]": {
+      "seconds": 0.7889031001832336,
+      "phases": {
+        "setup": 0.004287100047804415,
+        "call": 0.783369000069797,
+        "teardown": 0.0012470000656321645
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt2b1_every_alias_that_executes_enters_the_closure[from_namespace_pkg_import_a_b]": {
+      "seconds": 0.8604357000440359,
+      "phases": {
+        "setup": 0.002977500087581575,
+        "call": 0.8522727999370545,
+        "teardown": 0.005185400019399822
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt2b1_every_alias_that_executes_enters_the_closure[from_pkg_import_a_b]": {
+      "seconds": 0.8913249999750406,
+      "phases": {
+        "setup": 0.013893599971197546,
+        "call": 0.8762182999635115,
+        "teardown": 0.0012131000403314829
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt2b1_changing_any_included_module_changes_the_composite[from_dot_import_a_b]": {
+      "seconds": 0.06357730005402118,
+      "phases": {
+        "setup": 0.0032627000473439693,
+        "call": 0.05913109995890409,
+        "teardown": 0.0011835000477731228
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt2b1_changing_any_included_module_changes_the_composite[from_dotdot_import_a_b]": {
+      "seconds": 0.036217099986970425,
+      "phases": {
+        "setup": 0.00404919998254627,
+        "call": 0.031042000045999885,
+        "teardown": 0.0011258999584242702
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt2b1_changing_any_included_module_changes_the_composite[from_namespace_pkg_import_a_b]": {
+      "seconds": 0.03288309997878969,
+      "phases": {
+        "setup": 0.005043999990448356,
+        "call": 0.026537599973380566,
+        "teardown": 0.0013015000149607658
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt2b1_changing_any_included_module_changes_the_composite[from_pkg_import_a_b]": {
+      "seconds": 0.09120159992016852,
+      "phases": {
+        "setup": 0.003582000033929944,
+        "call": 0.08646109991241246,
+        "teardown": 0.0011584999738261104
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt2b1_unresolved_alias_is_reported_even_when_a_sibling_resolves": {
+      "seconds": 0.02965890010818839,
+      "phases": {
+        "setup": 0.0035419000778347254,
+        "call": 0.024703399976715446,
+        "teardown": 0.0014136000536382198
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt2b1_relative_unresolved_alias_is_reported_from_a_namespace_base": {
+      "seconds": 0.023223800002597272,
+      "phases": {
+        "setup": 0.003473800024949014,
+        "call": 0.018438900006003678,
+        "teardown": 0.0013110999716445804
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt2b1_attribute_import_from_a_real_package_is_not_a_false_gap": {
+      "seconds": 0.04648029990494251,
+      "phases": {
+        "setup": 0.004690999980084598,
+        "call": 0.03882209991570562,
+        "teardown": 0.002967200009152293
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt2b1_material_case_all_nine_real_trackers_in_one_statement": {
+      "seconds": 1.9824342998908833,
+      "phases": {
+        "setup": 0.006529100006446242,
+        "call": 1.9746110999258235,
+        "teardown": 0.001294099958613515
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt2b2_every_subprocess_invoked_gate_is_inside_the_governance_closure": {
+      "seconds": 0.005728699848987162,
+      "phases": {
+        "setup": 0.002237199922092259,
+        "call": 0.0005036999937146902,
+        "teardown": 0.002987799933180213
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt2b2_extractor_agrees_with_the_preflight_source": {
+      "seconds": 0.00736199994571507,
+      "phases": {
+        "setup": 0.004961899947375059,
+        "call": 0.0011193000245839357,
+        "teardown": 0.001280799973756075
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt2b2_editing_a_governance_authority_moves_the_composite[scripts/select_required_tests.py]": {
+      "seconds": 7.402116999961436,
+      "phases": {
+        "setup": 0.0037441999884322286,
+        "call": 7.39708869997412,
+        "teardown": 0.001284099998883903
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt2b2_editing_a_governance_authority_moves_the_composite[scripts/check_feature_promotion.py]": {
+      "seconds": 6.821323299896903,
+      "phases": {
+        "setup": 0.0036226999945938587,
+        "call": 6.8113029999658465,
+        "teardown": 0.006397599936462939
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt2b2_editing_a_governance_authority_moves_the_composite[features/feature_lifecycle_baseline.json]": {
+      "seconds": 9.717196700163186,
+      "phases": {
+        "setup": 0.016614400083199143,
+        "call": 9.69922820001375,
+        "teardown": 0.0013541000662371516
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt2b2_lifecycle_authority_data_files_are_sealed": {
+      "seconds": 3.4278138001682237,
+      "phases": {
+        "setup": 0.0028707999736070633,
+        "call": 3.4235565001145005,
+        "teardown": 0.0013865000801160932
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt2b2_narrowing_mandatory_test_selection_invalidates_the_seal": {
+      "seconds": 45.93906870007049,
+      "phases": {
+        "setup": 0.0032823000801727176,
+        "call": 45.934467599960044,
+        "teardown": 0.0013188000302761793
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt1b1_bound_evidence_is_accepted": {
+      "seconds": 6.267200099886395,
+      "phases": {
+        "setup": 3.1902568999212235,
+        "call": 3.075717099942267,
+        "teardown": 0.0012261000229045749
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt1b1_two_key_stub_is_refused": {
+      "seconds": 0.017125500016845763,
+      "phases": {
+        "setup": 0.0034917000448331237,
+        "call": 0.012431400013156235,
+        "teardown": 0.0012023999588564038
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt1b1_hand_edited_clear_artifact_is_refused": {
+      "seconds": 3.28558379993774,
+      "phases": {
+        "setup": 3.2559626000002027,
+        "call": 0.028342299978248775,
+        "teardown": 0.0012788999592885375
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt1b1_incomplete_check_set_is_refused_even_if_internally_consistent": {
+      "seconds": 3.3102522999979556,
+      "phases": {
+        "setup": 3.2792761999880895,
+        "call": 0.02978340000845492,
+        "teardown": 0.00119270000141114
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt1b1_stale_composite_is_refused": {
+      "seconds": 6.313975999946706,
+      "phases": {
+        "setup": 3.190416199970059,
+        "call": 3.1222936999984086,
+        "teardown": 0.0012660999782383442
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt1b1_real_code_edit_makes_existing_evidence_stale": {
+      "seconds": 6.439372399938293,
+      "phases": {
+        "setup": 3.251516900025308,
+        "call": 3.1865885999286547,
+        "teardown": 0.0012668999843299389
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt1b1_evidence_from_another_study_is_refused": {
+      "seconds": 3.233140100026503,
+      "phases": {
+        "setup": 3.198429899988696,
+        "call": 0.03335499996319413,
+        "teardown": 0.0013552000746130943
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt1b1_live_blocked_failure_packet_contradicts_clear_evidence": {
+      "seconds": 6.412192199961282,
+      "phases": {
+        "setup": 3.1701694999355823,
+        "call": 3.2404840000672266,
+        "teardown": 0.001538699958473444
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt1b1_superseded_failure_packet_does_not_block": {
+      "seconds": 6.717307499959134,
+      "phases": {
+        "setup": 3.274841499980539,
+        "call": 3.441217500017956,
+        "teardown": 0.0012484999606385827
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt1b1_producer_emits_a_self_consistent_binding": {
+      "seconds": 0.004143300000578165,
+      "phases": {
+        "setup": 0.002660700003616512,
+        "call": 0.00013749999925494194,
+        "teardown": 0.0013450999977067113
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt3b1_deleting_the_anchor_fails_closed": {
+      "seconds": 0.3694003999698907,
+      "phases": {
+        "setup": 0.0891651000129059,
+        "call": 0.27901249995920807,
+        "teardown": 0.0012227999977767467
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt3b1_deleting_the_ledger_still_fails_closed": {
+      "seconds": 0.2943151001818478,
+      "phases": {
+        "setup": 0.08575070009101182,
+        "call": 0.2073096000822261,
+        "teardown": 0.001254800008609891
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt3b1_deleting_both_fails_closed": {
+      "seconds": 0.3134299000957981,
+      "phases": {
+        "setup": 0.08089920005295426,
+        "call": 0.23127230000682175,
+        "teardown": 0.001258400036022067
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt3b1_rolling_back_anchor_and_ledger_together_is_detected": {
+      "seconds": 0.3275993999559432,
+      "phases": {
+        "setup": 0.08993929997086525,
+        "call": 0.23645760002546012,
+        "teardown": 0.0012024999596178532
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt3b1_rolling_back_the_anchor_only_is_detected": {
+      "seconds": 0.2359499998856336,
+      "phases": {
+        "setup": 0.07776350004132837,
+        "call": 0.1568813999183476,
+        "teardown": 0.0013050999259576201
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt3b1_rolling_back_the_ledger_only_is_detected": {
+      "seconds": 0.23026430001482368,
+      "phases": {
+        "setup": 0.07673470000736415,
+        "call": 0.15225779998581856,
+        "teardown": 0.0012718000216409564
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt3b1_foreign_anchor_is_refused": {
+      "seconds": 0.129527100129053,
+      "phases": {
+        "setup": 0.07767729996703565,
+        "call": 0.050587300094775856,
+        "teardown": 0.0012625000672414899
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt3b1_corrupt_anchor_is_refused": {
+      "seconds": 0.14374460000544786,
+      "phases": {
+        "setup": 0.0755743000190705,
+        "call": 0.06688439997378737,
+        "teardown": 0.001285900012589991
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt3b1_edited_anchor_entries_are_refused": {
+      "seconds": 0.1568848000606522,
+      "phases": {
+        "setup": 0.07550219993572682,
+        "call": 0.08014520001597703,
+        "teardown": 0.00123740010894835
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt3b1_environment_cannot_redirect_production_lineage": {
+      "seconds": 0.29118889989331365,
+      "phases": {
+        "setup": 0.07663819997105747,
+        "call": 0.2131394000025466,
+        "teardown": 0.0014112999197095633
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt3b1_test_override_refuses_outside_pytest": {
+      "seconds": 0.0036680001066997647,
+      "phases": {
+        "setup": 0.0024506000336259604,
+        "call": 0.0002300000051036477,
+        "teardown": 0.0009874000679701567
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt3b1_fresh_study_with_no_history_is_not_blocked": {
+      "seconds": 0.11807790002785623,
+      "phases": {
+        "setup": 0.07667029998265207,
+        "call": 0.039384800009429455,
+        "teardown": 0.002022800035774708
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt3b1_copied_study_needs_explicit_bootstrap": {
+      "seconds": 1.0158377999905497,
+      "phases": {
+        "setup": 0.0766839999705553,
+        "call": 0.9379010000266135,
+        "teardown": 0.0012527999933809042
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt3b1_recreated_study_with_same_identity_cannot_reset": {
+      "seconds": 0.314524200046435,
+      "phases": {
+        "setup": 0.07155069999862462,
+        "call": 0.24183200008701533,
+        "teardown": 0.001141499960795045
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt3b1_anchor_is_repository_visible_and_not_ignored": {
+      "seconds": 0.024814600008539855,
+      "phases": {
+        "setup": 0.00241650000680238,
+        "call": 0.021125799976289272,
+        "teardown": 0.001272300025448203
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt3b1_acceptance_study_has_a_durable_anchor": {
+      "seconds": 0.0038579999236389995,
+      "phases": {
+        "setup": 0.002549499971792102,
+        "call": 0.0003189999843016267,
+        "teardown": 0.000989499967545271
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_rt3b1_anchor_carries_a_monotonic_chain": {
+      "seconds": 0.2397233999799937,
+      "phases": {
+        "setup": 0.07551849994342774,
+        "call": 0.16141860000789165,
+        "teardown": 0.0027863000286743045
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_wa_study_config_json_is_inside_the_sealed_identity": {
+      "seconds": 3.0875010000308976,
+      "phases": {
+        "setup": 0.005217900034040213,
+        "call": 3.0811126000480726,
+        "teardown": 0.001170499948784709
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_wa_editing_deliverables_after_sealing_moves_the_composite": {
+      "seconds": 6.403799599967897,
+      "phases": {
+        "setup": 0.003925599972717464,
+        "call": 6.398569199955091,
+        "teardown": 0.001304800040088594
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_wa_validate_smoke_consumes_the_sealed_authority": {
+      "seconds": 0.004021799890324473,
+      "phases": {
+        "setup": 0.0026622998993843794,
+        "call": 0.00030529999639838934,
+        "teardown": 0.0010541999945417047
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_wa_sidecar_drift_from_the_compiled_contract_is_refused": {
+      "seconds": 0.04165699996519834,
+      "phases": {
+        "setup": 0.003966799937188625,
+        "call": 0.03652730002067983,
+        "teardown": 0.0011629000073298812
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_wa_compiled_contract_still_requires_the_collection_manifest": {
+      "seconds": 0.0038464999524876475,
+      "phases": {
+        "setup": 0.002561999950557947,
+        "call": 0.0003442999441176653,
+        "teardown": 0.0009402000578120351
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_wb_budget_exceeds_the_recorded_measurement_with_margin": {
+      "seconds": 0.0033866000594571233,
+      "phases": {
+        "setup": 0.002334499964490533,
+        "call": 0.00011790008284151554,
+        "teardown": 0.0009342000121250749
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_wb_preflight_uses_the_budget_constant_not_a_literal": {
+      "seconds": 0.004047799971885979,
+      "phases": {
+        "setup": 0.0024565999628975987,
+        "call": 0.00036449998151510954,
+        "teardown": 0.001226700027473271
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_wb_timeout_still_blocks": {
+      "seconds": 124.19104879989754,
+      "phases": {
+        "setup": 0.004210099927149713,
+        "call": 124.18543359998148,
+        "teardown": 0.0014050999889150262
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_wb_skip_tests_remains_non_audit_ready": {
+      "seconds": 14.099234600085765,
+      "phases": {
+        "setup": 0.004178400035016239,
+        "call": 14.093859700020403,
+        "teardown": 0.0011965000303462148
+      }
+    },
+    "scripts/tests/test_rt_final_blockers.py::test_wb_mandatory_selection_is_non_empty_and_discoverable": {
+      "seconds": 0.9479834999656305,
+      "phases": {
+        "setup": 0.0025531999999657273,
+        "call": 0.9441726999357343,
+        "teardown": 0.0012576000299304724
+      }
+    },
+    "scripts/tests/test_audit_pass_immutability.py::test_first_issuance_of_a_pass_is_permitted": {
+      "seconds": 0.04145340004470199,
+      "phases": {
+        "setup": 0.005452200071886182,
+        "call": 0.03478920005727559,
+        "teardown": 0.0012119999155402184
+      }
+    },
+    "scripts/tests/test_audit_pass_immutability.py::test_identical_reissue_is_idempotent": {
+      "seconds": 0.10415190004277974,
+      "phases": {
+        "setup": 0.005259800003841519,
+        "call": 0.09762120002415031,
+        "teardown": 0.0012709000147879124
+      }
+    },
+    "scripts/tests/test_audit_pass_immutability.py::test_overwriting_pass_01_for_a_new_composite_is_refused": {
+      "seconds": 0.10529339988715947,
+      "phases": {
+        "setup": 0.005698899971321225,
+        "call": 0.09840649995021522,
+        "teardown": 0.0011879999656230211
+      }
+    },
+    "scripts/tests/test_audit_pass_immutability.py::test_rewriting_the_report_under_the_same_composite_is_refused": {
+      "seconds": 0.34494020009879023,
+      "phases": {
+        "setup": 0.005141400033608079,
+        "call": 0.33859729999676347,
+        "teardown": 0.0012015000684186816
+      }
+    },
+    "scripts/tests/test_audit_pass_immutability.py::test_new_composite_requires_a_higher_pass_number": {
+      "seconds": 0.20209109981078655,
+      "phases": {
+        "setup": 0.0056850999826565385,
+        "call": 0.19510079990141094,
+        "teardown": 0.0013051999267190695
+      }
+    },
+    "scripts/tests/test_audit_pass_immutability.py::test_occupied_pass_number_is_refused_before_the_ordering_rule": {
+      "seconds": 0.18504539993591607,
+      "phases": {
+        "setup": 0.0063980999402701855,
+        "call": 0.17747150000650436,
+        "teardown": 0.0011757999891415238
+      }
+    },
+    "scripts/tests/test_audit_pass_immutability.py::test_contract_gate_has_an_independent_pass_sequence": {
+      "seconds": 0.10101909993682057,
+      "phases": {
+        "setup": 0.006542099989019334,
+        "call": 0.09301829989999533,
+        "teardown": 0.0014587000478059053
+      }
+    },
+    "scripts/tests/test_audit_pass_immutability.py::test_ledger_is_append_only": {
+      "seconds": 0.11575920006725937,
+      "phases": {
+        "setup": 0.005901800002902746,
+        "call": 0.10872280003968626,
+        "teardown": 0.0011346000246703625
+      }
+    },
+    "scripts/tests/test_audit_pass_immutability.py::test_corrupt_ledger_fails_closed": {
+      "seconds": 0.009040700155310333,
+      "phases": {
+        "setup": 0.005679900059476495,
+        "call": 0.002177600050345063,
+        "teardown": 0.0011832000454887748
+      }
+    },
+    "scripts/tests/test_audit_pass_immutability.py::test_malformed_ledger_fails_closed": {
+      "seconds": 0.020346499979496002,
+      "phases": {
+        "setup": 0.0060677999863401055,
+        "call": 0.013083699974231422,
+        "teardown": 0.0011950000189244747
+      }
+    },
+    "scripts/tests/test_audit_pass_immutability.py::test_absent_transcript_is_recorded_explicitly_not_silently": {
+      "seconds": 0.005726699950173497,
+      "phases": {
+        "setup": 0.004521699971519411,
+        "call": 0.00014649995137006044,
+        "teardown": 0.0010585000272840261
+      }
+    },
+    "scripts/tests/test_audit_pass_immutability.py::test_supplied_transcript_is_attached_not_promoted": {
+      "seconds": 0.018030900042504072,
+      "phases": {
+        "setup": 0.004199400078505278,
+        "call": 0.012635799939744174,
+        "teardown": 0.00119570002425462
+      }
+    },
+    "scripts/tests/test_audit_pass_immutability.py::test_nonexistent_transcript_does_not_upgrade_strength": {
+      "seconds": 0.005911099840886891,
+      "phases": {
+        "setup": 0.004516699933446944,
+        "call": 0.0002505999291315675,
+        "teardown": 0.0011437999783083797
+      }
+    },
+    "scripts/tests/test_audit_pass_immutability.py::test_independence_is_never_claimed_as_proven": {
+      "seconds": 0.006746100028976798,
+      "phases": {
+        "setup": 0.0048145001055672765,
+        "call": 0.0007376000285148621,
+        "teardown": 0.0011939998948946595
+      }
+    },
+    "scripts/tests/test_audit_pass_immutability.py::test_seal_refuses_a_status_that_overclaims_independence": {
+      "seconds": 0.006972300005145371,
+      "phases": {
+        "setup": 0.004696100018918514,
+        "call": 0.0008700999896973372,
+        "teardown": 0.0014060999965295196
+      }
+    },
+    "scripts/tests/test_audit_pass_immutability.py::test_post_audit_edit_to_a_closure_file_invalidates_the_seal": {
+      "seconds": 5.253994799917564,
+      "phases": {
+        "setup": 0.0030807999428361654,
+        "call": 5.249769399990328,
+        "teardown": 0.0011445999843999743
+      }
+    },
+    "scripts/tests/test_run_lifecycle_and_dates.py::test_preflight_artifacts_carry_a_generation_identity": {
+      "seconds": 1.5007791001116857,
+      "phases": {
+        "setup": 0.004166300059296191,
+        "call": 1.4950713999569416,
+        "teardown": 0.001541400095447898
+      }
+    },
+    "scripts/tests/test_run_lifecycle_and_dates.py::test_clear_preflight_supersedes_but_does_not_delete_a_failure_packet": {
+      "seconds": 1.5785049999831244,
+      "phases": {
+        "setup": 0.00472029997035861,
+        "call": 1.5697778000030667,
+        "teardown": 0.004006900009699166
+      }
+    },
+    "scripts/tests/test_run_lifecycle_and_dates.py::test_blocked_preflight_packet_is_bound_to_its_own_run": {
+      "seconds": 0.8014153999974951,
+      "phases": {
+        "setup": 0.008974600001238286,
+        "call": 0.7912016999907792,
+        "teardown": 0.0012391000054776669
+      }
+    },
+    "scripts/tests/test_run_lifecycle_and_dates.py::test_running_manifest_with_a_dead_pid_is_abandoned": {
+      "seconds": 0.19355939992237836,
+      "phases": {
+        "setup": 0.004504699958488345,
+        "call": 0.1868743000086397,
+        "teardown": 0.002180399955250323
+      }
+    },
+    "scripts/tests/test_run_lifecycle_and_dates.py::test_running_manifest_with_a_live_pid_is_still_running": {
+      "seconds": 0.1795547999208793,
+      "phases": {
+        "setup": 0.004168799961917102,
+        "call": 0.1728063999908045,
+        "teardown": 0.0025795999681577086
+      }
+    },
+    "scripts/tests/test_run_lifecycle_and_dates.py::test_running_manifest_with_no_pid_is_abandoned": {
+      "seconds": 0.016936000087298453,
+      "phases": {
+        "setup": 0.005752400029450655,
+        "call": 0.009757300023920834,
+        "teardown": 0.0014263000339269638
+      }
+    },
+    "scripts/tests/test_run_lifecycle_and_dates.py::test_successful_run_keeps_its_own_terminal_status": {
+      "seconds": 0.030319300130940974,
+      "phases": {
+        "setup": 0.004993500071577728,
+        "call": 0.022811600007116795,
+        "teardown": 0.0025142000522464514
+      }
+    },
+    "scripts/tests/test_run_lifecycle_and_dates.py::test_failed_validation_is_a_distinct_terminal_state": {
+      "seconds": 0.028763099922798574,
+      "phases": {
+        "setup": 0.005255599971860647,
+        "call": 0.0212032999843359,
+        "teardown": 0.0023041999666020274
+      }
+    },
+    "scripts/tests/test_run_lifecycle_and_dates.py::test_corrupt_manifest_is_reported_not_ignored": {
+      "seconds": 0.016173999989405274,
+      "phases": {
+        "setup": 0.004280099994502962,
+        "call": 0.010746699990704656,
+        "teardown": 0.001147200004197657
+      }
+    },
+    "scripts/tests/test_run_lifecycle_and_dates.py::test_reconciliation_writes_a_sidecar_and_preserves_the_manifest": {
+      "seconds": 0.19756220013368875,
+      "phases": {
+        "setup": 0.008633300079964101,
+        "call": 0.18783269997220486,
+        "teardown": 0.0010962000815197825
+      }
+    },
+    "scripts/tests/test_run_lifecycle_and_dates.py::test_live_run_gets_no_sidecar": {
+      "seconds": 0.1951724000973627,
+      "phases": {
+        "setup": 0.004136200062930584,
+        "call": 0.18985640001483262,
+        "teardown": 0.0011798000195994973
+      }
+    },
+    "scripts/tests/test_run_lifecycle_and_dates.py::test_collect_mode_finalizes_a_failed_run": {
+      "seconds": 0.008674300042912364,
+      "phases": {
+        "setup": 0.00435439997818321,
+        "call": 0.002587400027550757,
+        "teardown": 0.0017325000371783972
+      }
+    },
+    "scripts/tests/test_run_lifecycle_and_dates.py::test_no_declared_dates_leaves_year_gates_as_the_only_authority": {
+      "seconds": 0.007452100049704313,
+      "phases": {
+        "setup": 0.004905899986624718,
+        "call": 0.0001732000382617116,
+        "teardown": 0.002373000024817884
+      }
+    },
+    "scripts/tests/test_run_lifecycle_and_dates.py::test_authorized_date_is_admitted": {
+      "seconds": 0.006536299944855273,
+      "phases": {
+        "setup": 0.003658199915662408,
+        "call": 0.0007073000306263566,
+        "teardown": 0.0021707999985665083
+      }
+    },
+    "scripts/tests/test_run_lifecycle_and_dates.py::test_unauthorized_date_inside_an_authorized_year_is_refused": {
+      "seconds": 0.007112800027243793,
+      "phases": {
+        "setup": 0.005372900050133467,
+        "call": 0.0005927999736741185,
+        "teardown": 0.0011471000034362078
+      }
+    },
+    "scripts/tests/test_run_lifecycle_and_dates.py::test_window_spanning_an_unauthorized_gap_is_refused": {
+      "seconds": 0.006049199961125851,
+      "phases": {
+        "setup": 0.0039629999082535505,
+        "call": 0.000798800028860569,
+        "teardown": 0.0012874000240117311
+      }
+    },
+    "scripts/tests/test_run_lifecycle_and_dates.py::test_full_authorized_window_is_admitted": {
+      "seconds": 0.0044908999698236585,
+      "phases": {
+        "setup": 0.0030129000078886747,
+        "call": 0.0004390999674797058,
+        "teardown": 0.001038899994455278
+      }
+    },
+    "scripts/tests/test_run_lifecycle_and_dates.py::test_malformed_authorized_dates_fail_closed": {
+      "seconds": 0.010119699873030186,
+      "phases": {
+        "setup": 0.0029305999632924795,
+        "call": 0.004556700005196035,
+        "teardown": 0.0026323999045416713
+      }
+    },
+    "scripts/tests/test_run_lifecycle_and_dates.py::test_full_stage_of_a_date_bounded_study_does_not_expand_to_the_year": {
+      "seconds": 0.009702400071546435,
+      "phases": {
+        "setup": 0.0070677000330761075,
+        "call": 0.0003825000021606684,
+        "teardown": 0.0022522000363096595
+      }
+    },
+    "scripts/tests/test_run_lifecycle_and_dates.py::test_day_stage_defaults_to_the_first_authorized_date": {
+      "seconds": 0.005946599994786084,
+      "phases": {
+        "setup": 0.003299199976027012,
+        "call": 0.0003704000264406204,
+        "teardown": 0.0022769999923184514
+      }
+    },
+    "scripts/tests/test_run_lifecycle_and_dates.py::test_unbounded_study_keeps_its_previous_default": {
+      "seconds": 0.004833899904042482,
+      "phases": {
+        "setup": 0.0033946000039577484,
+        "call": 0.0002482999116182327,
+        "teardown": 0.0011909999884665012
+      }
+    },
+    "scripts/tests/test_freeze_boundary.py::test_prepare_freeze_lifecycle_and_mutations": {
+      "seconds": 23.728082700050436,
+      "phases": {
+        "setup": 0.003852299996651709,
+        "call": 23.722224800032564,
+        "teardown": 0.0020056000212207437
+      }
+    }
+  },
+  "ran": 94,
+  "passed": 88,
+  "failed": 6,
+  "counts": {
+    "NEW_FAILURE": 6,
+    "NEW_FAILURE_OUTSIDE_BASELINE_SCOPE": 0,
+    "KNOWN_BASELINE_FAILURE": 0,
+    "BASELINE_FAILURE_NOW_FIXED": 0,
+    "ENVIRONMENTAL_MISSING_ARTIFACT": 0
+  },
+  "NEW_FAILURE": [
+    {
+      "node_id": "scripts/tests/test_rt_final_blockers.py::test_rt1b1_real_code_edit_makes_existing_evidence_stale",
+      "message": "call: bound_study = WindowsPath('C:/Users/Scott McCarty/AppData/Local/Temp/pytest-of-Scott McCarty/pytest-4957/test_rt1b1_real_code_edit_make0/study')\n\n    def test_rt1b1_real_code_edit_makes_existing_evidence_stale(bound_study):\n        \"\"\"Not just a doctored field: a genuine edit to closure code invalidates evidence.\"\"\"\n        target = REPO_ROOT / \"scripts\" / \"select_required_tests.py\"\n        original = target.read_bytes()\n        try:\n            target.write_text(original.decode(\"utf-8\") + \"\\n# rt_canary\\n\", encoding=\"utf-8\")\n>           with pytest.raises(PreflightEvidenceError) as e:\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE           Failed: DID NOT RAISE <class 'research_workflow.preflight.PreflightEvidenceError'>\n\nscripts\\tests\\test_rt_final_blockers.py:456: Failed",
+      "reason": "BASELINE_COMMIT_MISMATCH,BASELINE_ENVIRONMENT_MISMATCH"
+    },
+    {
+      "node_id": "scripts/tests/test_rt_final_blockers.py::test_rt2b2_editing_a_governance_authority_moves_the_composite[scripts/check_feature_promotion.py]",
+      "message": "call: rel = 'scripts/check_feature_promotion.py'\ntmp_path = WindowsPath('C:/Users/Scott McCarty/AppData/Local/Temp/pytest-of-Scott McCarty/pytest-4957/test_rt2b2_editing_a_governanc1')\n\n    @pytest.mark.parametrize(\"rel\", [\n        \"scripts/select_required_tests.py\",\n        \"scripts/check_feature_promotion.py\",\n        \"features/feature_lifecycle_baseline.json\",\n    ])\n    def test_rt2b2_editing_a_governance_authority_moves_the_composite(rel, tmp_path):\n        \"\"\"These three changed mandatory verdicts while leaving every seal valid.\"\"\"\n        target = REPO_ROOT / rel\n        assert target.exists(), rel\n        original = target.read_bytes()\n        baseline, _, _ = resolve_execution_manifest(STUDY_DIR, REPO_ROOT)\n        try:\n            if rel.endswith(\".json\"):\n                data = json.loads(original.decode(\"utf-8\"))\n                data[\"_rt_canary\"] = True\n                target.write_text(json.dumps(data), encoding=\"utf-8\")\n            else:\n                target.write_text(\n                    original.decode(\"utf-8\") + \"\\n# rt_canary\\n\", encoding=\"utf-8\"\n                )\n            mutated, _, _ = resolve_execution_manifest(STUDY_DIR, REPO_ROOT)\n>           assert mutated != baseline, f\"editing {rel} did not move the composite\"\nE           AssertionError: editing scripts/check_feature_promotion.py did not move the composite\nE           assert '20bda91391cd35ab542a04e0855c0540e5837a3a1a5171baf49b87d41b8c3a80' != '20bda91391cd35ab542a04e0855c0540e5837a3a1a5171baf49b87d41b8c3a80'\n\nscripts\\tests\\test_rt_final_blockers.py:331: AssertionError",
+      "reason": "BASELINE_COMMIT_MISMATCH,BASELINE_ENVIRONMENT_MISMATCH"
+    },
+    {
+      "node_id": "scripts/tests/test_rt_final_blockers.py::test_rt2b2_editing_a_governance_authority_moves_the_composite[scripts/select_required_tests.py]",
+      "message": "call: rel = 'scripts/select_required_tests.py'\ntmp_path = WindowsPath('C:/Users/Scott McCarty/AppData/Local/Temp/pytest-of-Scott McCarty/pytest-4957/test_rt2b2_editing_a_governanc0')\n\n    @pytest.mark.parametrize(\"rel\", [\n        \"scripts/select_required_tests.py\",\n        \"scripts/check_feature_promotion.py\",\n        \"features/feature_lifecycle_baseline.json\",\n    ])\n    def test_rt2b2_editing_a_governance_authority_moves_the_composite(rel, tmp_path):\n        \"\"\"These three changed mandatory verdicts while leaving every seal valid.\"\"\"\n        target = REPO_ROOT / rel\n        assert target.exists(), rel\n        original = target.read_bytes()\n        baseline, _, _ = resolve_execution_manifest(STUDY_DIR, REPO_ROOT)\n        try:\n            if rel.endswith(\".json\"):\n                data = json.loads(original.decode(\"utf-8\"))\n                data[\"_rt_canary\"] = True\n                target.write_text(json.dumps(data), encoding=\"utf-8\")\n            else:\n                target.write_text(\n                    original.decode(\"utf-8\") + \"\\n# rt_canary\\n\", encoding=\"utf-8\"\n                )\n            mutated, _, _ = resolve_execution_manifest(STUDY_DIR, REPO_ROOT)\n>           assert mutated != baseline, f\"editing {rel} did not move the composite\"\nE           AssertionError: editing scripts/select_required_tests.py did not move the composite\nE           assert '20bda91391cd35ab542a04e0855c0540e5837a3a1a5171baf49b87d41b8c3a80' != '20bda91391cd35ab542a04e0855c0540e5837a3a1a5171baf49b87d41b8c3a80'\n\nscripts\\tests\\test_rt_final_blockers.py:331: AssertionError",
+      "reason": "BASELINE_COMMIT_MISMATCH,BASELINE_ENVIRONMENT_MISMATCH"
+    },
+    {
+      "node_id": "scripts/tests/test_rt_final_blockers.py::test_rt2b2_every_subprocess_invoked_gate_is_inside_the_governance_closure",
+      "message": "call: def test_rt2b2_every_subprocess_invoked_gate_is_inside_the_governance_closure():\n        \"\"\"Derived from research_preflight.py's own source -- not a hand-maintained list.\n    \n        A second hand-written list is the same defect one edit later, so the assertion is\n        that the DERIVED set is a subset of the closure. Adding a new subprocess gate to the\n        preflight without sealing it fails here.\n        \"\"\"\n        derived = discover_subprocess_gate_scripts(REPO_ROOT)\n>       assert derived, \"no subprocess-invoked gates discovered; the extractor is broken\"\nE       AssertionError: no subprocess-invoked gates discovered; the extractor is broken\nE       assert []\n\nscripts\\tests\\test_rt_final_blockers.py:283: AssertionError",
+      "reason": "BASELINE_COMMIT_MISMATCH,BASELINE_ENVIRONMENT_MISMATCH"
+    },
+    {
+      "node_id": "scripts/tests/test_rt_final_blockers.py::test_wb_preflight_uses_the_budget_constant_not_a_literal",
+      "message": "call: def test_wb_preflight_uses_the_budget_constant_not_a_literal():\n        src = (REPO_ROOT / \"scripts\" / \"research_preflight.py\").read_text(encoding=\"utf-8\")\n>       assert \"timeout=CAUSAL_INVARIANTS_BUDGET_SECONDS\" in src\nE       assert 'timeout=CAUSAL_INVARIANTS_BUDGET_SECONDS' in '\"\"\"Deprecated shim; use :mod:`research_workflow.preflight`.\"\"\"\\nimport sys\\nfrom pathlib import Path\\n\\n_ROOT = Path(...1,F403\\n\\nif __name__ == \"__main__\":\\n    from research_workflow.preflight import main\\n    raise SystemExit(main())\\n'\n\nscripts\\tests\\test_rt_final_blockers.py:851: AssertionError",
+      "reason": "BASELINE_COMMIT_MISMATCH,BASELINE_ENVIRONMENT_MISMATCH"
+    },
+    {
+      "node_id": "scripts/tests/test_rt_final_blockers.py::test_wb_timeout_still_blocks",
+      "message": "call: tmp_path = WindowsPath('C:/Users/Scott McCarty/AppData/Local/Temp/pytest-of-Scott McCarty/pytest-4957/test_wb_timeout_still_blocks0')\nmonkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000263082C3E00>\n\n    def test_wb_timeout_still_blocks(tmp_path, monkeypatch):\n        \"\"\"Raising the number must not have turned an overrun into a pass.\"\"\"\n        import scripts.research_preflight as rp\n    \n        tmp_study = tmp_path / \"study\"\n        copy_study_as_fresh_identity(STUDY_DIR, tmp_study)\n        monkeypatch.setattr(rp, \"CAUSAL_INVARIANTS_BUDGET_SECONDS\", 0.001)\n        _, result = rp.run_preflight(tmp_study, [], out_json=tmp_path / \"pf.json\")\n>       assert result[\"check_outcomes\"].get(\"CAUSAL_INVARIANTS\") == \"TIMEOUT\"\nE       AssertionError: assert 'FAILED' == 'TIMEOUT'\nE         \nE         - TIMEOUT\nE         + FAILED\n\nscripts\\tests\\test_rt_final_blockers.py:863: AssertionError",
+      "reason": "BASELINE_COMMIT_MISMATCH,BASELINE_ENVIRONMENT_MISMATCH"
+    }
+  ],
+  "NEW_FAILURE_OUTSIDE_BASELINE_SCOPE": [],
+  "BASELINE_FAILURE_NOW_FIXED": [],
+  "ENVIRONMENTAL_MISSING_ARTIFACT": [],
+  "KNOWN_BASELINE_FAILURE": [],
+  "merge_tier": null
+}

@@ -49,7 +49,7 @@ def test_a3_plan_only_change_stales_every_plan_bound_gate_and_nothing_closure_bo
     _write(s / "audit/preflight.json", {"status": "CLEAR", "execution_composite_sha256": COMPOSITE, "plan_sha256": old})
     _write(c.work / "test_summary.json", {"status": "PASS", "execution_composite_sha256": COMPOSITE})
     for name in ("status.json", "contract_status.json"):
-        _write(s / "audit" / name, {"verdict": "CLEAR", "audited_execution_composite_sha256": COMPOSITE})
+        _write(s / "audit" / name, {"verdict": "CLEAR", "audited_execution_composite_sha256": COMPOSITE, "audited_plan_sha256": old})
     _write(s / "artifacts/preexec_audit_seal.json", {"composite_seal_hash": "h", "execution_manifest_composite_sha256": COMPOSITE,
                                                     "plan_sha256": old})
     smoke_card = _write(s / "artifacts/smoke_acceptance.json", {"status": "ACCEPTED"})
@@ -59,8 +59,10 @@ def test_a3_plan_only_change_stales_every_plan_bound_gate_and_nothing_closure_bo
     gates = ("prepare", "readiness", "preflight", "tests", "causal_audit", "contract_audit", "seal", "smoke")
     assert {g: c._fresh_stage(g, _fp(old)) for g in gates} == {g: True for g in gates}
     after = {g: c._fresh_stage(g, _fp(new)) for g in gates}
-    assert after == {"prepare": False, "readiness": False, "preflight": False, "tests": True, "causal_audit": True,
-                     "contract_audit": True, "seal": False, "smoke": False}
+    # autonomous_explore D1: the audits reviewed the OLD scientific definition, so they are stale too; only the
+    # code-only test evidence (closure-keyed) is legitimately reused
+    assert after == {"prepare": False, "readiness": False, "preflight": False, "tests": True, "causal_audit": False,
+                     "contract_audit": False, "seal": False, "smoke": False}
 
 
 def test_a5_new_compiles_carry_observed_seconds_for_every_disposition(tmp_path):

@@ -1,0 +1,202 @@
+{
+  "STATUS": "NEW_FAILURES",
+  "baseline": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-autonomous_explore\\config\\test_failure_baseline.json",
+  "baseline_commit": "c480d8af0068c69d19669497c53747efa187b5dd",
+  "head": "600e7c71",
+  "baseline_issues": [
+    "BASELINE_COMMIT_MISMATCH",
+    "BASELINE_ENVIRONMENT_MISMATCH"
+  ],
+  "pytest_exit_code": 1,
+  "wall_seconds": 3209.6071063999552,
+  "per_test_timings": {
+    "scripts/tests/test_supervisor_blackbox.py::test_one_prompt_to_study_closed": {
+      "seconds": 762.0583877000026,
+      "phases": {
+        "setup": 0.22592330002225935,
+        "call": 761.8272830999922,
+        "teardown": 0.005181299988180399
+      }
+    },
+    "scripts/tests/test_supervisor_blackbox.py::test_collect_study_runs_to_frame_register_with_no_owner_intervention": {
+      "seconds": 419.48641849984415,
+      "phases": {
+        "setup": 0.3526851999340579,
+        "call": 419.13219059992116,
+        "teardown": 0.0015426999889314175
+      }
+    },
+    "scripts/tests/test_supervisor_blackbox.py::test_study_side_gap_the_design_worker_cannot_fix_reaches_the_capability_flow": {
+      "seconds": 11.294804399949498,
+      "phases": {
+        "setup": 0.24237690004520118,
+        "call": 11.051011999952607,
+        "teardown": 0.0014154999516904354
+      }
+    },
+    "scripts/tests/test_supervisor_blackbox.py::test_semantic_decision_not_covered_stops_then_decide_resumes": {
+      "seconds": 9.811538099893369,
+      "phases": {
+        "setup": 0.21914000005926937,
+        "call": 9.591108099906705,
+        "teardown": 0.001289999927394092
+      }
+    },
+    "scripts/tests/test_supervisor_blackbox.py::test_adopt_existing_study_resumes_at_contract_audit_without_rerun": {
+      "seconds": 391.9651867999928,
+      "phases": {
+        "setup": 0.22064199997112155,
+        "call": 391.74086240003817,
+        "teardown": 0.0036823999835178256
+      }
+    },
+    "scripts/tests/test_supervisor_blackbox.py::test_adopt_with_foreign_live_lease_waits": {
+      "seconds": 0.6139849001774564,
+      "phases": {
+        "setup": 0.24491130001842976,
+        "call": 0.3657172000966966,
+        "teardown": 0.003356400062330067
+      }
+    },
+    "scripts/tests/test_supervisor_blackbox.py::test_crash_and_resume_derives_from_artifacts": {
+      "seconds": 17.90765890001785,
+      "phases": {
+        "setup": 0.31218649994116277,
+        "call": 17.59033240005374,
+        "teardown": 0.005140000022947788
+      }
+    },
+    "scripts/tests/test_supervisor_blackbox.py::test_capability_merged_offline_is_detected_from_git": {
+      "seconds": 10.773225300014019,
+      "phases": {
+        "setup": 0.31287190003786236,
+        "call": 10.454097299952991,
+        "teardown": 0.006256100023165345
+      }
+    },
+    "scripts/tests/test_supervisor_blackbox.py::test_stale_worker_result_is_refused": {
+      "seconds": 15.038709199987352,
+      "phases": {
+        "setup": 0.2607821000274271,
+        "call": 14.774337599985301,
+        "teardown": 0.0035894999746233225
+      }
+    },
+    "scripts/tests/test_supervisor_blackbox.py::test_execution_not_authorized_asks_once_and_decide_resumes": {
+      "seconds": 464.18740619986784,
+      "phases": {
+        "setup": 0.28403969993814826,
+        "call": 463.89531609998085,
+        "teardown": 0.008050399948842824
+      }
+    },
+    "scripts/tests/test_supervisor_blackbox.py::test_main_merge_lock_serializes_concurrent_merges": {
+      "seconds": 4.7785810000495985,
+      "phases": {
+        "setup": 0.5267685999860987,
+        "call": 4.245296400040388,
+        "teardown": 0.006516000023111701
+      }
+    },
+    "scripts/tests/test_supervisor_blackbox.py::test_resource_slots_are_machine_wide_and_dead_pid_slots_are_reclaimed": {
+      "seconds": 12.142897899844684,
+      "phases": {
+        "setup": 0.42413449997548014,
+        "call": 11.71748489991296,
+        "teardown": 0.0012784999562427402
+      }
+    },
+    "scripts/tests/test_supervisor_blackbox.py::test_detached_loop_argv_ticks_and_stop_kills_only_the_loop": {
+      "seconds": 18.02827319991775,
+      "phases": {
+        "setup": 0.2581941999960691,
+        "call": 17.768475899938494,
+        "teardown": 0.0016030999831855297
+      }
+    },
+    "scripts/tests/test_supervisor_blackbox.py::test_stop_during_analyze_job_survives_and_resume_reconciles_without_rerun": {
+      "seconds": 389.64249749993905,
+      "phases": {
+        "setup": 0.30523079994600266,
+        "call": 389.3358447999926,
+        "teardown": 0.001421900000423193
+      }
+    },
+    "scripts/tests/test_supervisor_blackbox.py::test_rejected_closure_is_never_terminal_and_close_validates_before_persisting": {
+      "seconds": 362.7753832000308,
+      "phases": {
+        "setup": 0.2093730999622494,
+        "call": 362.5647796000121,
+        "teardown": 0.0012305000564083457
+      }
+    },
+    "scripts/tests/test_supervisor_blackbox.py::test_stale_controller_card_forces_reseal_never_an_audit[spec]": {
+      "seconds": 147.2402650999138,
+      "phases": {
+        "setup": 0.1695399999152869,
+        "call": 147.06938540004194,
+        "teardown": 0.001339699956588447
+      }
+    },
+    "scripts/tests/test_supervisor_blackbox.py::test_stale_controller_card_forces_reseal_never_an_audit[platform]": {
+      "seconds": 169.89061739994213,
+      "phases": {
+        "setup": 0.17495319992303848,
+        "call": 169.71415800007526,
+        "teardown": 0.0015061999438330531
+      }
+    }
+  },
+  "ran": 17,
+  "passed": 10,
+  "failed": 7,
+  "counts": {
+    "NEW_FAILURE": 7,
+    "NEW_FAILURE_OUTSIDE_BASELINE_SCOPE": 0,
+    "KNOWN_BASELINE_FAILURE": 0,
+    "BASELINE_FAILURE_NOW_FIXED": 0,
+    "ENVIRONMENTAL_MISSING_ARTIFACT": 0
+  },
+  "NEW_FAILURE": [
+    {
+      "node_id": "scripts/tests/test_supervisor_blackbox.py::test_capability_merged_offline_is_detected_from_git",
+      "message": "call: sandbox = {'env': {'NT_RESEARCH_CONFIG': 'C:\\\\Users\\\\Scott McCarty\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-Scott McCarty\\\\pytest-4927\\\\...('C:/Users/Scott McCarty/AppData/Local/Temp/pytest-of-Scott McCarty/pytest-4927/test_capability_merged_offline0/repo')}\n\n    def test_capability_merged_offline_is_detected_from_git(sandbox):\n        \"\"\"Without platform_merge: auto_if_green the gate stops for approval (default). While it waits, a human merges the chore\n        branch by hand; on resume the supervisor detects the merge from git and never merges twice.\"\"\"\n        sup = _start(sandbox, plan={\"gap_first\": True}, study_id=\"sup_offline\")\n        sid = sup.study_id\n        sup, _ = drive(sid)\n>       assert sup.state[\"user_decision\"][\"code\"] == \"DESTRUCTIVE_ACTION_REQUIRES_APPROVAL\"\nE       AssertionError: assert 'SUPERVISOR_E...TION_REQUIRED' == 'DESTRUCTIVE_...IRES_APPROVAL'\nE         \nE         - DESTRUCTIVE_ACTION_REQUIRES_APPROVAL\nE         + SUPERVISOR_ESCALATION_REQUIRED\n\nscripts\\tests\\test_supervisor_blackbox.py:301: AssertionError",
+      "reason": "BASELINE_COMMIT_MISMATCH,BASELINE_ENVIRONMENT_MISMATCH"
+    },
+    {
+      "node_id": "scripts/tests/test_supervisor_blackbox.py::test_collect_study_runs_to_frame_register_with_no_owner_intervention",
+      "message": "call: sandbox = {'env': {'NT_RESEARCH_CONFIG': 'C:\\\\Users\\\\Scott McCarty\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-Scott McCarty\\\\pytest-4927\\\\...('C:/Users/Scott McCarty/AppData/Local/Temp/pytest-of-Scott McCarty/pytest-4927/test_collect_study_runs_to_fra0/repo')}\n\n    def test_collect_study_runs_to_frame_register_with_no_owner_intervention(sandbox):\n        \"\"\"THE FOUR STAGES (WORKFLOW.md section P): question -> design (stage: collect) -> controller to NEEDS_CAUSAL_AUDIT -> causal\n        worker -> seal (frame seal: contract audit NOT_REQUIRED, no contract worker) -> detached smoke..merge -> register job ->\n        FRAME_REGISTERED. No analysis worker, no closure, no user decision.\"\"\"\n        sup = _start(sandbox, plan={\"collect\": True}, study_id=\"sup_collect\")\n        sid = sup.study_id\n        sup, stats = drive(sid)\n        st = sup.state\n        assert st.get(\"terminal\") and st[\"derived_state\"] == \"FRAME_REGISTERED\", (st.get(\"derived_state\"), st.get(\"user_decision\"), stats[\"actions\"])\n        assert st[\"counters\"][\"user_interventions\"] == 0 and st.get(\"user_decision\") is None and stats[\"ai_alive_during_job\"] == 0\n        types = [h[\"session_type\"] for h in st[\"worker_history\"]]\n        assert types == [\"STUDY_DESIGN_COMPILE\", \"CAUSAL_AUDIT\"], types\n        throughs = [e[\"through\"] for e in _events(sid) if e[\"kind\"] == \"JOB_LAUNCHED\"]\n>       assert throughs == [\"seal\", \"seal\", \"merge\", \"register\"], throughs\nE       AssertionError: ['seal', 'seal', 'merge', 'register', 'register']\nE       assert ['seal', 'sea...', 'register'] == ['seal', 'sea...', 'register']\nE         \nE         Left contains one more item: 'register'\nE         Use -v to get more diff\n\nscripts\\tests\\test_supervisor_blackbox.py:158: AssertionError",
+      "reason": "BASELINE_COMMIT_MISMATCH,BASELINE_ENVIRONMENT_MISMATCH"
+    },
+    {
+      "node_id": "scripts/tests/test_supervisor_blackbox.py::test_crash_and_resume_derives_from_artifacts",
+      "message": "call: sandbox = {'env': {'NT_RESEARCH_CONFIG': 'C:\\\\Users\\\\Scott McCarty\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-Scott McCarty\\\\pytest-4927\\\\...('C:/Users/Scott McCarty/AppData/Local/Temp/pytest-of-Scott McCarty/pytest-4927/test_crash_and_resume_derives_0/repo')}\n\n    def test_crash_and_resume_derives_from_artifacts(sandbox):\n        \"\"\"Kill the supervisor while a worker runs and while the controller runs; restart -> state derived, no completed stage re-run,\n        a card completed offline is consumed, a stale worker pid is reaped.\"\"\"\n        sup = _start(sandbox, plan={\"worker_sleep_s\": 2.0}, study_id=\"sup_crash\")\n        sid = sup.study_id\n        card = sup.tick()\n        assert card[\"action\"] == \"WORKER_LAUNCHED\"\n        pid = int(sup.state[\"active_worker\"][\"pid\"])\n        del sup                                                    # \"crash\" while the worker runs\n        _wait_pid(pid, 120)                                        # the worker completes its card while the supervisor is offline\n        from research_workflow.supervisor.core import Supervisor\n        s2 = Supervisor(sid)\n        s2.tick()                                                  # consumes the offline-completed card, then derives COMPILED\n>       assert s2.state[\"worker_history\"][-1][\"status\"] == \"DONE\" and s2.state[\"active_worker\"] is None\nE       AssertionError: assert ('FAILED' == 'DONE'\nE         \nE         - DONE\nE         + FAILED)\n\nscripts\\tests\\test_supervisor_blackbox.py:267: AssertionError",
+      "reason": "BASELINE_COMMIT_MISMATCH,BASELINE_ENVIRONMENT_MISMATCH"
+    },
+    {
+      "node_id": "scripts/tests/test_supervisor_blackbox.py::test_detached_loop_argv_ticks_and_stop_kills_only_the_loop",
+      "message": "call: sandbox = {'env': {'NT_RESEARCH_CONFIG': 'C:\\\\Users\\\\Scott McCarty\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-Scott McCarty\\\\pytest-4927\\\\...('C:/Users/Scott McCarty/AppData/Local/Temp/pytest-of-Scott McCarty/pytest-4927/test_detached_loop_argv_ticks_0/repo')}\n\n    def test_detached_loop_argv_ticks_and_stop_kills_only_the_loop(sandbox):\n        \"\"\"DEV-01 / DEV-01b / DEV-07 black-box: the argv `supervise start` detaches parses and the loop TICKS (a dead loop with\n        STATUS OK was the first defect); `supervise stop` ends the loop process only -- the worker it spawned survives and its\n        card is consumed on resume without a relaunch.\"\"\"\n        from research_workflow.supervisor.core import Supervisor\n        from research_workflow.supervisor.procs import pid_alive\n        sup = _start(sandbox, plan={\"worker_sleep_s\": 6.0}, study_id=\"sup_loop\")\n        sid = sup.study_id\n        loop_pid = _detach_real_loop(sid)\n        try:\n            _wait_until(lambda: (Supervisor(sid).state.get(\"active_worker\") or {}).get(\"pid\"), 60, \"the detached loop to launch the design worker\")\n            st = Supervisor(sid).state\n            assert st[\"counters\"][\"ticks\"] >= 1 and st[\"counters\"][\"workers_launched\"] == 1\n            worker_pid = int(st[\"active_worker\"][\"pid\"])\n            assert pid_alive(worker_pid), \"the scripted worker (sleeping 6s) must still be running\"\n            out = Supervisor(sid).stop()\n            assert out[\"loop_killed\"] is True and out[\"worker_pid\"] == worker_pid and out[\"worker_alive\"] is True\n            _wait_until(lambda: not pid_alive(loop_pid), 10, \"the loop process to die\")\n            assert pid_alive(worker_pid), \"`supervise stop` must not kill the worker the loop spawned (DEV-07)\"\n            _wait_pid(worker_pid, 120)                                # the worker completes its card while no supervisor is alive\n            s2 = Supervisor(sid); card = s2.resume()                  # resume = reconcile: the completed card is consumed, nothing relaunched\n            hist = s2.state[\"worker_history\"]\n>           assert hist[-1][\"task_id\"] == st[\"active_worker\"][\"task_id\"] and hist[-1][\"status\"] == \"DONE\"\nE           AssertionError: assert ('001_study_de...pile_c65efd02' == '001_study_de...pile_c65efd02'\nE             \nE               001_study_design_compile_c65efd02 and 'FAILED' == 'DONE'\nE             \nE             - DONE\nE             + FAILED)\n\nscripts\\tests\\test_supervisor_blackbox.py:427: AssertionError",
+      "reason": "BASELINE_COMMIT_MISMATCH,BASELINE_ENVIRONMENT_MISMATCH"
+    },
+    {
+      "node_id": "scripts/tests/test_supervisor_blackbox.py::test_stale_controller_card_forces_reseal_never_an_audit[spec]",
+      "message": "call: sandbox = {'env': {'NT_RESEARCH_CONFIG': 'C:\\\\Users\\\\Scott McCarty\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-Scott McCarty\\\\pytest-4927\\\\...('C:/Users/Scott McCarty/AppData/Local/Temp/pytest-of-Scott McCarty/pytest-4927/test_stale_controller_card_for0/repo')}\nmonkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000167096E6A40>\nmode = 'spec'\n\n    @pytest.mark.parametrize(\"mode\", [\"spec\", \"platform\"])\n    def test_stale_controller_card_forces_reseal_never_an_audit(sandbox, monkeypatch, mode):\n        \"\"\"DEV-06 black-box: a controller card whose fingerprints no longer match the study spec (`spec`) or whose recorded\n        execution composite differs from what the platform compiles now (`platform`) is stale -- the supervisor re-runs the\n        controller to seal and never launches an auditor against it.\"\"\"\n        from research_workflow.supervisor import derive as D\n        from research_workflow.supervisor.core import Supervisor\n        from research_workflow.supervisor.procs import kill_tree\n        sup = _start(sandbox, plan={\"worker_sleep_s\": 30.0}, study_id=f\"sup_stale_{mode}\")\n        sid = sup.study_id\n        sup, _ = drive(sid, stop_before_wait=lambda s: (s.state.get(\"active_worker\") or {}).get(\"session_type\") == \"CAUSAL_AUDIT\")\n        aw = sup.state[\"active_worker\"]; assert aw and aw[\"session_type\"] == \"CAUSAL_AUDIT\"\n        study = Path(sup.state[\"study_worktree\"]) / \"studies\" / sid\n        card_before = json.loads((study / \"_work\" / \"controller\" / \"status.json\").read_text(encoding=\"utf-8\"))\n        assert card_before[\"state\"] == \"NEEDS_CAUSAL_AUDIT\"\n        kill_tree(int(aw[\"pid\"]))                                     # the auditor dies before its card (a crash); the card now goes stale underneath it\n        Path(aw[\"result_path\"]).unlink(missing_ok=True)\n        if mode == \"spec\":\n            spec = study / \"study.yaml\"                                 # a REAL spec change (a comment alone does not move the normalized spec hash)\n            text = spec.read_text(encoding=\"utf-8\"); assert \"n_estimators: 20\" in text\n            spec.write_text(text.replace(\"n_estimators: 20\", \"n_estimators: 21\"), encoding=\"utf-8\")\n>           subprocess.run([\"git\", \"commit\", \"-q\", \"-am\", \"edit spec after seal\"], cwd=str(sup.state[\"study_worktree\"]), check=True)\n\nscripts\\tests\\test_supervisor_blackbox.py:533: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\ninput = None, capture_output = False, timeout = None, check = True\npopenargs = (['git', 'commit', '-q', '-am', 'edit spec after seal'],)\nkwargs = {'cwd': 'C:\\\\Users\\\\Scott McCarty\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-Scott McCarty\\\\pytest-4927\\\\test_stale_controller_card_for0\\\\worktrees\\\\repo-sup_stale_spec'}\nprocess = <Popen: returncode: 128 args: ['git', 'commit', '-q', '-am', 'edit spec afte...>\nstdout = None, stderr = None, retcode = 128\n\n    def run(*popenargs,\n            input=None, capture_output=False, timeout=None, check=False, **kwargs):\n        \"\"\"Run command with arguments and return a CompletedProcess instance.\n    \n        The returned instance will have attributes args, returncode, stdout and\n        stderr. By default, stdout and stderr are not captured, and those attributes\n        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,\n        or pass capture_output=True to capture both.\n    \n        If check is True and the exit code was non-zero, it raises a\n        CalledProcessError. The CalledProcessError object will have the return code\n        in the returncode attribute, and output & stderr attributes if those streams\n        were captured.\n    \n        If timeout (seconds) is given and the process takes too long,\n         a TimeoutExpired exception will be raised.\n    \n        There is an optional argument \"input\", allowing you to\n        pass bytes or a string to the subprocess's stdin.  If you use this argument\n        you may not also use the Popen constructor's \"stdin\" argument, as\n        it will be used internally.\n    \n        By default, all communication is in bytes, and therefore any \"input\" should\n        be bytes, and the stdout and stderr will be bytes. If in text mode, any\n        \"input\" should be a string, and stdout and stderr will be strings decoded\n        according to locale encoding, or by \"encoding\" if set. Text mode is\n        triggered by setting any of text, encoding, errors or universal_newlines.\n    \n        The other arguments are the same as for the Popen constructor.\n        \"\"\"\n        if input is not None:\n            if kwargs.get('stdin') is not None:\n                raise ValueError('stdin and input arguments may not both be used.')\n            kwargs['stdin'] = PIPE\n    \n        if capture_output:\n            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:\n                raise ValueError('stdout and stderr arguments may not be used '\n                                 'with capture_output.')\n            kwargs['stdout'] = PIPE\n            kwargs['stderr'] = PIPE\n    \n        with Popen(*popenargs, **kwargs) as process:\n            try:\n                stdout, stderr = process.communicate(input, timeout=timeout)\n            except TimeoutExpired as exc:\n                process.kill()\n                if _mswindows:\n                    # Windows accumulates the output in a single blocking\n                    # read() call run on child threads, with the timeout\n                    # being done in a join() on those threads.  communicate()\n                    # _after_ kill() is required to collect that and add it\n                    # to the exception.\n                    exc.stdout, exc.stderr = process.communicate()\n                else:\n                    # POSIX _communicate already populated the output so\n                    # far into the TimeoutExpired exception.\n                    process.wait()\n                raise\n            except:  # Including KeyboardInterrupt, communicate handled that.\n                process.kill()\n                # We don't call process.wait() as .__exit__ does that for us.\n                raise\n            retcode = process.poll()\n            if check and retcode:\n>               raise CalledProcessError(retcode, process.args,\n                                         output=stdout, stderr=stderr)\nE               subprocess.CalledProcessError: Command '['git', 'commit', '-q', '-am', 'edit spec after seal']' returned non-zero exit status 128.\n\n..\\..\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\subprocess.py:577: CalledProcessError",
+      "reason": "BASELINE_COMMIT_MISMATCH,BASELINE_ENVIRONMENT_MISMATCH"
+    },
+    {
+      "node_id": "scripts/tests/test_supervisor_blackbox.py::test_stale_worker_result_is_refused",
+      "message": "call: sandbox = {'env': {'NT_RESEARCH_CONFIG': 'C:\\\\Users\\\\Scott McCarty\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-Scott McCarty\\\\pytest-4927\\\\...('C:/Users/Scott McCarty/AppData/Local/Temp/pytest-of-Scott McCarty/pytest-4927/test_stale_worker_result_is_re0/repo')}\n\n    def test_stale_worker_result_is_refused(sandbox):\n        sup = _start(sandbox, plan={\"worker_sleep_s\": 0}, study_id=\"sup_stale\")\n        sid = sup.study_id\n        sup.tick(); aw = sup.state[\"active_worker\"]; _wait_pid(int(aw[\"pid\"]), 120)\n>       card = json.loads(Path(aw[\"result_path\"]).read_text(encoding=\"utf-8\"))\n                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\nscripts\\tests\\test_supervisor_blackbox.py:318: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n..\\..\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\pathlib\\_local.py:546: in read_text\n    return PathBase.read_text(self, encoding, errors, newline)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n..\\..\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\pathlib\\_abc.py:632: in read_text\n    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n\nself = WindowsPath('C:/Users/Scott McCarty/AppData/Local/Temp/pytest-of-Scott McCarty/pytest-4927/test_stale_worker_result_is_re0/nt_research/supervisor/sup_stale/results/001_study_design_compile_c0dcc327.result.json')\nmode = 'r', buffering = -1, encoding = 'utf-8', errors = None, newline = None\n\n    def open(self, mode='r', buffering=-1, encoding=None,\n             errors=None, newline=None):\n        \"\"\"\n        Open the file pointed to by this path and return a file object, as\n        the built-in open() function does.\n        \"\"\"\n        if \"b\" not in mode:\n            encoding = io.text_encoding(encoding)\n>       return io.open(self, mode, buffering, encoding, errors, newline)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\\\Users\\\\Scott McCarty\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-Scott McCarty\\\\pytest-4927\\\\test_stale_worker_result_is_re0\\\\nt_research\\\\supervisor\\\\sup_stale\\\\results\\\\001_study_design_compile_c0dcc327.result.json'\n\n..\\..\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\pathlib\\_local.py:537: FileNotFoundError",
+      "reason": "BASELINE_COMMIT_MISMATCH,BASELINE_ENVIRONMENT_MISMATCH"
+    },
+    {
+      "node_id": "scripts/tests/test_supervisor_blackbox.py::test_study_side_gap_the_design_worker_cannot_fix_reaches_the_capability_flow",
+      "message": "call: sandbox = {'env': {'NT_RESEARCH_CONFIG': 'C:\\\\Users\\\\Scott McCarty\\\\AppData\\\\Local\\\\Temp\\\\pytest-of-Scott McCarty\\\\pytest-4927\\\\...('C:/Users/Scott McCarty/AppData/Local/Temp/pytest-of-Scott McCarty/pytest-4927/test_study_side_gap_the_design0/repo')}\n\n    def test_study_side_gap_the_design_worker_cannot_fix_reaches_the_capability_flow(sandbox):\n        \"\"\"The routing defect behind the atlas's ~$8-per-cycle loop: an unknown session name compiles to INVALID_PARAMETERIZATION,\n        which is routed to a DESIGN worker; the vocabulary is the platform's, so design cannot fix it and re-emits the same handoff\n        forever. Now: the second identical study-side gap set goes to the capability flow (chore claim + implementer), and design\n        runs again only once the capability has landed.\"\"\"\n        sup = _start(sandbox, plan={\"study_side_gap_first\": True, \"auto_merge\": True}, study_id=\"sup_routing\")\n        sid = sup.study_id\n        sup, stats = drive(sid, stop_when=lambda s: len(s.state.get(\"worker_history\") or []) >= 4)\n        st = sup.state\n        hist = st[\"worker_history\"]\n        types = [(h[\"session_type\"], h[\"status\"]) for h in hist]\n>       assert types[:4] == [(\"STUDY_DESIGN_COMPILE\", \"BLOCKED\"), (\"STUDY_DESIGN_COMPILE\", \"BLOCKED\"), (\"CAPABILITY_IMPLEMENTATION\", \"DONE\"),\n                             (\"STUDY_DESIGN_COMPILE\", \"DONE\")], types\nE       AssertionError: [('STUDY_DESIGN_COMPILE', 'FAILED'), ('STUDY_DESIGN_COMPILE', 'FAILED'), ('CAPABILITY_IMPLEMENTATION', 'FAILED'), ('CAPABILITY_IMPLEMENTATION', 'FAILED')]\nE       assert [('STUDY_DESI...N', 'FAILED')] == [('STUDY_DESI...ILE', 'DONE')]\nE         \nE         At index 0 diff: ('STUDY_DESIGN_COMPILE', 'FAILED') != ('STUDY_DESIGN_COMPILE', 'BLOCKED')\nE         Use -v to get more diff\n\nscripts\\tests\\test_supervisor_blackbox.py:187: AssertionError",
+      "reason": "BASELINE_COMMIT_MISMATCH,BASELINE_ENVIRONMENT_MISMATCH"
+    }
+  ],
+  "NEW_FAILURE_OUTSIDE_BASELINE_SCOPE": [],
+  "BASELINE_FAILURE_NOW_FIXED": [],
+  "ENVIRONMENTAL_MISSING_ARTIFACT": [],
+  "KNOWN_BASELINE_FAILURE": [],
+  "merge_tier": null
+}

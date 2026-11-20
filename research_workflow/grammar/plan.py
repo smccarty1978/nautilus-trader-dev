@@ -47,11 +47,17 @@ class CompiledPlan:
     # plan when None so every research plan (and its plan_sha256) is byte-identical to before the
     # field existed.
     stage: Optional[str] = None
+    # tier: explore (autonomous_explore): {"tier": "explore", "family": ..., "result": {...pre-registered rule}}.
+    # Omitted when None, so every governed plan (and its plan_sha256) is byte-identical to before the field existed.
+    explore: Optional[Dict[str, Any]] = None
+    # declared study-local targeted tests [{"path": "tests/test_x.py", "sha256": ...}]; omitted when none
+    study_tests: Optional[List[Dict[str, str]]] = None
 
     def to_dict(self) -> Dict[str, Any]:
         d = asdict(self)
-        if d.get("stage") is None:
-            d.pop("stage", None)
+        for k in ("stage", "explore", "study_tests"):
+            if d.get(k) is None:
+                d.pop(k, None)
         return d
 
     def identity_payload(self) -> Dict[str, Any]:

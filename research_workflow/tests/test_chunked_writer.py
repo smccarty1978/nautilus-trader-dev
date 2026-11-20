@@ -254,7 +254,7 @@ def test_declared_metadata_types_reads_tracker_field_types(monkeypatch):
     class _FakeTrackerBinding:
         FIELD_TYPES = {"profile": {"kind": "struct", "schema": {"poc": "float64", "levels": "int64[]"}}}
 
-    monkeypatch.setattr(strategy_mod, "_load", lambda dotted: _FakeTrackerBinding)
+    monkeypatch.setattr(strategy_mod, "_load", lambda dotted, plan=None: _FakeTrackerBinding)   # _load(dotted, plan) since research_lanes
     plan = {
         "trackers": [{"id": "vp120", "implementation": "fake.module.FakeBinding"}],
         "columns": {"metadata": [

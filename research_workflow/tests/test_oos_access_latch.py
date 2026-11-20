@@ -103,8 +103,9 @@ def _lc(study: Path, bars: _Bars, **extra) -> V2Lifecycle:
 
 def _clear_audits(study: Path) -> None:
     frozen = json.loads((study / "audit" / "frozen_execution_manifest.json").read_text(encoding="utf-8"))["frozen_execution_composite_sha256"]
+    plan_sha = json.loads((study / "compiled_plan.json").read_text(encoding="utf-8"))["plan_sha256"]   # audits review THIS plan
     for name, kind in (("status.json", "causal"), ("contract_status.json", "contract")):
-        (study / "audit" / name).write_text(json.dumps({"verdict": "CLEAR", "audited_execution_composite_sha256": frozen,
+        (study / "audit" / name).write_text(json.dumps({"verdict": "CLEAR", "audited_execution_composite_sha256": frozen, "audited_plan_sha256": plan_sha,
                                                          "auditor": f"{kind}-synthetic", "audit_report_sha256": "0" * 64}), encoding="utf-8")
 
 

@@ -39,6 +39,22 @@ from scripts.resolve_execution_manifest import resolve_execution_manifest
 AUDIT_PROVENANCE_VERSION = 2
 
 
+def audited_plan_sha256(study_dir: Path, audit_type: str) -> Optional[str]:
+    """The SCIENTIFIC definition an audit reviewed: the plan_sha256 of the packet it was given (the packet names the
+    population, outcome / session-end / censoring semantics, labels, availability, model, chronology), falling back to
+    the current compiled plan. A status carries it as ``audited_plan_sha256``; a V2 seal refuses a status whose plan is
+    not the plan being sealed, so a plan-only change can never inherit an earlier CLEAR (autonomous_explore, D1)."""
+    study_dir = Path(study_dir)
+    for p in (study_dir / "_work" / "controller" / f"audit_packet_{audit_type}.json", study_dir / "compiled_plan.json"):
+        try:
+            sha = json.loads(p.read_text(encoding="utf-8")).get("plan_sha256")
+        except (OSError, ValueError):
+            continue
+        if sha:
+            return str(sha)
+    return None
+
+
 class AuditArtifactParseError(RuntimeError):
     """Raised when an audit report or transcript cannot be deterministically parsed."""
     pass
@@ -1191,6 +1207,7 @@ def issue_causal_audit_status_from_report(
         "note": note,
         "causal_contract": "ts_avail <= T (latest_source_ts_init <= observation_ts)",
         "audited_execution_composite_sha256": composite_sha,
+        "audited_plan_sha256": audited_plan_sha256(study_dir, "causal"),
         "audit_report_sha256": report_sha256,
         "audit_report_path": f"audit/pass_{pass_num:02d}.md",
         "transcript_sha256": transcript_sha,
@@ -1262,6 +1279,7 @@ def issue_contract_audit_status_from_report(
         "warning": warning,
         "not_verified": not_verified,
         "audited_execution_composite_sha256": composite_sha,
+        "audited_plan_sha256": audited_plan_sha256(study_dir, "contract"),
         "audit_report_sha256": report_sha256,
         "audit_report_path": f"audit/contract_pass_{pass_num:02d}.md",
         "transcript_sha256": transcript_sha,

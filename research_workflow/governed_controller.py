@@ -323,6 +323,15 @@ class GovernedStudyController:
         log = self.work / "logs" / f"{stage}.log"
         _json(self.work / "receipts" / f"{stage}.json", {"schema_version": 1, "stage": stage, "status": "PASS", "execution_composite_sha256": fp.get("execution_composite"), "outputs": outputs, "partitions": partitions, "log": {"path": str(log), "sha256": _sha(log)} if log.is_file() else None})
 
+    def _autonomous_audit(self, stage: str, fp: dict[str, str | None]) -> dict[str, Any] | None:
+        """None = the audit is external (packet + stop). A subclass may run deterministic checks for a tier that
+        declares them (V2 tier: explore) and return {"verdict", "report", "failed"}."""
+        return None
+
+    def _before_stage(self, stage: str, fp: dict[str, str | None]) -> dict[str, Any] | None:
+        """Hook before an action stage runs; a returned card stops the run (V2 tier: explore ledger/result)."""
+        return None
+
     def _packet(self, audit_type: str, fp: dict[str, str | None]) -> Path:
         compiled = _read(self.study / "compiled_study.json")
         spec = compiled.get("spec", {})
@@ -371,11 +380,24 @@ class GovernedStudyController:
             if stage in {"causal_audit", "contract_audit"}:
                 existing = self.study / "audit" / ("status.json" if stage == "causal_audit" else "contract_status.json")
                 verdict = _read(existing).get("verdict", _read(existing).get("status"))
-                if existing.is_file() and verdict in {"BLOCKED", "INCOMPLETE"} and _read(existing).get("audited_execution_composite_sha256") == fp.get("execution_composite"):
+                current_plan = _read(existing).get("audited_plan_sha256", fp.get("plan_sha256")) == fp.get("plan_sha256")
+                if (existing.is_file() and verdict in {"BLOCKED", "INCOMPLETE"} and current_plan
+                        and _read(existing).get("audited_execution_composite_sha256") == fp.get("execution_composite")):
                     blocker = BlockerType.CAUSALITY_BLOCKER if stage == "causal_audit" else BlockerType.CONTRACT_BLOCKER
                     return self._card(state, stage, blocker=blocker, reason=f"current independent audit verdict={verdict}", last=last)
-                path = self._packet("causal" if stage == "causal_audit" else "contract", fp)
-                return self._card(state, stage, artifact=path, last=last)
+                auto = self._autonomous_audit(stage, fp)
+                if auto is None:
+                    path = self._packet("causal" if stage == "causal_audit" else "contract", fp)
+                    return self._card(state, stage, artifact=path, last=last)
+                if auto.get("verdict") != "CLEAR":
+                    blocker = BlockerType.CAUSALITY_BLOCKER if stage == "causal_audit" else BlockerType.CONTRACT_BLOCKER
+                    return self._card(state, stage, blocker=blocker, reason=f"deterministic {stage} BLOCKED: {auto.get('failed')}",
+                                      last=last, artifact=Path(auto["report"]))
+                self.ran.append(stage); last = stage
+                continue
+            hook = self._before_stage(stage, fp)
+            if hook is not None:
+                return hook
             action = getattr(self.actions, stage)
             if action is None:
                 return self._card(state, stage, blocker=BlockerType.CAPABILITY_BLOCKER,
@@ -403,7 +425,11 @@ class GovernedStudyController:
 
 
 def compact_card(card: dict[str, Any], *, as_json: bool = False) -> str:
-    if as_json: return json.dumps({k: card.get(k) for k in ("STATUS", "state", "stage", "artifact", "sha256", "next_state", "failure_packet", "blocker_code", "test_counts")}, sort_keys=True)
+    if as_json:
+        keys = ("STATUS", "state", "stage", "artifact", "sha256", "next_state", "failure_packet", "blocker_code", "test_counts")
+        # tier: explore delivers its result WITH the completion: terminal state + verdict + card path (when present)
+        extra = {k: card[k] for k in ("terminal", "result", "execution_authority") if k in card}
+        return json.dumps({**{k: card.get(k) for k in keys}, **extra}, sort_keys=True, default=str)
     return " ".join(f"{k}={str(card.get(k) or '-')}" for k in ("STATUS", "state", "stage", "artifact", "sha256", "next_state", "blocker_code", "test_counts"))
 
 
