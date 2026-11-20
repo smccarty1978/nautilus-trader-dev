@@ -1,4 +1,21 @@
-# SESSION HANDOFF — chore/research_lanes (Gate B done; stopped at the approval gate)
+# SESSION HANDOFF — chore/research_lanes
+
+## UPDATE 2026-11-20: P3–P6 approved and implemented at `9463711e` (see IMPLEMENTATION.md)
+
+- Targeted gate: 250 ran, 2 failed. Both are main's known node ids, so 0 attributable.
+- The required broad gate (this chore is CORE_SURFACE) was launched once, detached:
+  `test_delta.py research_workflow/tests scripts/tests research/analysis/tests features/tests --tier-base main --json`.
+  Output goes to `$TEMP/rl/broad.json`, with the exit line in `$TEMP/rl/broad.err`. Expect about 5 h.
+- Next session:
+  1. Read the card and classify NEW failures against `../volume_clock_tracker/test_delta_broad.json` (63 known node ids).
+  2. Copy the card to `test_delta_broad.json` here.
+  3. With 0 attributable failures and the owner's merge approval: under `main_merge.lock`, merge `--no-ff` to main and run `cap generate --check`.
+  4. Release the claim `research_lanes`.
+- Merge is NOT pre-authorized by the design approval; confirm with the owner.
+
+---
+
+## Earlier state (Gate B; superseded)
 
 ## Gate status
 
