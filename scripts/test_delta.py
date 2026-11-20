@@ -226,7 +226,15 @@ def main(argv: Optional[List[str]] = None) -> int:
     ap.add_argument("--json", action="store_true", help="full JSON card (default: compact card with NEW_FAILURE first)")
     ap.add_argument("--pytest-arg", action="append", default=[], help="extra argument forwarded to pytest (repeatable)")
     ap.add_argument("--include-slow", action="store_true", help="also run @pytest.mark.slow tests (data replay); excluded by default the measured Wave 1 broad run took 74m41s")
+    ap.add_argument("--tier-base", help="merge gate (WORKFLOW.md §N.3): classify <ref>..HEAD; ADDITIVE_CAPABILITY / INERT_OR_TESTS_ONLY "
+                    "run the derived surface instead of the given scopes, CORE_SURFACE / MODIFIED_CAPABILITY run the given scopes")
     ns = ap.parse_args(argv)
+    tier = None
+    if ns.tier_base and not (ns.check_baseline or ns.update_baseline):
+        from research_workflow.merge_tier import gate_plan
+        tier = gate_plan(ns.tier_base, "HEAD", list(ns.scope))
+        if tier["mode"] == "derived" and tier["scopes"]:
+            ns.scope = list(tier["scopes"])
     if not ns.include_slow:
         ns.pytest_arg = ["-m", "not slow", *ns.pytest_arg]
     baseline_path = Path(ns.baseline)
@@ -264,7 +272,9 @@ def main(argv: Optional[List[str]] = None) -> int:
             "NEW_FAILURE": rep["NEW_FAILURE"], "NEW_FAILURE_OUTSIDE_BASELINE_SCOPE": rep["NEW_FAILURE_OUTSIDE_BASELINE_SCOPE"],
             "BASELINE_FAILURE_NOW_FIXED": [e["node_id"] for e in rep["BASELINE_FAILURE_NOW_FIXED"]],
             "ENVIRONMENTAL_MISSING_ARTIFACT": [e["node_id"] for e in rep["ENVIRONMENTAL_MISSING_ARTIFACT"]],
-            "KNOWN_BASELINE_FAILURE": [e["node_id"] for e in rep["KNOWN_BASELINE_FAILURE"]] if ns.json else len(rep["KNOWN_BASELINE_FAILURE"])}
+            "KNOWN_BASELINE_FAILURE": [e["node_id"] for e in rep["KNOWN_BASELINE_FAILURE"]] if ns.json else len(rep["KNOWN_BASELINE_FAILURE"]),
+            "merge_tier": None if tier is None else {"class": tier["class"], "mode": tier["mode"], "scopes": len(ns.scope),
+                                                    "forcing_paths": [r["path"] for r in tier["rows"] if r["class"] == tier["class"]][:20]}}
     print(json.dumps(card, indent=2 if ns.json else None, default=str))
     return 0 if status == "OK" else 1
 

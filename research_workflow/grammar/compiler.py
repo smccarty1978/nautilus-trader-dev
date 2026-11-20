@@ -14,6 +14,7 @@ import re
 import difflib
 import hashlib
 import importlib
+import sys
 import json
 from dataclasses import dataclass
 from pathlib import Path
@@ -170,9 +171,13 @@ class _Ctx:
     """Mutable compile context."""
 
     def __init__(self, spec: StudySpecV2, repo_root: Path, registry: Mapping[str, Any],
-                 datasets_dir: Optional[Path] = None, extra_bindings: Optional[Mapping[str, Any]] = None) -> None:
+                 datasets_dir: Optional[Path] = None, extra_bindings: Optional[Mapping[str, Any]] = None,
+                 study_dir: Optional[Path] = None) -> None:
         self.spec = spec
         self.repo_root = repo_root
+        # The study's own directory: the only place a study-local observer (``tracker: study_local:<name>``) is read from.
+        self.study_dir = Path(study_dir) if study_dir is not None else Path(repo_root) / "studies" / spec.study.id
+        self.observer_checks: Dict[str, Any] = {}
         self.registry = registry
         self.datasets_dir = datasets_dir
         self.extra_bindings = dict(extra_bindings or {})
@@ -358,6 +363,20 @@ def _registry_status(ctx: _Ctx, cap: str) -> Optional[str]:
     return None
 
 
+def _study_local_observer(ctx: _Ctx, name: str, tracker: str, where: str) -> Any:
+    """``tracker: study_local:<module>`` -> the observer class from this study's own ``observers/`` directory.
+    None when the tracker is not study-local; False when it is and was refused (a gap is recorded)."""
+    from research_workflow import study_observers as SO
+    module = SO.observer_name(tracker)
+    if module is None:
+        return None
+    try:
+        return SO.load_observer(SO.observer_file(ctx.study_dir, module), ctx.spec.study.id, module)
+    except SO.ObserverError as exc:
+        ctx.gap(GapKind.INVALID_PARAMETERIZATION, where, str(exc), observer_error=exc.code)
+        return False
+
+
 def _resolve_trackers(ctx: _Ctx) -> None:
     table = _binding_table(ctx.extra_bindings)
     from research_workflow.host.interfaces import REQUIRED
@@ -370,7 +389,7 @@ def _resolve_trackers(ctx: _Ctx) -> None:
         guard += 1
         for name, ct in list(pending.items()):
             cap = ct.tracker if ct.tracker.startswith("tracker.") else f"tracker.{ct.tracker}"
-            cls = table.get(cap)
+            cls = table.get(cap)        # a study-local observer is never in the table: it has no tracker inputs
             deps = []
             if cls is not None:
                 for key, kind in cls.INPUTS.items():
@@ -385,13 +404,18 @@ def _resolve_trackers(ctx: _Ctx) -> None:
     for name in order:
         ct = declared[name]
         where = f"context.{name}"
+        local = _study_local_observer(ctx, name, ct.tracker, where)
+        if local is False:
+            continue
         cap = ct.tracker if ct.tracker.startswith("tracker.") else f"tracker.{ct.tracker}"
-        cls = table.get(cap)
+        cls = local if local is not None else table.get(cap)
+        if local is not None:
+            cap = local.CAPABILITY
         if cls is None:
             ctx.gap(GapKind.MISSING_CAPABILITY, where, f"no registered tracker {cap!r}",
                     capability=cap, closest=_closest(cap, list(table)))
             continue
-        status = _registry_status(ctx, cap)
+        status = None if local is not None else _registry_status(ctx, cap)
         if status in ("candidate", "broken"):
             # seeded by `cap scaffold` (resolved through the capabilities_index seed) but not promoted / not
             # verifiable: bindable for its own tests, never silently for a governed study
@@ -458,15 +482,29 @@ def _resolve_trackers(ctx: _Ctx) -> None:
                 events = sorted(set(cls.SUBSCRIBES) & set(src_cls.EVENTS))
                 if events:
                     subscriptions.append({"from": binding["tracker"], "input": key, "events": events})
-        entry = {"id": name, "capability": cap, "implementation": f"{cls.__module__}.{cls.__name__}", "params": params,
+        if local is not None:
+            from research_workflow import study_observers as SO
+            check = SO.causality_check(cls, params)
+            ctx.observer_checks[name] = check
+            if not check["passed"]:
+                ctx.gap(GapKind.INVALID_PARAMETERIZATION, where, f"study-local observer {cap!r} failed the generated causality harness: "
+                        f"{check.get('failure')}", observer_check=check)
+                continue
+        implementation = (SO.implementation_ref(ctx.spec.study.id, SO.observer_file(ctx.study_dir, cap.split(".", 1)[1]), ctx.repo_root, cls)
+                          if local is not None else f"{cls.__module__}.{cls.__name__}")
+        entry = {"id": name, "capability": cap, "implementation": implementation, "params": params,
                  "inputs": inputs, "subscriptions": subscriptions, "fields": list(cls.FIELDS), "epoch_fields": list(cls.EPOCH_FIELDS),
                  "events": list(cls.EVENTS), "cadence": cls.CADENCE, "warmup_bars": int(cls.WARMUP_BARS), "instrument": symbol}
         ctx.trackers.append(entry)
         ctx.tracker_meta[name] = cls
         ctx.tracker_stream[name] = (inputs.get("bars") or {}).get("stream")
-        ctx.binding_proof.append({"kind": "tracker", "id": name, "capability": cap, "implementation": entry["implementation"], "bound": True})
+        proof = {"kind": "tracker", "id": name, "capability": cap, "implementation": entry["implementation"], "bound": True}
+        if local is not None:
+            proof.update({"study_local": True, "observer_check": ctx.observer_checks[name]})
+        ctx.binding_proof.append(proof)
         try:
-            ctx.closure_files.add(Path(importlib.import_module(cls.__module__).__file__).resolve().relative_to(ctx.repo_root).as_posix())
+            src = sys.modules[cls.__module__].__file__ if local is not None else importlib.import_module(cls.__module__).__file__
+            ctx.closure_files.add(Path(src).resolve().relative_to(Path(ctx.repo_root).resolve()).as_posix())
         except ValueError:
             pass
 
@@ -2238,7 +2276,8 @@ def _resolve_deliverables(ctx: _Ctx, model: Optional[Dict[str, Any]],
 
 
 def compile_study(spec_data: Any, *, repo_root: Path = REPO_ROOT, registry: Optional[Mapping[str, Any]] = None,
-                  datasets_dir: Optional[Path] = None, extra_bindings: Optional[Mapping[str, Any]] = None) -> CompileOutcome:
+                  datasets_dir: Optional[Path] = None, extra_bindings: Optional[Mapping[str, Any]] = None,
+                  study_dir: Optional[Path] = None) -> CompileOutcome:
     repo_root = Path(repo_root)
     if registry is None:
         from research_workflow.capabilities import load_registry
@@ -2260,7 +2299,7 @@ def compile_study(spec_data: Any, *, repo_root: Path = REPO_ROOT, registry: Opti
             else:
                 report.add(GapKind.INVALID_PARAMETERIZATION, "spec", str(exc))
             return CompileOutcome(None, report)
-    ctx = _Ctx(spec, repo_root, registry, datasets_dir=datasets_dir, extra_bindings=extra_bindings)
+    ctx = _Ctx(spec, repo_root, registry, datasets_dir=datasets_dir, extra_bindings=extra_bindings, study_dir=study_dir)
     _resolve_streams(ctx)
     if not ctx.gaps.ok:
         return CompileOutcome(None, ctx.gaps)

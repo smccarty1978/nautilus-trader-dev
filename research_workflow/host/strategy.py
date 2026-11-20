@@ -43,7 +43,13 @@ def plan_output_columns(plan: Mapping[str, Any]) -> Tuple[List[str], List[str]]:
     return candidate_columns, observation_columns
 
 
-def _load(dotted: str) -> Any:
+def _load(dotted: str, plan: Optional[Mapping[str, Any]] = None) -> Any:
+    if dotted.startswith("study_local:"):
+        # a study-local observer (WORKFLOW.md §Q): loaded from its own study's observers/ directory, refused for any other study
+        from pathlib import Path
+        from research_workflow.study_observers import resolve_implementation
+        study_id = ((plan or {}).get("study") or {}).get("id")
+        return resolve_implementation(dotted, plan_study_id=study_id, repo_root=Path(__file__).resolve().parents[2])
     module, _, attr = dotted.rpartition(".")
     return getattr(importlib.import_module(module), attr)
 
@@ -68,7 +74,7 @@ def declared_metadata_types(plan: Mapping[str, Any]) -> Dict[str, Any]:
         t = trackers_by_id.get(root)
         if t is None:
             continue
-        cls = _load(t["implementation"])
+        cls = _load(t["implementation"], plan)
         field_types = getattr(cls, "FIELD_TYPES", {}) or {}
         spec = field_types.get(field)
         if spec is None:
@@ -116,7 +122,7 @@ class HostCore:
         self._event_subscribers: Dict[str, List[Tuple[Any, str, str, Set[str]]]] = {}
         self._tracker_ids: List[str] = []
         for t in self.plan["trackers"]:
-            cls = _load(t["implementation"])
+            cls = _load(t["implementation"], self.plan)
             inputs_resolved: Dict[str, Any] = {}
             for key, binding in (t.get("inputs") or {}).items():
                 if "tracker" in binding:

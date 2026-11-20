@@ -101,6 +101,8 @@ These are the specific things Claude has done here that cost real time.
   `FeatureInstance`s, `research_workflow/hooks/` protocols, and small declarative hooks in
   `studies/<id>/implementation/`. Copying, subclassing or wrapping a historical study
   collector is prohibited. So is `sys.path.insert` into a sibling study directory.
+  A study-local causal observer (`WORKFLOW.md` §Q.2) is the sanctioned exception for a novel decision-time
+  feature: checked at compile time, run by the platform host, isolated to its study.
 - **Don't create a duplicate auditor.** The lookahead/causal system already exists
   (`scripts/causal_lint.py`, `docs/CAUSAL_CHECKLIST.md`, `lookahead-auditor`,
   `contract-checker`, `research_workflow/causal_audit.py`). If it misses something, extend

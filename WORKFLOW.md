@@ -36,8 +36,11 @@ research question
 Two facts define the platform:
 
 * **A normal new study contains zero Python.** Its `study.yaml` composes registered primitives; the
-  controller owns every stage; the host executes the compiled plan. If a study needs bespoke Python,
-  that is a platform gap: raise it as a typed CapabilityGap and add a reusable primitive (§E).
+  controller owns every stage; the host executes the compiled plan. The one sanctioned exception is a
+  **study-local causal observer** (§Q.2): a novel decision-time quantity, written as a bounded tracker binding in
+  `studies/<id>/observers/`, run by the same host, isolated to its study. Anything else that needs bespoke Python
+  (a collector, driver, event loop, outcome or merge code) is a platform gap: raise it as a typed CapabilityGap
+  and add a reusable primitive (§E).
 * **Historical studies are references, not templates.** Sealed studies keep their historical runtime
   authority at their own commit. They are never recompiled, resealed, migrated or copied. The three
   Platform V2 proof studies (`studies/v2_shape_*`) are the closest thing to templates; `docs/examples/`
@@ -56,9 +59,12 @@ creates v2 studies; `study compile` and `study run` refuse a new v1 study.
 4a. `chronology.windows` NARROWS an authorized train/dev year to explicit dates; it never opens a year the roles did not authorize.
 5. One writing agent per git worktree; `study new` gives every study its own branch and sibling worktree.
 6. Canonical sparse 1s data is never forward-filled (Dataset V2 is native rows only).
-7. No custom study event loops, collectors, drivers or merge scripts for normal studies.
+7. No custom study event loops, collectors, drivers or merge scripts for normal studies. A study-local causal
+   observer (§Q.2) is not one: it is a tracker binding run by the platform host, checked at compile time.
 8. Deterministic work belongs to scripts and the controller, not to model reasoning or prompts.
-9. Use a typed CapabilityGap rather than a study-local hack.
+9. Use a typed CapabilityGap rather than a study-local hack. A novel causal feature that only this study needs
+   is a study-local observer (§Q.2), not a gap; platform work starts when a second study needs it or an
+   observer cannot express it (§Q.1 routing test).
 10. Existing capability before new capability; reusable capability before bespoke implementation.
 11. Historical scientific authority is immutable (seals, target authorities, closures, frozen frames).
 12. A model's scientific identity (lineage, contracts, identities) is distinct from its representation (joblib/native/onnx bytes).
@@ -245,7 +251,10 @@ python scripts/research.py cap propose research_workflow/capabilities/proposals/
 # 2. scaffold: features/trackers/<slug>.py + features/tests/test_<slug>.py + a `candidate` registry seed
 python scripts/research.py cap scaffold tracker.volume.imbalance_60s
 # 3. implement the binding; keep its declarations truthful (the compiler and registry read them)
-# 4. synthetic causal test (features/tests/test_<slug>.py) + parity/oracle evidence (a JSON artifact)
+# 4. synthetic causal test (features/tests/test_<slug>.py) + parity/oracle evidence (a JSON artifact);
+#    parity bar (§Q.5): exact parity on a bounded, representative window covering every registered edge
+#    class by default; expanded / full-history parity only when scientifically necessary or for
+#    production-equivalent signal behaviour; never approximate parity where an exact comparison is required
 # 5. promote: flips the seed to `verified` only with the parity artifact and green tests
 python scripts/research.py cap promote tracker.volume.imbalance_60s --parity artifacts/parity/<slug>.json
 # 6. regenerate and check the registry, then consume it from study.yaml
@@ -680,6 +689,9 @@ decisions already resolved, prohibited changes, suggested platform files, study 
 next action. The owner commits `study.yaml` + `research_decision.yaml` + the handoff and **ends the
 session**. It must NOT modify `research_workflow/`, the grammar/compiler or `features/`, build the
 capability itself, patch around the gap with study Python, or keep accumulating context.
+**Before** treating a `MISSING_CAPABILITY` on a `context:` tracker as platform work, apply the §Q.1 routing
+test: if the quantity is a causal, bounded, per-bar state that only this study needs, write it as a study-local
+observer (§Q.2) and recompile -- that is study work, in the study session, with no chore.
 
 A **new short capability session** (fresh context) then:
 
@@ -726,7 +738,14 @@ python scripts/test_delta.py <scopes> --update-baseline --reason "..."  # explic
 
 **Commit gate (supervisor / platform chores).** Per commit: the targeted tests for the files you changed (the test
 file next to the module, the black-box scenario you extended). Before merge to `main`: exactly ONE broad relevant
-`test_delta` run over the affected suites (`research_workflow/tests scripts/tests` for supervisor work). Never run a
+`test_delta` run over the affected suites (`research_workflow/tests scripts/tests` for supervisor work).
+**Tiered merge gate:** pass `--tier-base main` with the broad scopes. `research_workflow/merge_tier.py` classifies
+the diff mechanically (nothing is declared by the session). A strictly ADDITIVE_CAPABILITY or INERT_OR_TESTS_ONLY
+diff (new tracker / parity harness / test files, insertion-only registration or capability-index entries, docs,
+artifacts) runs the derived surface: reverse import coverage of every changed file plus a fixed governance floor.
+CORE_SURFACE (shared interfaces, `research_workflow/**`, scripts, config, test configuration, `studies/**`, any
+deletion, any unmapped path) and MODIFIED_CAPABILITY (a semantic edit of an existing capability) run the broad
+scopes unchanged. Uncertain = CORE. `cap generate --check` stays mandatory in every tier. Never run a
 broad suite before every commit -- the 2026-09-05 supervisor hardening ran `research_workflow/tests scripts/tests`
 (minutes each, with the black-box proof tens of minutes) before each of five one-file commits; the merge gate is
 the only place a broad run changes a decision. A worker's result card reports the broad run once, in `--tests-json`.
@@ -972,3 +991,100 @@ whole census (pilot smoke: 1380/1380); `truncate` ends the window at the close a
 event that happens before it. BIND and
 SELECTION follow as separate steps.
 
+## Q. Research lanes: proportional validation
+
+Research is cheap to attempt, causal and reproducible by default, and expensive only to promote. Every study is in
+one lane. `research_workflow/research_lanes.py` (`route`, `required_gates`, `validate_execution_claim`,
+`lane_manifest`) picks the cheapest lane the study's own facts allow. A `research_lane:` key in
+`research_decision.yaml` can raise the lane, never lower it. Sealed or closed studies are HISTORICAL: their evidence
+and contracts stand, and nothing is re-selected. Design: `artifacts/platform_v2/research_lanes/DESIGN.md`.
+
+| Lane | When | Path |
+|---|---|---|
+| **FAST_OBSERVATION** (default) | exploratory observations, distributions, regimes, MFE/MAE, first passage, conditional probabilities, preliminary feature evaluation | `stage: collect` -> frame -> `explore` (§P) on registered primitives and study-local observers (§Q.2) |
+| **RESEARCH_VALIDATION** | a FAST result worth confirming; a model / held-out-year evaluation; `prior_verdict: VALIDATE` | the full V2 study (seal, contract audit, train freeze, OOS latch, closure) |
+| **EXECUTION_VALIDATION** | a trading policy with orders and fills | the NT engine generates candidates, features, scores, orders, fills and exits itself (`backtests/run_backtest.py`) |
+| **PLATFORM_CHANGE** | shared code changes; a capability needed by >= 2 studies or not expressible as an observer | §M.3 capability flow, tiered merge gate (§N.3) |
+
+### Q.1 Routing test (before any platform work)
+
+1. Composable from registered capabilities (`cap search` / `describe`)? -> study lane.
+2. Expressible as existing tracker fields plus predicates / analysis ops (§K)? -> study lane.
+3. A causal, bounded, per-bar state that only this study needs? -> study-local observer, study lane.
+4. Persistent reusable state needed by more than one study? -> PLATFORM_CHANGE (promote the observer).
+5. Platform work only convenient, not needed for correctness? -> stay in the study lane.
+
+**Retired route:** new research never runs as an ungoverned offline script on a `research/<id>` branch (pandas over
+parquet, sibling-study imports). Existing `research/*` branches are kept as historical evidence and are not migrated.
+
+### Q.2 Study-local causal observers
+
+`context.<x>: {tracker: "study_local:<name>", bars: <stream>, <params>}` binds `studies/<id>/observers/<name>.py`
+(`research_workflow/study_observers.py`). The observer is a `features.trackers.base.BaseBinding` subclass that
+declares:
+
+* `CAPABILITY = "study_local.<name>"`;
+* `AVAILABILITY = "bar_close"`: fields are published at the `ts_init` of the last ingested bar;
+* `MAX_STATE_ITEMS`: an explicit state bound;
+* stream inputs only, and FIELDS only (no events).
+
+At compile time it must pass two checks.
+
+**Static isolation check.**
+- Allowed imports: `math`, `collections`, `dataclasses`, `typing`, `bisect`, `heapq`, `itertools`, `functools`,
+  `statistics`, `enum`, `numpy`, `features.trackers.base`, `research_workflow.host.interfaces`.
+- Refused: pandas / polars / pyarrow / OS / `sys` / `importlib`; relative or `studies.*` imports; `open` / `eval` /
+  `exec`; table-shift access. Candidates and decision-time features are never calculated retrospectively.
+
+**Generated causality harness.** Determinism, prefix invariance, future perturbation at three cuts, scalar fields
+and the declared state bound.
+
+Enforcement:
+- A failure is a study-side `INVALID_PARAMETERIZATION` gap, never a platform handoff.
+- The file is hashed into the closure, so editing it stales the seal.
+- The plan's implementation ref names the study, and the host refuses it for any other study.
+- R10 / ZERO_STUDY_PYTHON exempts only the observers the current plan binds.
+- Reuse by another study requires promotion through §M.3.
+
+### Q.3 Validation budget
+
+| Gate | FAST | RESEARCH_VAL | EXECUTION_VAL | PLATFORM |
+|---|---|---|---|---|
+| synthetic causal tests / observer harness | yes | yes | yes | yes |
+| bounded smoke of collect -> compare -> report (§M.3 step 3) | yes | yes | yes | yes |
+| one full collection | if the question needs it | yes | yes | no |
+| causal audit | yes | yes | yes | no |
+| contract audit, seal, OOS latch | no | yes | yes | no |
+| independent reference parity, population / timestamp reconciliation | no | yes | vs research expectations | at the §Q.5 bar |
+| NT order / fill / exit realism | no | no | yes | no |
+| capability promotion | no | no | no | yes |
+| broad `test_delta` | only if shared code changed | only if shared code changed | only if shared code changed | by merge tier (§N.3) |
+| re-proof of a consumed, unchanged promoted capability | never (cite registry id + promotion evidence) | never | never | n/a |
+
+A frozen population is resumed, never re-collected.
+
+EXECUTION_VALIDATION is refused for a precomputed trade schedule. The NT engine must generate the candidates, and the
+evidence must reconcile:
+- missing, extra, duplicate and retimed candidates;
+- feature and score differences;
+- triggers, orders, fills, exits and costs.
+
+### Q.4 One compact manifest
+
+Each run writes one `lane_manifest.json` (`research_lanes.lane_manifest`) containing:
+- study id, lane, dataset id and digest;
+- capability versions, study-contract sha, plan sha, schema version;
+- timestamp convention, timezone, period;
+- output paths with sha256;
+- validation status per gate (PASS / FAIL / NOT_REQUIRED);
+- the verdict (STOP / REFINE / VALIDATE / PROMOTE).
+
+Large unchanged inputs are referenced by digest, never re-hashed. Humans read one `EXECUTIVE_SUMMARY.md`: hypothesis,
+population, measurements, caveats, evidence and decision.
+
+### Q.5 Parity bar
+
+Exploratory observers and new capabilities need exact parity on a bounded, representative window that covers every
+registered edge class (session classes, rolls, gaps, resets). Expanded or full-history population parity is required
+only when it is scientifically necessary or when validating production-equivalent signal behaviour. Approximate
+parity never substitutes for a required exact comparison.

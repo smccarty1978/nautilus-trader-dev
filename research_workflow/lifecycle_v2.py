@@ -678,7 +678,13 @@ class V2Lifecycle:
         is a reject unless the study id has a platform-sanctioned exception. Returns
         (python_files, exception_reason_or_None)."""
         from research_workflow.policy import STUDY_PYTHON_EXCEPTIONS, scan_study_python
-        py_files = scan_study_python(self.study)
+        from research_workflow.study_observers import bound_observer_files
+        # WORKFLOW.md §Q / golden rule 7: an observers/<name>.py that the compiled plan binds as a study-local observer
+        # (static isolation check + generated causality harness passed at compile, file hashed into the closure) is the
+        # one sanctioned kind of study Python. Any other file -- including an observer the plan does not bind -- still fails.
+        plan_p = self.study / PLAN_NAME
+        bound = bound_observer_files(self.study, _read(plan_p) if plan_p.is_file() else {})
+        py_files = [f for f in scan_study_python(self.study) if f not in bound]
         return py_files, (STUDY_PYTHON_EXCEPTIONS.get(self.study.name) if py_files else None)
 
     def _seal_identities(self) -> Dict[str, str]:
