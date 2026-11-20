@@ -449,3 +449,13 @@ def test_zero_study_python_exempts_only_plan_bound_observers(tmp_path):
     assert check() == ["helpers.py", "observers/unbound_extra.py"]           # everything else still fails
     (d / PLAN_NAME).write_text(json.dumps({"study": {"id": "someone_else"}, "trackers": [{"id": "obs", "implementation": ref}]}), encoding="utf-8")
     assert "observers/signed_volume_streak.py" in check()                     # another study's plan cannot sanction it
+
+
+def test_test_delta_tier_base_runs_as_a_script_and_reports_the_tier():
+    """Regression: `scripts/test_delta.py --tier-base` crashed (ModuleNotFoundError) when run as a script."""
+    r = subprocess.run([os.sys.executable, "scripts/test_delta.py", "research_workflow/tests/test_research_lanes.py::test_routing_matrix",
+                        "--tier-base", "HEAD", "--json"], cwd=ROOT, capture_output=True, text=True, encoding="utf-8", errors="replace",
+                       env={k: v for k, v in os.environ.items() if k != "PYTHONPATH"})
+    assert "ModuleNotFoundError" not in r.stderr, r.stderr[-800:]
+    card = json.loads(r.stdout)
+    assert card["merge_tier"]["class"] == "EMPTY_DIFF" and card["merge_tier"]["mode"] == "requested" and card["ran"] == 1

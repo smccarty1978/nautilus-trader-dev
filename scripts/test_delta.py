@@ -231,6 +231,8 @@ def main(argv: Optional[List[str]] = None) -> int:
     ns = ap.parse_args(argv)
     tier = None
     if ns.tier_base and not (ns.check_baseline or ns.update_baseline):
+        if str(ROOT) not in sys.path:          # run as a script: the repo root is not on sys.path
+            sys.path.insert(0, str(ROOT))
         from research_workflow.merge_tier import gate_plan
         tier = gate_plan(ns.tier_base, "HEAD", list(ns.scope))
         if tier["mode"] == "derived" and tier["scopes"]:

@@ -352,6 +352,8 @@ def derive_surface(rows, reverse):
 def gate_plan(base: str, head: str = "HEAD", broad_scopes: Optional[List[str]] = None) -> Dict[str, Any]:
     """{class, rows, mode: derived|broad, scopes, why}. Broad scopes are returned untouched for CORE / MODIFIED."""
     cls, rows = classify_diff(base, head)
+    if not rows:                                   # nothing changed: nothing to derive, run exactly what was requested
+        return {"class": "EMPTY_DIFF", "mode": "requested", "scopes": list(broad_scopes or []), "rows": []}
     if cls in BROAD_CLASSES:
         return {"class": cls, "mode": "broad", "scopes": list(broad_scopes or []), "rows": rows}
     _, reverse = build_map()
