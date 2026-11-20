@@ -1088,3 +1088,54 @@ Exploratory observers and new capabilities need exact parity on a bounded, repre
 registered edge class (session classes, rolls, gaps, resets). Expanded or full-history population parity is required
 only when it is scientifically necessary or when validating production-equivalent signal behaviour. Approximate
 parity never substitutes for a required exact comparison.
+
+## R. `tier: explore`: autonomous exploratory studies (autonomous_explore)
+
+Use it for any exploratory hypothesis on TRAIN-role data. The researcher states the hypothesis; one controller call runs
+`compile -> close`. There are no audit packets, no `--execute-authorized`, no phase-per-session (§N.2 does not apply), no
+capability chore for a study-local observer, no merge and no broad regression.
+
+```yaml
+tier: explore
+family: <experiment_family>          # ledger grouping: variants of one idea share a family
+study_tests: [tests/test_<name>.py]  # declared, hashed into the plan, run by the tests stage
+context:
+  x: {tracker: "study_local:<name>", bars: 1m, regime: regime_1m}   # observer may take tracker inputs + SESSION = True
+analysis: {...}                      # declared pipeline; the primary is an analysis.uncertainty.clustered_mean difference
+result:                              # PRE-REGISTERED rule, hashed into the plan before any outcome exists
+  hypothesis: "..."
+  primary: {artifact: <analysis artifact>, difference: <name>, column: <value column>}
+  expected_sign: positive|negative
+  min_effect: 0.02
+  min_clusters: 20
+  control: "..."
+```
+
+`python scripts/run_governed_study.py --study studies/<id> --through close --smoke-date <date> --json`
+
+The run ends in `STUDY_CLOSED` with `terminal: CLOSED_ISOLATED`. The card carries the verdict, the CI and the claim level.
+`RESULT_CARD.md` and `artifacts/result.json` are in the study.
+
+**Machine-enforced, not prompt-enforced:**
+
+- **Grammar.** Refuses dev/OOS, a model, outcome `none`, or a missing rule.
+- **Observer harness.** Determinism, prefix invariance, future perturbation through the real upstream chain, and the
+  state bound, all at compile time.
+- **Deterministic causal and contract checks.** They replace the external audits, and every approval is bound to the
+  reviewed `plan_sha256`.
+- **Reserved-data refusal.** `reserved_windows` in `~/.nt_research/config.yaml` are refused.
+- **Exposure recorded before smoke.** Write-once ledger event at `~/.nt_research/ledger`, mirrored to
+  `artifacts/ledger/`.
+- **Computed verdict and claim level.** EXPLORATORY, HISTORICAL_REPLICATION or CHRONOLOGICAL_ROBUSTNESS. CONFIRMATORY
+  needs declared reserved data and a governed study. EXECUTION_VALIDATED needs live-NT execution validation.
+
+A changed hypothesis is a new attempt (new plan, new ledger identity). The closed study keeps the original.
+
+Escalate to a governed study for:
+
+- a SUPPORTED result being promoted to a confirmatory claim (independent review first);
+- any OOS or reserved data;
+- a model;
+- a shared platform change.
+
+Report and pilots: `artifacts/platform_v2/autonomous_explore/REPORT.md`.

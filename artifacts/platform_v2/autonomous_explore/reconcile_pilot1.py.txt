@@ -1,0 +1,62 @@
+"""Independent reconciliation of the pilot-1 observer feature + population against catalog 1m bars.
+
+Brute force, no shared code with the observer or the host: streak / session_bar recomputed from raw catalog bars with the
+RTH window taken from the Chicago clock (08:30-15:15 CT (CME RTH); 2024 Q1 has no early closes inside the window), and every frame
+row compared at its cls_seen_ts. Also checks availability (seen <= observation_ts) and population membership.
+"""
+import json
+import sys
+from pathlib import Path
+from zoneinfo import ZoneInfo
+
+import pandas as pd
+
+WT = Path(sys.argv[1])
+sys.path.insert(0, str(WT))
+from research_workflow.roots import resolve_dataset  # noqa: E402
+from utils.runner.data import CausalDataLoader      # noqa: E402
+
+study = WT / "studies" / "pilot_close_location_streak"
+frame = pd.read_parquet(study / "artifacts" / "pilot_rows.parquet")
+ds = resolve_dataset("NQ_1S_V2_GLOBEX", WT)
+cat = getattr(ds, "catalog_path", None) or ds["catalog_path"]
+bars = CausalDataLoader(Path(cat)).load_bars("NQ.XCME-1-MINUTE-LAST-EXTERNAL", pd.Timestamp("2024-01-01", tz="UTC"), pd.Timestamp("2024-03-30", tz="UTC"))
+b = pd.DataFrame({"ts": [x.ts_init for x in bars], "o": [float(x.open) for x in bars], "h": [float(x.high) for x in bars],
+                  "l": [float(x.low) for x in bars], "c": [float(x.close) for x in bars]}).sort_values("ts").drop_duplicates("ts")
+CT = ZoneInfo("America/Chicago")
+t = pd.to_datetime(b["ts"], utc=True).dt.tz_convert(CT)
+mins = t.dt.hour * 60 + t.dt.minute
+b["rth"] = (mins > 8 * 60 + 30) & (mins <= 15 * 60 + 15)        # bar closes in (08:30, 15:00]
+b["day"] = t.dt.date
+rng = b["h"] - b["l"]
+loc = ((b["c"] - b["l"]) / rng).where(rng > 0, 0.5)
+b["s"] = (loc >= 0.75).astype(int) - (loc <= 0.25).astype(int)
+streak, sbar, day0 = [], [], None
+k = n = 0
+for rth, day, s in zip(b["rth"], b["day"], b["s"]):
+    if not rth:
+        streak.append(None); sbar.append(None); continue
+    if day != day0:
+        day0, k, n = day, 0, 0
+    n += 1
+    k = 0 if s == 0 else (k + s if k * s > 0 else s)
+    streak.append(k); sbar.append(n)
+b["ref_streak"], b["ref_sbar"] = streak, sbar
+ref = b.set_index("ts")
+m = frame.join(ref[["ref_streak", "ref_sbar"]], on="cls_seen_ts")
+out = {
+    "frame_rows": int(len(frame)),
+    "rows_with_reference_bar": int(m["ref_streak"].notna().sum()),
+    "streak_exact": int((m["ref_streak"] == m["cls_streak"]).sum()),
+    "session_bar_exact": int((m["ref_sbar"] == m["cls_session_bar"]).sum()),
+    "availability_seen_le_T": bool((frame["cls_seen_ts"] <= frame["observation_ts"]).all()),
+    "seen_eq_T_completed_1m": int((frame["cls_seen_ts"] == frame["observation_ts"]).sum()),
+    "population_session_bar_ge_15": bool((frame["cls_session_bar"] >= 15).all()),
+    "rows_in_rth": int(m["ref_sbar"].notna().sum()),
+    "sessions": int(pd.to_datetime(frame["observation_ts"], utc=True).dt.tz_convert(CT).dt.date.nunique()),
+    "aligned_rows": int(((frame["cls_streak"] * frame["regime_direction"]) >= 3).sum()),
+}
+bad = m[(m["ref_streak"] != m["cls_streak"]) | (m["ref_sbar"] != m["cls_session_bar"])]
+out["mismatch_examples"] = bad[["observation_ts", "cls_seen_ts", "cls_streak", "ref_streak", "cls_session_bar", "ref_sbar"]].head(5).astype(str).to_dict("records")
+print(json.dumps(out, indent=1))
+(study / "artifacts").mkdir(exist_ok=True)
