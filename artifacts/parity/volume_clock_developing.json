@@ -1,0 +1,482 @@
+{
+ "all_comparisons_pass": true,
+ "bars": {
+  "V1": {
+   "dup_ref": 0,
+   "dup_trk": 0,
+   "examples": [],
+   "field_mismatches": {
+    "T": 0,
+    "avail_ts": 0,
+    "close": 0,
+    "collapsed": 0,
+    "completion_speed": 0,
+    "cum_session_contracts": 0,
+    "dur_raw": 0,
+    "duration_s": 0,
+    "end_partial_cmp": 0,
+    "end_ts": 0,
+    "high": 0,
+    "low": 0,
+    "open": 0,
+    "shared_second_completions": 0,
+    "start_partial": 0,
+    "start_ts": 0
+   },
+   "first_divergence": null,
+   "flag_derivation_on_reference_mismatches": {
+    "completion_speed": 0,
+    "end_partial_non_last": 0,
+    "shared_second_completions": 0,
+    "start_partial": 0
+   },
+   "keys": [
+    "date",
+    "bar_seq"
+   ],
+   "matched": 210163,
+   "name": "bars_V1",
+   "only_ref": 0,
+   "only_trk": 0,
+   "pass": true,
+   "primary_matched": 193314,
+   "primary_oracle": 193314,
+   "ref_rows": 210163,
+   "seconds": 0.1785,
+   "trk_rows": 210163,
+   "values": [
+    "start_ts",
+    "end_ts",
+    "avail_ts",
+    "dur_raw",
+    "duration_s",
+    "cum_session_contracts",
+    "T",
+    "collapsed",
+    "open",
+    "high",
+    "low",
+    "close",
+    "start_partial",
+    "end_partial_cmp",
+    "shared_second_completions",
+    "completion_speed"
+   ]
+  },
+  "V15": {
+   "dup_ref": 0,
+   "dup_trk": 0,
+   "examples": [],
+   "field_mismatches": {
+    "T": 0,
+    "avail_ts": 0,
+    "close": 0,
+    "collapsed": 0,
+    "completion_speed": 0,
+    "cum_session_contracts": 0,
+    "dur_raw": 0,
+    "duration_s": 0,
+    "end_partial_cmp": 0,
+    "end_ts": 0,
+    "high": 0,
+    "low": 0,
+    "open": 0,
+    "shared_second_completions": 0,
+    "start_partial": 0,
+    "start_ts": 0
+   },
+   "first_divergence": null,
+   "flag_derivation_on_reference_mismatches": {
+    "completion_speed": 0,
+    "end_partial_non_last": 0,
+    "shared_second_completions": 0,
+    "start_partial": 0
+   },
+   "keys": [
+    "date",
+    "bar_seq"
+   ],
+   "matched": 13774,
+   "name": "bars_V15",
+   "only_ref": 0,
+   "only_trk": 0,
+   "pass": true,
+   "primary_matched": 12679,
+   "primary_oracle": 12679,
+   "ref_rows": 13774,
+   "seconds": 0.0191,
+   "trk_rows": 13774,
+   "values": [
+    "start_ts",
+    "end_ts",
+    "avail_ts",
+    "dur_raw",
+    "duration_s",
+    "cum_session_contracts",
+    "T",
+    "collapsed",
+    "open",
+    "high",
+    "low",
+    "close",
+    "start_partial",
+    "end_partial_cmp",
+    "shared_second_completions",
+    "completion_speed"
+   ]
+  },
+  "V5": {
+   "dup_ref": 0,
+   "dup_trk": 0,
+   "examples": [],
+   "field_mismatches": {
+    "T": 0,
+    "avail_ts": 0,
+    "close": 0,
+    "collapsed": 0,
+    "completion_speed": 0,
+    "cum_session_contracts": 0,
+    "dur_raw": 0,
+    "duration_s": 0,
+    "end_partial_cmp": 0,
+    "end_ts": 0,
+    "high": 0,
+    "low": 0,
+    "open": 0,
+    "shared_second_completions": 0,
+    "start_partial": 0,
+    "start_ts": 0
+   },
+   "first_divergence": null,
+   "flag_derivation_on_reference_mismatches": {
+    "completion_speed": 0,
+    "end_partial_non_last": 0,
+    "shared_second_completions": 0,
+    "start_partial": 0
+   },
+   "keys": [
+    "date",
+    "bar_seq"
+   ],
+   "matched": 41849,
+   "name": "bars_V5",
+   "only_ref": 0,
+   "only_trk": 0,
+   "pass": true,
+   "primary_matched": 38503,
+   "primary_oracle": 38503,
+   "ref_rows": 41849,
+   "seconds": 0.0402,
+   "trk_rows": 41849,
+   "values": [
+    "start_ts",
+    "end_ts",
+    "avail_ts",
+    "dur_raw",
+    "duration_s",
+    "cum_session_contracts",
+    "T",
+    "collapsed",
+    "open",
+    "high",
+    "low",
+    "close",
+    "start_partial",
+    "end_partial_cmp",
+    "shared_second_completions",
+    "completion_speed"
+   ]
+  }
+ },
+ "capability": "tracker.volume_clock.developing",
+ "checkpoints": {
+  "dup_ref": 0,
+  "dup_trk": 0,
+  "examples": [],
+  "field_mismatches": {
+   "ts": 0
+  },
+  "first_divergence": null,
+  "keys": [
+   "date",
+   "bar_seq",
+   "level"
+  ],
+  "matched": 631274,
+  "name": "checkpoints_V1",
+  "only_ref": 0,
+  "only_trk": 0,
+  "pass": true,
+  "ref_rows": 631274,
+  "seconds": 1.0847,
+  "tracker_collapsed": 162,
+  "tracker_completed_in_row": 3777,
+  "tracker_multi_cross": 11405,
+  "trk_rows": 631274,
+  "values": [
+   "ts"
+  ]
+ },
+ "comparison_seconds": 2.8,
+ "developing_states": {
+  "dup_ref": 0,
+  "dup_trk": 0,
+  "examples": [],
+  "field_mismatches": {
+   "bar_high": 0,
+   "bar_low": 0,
+   "bar_open_price": 0,
+   "carry_contracts": 0,
+   "consumed": 0,
+   "d60_points": 0,
+   "dir_d60": 0,
+   "elapsed_s": 0,
+   "frac": 0,
+   "internal_contracts": 0,
+   "n_completed": 0,
+   "r_exp": 0,
+   "rate_last_10s": 0,
+   "rate_last_15s": 0,
+   "rate_last_30s": 0,
+   "rate_since_open": 0,
+   "rv_120s": 0,
+   "rv_15s": 0,
+   "rv_300s": 0,
+   "rv_30s": 0,
+   "rv_60s": 0,
+   "vol_120s": 0,
+   "vol_15s": 0,
+   "vol_300s": 0,
+   "vol_30s": 0,
+   "vol_60s": 0
+  },
+  "first_divergence": null,
+  "keys": [
+   "date",
+   "t"
+  ],
+  "matched": 127848,
+  "name": "developing_states_V1",
+  "only_ref": 0,
+  "only_trk": 0,
+  "pass": true,
+  "ref_rows": 127848,
+  "seconds": 0.1616,
+  "trk_rows": 127848,
+  "values": [
+   "n_completed",
+   "consumed",
+   "frac",
+   "elapsed_s",
+   "bar_open_price",
+   "bar_high",
+   "bar_low",
+   "carry_contracts",
+   "internal_contracts",
+   "rate_since_open",
+   "rate_last_10s",
+   "rate_last_15s",
+   "rate_last_30s",
+   "r_exp",
+   "vol_15s",
+   "vol_30s",
+   "vol_60s",
+   "vol_120s",
+   "vol_300s",
+   "rv_15s",
+   "rv_30s",
+   "rv_60s",
+   "rv_120s",
+   "rv_300s",
+   "d60_points",
+   "dir_d60"
+  ]
+ },
+ "last_session": "2025-12-30",
+ "passed": true,
+ "population": {
+  "V1": {
+   "oracle_all": 210163,
+   "oracle_by_class": {
+    "FULL": 206341,
+    "ROLL_TRANSITION": 2636,
+    "SHORT_RTH": 1186
+   },
+   "oracle_primary": 193314,
+   "oracle_primary_sessions": 475,
+   "oracle_reported_2024_2025": 196784,
+   "tracker_all": 210163
+  },
+  "V15": {
+   "oracle_all": 13774,
+   "oracle_by_class": {
+    "FULL": 13534,
+    "ROLL_TRANSITION": 165,
+    "SHORT_RTH": 75
+   },
+   "oracle_primary": 12679,
+   "oracle_primary_sessions": 475,
+   "oracle_reported_2024_2025": 12897,
+   "tracker_all": 13774
+  },
+  "V5": {
+   "oracle_all": 41849,
+   "oracle_by_class": {
+    "FULL": 41096,
+    "ROLL_TRANSITION": 519,
+    "SHORT_RTH": 234
+   },
+   "oracle_primary": 38503,
+   "oracle_primary_sessions": 475,
+   "oracle_reported_2024_2025": 39187,
+   "tracker_all": 41849
+  }
+ },
+ "replay_manifest_sha256": "d30adf8da6974d7039237861a35257e745f6be77038d8937dd52b5450a86c5fa",
+ "rows_fed": 26041806,
+ "sessions": {
+  "V1": {
+   "dup_ref": 0,
+   "dup_trk": 0,
+   "examples": [],
+   "field_mismatches": {
+    "T": 0,
+    "cal_source_dates": 0,
+    "calibrated": 0,
+    "conserved": 0,
+    "n_bars": 0,
+    "residual_contracts": 0,
+    "rth_class": 0,
+    "rth_end_ns": 0,
+    "rth_start_ns": 0,
+    "rth_volume": 0,
+    "target_exact": 0
+   },
+   "first_divergence": null,
+   "keys": [
+    "date"
+   ],
+   "matched": 556,
+   "name": "sessions_V1",
+   "only_ref": 0,
+   "only_trk": 0,
+   "pass": true,
+   "ref_rows": 556,
+   "seconds": 0.0078,
+   "trk_rows": 556,
+   "values": [
+    "rth_class",
+    "calibrated",
+    "T",
+    "target_exact",
+    "cal_source_dates",
+    "rth_volume",
+    "rth_start_ns",
+    "rth_end_ns",
+    "n_bars",
+    "residual_contracts",
+    "conserved"
+   ]
+  },
+  "V15": {
+   "dup_ref": 0,
+   "dup_trk": 0,
+   "examples": [],
+   "field_mismatches": {
+    "T": 0,
+    "cal_source_dates": 0,
+    "calibrated": 0,
+    "conserved": 0,
+    "n_bars": 0,
+    "residual_contracts": 0,
+    "rth_class": 0,
+    "rth_end_ns": 0,
+    "rth_start_ns": 0,
+    "rth_volume": 0,
+    "target_exact": 0
+   },
+   "first_divergence": null,
+   "keys": [
+    "date"
+   ],
+   "matched": 556,
+   "name": "sessions_V15",
+   "only_ref": 0,
+   "only_trk": 0,
+   "pass": true,
+   "ref_rows": 556,
+   "seconds": 0.0072,
+   "trk_rows": 556,
+   "values": [
+    "rth_class",
+    "calibrated",
+    "T",
+    "target_exact",
+    "cal_source_dates",
+    "rth_volume",
+    "rth_start_ns",
+    "rth_end_ns",
+    "n_bars",
+    "residual_contracts",
+    "conserved"
+   ]
+  },
+  "V5": {
+   "dup_ref": 0,
+   "dup_trk": 0,
+   "examples": [],
+   "field_mismatches": {
+    "T": 0,
+    "cal_source_dates": 0,
+    "calibrated": 0,
+    "conserved": 0,
+    "n_bars": 0,
+    "residual_contracts": 0,
+    "rth_class": 0,
+    "rth_end_ns": 0,
+    "rth_start_ns": 0,
+    "rth_volume": 0,
+    "target_exact": 0
+   },
+   "first_divergence": null,
+   "keys": [
+    "date"
+   ],
+   "matched": 556,
+   "name": "sessions_V5",
+   "only_ref": 0,
+   "only_trk": 0,
+   "pass": true,
+   "ref_rows": 556,
+   "seconds": 0.0073,
+   "trk_rows": 556,
+   "values": [
+    "rth_class",
+    "calibrated",
+    "T",
+    "target_exact",
+    "cal_source_dates",
+    "rth_volume",
+    "rth_start_ns",
+    "rth_end_ns",
+    "n_bars",
+    "residual_contracts",
+    "conserved"
+   ]
+  }
+ },
+ "smoke": false,
+ "source_identity": {
+  "all_in_dataset_provenance": true,
+  "catalog_logical_digest_at_replay": "9e7aecb7a2910b4402a6cb4f34cc2f6deb5df19d0e889b2c696cf4f844292c64",
+  "note": "the catalog stream carries no instrument_id; identity = the same v.0 raw files (sha256) the dataset was built from; Stage C gate G02 (one instrument per RTH session) holds",
+  "oracle_raw_sha256": {
+   "NQ_v0_1s_2023.parquet": "1f6d667dc4e7e99847ff9fa296eccd6d15b1295736a9269b7cb42be96c22e153",
+   "NQ_v0_1s_2024.parquet": "387303eccf03893a5ba34f93c6ddec79893542289503147960533b1655daa954",
+   "NQ_v0_1s_2025.parquet": "c4d498e77da916fd372b1faf455c68513dac38fdf45eced028b9fb99345d1e2d"
+  },
+  "pass": true
+ },
+ "tracker_commit_at_replay": "c31d42eca42f41a592278dcff6df7df25b76c501",
+ "tracker_module_sha256_at_replay": "3e60f955e6805173b11b57ef5f43fb02104e622733be1d903c8bbe26240fd4fc"
+}

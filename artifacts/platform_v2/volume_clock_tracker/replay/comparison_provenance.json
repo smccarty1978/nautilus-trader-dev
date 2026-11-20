@@ -1,0 +1,228 @@
+{
+ "replay_dir": "artifacts\\platform_v2\\volume_clock_tracker\\replay",
+ "replay_manifest": {
+  "capability": "tracker.volume_clock.developing",
+  "step": "replay",
+  "dataset": "NQ_1S_V2_GLOBEX",
+  "bar_type": "NQ.XCME-1-SECOND-LAST-EXTERNAL",
+  "catalog_logical_digest": "9e7aecb7a2910b4402a6cb4f34cc2f6deb5df19d0e889b2c696cf4f844292c64",
+  "window_utc": [
+   "2023-10-31 22:00:00+00:00",
+   "2025-12-31 23:59:59+00:00"
+  ],
+  "months_limit": null,
+  "rows_fed": 26041806,
+  "scales": {
+   "V1": 1,
+   "V5": 5,
+   "V15": 15
+  },
+  "tracker_commit": "c31d42eca42f41a592278dcff6df7df25b76c501",
+  "tracker_module_sha256": "3e60f955e6805173b11b57ef5f43fb02104e622733be1d903c8bbe26240fd4fc",
+  "harness_sha256": "dff2fa0cf9e37200a9f6575b5e9a5b5ce70f4f30a1598ec97086bc50721f5e7d",
+  "oracle": {
+   "version": "vc_v1",
+   "stage": "C",
+   "branch": "research/nq_adaptive_volume_clock",
+   "contract": "VOLUME_CLOCK_CONTRACT_FROZEN.md",
+   "contract_sha256": "3535f09dab33057cdbe76a86c7711285b450572fd8f0cf5070f4cb3caafb69d5",
+   "dir": "C:\\Users\\Scott McCarty\\Projects\\Nautilus Trader-nq_adaptive_volume_clock\\research\\nq_adaptive_volume_clock\\out\\full",
+   "sha256": {
+    "volume_bars_v1.parquet": "1913951903cced6f7ba0a574c391cd2c78719338e6d19fb36a8743a70aac691c",
+    "volume_bars_v5.parquet": "dff5b307aef76df866d050a54d503bd40abe15259acef02e8e82981f418fb64c",
+    "volume_bars_v15.parquet": "4c36614aa78092a411f4209978f01eea2b484efa6fd35f89e82017fa6ff87e8b",
+    "daily_calibration.parquet": "5e958a44e5a116f0d8e73eadc658442c076187f810519a212a0f914ed4a053b2",
+    "session_build_audit.parquet": "905f4a20c0f37decc06c833526004d70b36c9b1ef66ab037f05077fd0e2bf066"
+   }
+  },
+  "timestamp_convention": "int64 UTC ns; ts_event = second open, ts_init = second close = availability; avail_ts = end_ts + 1 s",
+  "sampling": "every 97th RTH row (0-based row index within the session) of every calibrated V1 session",
+  "outputs": {
+   "tracker_bars.parquet": {
+    "rows": 265786,
+    "sha256": "8ef051ef66a2a8e0357165951fb13d5f37f3850528fbf9922432d537ed347baa",
+    "schema": {
+     "scale": "object",
+     "session_date": "object",
+     "bar_seq": "Int64",
+     "T": "Int64",
+     "start_ts": "Int64",
+     "end_ts": "Int64",
+     "avail_ts": "Int64",
+     "dur_raw": "Int64",
+     "duration_s": "Int64",
+     "cum_session_contracts": "Int64",
+     "collapsed": "bool",
+     "open": "float64",
+     "high": "float64",
+     "low": "float64",
+     "close": "float64"
+    }
+   },
+   "tracker_sessions.parquet": {
+    "rows": 3336,
+    "sha256": "3bc8e774ac4bda67d2b805005dfce23bb8bde9626ec767cd90e22d11f5856f5f",
+    "schema": {
+     "scale": "object",
+     "event": "object",
+     "session_date": "object",
+     "rth_class": "object",
+     "rth_start_ns": "Int64",
+     "rth_end_ns": "Int64",
+     "calibrated": "bool",
+     "T": "Int64",
+     "target_exact": "float64",
+     "cal_source_dates": "object",
+     "rth_volume": "Int64",
+     "native_rows": "Int64",
+     "roll_ratio_med20": "float64",
+     "n_bars": "Int64",
+     "residual_contracts": "Int64"
+    }
+   },
+   "tracker_checkpoints.parquet": {
+    "rows": 631274,
+    "sha256": "c001fc322089e03c61cb0623ceaabdbab8e19c5ba1c16b98ff9022fa3e2aff62",
+    "schema": {
+     "date": "object",
+     "bar_seq": "Int64",
+     "level": "float64",
+     "ts": "Int64",
+     "completed_in_row": "bool",
+     "collapsed": "bool",
+     "multi_cross": "bool"
+    }
+   },
+   "tracker_states.parquet": {
+    "rows": 127848,
+    "sha256": "f1633d368588a4aade937632e27f16eb8ca63a8b3b66516f7efee95f0012ab75",
+    "schema": {
+     "date": "object",
+     "t": "Int64",
+     "n_completed": "Int64",
+     "consumed": "Int64",
+     "frac": "float64",
+     "elapsed_s": "Int64",
+     "bar_open_price": "float64",
+     "bar_high": "float64",
+     "bar_low": "float64",
+     "carry_contracts": "Int64",
+     "internal_contracts": "Int64",
+     "rate_since_open": "float64",
+     "rate_last_10s": "float64",
+     "rate_last_15s": "float64",
+     "rate_last_30s": "float64",
+     "r_exp": "float64",
+     "vol_15s": "Int64",
+     "vol_30s": "Int64",
+     "vol_60s": "Int64",
+     "vol_120s": "Int64",
+     "vol_300s": "Int64",
+     "rv_15s": "float64",
+     "rv_30s": "float64",
+     "rv_60s": "float64",
+     "rv_120s": "float64",
+     "rv_300s": "float64",
+     "d60_points": "float64",
+     "dir_d60": "Int64"
+    }
+   },
+   "reference_states.parquet": {
+    "rows": 127848,
+    "sha256": "f1633d368588a4aade937632e27f16eb8ca63a8b3b66516f7efee95f0012ab75",
+    "schema": {
+     "date": "object",
+     "t": "Int64",
+     "n_completed": "Int64",
+     "consumed": "Int64",
+     "frac": "float64",
+     "elapsed_s": "Int64",
+     "bar_open_price": "float64",
+     "bar_high": "float64",
+     "bar_low": "float64",
+     "carry_contracts": "Int64",
+     "internal_contracts": "Int64",
+     "rate_since_open": "float64",
+     "rate_last_10s": "float64",
+     "rate_last_15s": "float64",
+     "rate_last_30s": "float64",
+     "r_exp": "float64",
+     "vol_15s": "Int64",
+     "vol_30s": "Int64",
+     "vol_60s": "Int64",
+     "vol_120s": "Int64",
+     "vol_300s": "Int64",
+     "rv_15s": "float64",
+     "rv_30s": "float64",
+     "rv_60s": "float64",
+     "rv_120s": "float64",
+     "rv_300s": "float64",
+     "d60_points": "float64",
+     "dir_d60": "Int64"
+    }
+   },
+   "reference_checkpoints.parquet": {
+    "rows": 631274,
+    "sha256": "b611f0493dae1e566d35d7d57c5e0c70ff02b9b15b17d81828df1b25c4bd3c7f",
+    "schema": {
+     "date": "object",
+     "bar_seq": "Int64",
+     "level": "float64",
+     "ts": "Int64"
+    }
+   }
+  },
+  "durations_seconds": {
+   "source_load": 21.2,
+   "tracker_feed_incl_harness": 3151.9,
+   "reference_build": 90.4,
+   "wall": 3190.1
+  },
+  "memory_by_month": "27 samples (see replay_manifest.json)"
+ },
+ "replay_output_sha256": {
+  "tracker_bars.parquet": "8ef051ef66a2a8e0357165951fb13d5f37f3850528fbf9922432d537ed347baa",
+  "tracker_sessions.parquet": "3bc8e774ac4bda67d2b805005dfce23bb8bde9626ec767cd90e22d11f5856f5f",
+  "tracker_checkpoints.parquet": "c001fc322089e03c61cb0623ceaabdbab8e19c5ba1c16b98ff9022fa3e2aff62",
+  "tracker_states.parquet": "f1633d368588a4aade937632e27f16eb8ca63a8b3b66516f7efee95f0012ab75",
+  "reference_states.parquet": "f1633d368588a4aade937632e27f16eb8ca63a8b3b66516f7efee95f0012ab75",
+  "reference_checkpoints.parquet": "b611f0493dae1e566d35d7d57c5e0c70ff02b9b15b17d81828df1b25c4bd3c7f"
+ },
+ "oracle_sha256": {
+  "volume_bars_v1.parquet": "1913951903cced6f7ba0a574c391cd2c78719338e6d19fb36a8743a70aac691c",
+  "volume_bars_v5.parquet": "dff5b307aef76df866d050a54d503bd40abe15259acef02e8e82981f418fb64c",
+  "volume_bars_v15.parquet": "4c36614aa78092a411f4209978f01eea2b484efa6fd35f89e82017fa6ff87e8b",
+  "daily_calibration.parquet": "5e958a44e5a116f0d8e73eadc658442c076187f810519a212a0f914ed4a053b2",
+  "session_build_audit.parquet": "905f4a20c0f37decc06c833526004d70b36c9b1ef66ab037f05077fd0e2bf066"
+ },
+ "oracle_contract": {
+  "version": "vc_v1",
+  "stage": "C",
+  "branch": "research/nq_adaptive_volume_clock",
+  "contract": "VOLUME_CLOCK_CONTRACT_FROZEN.md",
+  "contract_sha256": "3535f09dab33057cdbe76a86c7711285b450572fd8f0cf5070f4cb3caafb69d5"
+ },
+ "comparison_key_definitions": {
+  "sessions": [
+   "date"
+  ],
+  "bars": [
+   "scale",
+   "date",
+   "bar_seq"
+  ],
+  "developing_states": [
+   "date",
+   "t (ts_init ns of the sampled row)"
+  ],
+  "checkpoints": [
+   "date",
+   "bar_seq",
+   "level"
+  ]
+ },
+ "equality": "exact; NaN/None equal NaN/None; int64 ns timestamps; no tolerance",
+ "comparison_harness_sha256": "dff2fa0cf9e37200a9f6575b5e9a5b5ce70f4f30a1598ec97086bc50721f5e7d",
+ "artifact": "artifacts/parity/volume_clock_developing.json",
+ "artifact_sha256": "ffc1e6d06c43e5ef475c42aadb8bed4c7f76c9bfdd57305ce66e81b693042bf0"
+}
