@@ -425,7 +425,11 @@ class GovernedStudyController:
 
 
 def compact_card(card: dict[str, Any], *, as_json: bool = False) -> str:
-    if as_json: return json.dumps({k: card.get(k) for k in ("STATUS", "state", "stage", "artifact", "sha256", "next_state", "failure_packet", "blocker_code", "test_counts")}, sort_keys=True)
+    if as_json:
+        keys = ("STATUS", "state", "stage", "artifact", "sha256", "next_state", "failure_packet", "blocker_code", "test_counts")
+        # tier: explore delivers its result WITH the completion: terminal state + verdict + card path (when present)
+        extra = {k: card[k] for k in ("terminal", "result", "execution_authority") if k in card}
+        return json.dumps({**{k: card.get(k) for k in keys}, **extra}, sort_keys=True, default=str)
     return " ".join(f"{k}={str(card.get(k) or '-')}" for k in ("STATUS", "state", "stage", "artifact", "sha256", "next_state", "blocker_code", "test_counts"))
 
 

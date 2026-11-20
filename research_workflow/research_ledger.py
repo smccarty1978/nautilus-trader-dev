@@ -342,7 +342,10 @@ def render_card(rec: Mapping[str, Any], plan: Mapping[str, Any]) -> str:
     iv = rec.get("intervals") or []
     span = f"{iv[0]['start']} .. {iv[-1]['end']}" if iv else "n/a"
     lim = list((rec.get("validation") or {}).get("limitations") or [])
+    first = next(iter(events()), {}).get("recorded_at_utc", "")[:10] or "today"
     lim += [f"Claim level {rec['claim_level']}: {rec['claim_reason']}.",
+            f"Ledger history begins {first}: exposure from earlier (pre-ledger) research is NOT recorded, so '0 prior exposures' "
+            "never means the data are unseen.",
             "Exploratory evidence on previously examined data; not out-of-sample confirmation.",
             "Predictive research only: no orders, fills, costs or execution validation."]
     lines = [
