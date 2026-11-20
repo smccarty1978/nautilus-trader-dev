@@ -563,6 +563,11 @@ study session). The sanctioned platform sequence is:
 1. `research cap propose <yaml>` (the proposal records the gap and the closest existing primitives);
 2. create an isolated `chore/<topic>` worktree from `main`;
 3. `research cap scaffold <id>`, implement, synthetic causal test, parity/oracle evidence, `research cap promote <id> --parity <json>`, `research cap generate --check`;
+   **long historical parity:** replay market data ONCE into persisted, hashed outputs and compare them in a separate
+   step that reads no market data. Before the full-history run, push the COMPLETE pipeline (replay -> persist ->
+   compare -> report/artifact writing) through a bounded representative sample, and time the comparison on n and 4n
+   rows: a lookup structure rebuilt per element is quadratic and only surfaces at full scale
+   (chore/volume_clock_tracker, 2026-11-19: a ~600k-element set rebuilt per checkpoint stalled a finished 26M-row replay);
 4. merge the platform change into `main` with `--no-ff`;
 5. in the study worktree: `git merge --no-ff main` (or the chore branch, if the platform change is not yet on main and that is recorded);
 6. re-run `python scripts/run_governed_study.py --study studies/<id> --through tests --execute-authorized`: the closure composite changed, so compile/prepare/readiness/preflight/tests re-execute and
